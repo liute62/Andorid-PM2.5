@@ -1,0 +1,23 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="button_corner_radius">2.0dip</dimen>
+
+    <!-- 自定义控件侧边栏需要用到的Start -->
+    <dimen name="rbm_menu_width">200dp</dimen>
+    <dimen name="rbm_item_padding_topbottom">16dp</dimen>
+    <dimen name="rbm_item_padding_leftright">8dp</dimen>
+    <dimen name="rbm_item_image_height">24dp</dimen>
+    <dimen name="rbm_item_image_width">24dp</dimen>
+    <dimen name="rbm_item_text_size">16sp</dimen>
+    <dimen name="rbm_item_text_padding_left">10dp</dimen>
+    <!-- 自定义控件侧边栏需要用到的End -->
+
+    <!-- Main UI Top Layout Margin -->
+    <dimen name="main_top_first_left">5dp</dimen>
+    <dimen name="main_top_first_right">5dp</dimen>
+    <dimen name="main_top_first_top">5dp</dimen>
+    <dimen name="main_top_first_bottom">5dp</dimen>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PM</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="main_top_title">生态 健康 生活</string>
+    <!-- main top first -->
+    <string name="main_top_f_left">当前时间</string>
+    <string name="main_top_f_right">今日空气质量</string>
+    <string name="main_top_s_left">当前城市</string>
+    <string name="main_top_s_right">健康提示</string>
+    <string name="main_top_t_first">近一小时PM2.5吸入量：</string>
+    <string name="main_top_t_second">今日累积PM2.5吸入量：</string>
+    <string name="main_top_t_third">近7日平均日PM2.5吸入量：</string>
+    <string name="main_top_bottom_l">显示手环状态</string>
+    <string name="main_top_bottom_r">显示805状态</string>
+    <string name="main_fig_1_title">平均5分钟PM2.5吸入量(mg)</string>
+    <string name="main_fig_2_title">您所处位置PM2.5浓度(ug/m3)</string>
+    <string name="main_fig_3_title">累积吸入的PM2.5量(L)</string>
+    <string name="main_fig_4_title">平均单位时间吸入的空气量(L/min)</string>
+    <string name="main_fig_5_title"></string>
+    <string name="main_fig_6_title">累积吸入的空气量(L)</string>
+</resources>

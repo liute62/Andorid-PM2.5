@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="White">#ffffff</color>
+    <color name="Royalblue">#4161e1</color>
+    <color name="Black">#000000</color>
+    <color name="Lightgray">#d3d3d3</color>
+    <color name="Gainsboro">#dcdcdc</color>
+    <color name="AccentBlue">#ff366c96</color>
+    <color name="Brown">#A52A2A</color>
+    <color name="Orange">#FFA500</color>
+    <!-- 自定义Loading_Dialog_Start -->
+    <color name="dialog_loading">#77000000</color>
+    <!-- 自定义Loading_Dialog_End -->
+
+    <!-- 自定义控件侧边栏需要用到的颜色Start -->
+    <color name="rbm_menu_background">#303030</color>
+    <color name="rbm_item_text_color">#ffffff</color>
+    <!-- 自定义控件侧边栏需要用到的颜色End -->
+    <color name="Red">#FF0000</color>
+    <color name="transparent">#00000000</color>
+
+</resources>
