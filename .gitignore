@@ -1,0 +1,12 @@
+
+*.properties
+
+*.lock
+
+*.bin
+
+pM/build/
+
+build/
+
+.idea/*
