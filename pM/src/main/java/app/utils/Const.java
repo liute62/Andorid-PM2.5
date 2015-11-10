@@ -1,6 +1,20 @@
 package app.utils;
 
+import java.util.Map;
+
 public class Const {
+
+    public static String CURRENT_USER_ID = "";
+
+    public static String CURRENT_ACCESS_TOKEN = "";
+
+    /**Cache**/
+    public static final String Cache_User_Id = "Cache_User_Id";
+
+    public static final String Cache_Access_Token = "Cache_Access_Token";
+
+    /**Handler Code**/
+    public static final int Handler_Login_Success = 100001;
 
     public static String[] cityName =
             {
@@ -54,5 +68,11 @@ public class Const {
 
     public static String[] ringState2 = {
             "Bio3检测盒未连接", "Bio3检测盒已经连接"
+    };
+
+    public static String[] downloadPeriod = {
+      "0:10","1:10","2:10","3:10","4:10","5:10","6:10","7:10","8:10",
+       "9:10","10:10","11:10","12:10","13:10","14:10","15:10","16:10","17:10",
+       "18:10","19:10","20:10","21:10","22:10","23:10"
     };
 }

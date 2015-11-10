@@ -57,4 +57,11 @@
         <item name="android:background">@drawable/main_top_bg</item>
         <item name="android:textColor">@color/White</item>
     </style>
+
+    <style name="Dialog_bocop">
+        <item name="android:windowBackground">@color/loading_dialog_bg</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
 </resources>

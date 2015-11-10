@@ -17,8 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import app.model.HttpResult;
 import app.utils.Const;
 import app.utils.DataFaker;
+import app.utils.HttpUtil;
+import app.view.widget.LoadingDialog;
 import lecho.lib.hellocharts.view.LineChartView;
 
 public class MainFragment extends Fragment implements OnClickListener {
@@ -42,6 +45,8 @@ public class MainFragment extends Fragment implements OnClickListener {
     int currentMin;
     ClockTask clockTask;
     boolean isClockTaskRun = false;
+    DataTask dataTask;
+    boolean isDataTaskRun = false;
 
     Handler mClockHandler = new Handler() {
         @Override
@@ -54,6 +59,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                     mTime.setText(String.valueOf(currentHour) + ": " + String.valueOf(currentMin));
                 }
             }
+
         }
     };
 
@@ -65,6 +71,10 @@ public class MainFragment extends Fragment implements OnClickListener {
         PMDensity = (int) (Math.random() * 300);
         Log.e("PM2.5:", String.valueOf(PMDensity));
         mActivity = getActivity();
+        if (isDataTaskRun == false){
+            dataTask = new DataTask();
+            dataTask.execute(1);
+        }
     }
 
     @Override
@@ -151,6 +161,36 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
     }
 
+    private class DataTask extends AsyncTask<Integer,Integer,Integer>{
+
+        LoadingDialog mDialog;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            isDataTaskRun = true;
+            mDialog = new LoadingDialog(getActivity());
+            mDialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Integer... integers) {
+            HttpResult result = HttpUtil.SearchPMRequest(getActivity(), "131", "31");
+            if(result.getResultBody() != null){
+                return 1;
+            }
+            return 0;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            isDataTaskRun = false;
+            if(integer == 1) {
+                mDialog.dismiss();
+            }
+        }
+    }
+
     private class ClockTask extends AsyncTask<Integer, Integer, Integer> {
 
         @Override
@@ -158,6 +198,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             while (true) {
                 Time t = new Time();
                 t.setToNow();
+                //if current time matches the download time array.
                 if (t.minute == currentMin + 1 || t.hour == currentHour + 1 || (t.hour == 0 && currentMin == 59)) {
                     currentMin = t.minute;
                     currentHour = t.hour;

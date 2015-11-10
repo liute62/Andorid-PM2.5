@@ -68,6 +68,17 @@
                         android:textColor="#A1A1A1"
                         android:textSize="12sp" />
 
+                    <Button
+                        android:layout_width="80dip"
+                        android:layout_height="50dip"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="20dip"
+                        android:layout_marginRight="20dip"
+                        android:id="@+id/profile_login"
+                        android:textColor="@color/White"
+                        android:text="登陆"
+                        android:background="@drawable/main_top_bg"/>
+
                 </RelativeLayout>
 
                 <ImageView
@@ -99,7 +110,7 @@
             </RelativeLayout>
 
             <Button
-                android:layout_marginTop="100dip"
+                android:layout_marginTop="10dip"
                 android:id="@+id/personal_info_look_remind"
                 style="@style/main_left_button_style"
                 android:text="查看提醒" />
@@ -115,7 +126,7 @@
                 android:text="相关反馈" />
 
             <Button
-                android:id="@+id/personal_info_logout"
+                android:id="@+id/profile_logout"
                 style="@style/main_left_button_style"
                 android:text="退出登录" />
 

@@ -1,40 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2">
+<items version="2" >
 
     <item
         jar="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/exploded-aar/PM/slidingmenu_library/unspecified/classes.jar"
-        jumboMode="false" revision="23.0.1" sha1="b4549326e8c367adfa56b6863fead94500ec2fa2">
-        <dex
-            dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/classes-5ffc5b6777ada910adb0b7b5e516cebe652b93d4.jar" />
-    </item>
-    <item
-        jar="/Users/liuhaodong1/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.0/support-annotations-23.1.0.jar"
-        jumboMode="false" revision="23.0.1" sha1="92e3fc113ec3ee36b64603a38857b95700025633">
-        <dex
-            dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/support-annotations-23.1.0-09763f7e0362d5fcc41ac5058304940fce3f6804.jar" />
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="4b3287d5b9db9e2c44736610328187974445fef0">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/classes-5ffc5b6777ada910adb0b7b5e516cebe652b93d4.jar" />
     </item>
     <item
         jar="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/classes.jar"
-        jumboMode="false" revision="23.0.1" sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
-        <dex
-            dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/classes-209f980bf778594096a26d7300cf6c5e6b374ae7.jar" />
-    </item>
-    <item jar="/Users/liuhaodong1/Documents/Git/PM/Android_Map_V3.0.20150831.jar" jumboMode="false"
-        revision="23.0.1" sha1="b7cd1ac572162f78b5ca23d763d4c3cc9b7e1e07">
-        <dex
-            dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/Android_Map_V3.0.20150831-51a1187aee710602412538111f940f92bc4f0057.jar" />
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/classes-209f980bf778594096a26d7300cf6c5e6b374ae7.jar" />
     </item>
     <item
-        jar="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/exploded-aar/com.github.lecho/hellocharts-library/1.5.8/classes.jar"
-        jumboMode="false" revision="23.0.1" sha1="56c6a22c42588628903e9dda5d8f3aa1c1b4372f">
-        <dex
-            dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/classes-5486dc695613669515c626fa2b521b852a068aba.jar" />
+        jar="/Users/liuhaodong1/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.0/support-annotations-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="92e3fc113ec3ee36b64603a38857b95700025633">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/support-annotations-23.1.0-09763f7e0362d5fcc41ac5058304940fce3f6804.jar" />
+    </item>
+    <item
+        jar="/Users/liuhaodong1/.gradle/caches/modules-2/files-2.1/com.mcxiaoke.volley/library/1.0.18/38da306aafee11459cd935a01d2c92a98dc670a4/library-1.0.18.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/library-1.0.18-19ee89f183d291ae2fec9d5b829c6f0ef9664a63.jar" />
+    </item>
+    <item
+        jar="/Users/liuhaodong1/Documents/Git/PM/Android_Map_V3.0.20150831.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="b7cd1ac572162f78b5ca23d763d4c3cc9b7e1e07">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/Android_Map_V3.0.20150831-51a1187aee710602412538111f940f92bc4f0057.jar" />
     </item>
     <item
         jar="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/libs/internal_impl-23.1.0.jar"
-        jumboMode="false" revision="23.0.1" sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
-        <dex
-            dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/internal_impl-23.1.0-6efca9e0bf8bf57c0f52c7494b464e7d61f19567.jar" />
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/internal_impl-23.1.0-6efca9e0bf8bf57c0f52c7494b464e7d61f19567.jar" />
+    </item>
+    <item
+        jar="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/exploded-aar/com.github.lecho/hellocharts-library/1.5.8/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="56c6a22c42588628903e9dda5d8f3aa1c1b4372f">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/classes-5486dc695613669515c626fa2b521b852a068aba.jar" />
+    </item>
+    <item
+        jar="/Users/liuhaodong1/.gradle/caches/modules-2/files-2.1/nl.qbusict/cupboard/2.1.2/aa2654568535e3a29af7a3b86453b8ff85af6d12/cupboard-2.1.2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
+        <dex dex="/Users/liuhaodong1/Documents/Git/PM/pM/build/intermediates/pre-dexed/debug/cupboard-2.1.2-4389212b1f8c608206bf592a7d5bfe1d0142de69.jar" />
     </item>
 
 </items>

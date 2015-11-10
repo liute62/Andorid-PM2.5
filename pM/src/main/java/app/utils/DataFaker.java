@@ -100,7 +100,7 @@ public class DataFaker {
         int maxNumberOfLines = 4;
         float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
         boolean hasAxes = true;
-        boolean hasAxesNames = true;
+        boolean hasAxesNames = false;
         boolean hasLines = true;
         boolean hasPoints = true;
         boolean isFilled = false;

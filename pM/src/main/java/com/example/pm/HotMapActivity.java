@@ -18,7 +18,7 @@ public class HotMapActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hot_map);
         mMapView = (MapView) findViewById(R.id.hot_map_mapview);
-        mMapView.onCreate(savedInstanceState);// ±ØÐëÒªÐ´
+        mMapView.onCreate(savedInstanceState);
         aMap = mMapView.getMap();
         setLocation();
     }

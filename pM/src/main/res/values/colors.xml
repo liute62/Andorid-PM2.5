@@ -18,5 +18,6 @@
     <!-- 自定义控件侧边栏需要用到的颜色End -->
     <color name="Red">#FF0000</color>
     <color name="transparent">#00000000</color>
+    <color name="loading_dialog_bg">#77000000</color>
 
 </resources>

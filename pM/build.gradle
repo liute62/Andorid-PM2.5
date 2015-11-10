@@ -16,6 +16,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+    packagingOptions{
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+
+    }
 }
 
 repositories {
@@ -25,5 +32,7 @@ repositories {
 dependencies {
     compile project(':slidingmenu_library')
     compile 'com.github.lecho:hellocharts-library:1.5.8@aar'
+    compile 'com.mcxiaoke.volley:library:1.0.18'
+    compile 'nl.qbusict:cupboard:2.1.2'
     compile files('/Users/liuhaodong1/Documents/Git/PM/Android_Map_V3.0.20150831.jar')
 }
