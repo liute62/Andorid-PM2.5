@@ -2,19 +2,71 @@ package app.utils;
 
 import java.util.Map;
 
+import app.model.PMModel;
+
 public class Const {
 
     public static String CURRENT_USER_ID = "";
 
     public static String CURRENT_ACCESS_TOKEN = "";
 
+    public static double CURRENT_LONGITUDE = 0;
+
+    public static double CURRENT_LATITUDE = 0;
+
+    public static PMModel CURRENT_PM_MODEL;
+
+    public static boolean CURRENT_INDOOR;
+
+    public static MotionStatus CURRENT_STATUS;
+
+    public static Double CURRENT_VENTILATION_VOLUME = 0.0;
+
+    public static int CURRENT_STEPS_NUM = 0;
     /**Cache**/
     public static final String Cache_User_Id = "Cache_User_Id";
 
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
+    public static final String Cache_PM_State = "Cache_PM_State";
+
+    public static final String Cache_Longitude = "Cache_Longitude";
+
+    public static final String Cache_Latitude = "Cache_Latitude";
+
     /**Handler Code**/
     public static final int Handler_Login_Success = 100001;
+
+    public static final int Handler_PM_Data = 100002;
+
+    /**GPS**/
+    public static int LOCATION_TIME_INTERVAL = 60 ; //1MIN
+
+    public static final String APP_MAP_KEY = "";
+
+    /**Movement**/
+    public static enum MotionStatus{
+        NULL, STATIC, WALK, RUN
+    }
+
+    /**Time related values**/
+    public final static int DENSITY_TIME_INTERVAL = 60*60*1000; //1Hour
+
+    public final static int DB_TIME_INTERVAL = 1;
+
+    public static final String ERROR_NO_GPS = "请先打开定位！";
+
+    public static final String ERROR_NO_PM_DATA = "本地暂无PM数据!";
+
+    public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
+
+    //breath according to state
+    public static final double boy_breath = 6.6; // L/min
+    public static final double girl_breath = 6.0; // L/min
+    public static double static_breath = boy_breath;
+    public static final double walk_breath = 2.1 * static_breath;
+    public static final double bicycle_breath = 2.1 * static_breath;
+    public static final double run_breath = 6 * static_breath;
 
     public static String[] cityName =
             {

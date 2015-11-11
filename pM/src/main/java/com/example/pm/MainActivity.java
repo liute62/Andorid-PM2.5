@@ -7,10 +7,12 @@ import android.util.Log;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
+import app.utils.ACache;
 
 public class MainActivity extends SlidingActivity {
 
     Fragment newFragment;
+    ACache aCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -19,6 +21,8 @@ public class MainActivity extends SlidingActivity {
         setContentView(R.layout.activity_main);
         MyInitial();
     }
+
+
 
     private void MyInitial() {
         newFragment = new MainFragment();
@@ -66,5 +70,18 @@ public class MainActivity extends SlidingActivity {
                 .commit();
         getSlidingMenu().showContent();
         Log.e("switchContent", "yes");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.e("MainActivity","onPause");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("MainActivity","onDestrory");
     }
 }

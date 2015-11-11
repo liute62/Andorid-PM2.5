@@ -83,10 +83,15 @@ public class ProfileFragment extends Fragment implements
                 loginDialog.show();
                 break;
             case R.id.profile_logout:
-                aCache.remove(Const.Cache_User_Id);
-                aCache.remove(Const.Cache_Access_Token);
+                clearCache();
                 getActivity().finish();
                 break;
         }
+    }
+
+    private void clearCache(){
+        aCache.remove(Const.Cache_User_Id);
+        aCache.remove(Const.Cache_Access_Token);
+        aCache.remove(Const.Cache_PM_State);
     }
 }

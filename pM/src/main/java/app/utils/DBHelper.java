@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
-import app.entity.State;
+import app.Entity.State;
 
 /**
  /**

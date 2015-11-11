@@ -1,4 +1,4 @@
-package app.entity;
+package app.Entity;
 
 import app.utils.DBConstants;
 import nl.qbusict.cupboard.annotation.Column;

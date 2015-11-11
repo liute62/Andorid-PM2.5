@@ -32,6 +32,8 @@ public class HttpUtil {
 
     public static final String DeviceData_url = base_url+"device-datas";
 
+    public static final String SearchCity_url = "http://api.map.baidu.com/geocoder?output=json";
+
     private static HttpUtil instance;
 
     public static HttpUtil Instance(){
@@ -41,32 +43,32 @@ public class HttpUtil {
         return instance;
     }
 
-    /**
-     * Api-1
-     * @param mActivity
-     * @return
-     */
-    public static HttpResult SearchPMRequest(final Activity mActivity,String longitude,String latitude){
-        String url = HttpUtil.Search_PM_url;
-        url = url+"?longitude="+longitude+"&latitude="+latitude;
-        final HttpResult result = new HttpResult();
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                result.setResultBody(response.toString());
-                Toast.makeText(mActivity.getApplicationContext(), "Data Get Success!", Toast.LENGTH_LONG).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                result.setResultBody(null);
-                Toast.makeText(mActivity.getApplicationContext(), "Data Get Fail!", Toast.LENGTH_SHORT).show();
-            }
-
-        });
-        VolleyQueue.getInstance(mActivity.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
-        return result;
-    }
+//    /**
+//     * Api-1
+//     * @param mActivity
+//     * @return
+//     */
+//    public static HttpResult SearchPMRequest(final Activity mActivity,String longitude,String latitude){
+//        String url = HttpUtil.Search_PM_url;
+//        url = url+"?longitude="+longitude+"&latitude="+latitude;
+//        final HttpResult result = new HttpResult();
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+//            @Override
+//            public void onResponse(JSONObject response) {
+//                result.setResultBody(response.toString());
+//                Toast.makeText(mActivity.getApplicationContext(), "Data Get Success!", Toast.LENGTH_LONG).show();
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                result.setResultBody(null);
+//                Toast.makeText(mActivity.getApplicationContext(), "Data Get Fail!", Toast.LENGTH_SHORT).show();
+//            }
+//
+//        });
+//        VolleyQueue.getInstance(mActivity.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+//        return result;
+//    }
 
     /**
      * Api-1.2
