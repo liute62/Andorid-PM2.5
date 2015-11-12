@@ -306,22 +306,25 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int slider4=0x7f020014;
     }
     public static final class id {
-        public static final int activitytitle_cancel=0x7f07003c;
-        public static final int activitytitle_sure=0x7f07003b;
-        public static final int activitytitle_title=0x7f070038;
-        public static final int contact_info_gender=0x7f07003d;
+        public static final int activitytitle_cancel=0x7f07003f;
+        public static final int activitytitle_sure=0x7f07003e;
+        public static final int activitytitle_title=0x7f07003b;
+        public static final int contact_info_gender=0x7f070040;
         public static final int content=0x7f070006;
-        public static final int dialog=0x7f070036;
-        public static final int dialogname=0x7f070037;
-        public static final int dialognum=0x7f070039;
+        public static final int dialog=0x7f070032;
+        public static final int dialog_info_cancel=0x7f070036;
+        public static final int dialog_info_content=0x7f070034;
+        public static final int dialog_info_sure=0x7f070035;
+        public static final int dialogname=0x7f070033;
+        public static final int dialognum=0x7f07003c;
         public static final int fullscreen=0x7f070003;
         public static final int hot_map_mapview=0x7f070005;
-        public static final int imageView1=0x7f070032;
+        public static final int imageView1=0x7f070037;
         public static final int left=0x7f070001;
-        public static final int loading_dialog_point=0x7f070034;
-        public static final int loading_dialog_rotate=0x7f070033;
-        public static final int loading_dialog_text=0x7f070035;
-        public static final int login_password=0x7f07003a;
+        public static final int loading_dialog_point=0x7f070039;
+        public static final int loading_dialog_rotate=0x7f070038;
+        public static final int loading_dialog_text=0x7f07003a;
+        public static final int login_password=0x7f07003d;
         public static final int main_air_quality=0x7f070010;
         public static final int main_chart_1=0x7f07001f;
         public static final int main_chart_1_change=0x7f07001e;
@@ -342,17 +345,17 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int main_top_layout=0x7f070007;
         public static final int main_week_pm=0x7f07001b;
         public static final int margin=0x7f070004;
-        public static final int personal_info_feed_back=0x7f07002f;
         public static final int personal_info_gender=0x7f070029;
-        public static final int personal_info_look_remind=0x7f07002d;
         public static final int personal_info_modify_password=0x7f07002e;
         public static final int personal_info_name=0x7f07002c;
         public static final int personal_info_username=0x7f070028;
         public static final int profile_background_img=0x7f070025;
+        public static final int profile_clear_data=0x7f07002f;
         public static final int profile_fragment=0x7f070024;
         public static final int profile_login=0x7f07002a;
         public static final int profile_logout=0x7f070030;
         public static final int profile_scroll_view=0x7f070026;
+        public static final int profile_turnoff=0x7f07002d;
         public static final int right=0x7f070002;
         public static final int scroll_view_head=0x7f070027;
         public static final int selected_view=0x7f070000;
@@ -375,8 +378,9 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int fragment_main=0x7f030002;
         public static final int fragment_profile=0x7f030003;
         public static final int slidingmenumain=0x7f030004;
-        public static final int widget_dialog_loading=0x7f030005;
-        public static final int widget_dialog_login=0x7f030006;
+        public static final int widget_dialog_info=0x7f030005;
+        public static final int widget_dialog_loading=0x7f030006;
+        public static final int widget_dialog_login=0x7f030007;
     }
     public static final class string {
         public static final int action_settings=0x7f080000;

@@ -3,8 +3,11 @@ package com.example.pm;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -22,19 +25,25 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import app.model.PMModel;
+import app.services.DBService;
 import app.utils.ACache;
 import app.utils.Const;
+import app.utils.DBHelper;
 import app.utils.DataFaker;
 import app.utils.HttpUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.LoadingDialog;
+import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.LineChartView;
 
 public class MainFragment extends Fragment implements OnClickListener {
@@ -42,7 +51,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     Activity mActivity;
     ImageView mProfile;
     ImageView mHotMap;
-    LineChartView mChart1;
+    ColumnChartView mChart1;
     LineChartView mChart2;
     TextView mTime;
     TextView mAirQuality;
@@ -105,6 +114,13 @@ public class MainFragment extends Fragment implements OnClickListener {
         mActivity = getActivity();
         loadingDialog = new LoadingDialog(getActivity());
         aCache = ACache.get(mActivity);
+        //GPS Task
+        GPSInitial();
+        if (Const.CURRENT_DB_RUNNING == false){
+            Const.CURRENT_DB_RUNNING = true;
+            Intent DBIntent = new Intent(mActivity, DBService.class);
+            mActivity.startService(DBIntent);
+        }
     }
 
     @Override
@@ -118,13 +134,14 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAirQuality = (TextView) view.findViewById(R.id.main_air_quality);
         mCity = (TextView) view.findViewById(R.id.main_current_city);
         mHint = (TextView) view.findViewById(R.id.main_hint);
-        mChart1 = (LineChartView) view.findViewById(R.id.main_chart_1);
+        mChart1 = (ColumnChartView) view.findViewById(R.id.main_chart_1);
         mChart2 = (LineChartView) view.findViewById(R.id.main_chart_2);
         mHourPM = (TextView) view.findViewById(R.id.main_hour_pm);
         mDayPM = (TextView) view.findViewById(R.id.main_day_pm);
         mWeekPM = (TextView) view.findViewById(R.id.main_week_pm);
         mChangeChart1 = (TextView) view.findViewById(R.id.main_chart_1_change);
         mChangeChart2 = (TextView) view.findViewById(R.id.main_chart_2_change);
+        setFonts(view);
         cacheInitial();
         setListener();
         dataInitial();
@@ -134,6 +151,8 @@ public class MainFragment extends Fragment implements OnClickListener {
 
     private void cacheInitial(){
         JSONObject object = aCache.getAsJSONObject(Const.Cache_PM_State);
+        DBHelper dbHelper = new DBHelper(mActivity.getApplicationContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         if (object == null){
                 Toast.makeText(mActivity.getApplicationContext(),Const.ERROR_NO_PM_DATA,Toast.LENGTH_SHORT).show();
         }else{
@@ -157,6 +176,12 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChangeChart2.setOnClickListener(this);
     }
 
+    private void setFonts(View view){
+        Typeface typeFace = Typeface.createFromAsset(mActivity.getAssets(), "SourceHanSansCNLight.ttf");
+        TextView textView1 = (TextView)view.findViewById(R.id.textView1);
+        textView1.setTypeface(typeFace);
+    }
+
     private void dataInitial() {
         Time t = new Time();
         t.setToNow();
@@ -175,19 +200,19 @@ public class MainFragment extends Fragment implements OnClickListener {
         mHourPM.setText(String.valueOf(PMDensity));
         mDayPM.setText(String.valueOf(PMDensity * 2));
         mWeekPM.setText(String.valueOf(PMDensity * 7));
-        mChart1.setLineChartData(DataFaker.setDataForChart1());
+        mChart1.setColumnChartData(DataFaker.setColumnDataForChart1());
         mChart2.setLineChartData(DataFaker.setDataForChart1());
     }
 
     private void taskInitial() {
-        //GPS Task
-        GPSInitial();
         //clock task
         if (isClockTaskRun == false) {
             isClockTaskRun = true;
             clockTask = new ClockTask();
             clockTask.execute(1);
         }
+        // DB Task
+
     }
 
     @Override
@@ -253,6 +278,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
+                Log.e("onStatusChanged", s);
 
             }
 
@@ -342,15 +368,13 @@ public class MainFragment extends Fragment implements OnClickListener {
         VolleyQueue.getInstance(mActivity.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.e("MainFragment","onDestrory");
+
+    public class DBServiceReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+        }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.e("MainFragment","onPause");
-    }
 }

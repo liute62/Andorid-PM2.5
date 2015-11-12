@@ -27,7 +27,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".HotMapActivity"></activity>
-        <activity android:name=".SensorActivity"></activity>
+        <service android:name="app.services.DBService"
+            android:exported="false" />
     </application>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

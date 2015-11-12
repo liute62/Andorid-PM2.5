@@ -2,18 +2,17 @@ package com.example.pm;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
-import app.utils.ACache;
 
-public class MainActivity extends SlidingActivity {
+public class MainActivity extends SlidingActivity{
 
     Fragment newFragment;
-    ACache aCache;
-
+    ServiceConnection sc;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -22,22 +21,17 @@ public class MainActivity extends SlidingActivity {
         MyInitial();
     }
 
-
-
     private void MyInitial() {
         newFragment = new MainFragment();
         getFragmentManager().
                 beginTransaction().
                 replace(R.id.content, newFragment).
                 commit();
-
         // set the Behind View
         setBehindContentView(R.layout.fragment_profile);
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         Fragment profileFragment = new ProfileFragment();
         fragmentTransaction.replace(R.id.profile_fragment, profileFragment);
-
-        // fragmentTransaction.replace(R.id.content, new set("Welcome"),"Welcome");
         fragmentTransaction.commit();
 
         // customize the SlidingMenu

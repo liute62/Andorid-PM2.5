@@ -1,7 +1,9 @@
 package com.example.pm;
 
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,7 +13,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import app.services.DBService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.view.widget.LoginDialog;
@@ -20,10 +25,13 @@ import app.view.widget.PullScrollView;
 public class ProfileFragment extends Fragment implements
         OnClickListener, PullScrollView.OnTurnListener {
 
+    Activity mActivity;
     ImageView mHead;
     PullScrollView mScrollView;
     Button mLogin;
     Button mLogout;
+    Button mTurnOff;
+    Button mClear;
     ACache aCache;
 
     Handler loginHandler = new Handler(){
@@ -38,7 +46,8 @@ public class ProfileFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        aCache = ACache.get(getActivity());
+        mActivity = getActivity();
+        aCache = ACache.get(mActivity);
     }
 
     @Override
@@ -51,6 +60,8 @@ public class ProfileFragment extends Fragment implements
         mScrollView.setHeader(mHead);
         mLogin = (Button)view.findViewById(R.id.profile_login);
         mLogout = (Button)view.findViewById(R.id.profile_logout);
+        mTurnOff = (Button)view.findViewById(R.id.profile_turnoff);
+        mClear = (Button)view.findViewById(R.id.profile_clear_data);
         checkCache();
         setListener();
         return view;
@@ -67,6 +78,8 @@ public class ProfileFragment extends Fragment implements
         mScrollView.setOnTurnListener(this);
         mLogin.setOnClickListener(this);
         mLogout.setOnClickListener(this);
+        mTurnOff.setOnClickListener(this);
+        mClear.setOnClickListener(this);
     }
     @Override
     public void onTurn() {
@@ -85,6 +98,23 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_logout:
                 clearCache();
                 getActivity().finish();
+                break;
+            case R.id.profile_turnoff:
+                if(v.getTag() == null || v.getTag().equals("on")){
+                    v.setTag("off");
+                    Intent intent = new Intent(mActivity,DBService.class);
+                    mActivity.stopService(intent);
+                    ((TextView)v).setText(Const.Info_Turn_On_Service);
+                    Toast.makeText(mActivity,Const.Info_Turn_Off_Service,Toast.LENGTH_SHORT).show();
+                }else if(v.getTag().equals("off")){
+                    v.setTag("on");
+                    Intent intent = new Intent(mActivity,DBService.class);
+                    mActivity.startService(intent);
+                    ((TextView)v).setText(Const.Info_Turn_Off_Service);
+                    Toast.makeText(mActivity,Const.Info_Turn_On_Service,Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.profile_clear_data:
                 break;
         }
     }

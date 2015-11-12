@@ -18,7 +18,7 @@
         <TextView
             android:id="@+id/textView1"
             style="@style/main_top_center_style"
-            android:text="@string/main_top_title" />
+            android:text="@string/main_top_title"/>
 
         <ImageView
             android:id="@+id/main_hot_map"
@@ -200,7 +200,7 @@
             android:textColor="@color/AccentBlue"
             android:textSize="20sp" />
 
-        <lecho.lib.hellocharts.view.LineChartView
+        <lecho.lib.hellocharts.view.ColumnChartView
             android:id="@+id/main_chart_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

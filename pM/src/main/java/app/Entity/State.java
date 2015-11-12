@@ -1,5 +1,8 @@
 package app.Entity;
 
+import android.text.LoginFilter;
+import android.util.Log;
+
 import app.utils.DBConstants;
 import nl.qbusict.cupboard.annotation.Column;
 
@@ -52,6 +55,21 @@ public class State {
 		this.pm25 = pm25;
 		this.source = source;
 	}
+
+    public void print(){
+        Log.e("userid",String.valueOf(userid));
+        Log.e("time_point",String.valueOf(time_point));
+        Log.e("longtitude",String.valueOf(longtitude));
+        Log.e("latitude",String.valueOf(latitude));
+        Log.e("outdoor",String.valueOf(outdoor));
+        Log.e("status",String.valueOf(status));
+        Log.e("steps",String.valueOf(steps));
+        Log.e("avg_rate",String.valueOf(avg_rate));
+        Log.e("ventilation_volume",String.valueOf(ventilation_volume));
+        Log.e("density",String.valueOf(density));
+        Log.e("pm25",String.valueOf(pm25));
+        Log.e("source",String.valueOf(source));
+    }
 
 	public String getUserid() {
 		return userid;

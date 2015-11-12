@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog"
+    android:layout_width="400dip"
+    android:layout_height="wrap_content"
+    android:background="@color/White"
+    android:orientation="vertical" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dip"></LinearLayout>
+    <LinearLayout
+        android:id="@+id/dialogname"
+        android:layout_width="320dip"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_marginLeft="@dimen/login_dialog_left2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/dialog_info_content" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dialog_info_sure"
+        android:layout_width="300dip"
+        android:layout_height="40dip"
+        android:layout_marginTop="@dimen/login_dialog_top"
+        android:layout_marginLeft="@dimen/login_dialog_left2"
+        android:background="@drawable/bg_event_detail_action_pressed"
+        android:text="确认"
+        android:textColor="@color/White" />
+
+    <Button
+        android:id="@+id/dialog_info_cancel"
+        android:layout_width="300dip"
+        android:layout_height="40dip"
+        android:layout_marginTop="@dimen/login_dialog_top"
+        android:layout_marginLeft="@dimen/login_dialog_left2"
+        android:background="@drawable/btn_feed_attention_click"
+        android:text="取消"
+        android:textColor="@color/White" />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dip"></LinearLayout>
+
+</LinearLayout>

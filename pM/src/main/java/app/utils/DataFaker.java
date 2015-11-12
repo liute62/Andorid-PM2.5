@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.model.ValueShape;
 import lecho.lib.hellocharts.util.ChartUtils;
 
@@ -25,6 +28,16 @@ public class DataFaker {
         }
         return instance;
     }
+
+    static boolean hasAxes = true;
+    static boolean hasAxesNames = false;
+    static boolean hasLines = true;
+    static boolean hasPoints = true;
+    static boolean isFilled = false;
+    static boolean hasLabels = false;
+    static boolean isCubic = false;
+    static boolean hasLabelForSelected = false;
+    static boolean pointsHaveDifferentColor = false;
 
     public static String setAirQualityText(int pm) {
         if (pm < 50) {
@@ -94,20 +107,52 @@ public class DataFaker {
         return Color.GRAY;
     }
 
+    public static ColumnChartData setColumnDataForChart1(){
+        ColumnChartData data;
+        int numSubcolumns = 12;
+        int numColumns = Const.Chart1_X.length;
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+
+            values = new ArrayList<SubcolumnValue>();
+            for (int j = 0; j < numSubcolumns; ++j) {
+//                values.add(new SubcolumnValue((float) Math.random() * 50f + 5, ChartUtils.pickColor()));
+                  values.add(new SubcolumnValue((float) Math.random() * 50f + 5,  ChartUtils.pickColor()));
+
+            }
+
+            Column column = new Column(values);
+            column.setHasLabels(hasLabels);
+            column.setHasLabelsOnlyForSelected(hasLabelForSelected);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+
+        if (hasAxes) {
+            Axis axisX = new Axis();
+            Axis axisY = new Axis().setHasLines(true);
+            if (hasAxesNames) {
+                axisX.setName("Axis X");
+                axisY.setName("Axis Y");
+            }
+            data.setAxisXBottom(axisX);
+            data.setAxisYLeft(axisY);
+        } else {
+            data.setAxisXBottom(null);
+            data.setAxisYLeft(null);
+        }
+
+        return data;
+    }
+
     public static LineChartData setDataForChart1() {
         int numberOfLines = 1;
         int numberOfPoints = 12;
         int maxNumberOfLines = 4;
         float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
-        boolean hasAxes = true;
-        boolean hasAxesNames = false;
-        boolean hasLines = true;
-        boolean hasPoints = true;
-        boolean isFilled = false;
-        boolean hasLabels = false;
-        boolean isCubic = false;
-        boolean hasLabelForSelected = false;
-        boolean pointsHaveDifferentColor = false;
         ValueShape shape = ValueShape.CIRCLE;
         LineChartData data;
 

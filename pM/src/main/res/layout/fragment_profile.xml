@@ -111,9 +111,9 @@
 
             <Button
                 android:layout_marginTop="10dip"
-                android:id="@+id/personal_info_look_remind"
+                android:id="@+id/profile_turnoff"
                 style="@style/main_left_button_style"
-                android:text="查看提醒" />
+                android:text="关闭数据上传服务" />
 
             <Button
                 android:id="@+id/personal_info_modify_password"
@@ -121,9 +121,9 @@
                 android:text="修改密码" />
 
             <Button
-                android:id="@+id/personal_info_feed_back"
+                android:id="@+id/profile_clear_data"
                 style="@style/main_left_button_style"
-                android:text="相关反馈" />
+                android:text="清空本地数据" />
 
             <Button
                 android:id="@+id/profile_logout"

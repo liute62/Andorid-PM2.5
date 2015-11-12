@@ -23,6 +23,9 @@ public class Const {
     public static Double CURRENT_VENTILATION_VOLUME = 0.0;
 
     public static int CURRENT_STEPS_NUM = 0;
+
+    public static boolean CURRENT_DB_RUNNING = false;
+
     /**Cache**/
     public static final String Cache_User_Id = "Cache_User_Id";
 
@@ -39,20 +42,18 @@ public class Const {
 
     public static final int Handler_PM_Data = 100002;
 
+    /****/
+    public static final String Intent_PM_Density = "Intent_PM_Density";
+
     /**GPS**/
     public static int LOCATION_TIME_INTERVAL = 60 ; //1MIN
 
     public static final String APP_MAP_KEY = "";
 
-    /**Movement**/
-    public static enum MotionStatus{
-        NULL, STATIC, WALK, RUN
-    }
-
     /**Time related values**/
     public final static int DENSITY_TIME_INTERVAL = 60*60*1000; //1Hour
 
-    public final static int DB_TIME_INTERVAL = 1;
+    public final static int DB_TIME_INTERVAL = 1000 * 5;
 
     public static final String ERROR_NO_GPS = "请先打开定位！";
 
@@ -67,6 +68,26 @@ public class Const {
     public static final double walk_breath = 2.1 * static_breath;
     public static final double bicycle_breath = 2.1 * static_breath;
     public static final double run_breath = 6 * static_breath;
+
+    /**Movement**/
+    public static enum MotionStatus{
+        NULL, STATIC, WALK, RUN
+    }
+
+    /****/
+    public static final String Info_No_Initial = "系统检测到本机并无数据，请确保网络和GPS正常，按确认键进行初始化。";
+
+    public static final String Info_Turn_Off_Service = "关闭数据上传服务";
+
+    public static final String Info_Turn_On_Service = "开启数据上传服务";
+
+    /**For Chart**/
+    public static String[] Chart1_X = new String[] {
+            "1点","2点","3点","4点","5点","6点",
+            "7点","8点","9点","10点","11点","12点",
+            "13点","14点","15点","16点","17点","18点",
+            "19点","20点","21点","22点","23点","24点"
+    };
 
     public static String[] cityName =
             {
