@@ -6,16 +6,16 @@ import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
-import android.location.Criteria;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.ViewPager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,17 +34,20 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.model.PMModel;
 import app.services.DBService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBHelper;
-import app.utils.DataFaker;
+import app.utils.DataGenerator;
 import app.utils.HttpUtil;
+import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.LoadingDialog;
 import lecho.lib.hellocharts.view.ColumnChartView;
-import lecho.lib.hellocharts.view.LineChartView;
 
 public class MainFragment extends Fragment implements OnClickListener {
 
@@ -52,7 +55,6 @@ public class MainFragment extends Fragment implements OnClickListener {
     ImageView mProfile;
     ImageView mHotMap;
     ColumnChartView mChart1;
-    LineChartView mChart2;
     TextView mTime;
     TextView mAirQuality;
     TextView mCity;
@@ -62,6 +64,8 @@ public class MainFragment extends Fragment implements OnClickListener {
     TextView mWeekPM;
     TextView mChangeChart1;
     TextView mChangeChart2;
+    TextView mChart1Title;
+    TextView mChart2Title;
     int PMDensity;
     int currentHour;
     int currentMin;
@@ -75,7 +79,15 @@ public class MainFragment extends Fragment implements OnClickListener {
     LocationListener locationListener;
     private Double latitude = null;
     private Double longitude = null;
+    private DBService myService;
 
+    /**Charts**/
+    ChartsPagerAdapter mChartsPagerAdapter1;
+    ChartsPagerAdapter mChartsPagerAdapter2;
+    ViewPager chartViewpager1;
+    ViewPager chartViewpager2;
+
+    private DBServiceReceiver dbReceiver = new DBServiceReceiver();
     Handler mClockHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -115,11 +127,13 @@ public class MainFragment extends Fragment implements OnClickListener {
         loadingDialog = new LoadingDialog(getActivity());
         aCache = ACache.get(mActivity);
         //GPS Task
-        GPSInitial();
-        if (Const.CURRENT_DB_RUNNING == false){
-            Const.CURRENT_DB_RUNNING = true;
-            Intent DBIntent = new Intent(mActivity, DBService.class);
-            mActivity.startService(DBIntent);
+        if(! ShortcutUtil.isServiceWork(mActivity,"app.services.DBService")){
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
+            intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
+            mActivity.registerReceiver(dbReceiver, intentFilter);
+            Intent mIntent = new Intent(mActivity,DBService.class);
+            mActivity.startService(mIntent);
         }
     }
 
@@ -135,18 +149,42 @@ public class MainFragment extends Fragment implements OnClickListener {
         mCity = (TextView) view.findViewById(R.id.main_current_city);
         mHint = (TextView) view.findViewById(R.id.main_hint);
         mChart1 = (ColumnChartView) view.findViewById(R.id.main_chart_1);
-        mChart2 = (LineChartView) view.findViewById(R.id.main_chart_2);
         mHourPM = (TextView) view.findViewById(R.id.main_hour_pm);
         mDayPM = (TextView) view.findViewById(R.id.main_day_pm);
         mWeekPM = (TextView) view.findViewById(R.id.main_week_pm);
         mChangeChart1 = (TextView) view.findViewById(R.id.main_chart_1_change);
         mChangeChart2 = (TextView) view.findViewById(R.id.main_chart_2_change);
+        mChart1Title = (TextView) view.findViewById(R.id.main_chart1_title);
+        mChart2Title = (TextView) view.findViewById(R.id.main_chart2_title);
         setFonts(view);
+        chartInitial(view);
         cacheInitial();
         setListener();
         dataInitial();
         taskInitial();
         return view;
+    }
+
+    private void chartInitial(View view){
+        LayoutInflater lf = mActivity.getLayoutInflater().from(mActivity);
+        List<View> view1s = new ArrayList<>();
+        List<View> view2s = new ArrayList<>();
+        /**For the first row charts**/
+        chartViewpager1 = (ViewPager) view.findViewById(R.id.main_chart_viewpager_1);
+        View chartView1 = lf.inflate(R.layout.view_top_chart_1, null);
+        View chartView2 = lf.inflate(R.layout.view_top_chart_2, null);
+        view1s.add(chartView1);
+        view1s.add(chartView2);
+        mChartsPagerAdapter1 = new ChartsPagerAdapter(view1s);
+        chartViewpager1.setAdapter(mChartsPagerAdapter1);
+        /**For the second row charts**/
+        chartViewpager2 = (ViewPager) view.findViewById(R.id.main_chart_viewpager_2);
+        View chartView3 = lf.inflate(R.layout.view_bottom_chart_1, null);
+        View chartView4 = lf.inflate(R.layout.view_bottom_chart_2, null);
+        view2s.add(chartView3);
+        view2s.add(chartView4);
+        mChartsPagerAdapter2 = new ChartsPagerAdapter(view2s);
+        chartViewpager2.setAdapter(mChartsPagerAdapter2);
     }
 
     private void cacheInitial(){
@@ -192,16 +230,14 @@ public class MainFragment extends Fragment implements OnClickListener {
         } else {
             mTime.setText(String.valueOf(currentHour) + ": " + String.valueOf(currentMin));
         }
-        mCity.setText(Const.cityName[(int) (Math.random() * Const.cityName.length)]);
-        mAirQuality.setText(DataFaker.setAirQualityText(PMDensity));
-        mAirQuality.setTextColor(DataFaker.setAirQualityColor(PMDensity));
-        mHint.setText(DataFaker.setHeathHintText(PMDensity));
-        mHint.setTextColor(DataFaker.setHeathHintColor(PMDensity));
-        mHourPM.setText(String.valueOf(PMDensity));
-        mDayPM.setText(String.valueOf(PMDensity * 2));
-        mWeekPM.setText(String.valueOf(PMDensity * 7));
-        mChart1.setColumnChartData(DataFaker.setColumnDataForChart1());
-        mChart2.setLineChartData(DataFaker.setDataForChart1());
+        mCity.setText("无");
+        mAirQuality.setText(DataGenerator.setAirQualityText(PMDensity));
+        mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
+        mHint.setText(DataGenerator.setHeathHintText(PMDensity));
+        mHint.setTextColor(DataGenerator.setHeathHintColor(PMDensity));
+        mHourPM.setText("0");
+        mDayPM.setText("0");
+        mWeekPM.setText("0");
     }
 
     private void taskInitial() {
@@ -211,8 +247,6 @@ public class MainFragment extends Fragment implements OnClickListener {
             clockTask = new ClockTask();
             clockTask.execute(1);
         }
-        // DB Task
-
     }
 
     @Override
@@ -229,14 +263,45 @@ public class MainFragment extends Fragment implements OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.main_chart_1_change:
+                if(Const.CURRENT_CHART1_INDEX == 1){
+                    //Now show the chart 3
+                    Const.CURRENT_CHART1_INDEX = 3;
+                    setChartDataByIndex(mChartsPagerAdapter1,Const.CURRENT_CHART1_INDEX);
+                    mChart1Title.setText(Const.Chart_title[Const.CURRENT_CHART1_INDEX]);
+                }else {
+                    //Now show the chart 1
+                    Const.CURRENT_CHART1_INDEX = 1;
+                    setChartDataByIndex(mChartsPagerAdapter1,Const.CURRENT_CHART1_INDEX);
+                    mChart1Title.setText(Const.Chart_title[Const.CURRENT_CHART1_INDEX]);
+                }
                 break;
             case R.id.main_chart_2_change:
+                if(Const.CURRENT_CHART2_INDEX == 2){
+                    //Now show the chart 4
+                    Const.CURRENT_CHART2_INDEX = 4;
+                    setChartDataByIndex(mChartsPagerAdapter2,Const.CURRENT_CHART2_INDEX);
+                    mChart2Title.setText(Const.Chart_title[Const.CURRENT_CHART2_INDEX]);
+
+                }else if(Const.CURRENT_CHART2_INDEX == 4){
+                    //Now show the chart 6
+                    Const.CURRENT_CHART2_INDEX = 6;
+                    setChartDataByIndex(mChartsPagerAdapter2,Const.CURRENT_CHART2_INDEX);
+                    mChart2Title.setText(Const.Chart_title[Const.CURRENT_CHART2_INDEX]);
+                }else if(Const.CURRENT_CHART2_INDEX == 6){
+                    //Now show the chart 2
+                    Const.CURRENT_CHART2_INDEX = 2;
+                    setChartDataByIndex(mChartsPagerAdapter2,Const.CURRENT_CHART2_INDEX);
+                    mChart2Title.setText(Const.Chart_title[Const.CURRENT_CHART2_INDEX]);
+                }
                 break;
             default:
                 break;
         }
     }
 
+    /**
+     * A light-weight thread to update the current time view
+     */
     private class ClockTask extends AsyncTask<Integer, Integer, Integer> {
 
         @Override
@@ -254,101 +319,12 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
     }
 
-    private void GPSInitial(){
-        mManager = (LocationManager)mActivity.getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                if(location != null) {
-                    longitude = location.getLongitude();
-                    latitude = location.getLatitude();
-                    if(Const.CURRENT_LONGITUDE == longitude && Const.CURRENT_LATITUDE == latitude){
-                        //means no changes
-                    }else {
-                        //location has been changed
-                        Const.CURRENT_LATITUDE = latitude;
-                        Const.CURRENT_LONGITUDE = longitude;
-                        if (isDataTaskRun == false){
-                            Log.e("onLocationChanged","searchPMRequest");
-                            searchPMRequest(String.valueOf(longitude),String.valueOf(latitude));
-                        }
-                    }
-                }
-            }
 
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-                Log.e("onStatusChanged", s);
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-                Log.e("onProviderEnabled",s);
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Log.e("onProviderDisabled",s);
-                Toast.makeText(mActivity.getApplicationContext(), Const.ERROR_NO_GPS,
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);  //模糊模式
-        criteria.setAltitudeRequired(false);             //不提供海拔信息
-        criteria.setBearingRequired(false);              //不提供方向信息
-        criteria.setCostAllowed(true);                   //允许运营商计费
-        criteria.setPowerRequirement(Criteria.POWER_LOW);//低电池消耗
-        criteria.setSpeedRequired(false);                //不提供位置信息
-
-        String provider = mManager.getBestProvider(criteria, true);
-        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                Const.LOCATION_TIME_INTERVAL, 0, locationListener);
-    }
-
-    /**
-     * Get and Update Current PM info.
-     * @param longitude
-     * @param latitude
-     */
-    private void searchPMRequest(String longitude,String latitude){
-        String url = HttpUtil.Search_PM_url;
-        url = url+"?longitude="+longitude+"&latitude="+latitude;
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                loadingDialog.dismiss();
-                isDataTaskRun = false;
-                try {
-                    aCache.put(Const.Cache_PM_State,response);
-                    pmModel = PMModel.parse(response);
-                    Message data = new Message();
-                    data.what = Const.Handler_PM_Data;
-                    data.obj = pmModel;
-                    mDataHandler.sendMessage(data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Log.e("searchPMRequest resp", response.toString());
-                Toast.makeText(mActivity.getApplicationContext(), "Data Get Success!", Toast.LENGTH_LONG).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                loadingDialog.dismiss();
-                isDataTaskRun  = false;
-                Toast.makeText(mActivity.getApplicationContext(), "Data Get Fail!", Toast.LENGTH_SHORT).show();
-            }
-
-        });
-        VolleyQueue.getInstance(mActivity.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
-    }
 
     /**
      * Get and Update Current City Name.
-     * @param lati
-     * @param Longi
+     * @param lati latitude
+     * @param Longi longitude
      */
     private void searchCityRequest(String lati, String Longi){
         String url = HttpUtil.SearchCity_url;
@@ -369,11 +345,44 @@ public class MainFragment extends Fragment implements OnClickListener {
     }
 
 
+    /**
+     * Receive the data from DBService
+     */
     public class DBServiceReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(Const.Action_DB_MAIN_PMDensity)){
+                //Update the density of PM
+                PMModel model = new PMModel();
+                model.setPm25(intent.getStringExtra(Const.Intent_PM_Density));
+                Message data = new Message();
+                data.what = Const.Handler_PM_Data;
+                data.obj = model;
+                mDataHandler.sendMessage(data);
 
+            }else if(intent.getAction().equals(Const.Action_DB_MAIN_PMResult)){
+                //Update the calculated data of PM
+                String ven = intent.getStringExtra(Const.Intent_DB_Ven_Volume);
+                String pm = intent.getStringExtra(Const.Intent_PM_Density);
+                String time = intent.getStringExtra(Const.Intent_DB_PM_TIME);
+                Log.e("time",ShortcutUtil.refFormatNowDate(Long.valueOf(time)));
+            }
+        }
+    }
+
+    private void setChartDataByIndex(ChartsPagerAdapter adapter,int index){
+        switch (index){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 6:
+                break;
         }
     }
 

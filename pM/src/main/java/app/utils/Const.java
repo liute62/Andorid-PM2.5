@@ -16,7 +16,11 @@ public class Const {
 
     public static PMModel CURRENT_PM_MODEL;
 
-    public static boolean CURRENT_INDOOR;
+    public static boolean CURRENT_INDOOR = false;
+
+    public static int CURRENT_CHART1_INDEX = 1;
+
+    public static int CURRENT_CHART2_INDEX = 2;
 
     public static MotionStatus CURRENT_STATUS;
 
@@ -42,8 +46,22 @@ public class Const {
 
     public static final int Handler_PM_Data = 100002;
 
-    /****/
+    /**Intent Tag Code**/
     public static final String Intent_PM_Density = "Intent_PM_Density";
+
+    public static final String Intent_DB_PM_Result = "Intent_DB_PM_Result";
+
+    public static final String Intent_DB_PM_TIME = "Intent_DB_PM_TIME";
+
+    public static final String Intent_DB_Ven_Volume = "Intent_DB_Ven_Volume";
+
+    public static final String Intent_Main_Location = "Intent_Main_Location";
+
+    /**Service & Activity Code**/
+    public static final String Action_DB_MAIN_PMResult = "Action_DB_MAIN_PMResult";
+
+    public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
+
 
     /**GPS**/
     public static int LOCATION_TIME_INTERVAL = 60 ; //1MIN
@@ -53,7 +71,9 @@ public class Const {
     /**Time related values**/
     public final static int DENSITY_TIME_INTERVAL = 60*60*1000; //1Hour
 
-    public final static int DB_TIME_INTERVAL = 1000 * 5;
+    public final static int DB_PM_Search_INTERVAL = 1000 * 5;
+
+    public final static int DB_Location_INTERVAL = 1000 * 5;
 
     public static final String ERROR_NO_GPS = "请先打开定位！";
 
@@ -87,6 +107,15 @@ public class Const {
             "7点","8点","9点","10点","11点","12点",
             "13点","14点","15点","16点","17点","18点",
             "19点","20点","21点","22点","23点","24点"
+    };
+
+    public static String[] Chart1_2_X = new String[]{
+            "1天","2天","3天","4天","5天","6天","7天"
+    };
+
+    public static String[] Chart_title = new String[]
+    {
+        "","单位时间吸入的PM2.5的量(L)","单位时间平均暴露浓度(ug/m3)","累积吸入的PM2.5量(L)","平均单位时间吸入的空气量(L/min)","","累积吸入的空气量(L)",
     };
 
     public static String[] cityName =

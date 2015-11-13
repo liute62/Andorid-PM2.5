@@ -306,30 +306,33 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int slider4=0x7f020014;
     }
     public static final class id {
-        public static final int activitytitle_cancel=0x7f07003f;
-        public static final int activitytitle_sure=0x7f07003e;
-        public static final int activitytitle_title=0x7f07003b;
-        public static final int contact_info_gender=0x7f070040;
+        public static final int activitytitle_cancel=0x7f070040;
+        public static final int activitytitle_sure=0x7f07003f;
+        public static final int activitytitle_title=0x7f07003c;
+        public static final int contact_info_gender=0x7f070041;
         public static final int content=0x7f070006;
-        public static final int dialog=0x7f070032;
-        public static final int dialog_info_cancel=0x7f070036;
-        public static final int dialog_info_content=0x7f070034;
-        public static final int dialog_info_sure=0x7f070035;
-        public static final int dialogname=0x7f070033;
-        public static final int dialognum=0x7f07003c;
+        public static final int dialog=0x7f070033;
+        public static final int dialog_info_cancel=0x7f070037;
+        public static final int dialog_info_content=0x7f070035;
+        public static final int dialog_info_sure=0x7f070036;
+        public static final int dialogname=0x7f070034;
+        public static final int dialognum=0x7f07003d;
         public static final int fullscreen=0x7f070003;
         public static final int hot_map_mapview=0x7f070005;
-        public static final int imageView1=0x7f070037;
+        public static final int imageView1=0x7f070038;
         public static final int left=0x7f070001;
-        public static final int loading_dialog_point=0x7f070039;
-        public static final int loading_dialog_rotate=0x7f070038;
-        public static final int loading_dialog_text=0x7f07003a;
-        public static final int login_password=0x7f07003d;
+        public static final int loading_dialog_point=0x7f07003a;
+        public static final int loading_dialog_rotate=0x7f070039;
+        public static final int loading_dialog_text=0x7f07003b;
+        public static final int login_password=0x7f07003e;
         public static final int main_air_quality=0x7f070010;
-        public static final int main_chart_1=0x7f07001f;
+        public static final int main_chart1_title=0x7f07001d;
+        public static final int main_chart2_title=0x7f070021;
+        public static final int main_chart_1=0x7f070032;
         public static final int main_chart_1_change=0x7f07001e;
-        public static final int main_chart_2=0x7f070023;
         public static final int main_chart_2_change=0x7f070022;
+        public static final int main_chart_viewpager_1=0x7f07001f;
+        public static final int main_chart_viewpager_2=0x7f070023;
         public static final int main_current_city=0x7f070012;
         public static final int main_current_time=0x7f07000d;
         public static final int main_day_pm=0x7f070019;
@@ -361,7 +364,6 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int selected_view=0x7f070000;
         public static final int slidingmenumain=0x7f070031;
         public static final int textView1=0x7f070009;
-        public static final int textView10=0x7f070021;
         public static final int textView2=0x7f07000e;
         public static final int textView3=0x7f07000f;
         public static final int textView4=0x7f070011;
@@ -369,7 +371,6 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int textView6=0x7f070016;
         public static final int textView7=0x7f070018;
         public static final int textView8=0x7f07001a;
-        public static final int textView9=0x7f07001d;
         public static final int user_avatar=0x7f07002b;
     }
     public static final class layout {
@@ -378,9 +379,13 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int fragment_main=0x7f030002;
         public static final int fragment_profile=0x7f030003;
         public static final int slidingmenumain=0x7f030004;
-        public static final int widget_dialog_info=0x7f030005;
-        public static final int widget_dialog_loading=0x7f030006;
-        public static final int widget_dialog_login=0x7f030007;
+        public static final int view_bottom_chart_1=0x7f030005;
+        public static final int view_bottom_chart_2=0x7f030006;
+        public static final int view_top_chart_1=0x7f030007;
+        public static final int view_top_chart_2=0x7f030008;
+        public static final int widget_dialog_info=0x7f030009;
+        public static final int widget_dialog_loading=0x7f03000a;
+        public static final int widget_dialog_login=0x7f03000b;
     }
     public static final class string {
         public static final int action_settings=0x7f080000;

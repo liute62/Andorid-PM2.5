@@ -186,7 +186,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/main_fig_1_title"
-            android:id="@+id/textView9"
+            android:id="@+id/main_chart1_title"
             android:layout_marginLeft="20dip" />
 
         <TextView
@@ -196,15 +196,15 @@
             android:id="@+id/main_chart_1_change"
             android:layout_alignParentRight="true"
             android:layout_marginRight="30dip"
-            android:layout_alignTop="@+id/textView9"
+            android:layout_alignTop="@+id/main_chart1_title"
             android:textColor="@color/AccentBlue"
             android:textSize="20sp" />
 
-        <lecho.lib.hellocharts.view.ColumnChartView
-            android:id="@+id/main_chart_1"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/main_chart_viewpager_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/main_chart_1_change" />
+            android:layout_below="@+id/main_chart_1_change"/>
 
     </RelativeLayout>
 
@@ -219,7 +219,7 @@
             android:layout_height="wrap_content"
             android:text="@string/main_fig_2_title"
             android:layout_marginLeft="20dip"
-            android:id="@+id/textView10" />
+            android:id="@+id/main_chart2_title" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -228,15 +228,15 @@
             android:id="@+id/main_chart_2_change"
             android:layout_alignParentRight="true"
             android:layout_marginRight="30dip"
-            android:layout_alignTop="@+id/textView10"
+            android:layout_alignTop="@+id/main_chart2_title"
             android:textColor="@color/AccentBlue"
             android:textSize="20sp" />
 
-        <lecho.lib.hellocharts.view.LineChartView
-            android:id="@+id/main_chart_2"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/main_chart_viewpager_2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/main_chart_2_change" />
+            android:layout_below="@+id/main_chart_2_change"/>
 
     </RelativeLayout>
 

@@ -1,22 +1,34 @@
 package com.example.pm;
 
+import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
+import com.example.pm.MainFragment;
+
+import java.util.List;
+
+import app.services.DBService;
+import app.utils.Const;
+import app.utils.ShortcutUtil;
 
 public class MainActivity extends SlidingActivity{
 
     Fragment newFragment;
-    ServiceConnection sc;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+        Log.e("onCreate","1");
         setContentView(R.layout.activity_main);
         MyInitial();
     }
@@ -49,8 +61,6 @@ public class MainActivity extends SlidingActivity{
 
         //使用左上方icon可点，这样在onOptionsItemSelected里面才可以监听到R.id.home
         //getActionBar().setDisplayHomeAsUpEnabled(true);
-
-
     }
 
     /**
@@ -74,8 +84,21 @@ public class MainActivity extends SlidingActivity{
     }
 
     @Override
+    protected void onResume() {
+        Log.e("OnResume","1");
+        super.onResume();
+        Log.e("OnResume","2");
+    }
+
+    @Override
     protected void onDestroy() {
+        Log.e("onDestroy","1");
         super.onDestroy();
-        Log.e("MainActivity","onDestrory");
+        Log.e("onDestroy","2");
+    }
+
+    @Override
+    public boolean stopService(Intent name) {
+        return super.stopService(name);
     }
 }
