@@ -1,6 +1,5 @@
 package app.Entity;
 
-import android.text.LoginFilter;
 import android.util.Log;
 
 import app.utils.DBConstants;

@@ -1,25 +1,13 @@
 package com.example.pm;
 
-import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
-import com.example.pm.MainFragment;
-
-import java.util.List;
-
-import app.services.DBService;
-import app.utils.Const;
-import app.utils.ShortcutUtil;
 
 public class MainActivity extends SlidingActivity{
 

@@ -1,9 +1,7 @@
 package app.services;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -35,6 +33,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.List;
+
 import app.Entity.State;
 import app.model.PMModel;
 import app.movement.SimpleStepDetector;
@@ -159,7 +158,8 @@ public class DBService extends Service
 
     private State calculatePM25(double longi,double lati) {
         Double breath = 0.0;
-        Double density = Double.valueOf(Const.CURRENT_PM_MODEL.getPm25());
+        Double density = 70.0;
+        //Double density = Double.valueOf(Const.CURRENT_PM_MODEL.getPm25());
         if (Const.CURRENT_INDOOR) {
             density /= 3;
         }

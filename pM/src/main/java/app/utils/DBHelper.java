@@ -3,9 +3,10 @@ package app.utils;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 import app.Entity.State;
+
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  /**

@@ -1,7 +1,12 @@
 package app.utils;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Parcelable;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -70,5 +75,42 @@ public class ShortcutUtil {
         SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss E");
         String retStrFormatNowDate = sdFormatter.format(nowTime);
         return retStrFormatNowDate;
+    }
+
+    public static String getAppVersionName(Context context) {
+        try {
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            return pi.versionName;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public static String getAppVersionCode(Context context) {
+        try {
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            return String.valueOf(pi.versionCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "0";
+        }
+    }
+
+    public static void createShortCut(Activity act, int iconResId,
+                                      int appnameResId) {
+
+        Intent shortcutintent = new Intent(
+                "com.android.launcher.action.INSTALL_SHORTCUT");
+        shortcutintent.putExtra("duplicate", false);
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_NAME,
+                act.getString(appnameResId));
+        Parcelable icon = Intent.ShortcutIconResource.fromContext(
+                act.getApplicationContext(), iconResId);
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
+        shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
+                new Intent(act.getApplicationContext(), act.getClass()));
+        act.sendBroadcast(shortcutintent);
     }
 }

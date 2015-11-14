@@ -32,6 +32,7 @@ public class ProfileFragment extends Fragment implements
     Button mLogout;
     Button mTurnOff;
     Button mClear;
+    Button mRegister;
     ACache aCache;
 
     Handler loginHandler = new Handler(){
@@ -39,7 +40,8 @@ public class ProfileFragment extends Fragment implements
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (msg.what == Const.Handler_Login_Success){
-                mLogin.setVisibility(View.INVISIBLE);
+               mLogin.setOnClickListener(null);
+               mLogin.setText("退出登陆");
             }
         }
     };
@@ -62,6 +64,7 @@ public class ProfileFragment extends Fragment implements
         mLogout = (Button)view.findViewById(R.id.profile_logout);
         mTurnOff = (Button)view.findViewById(R.id.profile_turnoff);
         mClear = (Button)view.findViewById(R.id.profile_clear_data);
+        mRegister = (Button)view.findViewById(R.id.profile_rigister);
         checkCache();
         setListener();
         return view;
@@ -80,6 +83,7 @@ public class ProfileFragment extends Fragment implements
         mLogout.setOnClickListener(this);
         mTurnOff.setOnClickListener(this);
         mClear.setOnClickListener(this);
+        mRegister.setOnClickListener(this);
     }
     @Override
     public void onTurn() {
@@ -115,6 +119,9 @@ public class ProfileFragment extends Fragment implements
                 }
                 break;
             case R.id.profile_clear_data:
+                break;
+            case R.id.profile_rigister:
+
                 break;
         }
     }

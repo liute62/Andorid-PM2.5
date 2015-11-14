@@ -1,14 +1,16 @@
 package app.utils;
 
 import android.app.Activity;
-import android.util.Log;
 import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import app.model.HttpResult;
 import app.model.UploadModel;
 import app.model.UserModel;

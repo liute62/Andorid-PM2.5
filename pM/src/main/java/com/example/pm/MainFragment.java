@@ -80,7 +80,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     private Double latitude = null;
     private Double longitude = null;
     private DBService myService;
-
+    private IntentFilter intentFilter;
     /**Charts**/
     ChartsPagerAdapter mChartsPagerAdapter1;
     ChartsPagerAdapter mChartsPagerAdapter2;
@@ -117,6 +117,22 @@ public class MainFragment extends Fragment implements OnClickListener {
     };
 
     @Override
+    public void onPause() {
+        if (mActivity !=  null){
+            mActivity.unregisterReceiver(dbReceiver);
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        if (mActivity != null){
+            mActivity.registerReceiver(dbReceiver,intentFilter);
+        }
+        super.onResume();
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
@@ -128,7 +144,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         aCache = ACache.get(mActivity);
         //GPS Task
         if(! ShortcutUtil.isServiceWork(mActivity,"app.services.DBService")){
-            IntentFilter intentFilter = new IntentFilter();
+            intentFilter = new IntentFilter();
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
             mActivity.registerReceiver(dbReceiver, intentFilter);

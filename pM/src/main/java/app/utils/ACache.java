@@ -40,8 +40,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import app.model.PMModel;
-
 /**
  * @author michael yang（www.yangfuhai.com）
  */

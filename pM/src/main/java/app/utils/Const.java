@@ -1,7 +1,5 @@
 package app.utils;
 
-import java.util.Map;
-
 import app.model.PMModel;
 
 public class Const {
@@ -31,6 +29,8 @@ public class Const {
     public static boolean CURRENT_DB_RUNNING = false;
 
     /**Cache**/
+    public static final String Cache_App_Initialized = "Cache_App_Initialized";
+
     public static final String Cache_User_Id = "Cache_User_Id";
 
     public static final String Cache_Access_Token = "Cache_Access_Token";

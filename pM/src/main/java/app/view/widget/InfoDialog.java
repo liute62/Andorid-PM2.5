@@ -2,17 +2,13 @@ package app.view.widget;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.pm.R;
-
-import app.utils.ACache;
 
 /**
  * Created by liuhaodong1 on 15/11/12.

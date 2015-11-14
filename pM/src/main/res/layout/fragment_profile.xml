@@ -68,6 +68,7 @@
                         android:textColor="#A1A1A1"
                         android:textSize="12sp" />
 
+
                     <Button
                         android:layout_width="80dip"
                         android:layout_height="50dip"
@@ -78,6 +79,7 @@
                         android:textColor="@color/White"
                         android:text="登陆"
                         android:background="@drawable/main_top_bg"/>
+
 
                 </RelativeLayout>
 
@@ -111,19 +113,24 @@
 
             <Button
                 android:layout_marginTop="10dip"
+                android:id="@+id/profile_rigister"
+                style="@style/main_left_button_style"
+                android:text="注册账户" />
+
+            <Button
                 android:id="@+id/profile_turnoff"
                 style="@style/main_left_button_style"
                 android:text="关闭数据上传服务" />
 
             <Button
-                android:id="@+id/personal_info_modify_password"
-                style="@style/main_left_button_style"
-                android:text="修改密码" />
-
-            <Button
                 android:id="@+id/profile_clear_data"
                 style="@style/main_left_button_style"
                 android:text="清空本地数据" />
+
+            <Button
+                android:id="@+id/personal_info_modify_password"
+                style="@style/main_left_button_style"
+                android:text="修改密码" />
 
             <Button
                 android:id="@+id/profile_logout"
