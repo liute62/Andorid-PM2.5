@@ -50,16 +50,18 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  */
 public class DBService extends Service
 {
-    private static final String TAG = "DBService" ;
     public static final String ACTION = "app.services.DBService";
 
     private DBHelper dbHelper;
     private SQLiteDatabase db;
 
-    double longitude;
-    double latitude;
-    double PM25;
-    double VENTILATION_VOLUME;
+    double longitude = 0.0;  //the newest longitude
+    double latitude = 0.0;  // the newest latitude
+    double last_long = -1.0; // the last time longitude
+    double last_lati = -1.0; // the last time latitude
+    double PM25Density;
+    double PM25Today;
+    double venVolToday;
 
     private LocationManager mManager;
     private LocationListener locationListener;
@@ -70,24 +72,29 @@ public class DBService extends Service
     private long time1;
     private static Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC;
     PMModel pmModel;
-    boolean isPMSearchRun;
+    boolean isPMSearchRun = false;
 
     private Handler DBHandler = new Handler();
 
+    private boolean DBCanRun = false;
     private Runnable DBRunnable = new Runnable() {
 
         @Override
         public void run() {
             //addPM25();
-            State state = calculatePM25(longitude,latitude);
-            //state.print();
-            Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
-            intent.putExtra(Const.Intent_DB_PM_Result,state.getPm25());
-            intent.putExtra(Const.Intent_DB_PM_TIME,state.getTime_point());
-            intent.putExtra(Const.Intent_DB_Ven_Volume,state.getVentilation_volume());
-            sendBroadcast(intent);
+            if(DBCanRun) {
+                State state = calculatePM25(longitude, latitude);
+                insertState(state); //insert the information into database
+                //state.print();
+                Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
+                intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM("Han"));
+                intent.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                intent.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                intent.putExtra(Const.Intent_DB_PM_TIME, state.getTime_point());
+                intent.putExtra(Const.Intent_DB_Ven_Volume, state.getVentilation_volume());
+                sendBroadcast(intent);
+            }
             //searchState();
-            //insertState(state);
             //upload(state);
             DBHandler.postDelayed(DBRunnable, Const.DB_PM_Search_INTERVAL);
         }
@@ -101,6 +108,7 @@ public class DBService extends Service
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.e("DBService","OnCreate");
         DBInitial();
         sensorInitial();
         GPSInitial();
@@ -129,18 +137,21 @@ public class DBService extends Service
 
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
         if (states.isEmpty()) {
-            PM25 = 0.0;
-            VENTILATION_VOLUME = 0.0;
+            PM25Today = 0.0;
+            venVolToday = 0.0;
         } else {
             State state = states.get(states.size() - 1);
-            PM25 = Double.parseDouble(state.getPm25());
-            VENTILATION_VOLUME = Double.parseDouble(state.getVentilation_volume());
+            PM25Today = Double.parseDouble(state.getPm25());
+            venVolToday = Double.parseDouble(state.getVentilation_volume());
         }
 
 
-        Intent intent = new Intent(ACTION);
-        intent.putExtra(Const.Intent_PM_Density, PM25);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        /** data initial for main fragment**/
+        //Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
+        //intent.putExtra(Const.Intent_DB_PM_Hour,calLastHourPM("Ini"));
+        //intent.putExtra(Const.Intent_DB_PM_Day, PM25Today);
+        //intent.putExtra(Const.Intent_DB_PM_Week,calLastWeekAvgPM());
+        //LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -158,7 +169,7 @@ public class DBService extends Service
 
     private State calculatePM25(double longi,double lati) {
         Double breath = 0.0;
-        Double density = 70.0;
+        Double density = PM25Density;
         //Double density = Double.valueOf(Const.CURRENT_PM_MODEL.getPm25());
         if (Const.CURRENT_INDOOR) {
             density /= 3;
@@ -171,16 +182,48 @@ public class DBService extends Service
             breath = Const.run_breath;
         }
 
-        VENTILATION_VOLUME += breath;
-        PM25 += density*breath;
+        venVolToday += breath;
+        PM25Today += density*breath;
 
         State state = new State("0", Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR? "1":"0",
                 mMotionStatus == Const.MotionStatus.STATIC? "1" : mMotionStatus == Const.MotionStatus.WALK? "2" : "3",
-                Integer.toString(numSteps), "12", String.valueOf(VENTILATION_VOLUME), density.toString(), String.valueOf(PM25), "1");
+                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1");
          return state;
+    }
+
+    private String calLastWeekAvgPM(){
+        Double result = 0.0;
+        return  String.valueOf(result);
+    }
+
+    private String calLastHourPM(String tag){
+        Double result = 0.0;
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(year, month, day, 0, 0, 0);
+
+        Long nowTime = calendar.getTime().getTime();
+        calendar.set(year, month, day, 23, 59, 59);
+        Long nextTime = calendar.getTime().getTime();
+
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
+        if(states.isEmpty()){
+            return String.valueOf(result);
+        }else if(states.size() == 1){
+            return states.get(states.size() - 1).getPm25();
+        }else {
+
+            State state1 = states.get(states.size() - 1);
+            State state2 = states.get(states.size() - 2);
+            result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
+        }
+        Log.e("calLast"+tag,String.valueOf(result));
+        return String.valueOf(result);
     }
 
    private void sensorInitial(){
@@ -231,12 +274,12 @@ public class DBService extends Service
                 if(location != null) {
                     longitude = location.getLongitude();
                     latitude = location.getLatitude();
-                    if(Const.CURRENT_LONGITUDE == longitude && Const.CURRENT_LATITUDE == latitude){
+                    if(last_long == longitude && last_lati == latitude){
                         //means no changes
                     }else {
                         //location has been changed
-                        Const.CURRENT_LATITUDE = latitude;
-                        Const.CURRENT_LONGITUDE = longitude;
+                        last_lati = latitude;
+                        last_long = longitude;
                         if (isPMSearchRun == false){
                             Log.e("onLocationChanged","searchPMRequest");
                             searchPMRequest(String.valueOf(longitude),String.valueOf(latitude));
@@ -309,6 +352,7 @@ public class DBService extends Service
      * @param latitude
      */
     private void searchPMRequest(String longitude,String latitude){
+        isPMSearchRun = true;
         String url = HttpUtil.Search_PM_url;
         url = url+"?longitude="+longitude+"&latitude="+latitude;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
@@ -319,7 +363,10 @@ public class DBService extends Service
                     pmModel = PMModel.parse(response);
                     Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
                     intent.putExtra(Const.Intent_PM_Density,pmModel.getPm25());
+                    //set current pm density for calculation
+                    PM25Density = Double.valueOf(pmModel.getPm25());
                     sendBroadcast(intent);
+                    DBCanRun = true;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

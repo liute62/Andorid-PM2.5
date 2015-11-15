@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Parcelable;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -112,5 +113,17 @@ public class ShortcutUtil {
         shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
                 new Intent(act.getApplicationContext(), act.getClass()));
         act.sendBroadcast(shortcutintent);
+    }
+
+    /**
+     * transfer the ug scale to mg scale
+     * @param ugNumber the ug number
+     * @param scale
+     * @return
+     */
+    public static String ugToMg(Double ugNumber,int scale){
+        BigDecimal bd = new BigDecimal(ugNumber / 1000);
+        BigDecimal setScale = bd.setScale(scale, bd.ROUND_DOWN);
+        return String.valueOf(setScale.doubleValue());
     }
 }

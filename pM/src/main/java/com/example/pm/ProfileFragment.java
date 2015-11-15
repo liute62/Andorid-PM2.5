@@ -30,9 +30,10 @@ public class ProfileFragment extends Fragment implements
     PullScrollView mScrollView;
     Button mLogin;
     Button mLogout;
-    Button mTurnOff;
+    Button mTurnOffUpload;
     Button mClear;
     Button mRegister;
+    Button mTurnOffService;
     ACache aCache;
 
     Handler loginHandler = new Handler(){
@@ -62,7 +63,8 @@ public class ProfileFragment extends Fragment implements
         mScrollView.setHeader(mHead);
         mLogin = (Button)view.findViewById(R.id.profile_login);
         mLogout = (Button)view.findViewById(R.id.profile_logout);
-        mTurnOff = (Button)view.findViewById(R.id.profile_turnoff);
+        mTurnOffUpload = (Button)view.findViewById(R.id.profile_turnoff_upload);
+        mTurnOffService = (Button)view.findViewById(R.id.profile_turnoff_service);
         mClear = (Button)view.findViewById(R.id.profile_clear_data);
         mRegister = (Button)view.findViewById(R.id.profile_rigister);
         checkCache();
@@ -81,7 +83,8 @@ public class ProfileFragment extends Fragment implements
         mScrollView.setOnTurnListener(this);
         mLogin.setOnClickListener(this);
         mLogout.setOnClickListener(this);
-        mTurnOff.setOnClickListener(this);
+        mTurnOffService.setOnClickListener(this);
+        mTurnOffUpload.setOnClickListener(this);
         mClear.setOnClickListener(this);
         mRegister.setOnClickListener(this);
     }
@@ -103,7 +106,7 @@ public class ProfileFragment extends Fragment implements
                 clearCache();
                 getActivity().finish();
                 break;
-            case R.id.profile_turnoff:
+            case R.id.profile_turnoff_service:
                 if(v.getTag() == null || v.getTag().equals("on")){
                     v.setTag("off");
                     Intent intent = new Intent(mActivity,DBService.class);
@@ -118,10 +121,22 @@ public class ProfileFragment extends Fragment implements
                     Toast.makeText(mActivity,Const.Info_Turn_On_Service,Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.profile_turnoff_upload:
+                if(v.getTag() == null || v.getTag().equals("on")){
+                    v.setTag("off");
+                    ((TextView)v).setText(Const.Info_Turn_On_Upload);
+                    Toast.makeText(mActivity,Const.Info_Turn_Off_Upload,Toast.LENGTH_SHORT).show();
+                }else if(v.getTag().equals("off")){
+                    v.setTag("on");
+                    Intent intent = new Intent(mActivity,DBService.class);
+                    mActivity.startService(intent);
+                    ((TextView)v).setText(Const.Info_Turn_Off_Upload);
+                    Toast.makeText(mActivity,Const.Info_Turn_On_Upload,Toast.LENGTH_SHORT).show();
+                }
+                break;
             case R.id.profile_clear_data:
                 break;
             case R.id.profile_rigister:
-
                 break;
         }
     }

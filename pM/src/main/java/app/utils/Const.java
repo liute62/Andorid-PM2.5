@@ -8,9 +8,9 @@ public class Const {
 
     public static String CURRENT_ACCESS_TOKEN = "";
 
-    public static double CURRENT_LONGITUDE = 0;
+    //public static double CURRENT_LONGITUDE = 0;
 
-    public static double CURRENT_LATITUDE = 0;
+    //public static double CURRENT_LATITUDE = 0;
 
     public static PMModel CURRENT_PM_MODEL;
 
@@ -44,16 +44,22 @@ public class Const {
     /**Handler Code**/
     public static final int Handler_Login_Success = 100001;
 
-    public static final int Handler_PM_Data = 100002;
+    public static final int Handler_PM_Density = 100002;
+
+    public static final int Handler_PM_Data = 100003;
 
     /**Intent Tag Code**/
     public static final String Intent_PM_Density = "Intent_PM_Density";
 
-    public static final String Intent_DB_PM_Result = "Intent_DB_PM_Result";
+    public static final String Intent_DB_PM_Day = "Intent_DB_PM_Day";
+
+    public static final String Intent_DB_PM_Hour = "Intent_DB_PM_Hour";
 
     public static final String Intent_DB_PM_TIME = "Intent_DB_PM_TIME";
 
     public static final String Intent_DB_Ven_Volume = "Intent_DB_Ven_Volume";
+
+    public static final String Intent_DB_PM_Week = "Intent_DB_PM_Week";
 
     public static final String Intent_Main_Location = "Intent_Main_Location";
 
@@ -97,9 +103,13 @@ public class Const {
     /****/
     public static final String Info_No_Initial = "系统检测到本机并无数据，请确保网络和GPS正常，按确认键进行初始化。";
 
-    public static final String Info_Turn_Off_Service = "关闭数据上传服务";
+    public static final String Info_Turn_Off_Service = "关闭后台服务";
 
-    public static final String Info_Turn_On_Service = "开启数据上传服务";
+    public static final String Info_Turn_On_Service = "开启后台服务";
+
+    public static final String Info_Turn_Off_Upload = "关闭数据上传";
+
+    public static final String Info_Turn_On_Upload = "开启数据上传";
 
     /**For Chart**/
     public static String[] Chart1_X = new String[] {

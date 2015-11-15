@@ -64,6 +64,12 @@ public class PMModel {
 
     private String wind;
 
+    private String pm_breath_hour;
+
+    private String pm_breath_today;
+
+    private String pm_breath_week;
+
     public PMModel(){
         pm25 = "0";
         pm10 = "0";
@@ -79,6 +85,9 @@ public class PMModel {
         co = "0";
         pressure = "0";
         wind = "0";
+        pm_breath_hour = "0";
+        pm_breath_today = "0";
+        pm_breath_week = "0";
     }
 
     public static PMModel parse(JSONObject object) throws JSONException {
@@ -225,5 +234,29 @@ public class PMModel {
 
     public void setWind(String wind) {
         this.wind = wind;
+    }
+
+    public String getPm_breath_hour() {
+        return pm_breath_hour;
+    }
+
+    public void setPm_breath_hour(String pm_breath_hour) {
+        this.pm_breath_hour = pm_breath_hour;
+    }
+
+    public String getPm_breath_today() {
+        return pm_breath_today;
+    }
+
+    public void setPm_breath_today(String pm_breath_toady) {
+        this.pm_breath_today = pm_breath_toady;
+    }
+
+    public String getPm_breath_week() {
+        return pm_breath_week;
+    }
+
+    public void setPm_breath_week(String pm_breath_week) {
+        this.pm_breath_week = pm_breath_week;
     }
 }

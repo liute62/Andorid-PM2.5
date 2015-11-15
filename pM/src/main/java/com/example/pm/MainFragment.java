@@ -66,7 +66,10 @@ public class MainFragment extends Fragment implements OnClickListener {
     TextView mChangeChart2;
     TextView mChart1Title;
     TextView mChart2Title;
-    int PMDensity;
+    int PMDensity = 0;
+    Double PMBreatheHour = 0.0;
+    Double PMBreatheDay = 0.0;
+    Double PMBreatheWeekAvg = 0.0;
     int currentHour;
     int currentMin;
     ClockTask clockTask;
@@ -107,10 +110,16 @@ public class MainFragment extends Fragment implements OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == Const.Handler_PM_Data){
+            if (msg.what == Const.Handler_PM_Density){
                 PMModel data = (PMModel)msg.obj;
                 PMDensity = Integer.valueOf(data.getPm25());
                 Log.e("mDataHandler",String.valueOf(PMDensity));
+                dataInitial();
+            }if(msg.what == Const.Handler_PM_Data){
+                PMModel data = (PMModel)msg.obj;
+                PMBreatheHour = Double.valueOf(data.getPm_breath_hour());
+                PMBreatheDay = Double.valueOf(data.getPm_breath_today());
+                PMBreatheWeekAvg = Double.valueOf(data.getPm_breath_week());
                 dataInitial();
             }
         }
@@ -138,7 +147,6 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-        PMDensity = 0;
         isClockTaskRun = false;
         pmModel = new PMModel();
         mActivity = getActivity();
@@ -216,7 +224,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             try {
                 Const.CURRENT_PM_MODEL = PMModel.parse(object);
                 Message data = new Message();
-                data.what = Const.Handler_PM_Data;
+                data.what = Const.Handler_PM_Density;
                 data.obj = Const.CURRENT_PM_MODEL;
                 mDataHandler.sendMessage(data);
             } catch (JSONException e) {
@@ -253,9 +261,9 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
         mHint.setTextColor(DataGenerator.setHeathHintColor(PMDensity));
-        mHourPM.setText("0");
-        mDayPM.setText("0");
-        mWeekPM.setText("0");
+        mHourPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheHour,1))+" 毫克");
+        mDayPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheDay,1))+" 毫克");
+        mWeekPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheWeekAvg,1))+" 毫克");
     }
 
     private void taskInitial() {
@@ -375,16 +383,20 @@ public class MainFragment extends Fragment implements OnClickListener {
                 PMModel model = new PMModel();
                 model.setPm25(intent.getStringExtra(Const.Intent_PM_Density));
                 Message data = new Message();
-                data.what = Const.Handler_PM_Data;
+                data.what = Const.Handler_PM_Density;
                 data.obj = model;
                 mDataHandler.sendMessage(data);
 
             }else if(intent.getAction().equals(Const.Action_DB_MAIN_PMResult)){
                 //Update the calculated data of PM
-                String ven = intent.getStringExtra(Const.Intent_DB_Ven_Volume);
-                String pm = intent.getStringExtra(Const.Intent_PM_Density);
-                String time = intent.getStringExtra(Const.Intent_DB_PM_TIME);
-                Log.e("time",ShortcutUtil.refFormatNowDate(Long.valueOf(time)));
+               PMModel model = new PMModel();
+                model.setPm_breath_hour(intent.getStringExtra(Const.Intent_DB_PM_Hour));
+                model.setPm_breath_today(intent.getStringExtra(Const.Intent_DB_PM_Day));
+                model.setPm_breath_week(intent.getStringExtra(Const.Intent_DB_PM_Week));
+                Message data = new Message();
+                data.what = Const.Handler_PM_Data;
+                data.obj = model;
+                mDataHandler.sendMessage(data);
             }
         }
     }
