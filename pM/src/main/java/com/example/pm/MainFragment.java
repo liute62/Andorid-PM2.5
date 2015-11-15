@@ -87,7 +87,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     ViewPager chartViewpager1;
     ViewPager chartViewpager2;
 
-    private DBServiceReceiver dbReceiver = new DBServiceReceiver();
+    private DBServiceReceiver dbReceiver;
     Handler mClockHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -118,15 +118,17 @@ public class MainFragment extends Fragment implements OnClickListener {
 
     @Override
     public void onPause() {
-        if (mActivity !=  null){
-            mActivity.unregisterReceiver(dbReceiver);
-        }
+        mActivity.unregisterReceiver(dbReceiver);
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        if (mActivity != null){
+        if(mActivity != null){
+            dbReceiver = new DBServiceReceiver();
+            intentFilter = new IntentFilter();
+            intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
+            intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
             mActivity.registerReceiver(dbReceiver,intentFilter);
         }
         super.onResume();
@@ -144,6 +146,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         aCache = ACache.get(mActivity);
         //GPS Task
         if(! ShortcutUtil.isServiceWork(mActivity,"app.services.DBService")){
+            dbReceiver = new DBServiceReceiver();
             intentFilter = new IntentFilter();
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
@@ -156,7 +159,6 @@ public class MainFragment extends Fragment implements OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.e("MainFragment","OncreateView");
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         mProfile = (ImageView) view.findViewById(R.id.main_profile);
         mHotMap = (ImageView) view.findViewById(R.id.main_hot_map);
