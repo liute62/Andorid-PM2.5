@@ -149,7 +149,7 @@ public class DBService extends Service
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("PM2.5")
-                        .setContentText("服务运行中")
+                        .setContentText(" 服务运行中")
                         .setContentIntent(pendingIntent)
                         .setOngoing(true);
 

@@ -16,7 +16,6 @@ public class MainActivity extends SlidingActivity{
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-        Log.e("onCreate","1");
         setContentView(R.layout.activity_main);
         MyInitial();
     }
@@ -66,23 +65,24 @@ public class MainActivity extends SlidingActivity{
 
     @Override
     protected void onPause() {
+        Log.e("MainActivity","onPause1");
         super.onPause();
-        Log.e("MainActivity","onPause");
+        Log.e("MainActivity","onPause1");
 
     }
 
     @Override
     protected void onResume() {
-        Log.e("OnResume","1");
+        Log.e("MainActivity","onResume1");
         super.onResume();
-        Log.e("OnResume","2");
+        Log.e("MainActivity","onResume2");
     }
 
     @Override
     protected void onDestroy() {
-        Log.e("onDestroy","1");
+        Log.e("MainActivity","onDestroy1");
         super.onDestroy();
-        Log.e("onDestroy","2");
+        Log.e("MainActivity","onDestroy2");
     }
 
     @Override

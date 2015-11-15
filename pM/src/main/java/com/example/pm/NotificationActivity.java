@@ -39,6 +39,9 @@ public class NotificationActivity extends Activity implements View.OnClickListen
                 NotificationActivity.this.finish();
                 break;
             case R.id.notification_cancel:
+                SharedPreferencesUtil
+                        .setValue(getBaseContext(), "isAlreadyInit"
+                                + ShortcutUtil.getAppVersionCode(getBaseContext()), false);
                 this.finish();
                 break;
         }

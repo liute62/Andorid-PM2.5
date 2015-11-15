@@ -304,7 +304,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int shadow=0x7f020012;
         public static final int shanghai=0x7f020013;
         public static final int slider4=0x7f020014;
-        public static final int test_pm=0x7f020015;
+        public static final int splash=0x7f020015;
+        public static final int test_pm=0x7f020016;
     }
     public static final class id {
         public static final int activitytitle_cancel=0x7f070043;
