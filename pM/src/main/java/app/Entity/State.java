@@ -40,8 +40,9 @@ public class State {
 
 	}
 
-	public State(String userid, String time_point, String longtitude, String latitude, String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source) {
-		this.userid = userid;
+	public State(Long id,String userid, String time_point, String longtitude, String latitude, String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source) {
+		this.id = id;
+        this.userid = userid;
 		this.time_point = time_point;
 		this.longtitude = longtitude;
 		this.latitude = latitude;
@@ -56,6 +57,7 @@ public class State {
 	}
 
     public void print(){
+        Log.e("id",String.valueOf(id));
         Log.e("userid",String.valueOf(userid));
         Log.e("time_point",String.valueOf(time_point));
         Log.e("longtitude",String.valueOf(longtitude));
@@ -70,7 +72,15 @@ public class State {
         Log.e("source",String.valueOf(source));
     }
 
-	public String getUserid() {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUserid() {
 		return userid;
 	}
 

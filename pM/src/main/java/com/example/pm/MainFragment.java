@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -36,10 +37,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import app.model.PMModel;
 import app.services.DBService;
 import app.utils.ACache;
+import app.utils.ChartsConst;
 import app.utils.Const;
 import app.utils.DBHelper;
 import app.utils.DataGenerator;
@@ -47,7 +50,19 @@ import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.LoadingDialog;
+import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter;
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.model.ValueShape;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
+import lecho.lib.hellocharts.view.LineChartView;
 
 public class MainFragment extends Fragment implements OnClickListener {
 
@@ -85,10 +100,16 @@ public class MainFragment extends Fragment implements OnClickListener {
     private DBService myService;
     private IntentFilter intentFilter;
     /**Charts**/
-    ChartsPagerAdapter mChartsPagerAdapter1;
-    ChartsPagerAdapter mChartsPagerAdapter2;
-    ViewPager chartViewpager1;
-    ViewPager chartViewpager2;
+    int current_chart1_index;
+    int current_chart2_index;
+//    ChartsPagerAdapter mChartsPagerAdapter1;
+//    ChartsPagerAdapter mChartsPagerAdapter2;
+//    ViewPager chartViewpager1;
+//    ViewPager chartViewpager2;
+    ColumnChartView mChart1column;
+    LineChartView mChart1line;
+    ColumnChartView mChart2column;
+    LineChartView mChart2line;
 
     private DBServiceReceiver dbReceiver;
     Handler mClockHandler = new Handler() {
@@ -147,6 +168,8 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+        current_chart1_index = 1;
+        current_chart2_index = 2;
         isClockTaskRun = false;
         pmModel = new PMModel();
         mActivity = getActivity();
@@ -174,16 +197,19 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAirQuality = (TextView) view.findViewById(R.id.main_air_quality);
         mCity = (TextView) view.findViewById(R.id.main_current_city);
         mHint = (TextView) view.findViewById(R.id.main_hint);
-        mChart1 = (ColumnChartView) view.findViewById(R.id.main_chart_1);
         mHourPM = (TextView) view.findViewById(R.id.main_hour_pm);
         mDayPM = (TextView) view.findViewById(R.id.main_day_pm);
         mWeekPM = (TextView) view.findViewById(R.id.main_week_pm);
+        mChart1column = (ColumnChartView)view.findViewById(R.id.main_chart_1_column);
+        mChart1line = (LineChartView)view.findViewById(R.id.main_chart_1_line);
+        mChart2column = (ColumnChartView)view.findViewById(R.id.main_chart_2_column);
+        mChart2line  =(LineChartView)view.findViewById(R.id.main_chart_2_line);
         mChangeChart1 = (TextView) view.findViewById(R.id.main_chart_1_change);
         mChangeChart2 = (TextView) view.findViewById(R.id.main_chart_2_change);
         mChart1Title = (TextView) view.findViewById(R.id.main_chart1_title);
         mChart2Title = (TextView) view.findViewById(R.id.main_chart2_title);
         setFonts(view);
-        chartInitial(view);
+        chartInitial(current_chart1_index,current_chart2_index);
         cacheInitial();
         setListener();
         dataInitial();
@@ -191,26 +217,66 @@ public class MainFragment extends Fragment implements OnClickListener {
         return view;
     }
 
-    private void chartInitial(View view){
-        LayoutInflater lf = mActivity.getLayoutInflater().from(mActivity);
-        List<View> view1s = new ArrayList<>();
-        List<View> view2s = new ArrayList<>();
-        /**For the first row charts**/
-        chartViewpager1 = (ViewPager) view.findViewById(R.id.main_chart_viewpager_1);
-        View chartView1 = lf.inflate(R.layout.view_top_chart_1, null);
-        View chartView2 = lf.inflate(R.layout.view_top_chart_2, null);
-        view1s.add(chartView1);
-        view1s.add(chartView2);
-        mChartsPagerAdapter1 = new ChartsPagerAdapter(view1s);
-        chartViewpager1.setAdapter(mChartsPagerAdapter1);
-        /**For the second row charts**/
-        chartViewpager2 = (ViewPager) view.findViewById(R.id.main_chart_viewpager_2);
-        View chartView3 = lf.inflate(R.layout.view_bottom_chart_1, null);
-        View chartView4 = lf.inflate(R.layout.view_bottom_chart_2, null);
-        view2s.add(chartView3);
-        view2s.add(chartView4);
-        mChartsPagerAdapter2 = new ChartsPagerAdapter(view2s);
-        chartViewpager2.setAdapter(mChartsPagerAdapter2);
+    private void chartInitial(int chart1_index,int chart2_index){
+        mChart1Title.setText(ChartsConst.Chart_title[chart1_index]);
+        if(ChartsConst.Chart_type[chart1_index] == 0){
+            mChart1column.setVisibility(View.VISIBLE);
+            mChart1line.setVisibility(View.INVISIBLE);
+            mChart1column.setColumnChartData((ColumnChartData)setChartDataByIndex(chart1_index));
+        }else if(ChartsConst.Chart_type[chart1_index] == 1){
+            mChart1column.setVisibility(View.INVISIBLE);
+            mChart1line.setVisibility(View.VISIBLE);
+            mChart1line.setLineChartData((LineChartData)setChartDataByIndex(chart1_index));
+        }else {
+            mChart1column.setVisibility(View.INVISIBLE);
+            mChart1line.setVisibility(View.INVISIBLE);
+        }
+
+        mChart2Title.setText(ChartsConst.Chart_title[chart2_index]);
+        if(ChartsConst.Chart_type[chart2_index] == 0){
+            mChart2column.setVisibility(View.VISIBLE);
+            mChart2line.setVisibility(View.INVISIBLE);
+            mChart2column.setColumnChartData((ColumnChartData) setChartDataByIndex(chart2_index));
+        }else if(ChartsConst.Chart_type[chart2_index] == 1){
+            mChart2column.setVisibility(View.INVISIBLE);
+            mChart2line.setVisibility(View.VISIBLE);
+            mChart2line.setLineChartData((LineChartData)setChartDataByIndex(chart2_index));
+        }else {
+            mChart2column.setVisibility(View.INVISIBLE);
+            mChart2line.setVisibility(View.INVISIBLE);
+        }
+    }
+
+//    private void chartInitial(View view){
+//        LayoutInflater lf = mActivity.getLayoutInflater().from(mActivity);
+//        List<View> view1s = new ArrayList<>();
+//        List<Integer> type1 = new ArrayList<>();
+//        type1.add(1);
+//        type1.add(2);
+//        List<View> view2s = new ArrayList<>();
+//        List<Integer> type2 = new ArrayList<>();
+//        type2.add(1);
+//        type2.add(2);
+//        /**For the first row charts**/
+//        chartViewpager1 = (ViewPager) view.findViewById(R.id.main_chart_viewpager_1);
+//        View chartView1 = lf.inflate(R.layout.view_top_chart_1, null);
+//        View chartView2 = lf.inflate(R.layout.view_top_chart_2, null);
+//        view1s.add(chartView1);
+//        view1s.add(chartView2);
+//        mChartsPagerAdapter1 = new ChartsPagerAdapter(view1s,type1);
+//        chartViewpager1.setAdapter(mChartsPagerAdapter1);
+//        /**For the second row charts**/
+//        chartViewpager2 = (ViewPager) view.findViewById(R.id.main_chart_viewpager_2);
+//        View chartView3 = lf.inflate(R.layout.view_bottom_chart_1, null);
+//        View chartView4 = lf.inflate(R.layout.view_bottom_chart_2, null);
+//        view2s.add(chartView3);
+//        view2s.add(chartView4);
+//        mChartsPagerAdapter2 = new ChartsPagerAdapter(view2s,type2);
+//        chartViewpager2.setAdapter(mChartsPagerAdapter2);
+//    }
+
+    private void chart1Initial(){
+
     }
 
     private void cacheInitial(){
@@ -289,36 +355,22 @@ public class MainFragment extends Fragment implements OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.main_chart_1_change:
-                if(Const.CURRENT_CHART1_INDEX == 1){
-                    //Now show the chart 3
-                    Const.CURRENT_CHART1_INDEX = 3;
-                    setChartDataByIndex(mChartsPagerAdapter1,Const.CURRENT_CHART1_INDEX);
-                    mChart1Title.setText(Const.Chart_title[Const.CURRENT_CHART1_INDEX]);
+                if(current_chart1_index == 7){
+                    current_chart1_index = 1;
                 }else {
-                    //Now show the chart 1
-                    Const.CURRENT_CHART1_INDEX = 1;
-                    setChartDataByIndex(mChartsPagerAdapter1,Const.CURRENT_CHART1_INDEX);
-                    mChart1Title.setText(Const.Chart_title[Const.CURRENT_CHART1_INDEX]);
+                    current_chart1_index += 2;
                 }
+                mChart1Title.setText(ChartsConst.Chart_title[current_chart1_index]);
+                chartInitial(current_chart1_index,current_chart2_index);
                 break;
             case R.id.main_chart_2_change:
-                if(Const.CURRENT_CHART2_INDEX == 2){
-                    //Now show the chart 4
-                    Const.CURRENT_CHART2_INDEX = 4;
-                    setChartDataByIndex(mChartsPagerAdapter2,Const.CURRENT_CHART2_INDEX);
-                    mChart2Title.setText(Const.Chart_title[Const.CURRENT_CHART2_INDEX]);
-
-                }else if(Const.CURRENT_CHART2_INDEX == 4){
-                    //Now show the chart 6
-                    Const.CURRENT_CHART2_INDEX = 6;
-                    setChartDataByIndex(mChartsPagerAdapter2,Const.CURRENT_CHART2_INDEX);
-                    mChart2Title.setText(Const.Chart_title[Const.CURRENT_CHART2_INDEX]);
-                }else if(Const.CURRENT_CHART2_INDEX == 6){
-                    //Now show the chart 2
-                    Const.CURRENT_CHART2_INDEX = 2;
-                    setChartDataByIndex(mChartsPagerAdapter2,Const.CURRENT_CHART2_INDEX);
-                    mChart2Title.setText(Const.Chart_title[Const.CURRENT_CHART2_INDEX]);
+                if(current_chart2_index == 12){
+                    current_chart2_index = 2;
+                }else {
+                    current_chart2_index += 2;
                 }
+                mChart2Title.setText(ChartsConst.Chart_title[current_chart2_index]);
+                chartInitial(current_chart1_index,current_chart2_index);
                 break;
             default:
                 break;
@@ -389,7 +441,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 
             }else if(intent.getAction().equals(Const.Action_DB_MAIN_PMResult)){
                 //Update the calculated data of PM
-               PMModel model = new PMModel();
+                PMModel model = new PMModel();
                 model.setPm_breath_hour(intent.getStringExtra(Const.Intent_DB_PM_Hour));
                 model.setPm_breath_today(intent.getStringExtra(Const.Intent_DB_PM_Day));
                 model.setPm_breath_week(intent.getStringExtra(Const.Intent_DB_PM_Week));
@@ -401,19 +453,173 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
     }
 
-    private void setChartDataByIndex(ChartsPagerAdapter adapter,int index){
+    private Object setChartDataByIndex(int index){
         switch (index){
             case 1:
-                break;
+                return chart1DataGenerator(DataGenerator.generateDataForChart1());
             case 2:
-                break;
+                return chart2DataGenerator(DataGenerator.generateDataForChart2());
             case 3:
-                break;
+                return chart3DataGenerator((int)DataGenerator.generateDataForChart3().keySet().toArray()[0],
+                        (float)DataGenerator.generateDataForChart3().values().toArray()[0]);
             case 4:
-                break;
+                return chart4DataGenerator(DataGenerator.generateDataForChart4());
             case 6:
                 break;
         }
+        return null;
+    }
+
+    private ColumnChartData chart1DataGenerator(Map<Integer,Float> maps){
+        ColumnChartData data;
+        int numSubcolumns = 1;
+        int numColumns = ChartsConst.Chart_X[1].length;
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<SubcolumnValue>();
+            SubcolumnValue value;
+            if(maps.containsKey(i)){
+                float input = maps.get(i).floatValue();
+                value = new SubcolumnValue(input,ChartUtils.COLOR_BLUE);
+            }else {
+                value = new SubcolumnValue(0.0f);
+            }
+
+            values.add(value);
+            Column column = new Column(values);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisX = new Axis();
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        return data;
+    }
+
+    private LineChartData chart2DataGenerator(Map<Integer,Float> map){
+        int numberOfLines = 1;
+        int numberOfPoints = ChartsConst.Chart_X[2].length;
+        int maxNumberOfLines = 1;
+        float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
+        ValueShape shape = ValueShape.CIRCLE;
+        LineChartData data;
+        //data generation
+        for (int j = 0; j < numberOfPoints; ++j) {
+              if(map.containsKey(j)){
+                  randomNumbersTab[0][j] = map.get(j).floatValue();
+              }else {
+                  randomNumbersTab[0][j] = 0;
+              }
+        }
+        List<Line> lines = new ArrayList<Line>();
+        for (int i = 0; i < numberOfLines; ++i) {
+            List<PointValue> values = new ArrayList<PointValue>();
+            for (int j = 0; j < numberOfPoints; ++j) {
+                values.add(new PointValue(j, randomNumbersTab[i][j]));
+            }
+
+            Line line = new Line(values);
+            line.setColor(ChartUtils.COLOR_BLUE);
+            line.setShape(shape);
+            line.setFilled(true);
+            line.setHasLines(true);
+            line.setHasPoints(true);
+            lines.add(line);
+        }
+
+        data = new LineChartData(lines);
+        Axis axisX = new Axis();
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        data.setBaseValue(Float.NEGATIVE_INFINITY);
+        return data;
+    }
+
+    private LineChartData chart3DataGenerator(int time,float result){
+        // I got speed in range (0-55) and height in meters in range(200 - 300). I want this chart to display both
+        // information. Differences between speed and height values are large and chart doesn't look good so I need
+        // to modify height values to be in range of speed values.
+
+        float speedRange = 55;
+        int numValues = 2;
+        Line line;
+        List<PointValue> values;
+        List<Line> lines = new ArrayList<Line>();
+
+        // Height line, add it as first line to be drawn in the background.
+        values = new ArrayList<PointValue>();
+        values.add(new PointValue(0, 0));
+        values.add(new PointValue(time,result));
+        line = new Line(values);
+        line.setColor(Color.BLUE);
+        line.setHasPoints(false);
+        line.setFilled(true);
+        line.setStrokeWidth(1);
+        lines.add(line);
+        // Data and axes
+        LineChartData data = new LineChartData(lines);
+        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
+        // value.
+        Axis distanceAxis = new Axis();
+        distanceAxis.setName("时间");
+        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
+        distanceAxis.setMaxLabelChars(4);
+        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("点".toCharArray()));
+        distanceAxis.setHasLines(true);
+        distanceAxis.setInside(true);
+        data.setAxisXBottom(distanceAxis);
+        // Speed axis
+        data.setAxisYLeft(new Axis().setName("毫克").setHasLines(true).setMaxLabelChars(3)
+                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+
+        return data;
+    }
+
+    private LineChartData chart4DataGenerator(Map<Integer,Float> map) {
+        String [] tmp = ChartsConst.Chart_X[4];
+        int numValues = Integer.valueOf(tmp[tmp.length - 1]);
+        Line line;
+        List<PointValue> values;
+        List<Line> lines = new ArrayList<Line>();
+        // Height line, add it as first line to be drawn in the background.
+        values = new ArrayList<PointValue>();
+        for (int i = 0; i < numValues; i = i + 5) {
+            if (map.containsKey(i)) {
+                values.add(new PointValue(i, map.get(i)));
+            }
+        }
+
+        line = new Line(values);
+        line.setColor(Color.BLUE);
+        line.setHasPoints(false);
+        //line.setFilled(true);
+        line.setStrokeWidth(3);
+        lines.add(line);
+
+        // Data and axes
+        LineChartData data = new LineChartData(lines);
+
+        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
+        // value.
+        Axis distanceAxis = new Axis();
+        distanceAxis.setName("两小时内");
+        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
+        distanceAxis.setMaxLabelChars(4);
+        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("分".toCharArray()));
+        distanceAxis.setHasLines(true);
+        distanceAxis.setInside(true);
+        data.setAxisXBottom(distanceAxis);
+
+        // Speed axis
+        data.setAxisYLeft(new Axis().setName("微克/立方米").setHasLines(true).setMaxLabelChars(3)
+                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+
+        return data;
     }
 
 }

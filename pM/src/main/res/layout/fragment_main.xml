@@ -195,16 +195,30 @@
             android:text="切换"
             android:id="@+id/main_chart_1_change"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dip"
+            android:layout_marginRight="10dip"
             android:layout_alignTop="@+id/main_chart1_title"
             android:textColor="@color/AccentBlue"
             android:textSize="20sp" />
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/main_chart_viewpager_1"
+        <lecho.lib.hellocharts.view.ColumnChartView
+            android:id="@+id/main_chart_1_column"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/main_chart_1_change"/>
+            android:layout_below="@id/main_chart_1_change"
+            android:visibility="invisible"/>
+
+        <lecho.lib.hellocharts.view.LineChartView
+            android:id="@+id/main_chart_1_line"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/main_chart_1_change"
+            android:visibility="invisible"/>
+
+        <!--<android.support.v4.view.ViewPager-->
+            <!--android:id="@+id/main_chart_viewpager_1"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_below="@+id/main_chart_1_change"/>-->
 
     </RelativeLayout>
 
@@ -227,16 +241,30 @@
             android:text="切换"
             android:id="@+id/main_chart_2_change"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dip"
+            android:layout_marginRight="10dip"
             android:layout_alignTop="@+id/main_chart2_title"
             android:textColor="@color/AccentBlue"
             android:textSize="20sp" />
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/main_chart_viewpager_2"
+        <lecho.lib.hellocharts.view.ColumnChartView
+            android:id="@+id/main_chart_2_column"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/main_chart_2_change"/>
+            android:layout_below="@id/main_chart_2_change"
+            android:visibility="invisible"/>
+
+        <lecho.lib.hellocharts.view.LineChartView
+            android:id="@+id/main_chart_2_line"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/main_chart_2_change"
+            android:visibility="invisible"/>
+
+        <!--<android.support.v4.view.ViewPager-->
+            <!--android:id="@+id/main_chart_viewpager_2"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_below="@+id/main_chart_2_change"/>-->
 
     </RelativeLayout>
 

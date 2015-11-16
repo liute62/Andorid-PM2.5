@@ -49,6 +49,8 @@ public class Const {
     public static final int Handler_PM_Data = 100003;
 
     /**Intent Tag Code**/
+    public static final String Intent_PM_Id = "Intent_PM_Id";
+
     public static final String Intent_PM_Density = "Intent_PM_Density";
 
     public static final String Intent_DB_PM_Day = "Intent_DB_PM_Day";
@@ -61,6 +63,8 @@ public class Const {
 
     public static final String Intent_DB_PM_Week = "Intent_DB_PM_Week";
 
+    public static final String Intent_DB_PM_Chart1 = "Intent_DB_PM_Chart1";
+
     public static final String Intent_Main_Location = "Intent_Main_Location";
 
     /**Service & Activity Code**/
@@ -70,16 +74,14 @@ public class Const {
 
 
     /**GPS**/
-    public static int LOCATION_TIME_INTERVAL = 60 ; //1MIN
-
     public static final String APP_MAP_KEY = "";
 
     /**Time related values**/
-    public final static int DENSITY_TIME_INTERVAL = 60*60*1000; //1Hour
-
-    public final static int DB_PM_Search_INTERVAL = 1000 * 5;
+    public final static int DB_PM_Search_INTERVAL = 1000 * 5;//1Hour
 
     public final static int DB_Location_INTERVAL = 1000 * 5;
+
+    public final static int DB_PM_Cal_INTERVAL = 1000 * 60; //1min
 
     public static final String ERROR_NO_GPS = "请先打开定位！";
 
@@ -110,23 +112,6 @@ public class Const {
     public static final String Info_Turn_Off_Upload = "关闭数据上传";
 
     public static final String Info_Turn_On_Upload = "开启数据上传";
-
-    /**For Chart**/
-    public static String[] Chart1_X = new String[] {
-            "1点","2点","3点","4点","5点","6点",
-            "7点","8点","9点","10点","11点","12点",
-            "13点","14点","15点","16点","17点","18点",
-            "19点","20点","21点","22点","23点","24点"
-    };
-
-    public static String[] Chart1_2_X = new String[]{
-            "1天","2天","3天","4天","5天","6天","7天"
-    };
-
-    public static String[] Chart_title = new String[]
-    {
-        "","单位时间吸入的PM2.5的量(L)","单位时间平均暴露浓度(ug/m3)","累积吸入的PM2.5量(L)","平均单位时间吸入的空气量(L/min)","","累积吸入的空气量(L)",
-    };
 
     public static String[] cityName =
             {

@@ -60,6 +60,7 @@ public class DBService extends Service
     double last_long = -1.0; // the last time longitude
     double last_lati = -1.0; // the last time latitude
     double PM25Density;
+    long idToday = 0;
     double PM25Today;
     double venVolToday;
 
@@ -85,8 +86,9 @@ public class DBService extends Service
             if(DBCanRun) {
                 State state = calculatePM25(longitude, latitude);
                 insertState(state); //insert the information into database
-                //state.print();
+                state.print();
                 Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
+                intent.putExtra(Const.Intent_PM_Id,idToday);
                 intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM("Han"));
                 intent.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                 intent.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
@@ -96,7 +98,7 @@ public class DBService extends Service
             }
             //searchState();
             //upload(state);
-            DBHandler.postDelayed(DBRunnable, Const.DB_PM_Search_INTERVAL);
+            DBHandler.postDelayed(DBRunnable, Const.DB_PM_Cal_INTERVAL);
         }
     };
 
@@ -139,10 +141,12 @@ public class DBService extends Service
         if (states.isEmpty()) {
             PM25Today = 0.0;
             venVolToday = 0.0;
+            idToday = 0;
         } else {
             State state = states.get(states.size() - 1);
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
+            idToday = state.getId();
         }
 
 
@@ -167,6 +171,13 @@ public class DBService extends Service
         startForeground(12450, mBuilder.build());
     }
 
+    /**
+     * density: (ug/m3)
+     * breath:  (L/min)
+     * @param longi
+     * @param lati
+     * @return
+     */
     private State calculatePM25(double longi,double lati) {
         Double breath = 0.0;
         Double density = PM25Density;
@@ -181,17 +192,17 @@ public class DBService extends Service
         } else if (mMotionStatus == Const.MotionStatus.RUN) {
             breath = Const.run_breath;
         }
-
         venVolToday += breath;
+        breath = breath / 1000; //change L/min to m3/min
         PM25Today += density*breath;
 
-        State state = new State("0", Long.toString(System.currentTimeMillis()),
+        State state = new State(idToday,"0", Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR? "1":"0",
                 mMotionStatus == Const.MotionStatus.STATIC? "1" : mMotionStatus == Const.MotionStatus.WALK? "2" : "3",
                 Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1");
-         return state;
+        return state;
     }
 
     private String calLastWeekAvgPM(){
@@ -316,7 +327,7 @@ public class DBService extends Service
 
         String provider = mManager.getBestProvider(criteria, true);
         mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                Const.LOCATION_TIME_INTERVAL, 0, locationListener);
+                Const.DB_Location_INTERVAL, 0, locationListener);
     }
 
     /**
@@ -326,6 +337,7 @@ public class DBService extends Service
     private void insertState(State state) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         cupboard().withDatabase(db).put(state);
+        idToday++;
     }
 
     private void searchState(){
