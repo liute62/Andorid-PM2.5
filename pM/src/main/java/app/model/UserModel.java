@@ -6,7 +6,7 @@ import org.json.JSONObject;
 /**
  * Created by liuhaodong1 on 15/11/10.
  */
-public class UserModel extends BaseModel{
+public class UserModel extends BaseModel {
 
     public static final String ID = "id";
 
@@ -40,7 +40,7 @@ public class UserModel extends BaseModel{
 
     private String phone;
 
-    public static UserModel AddDataForTest(){
+    public static UserModel AddDataForTest() {
         UserModel userModel = new UserModel();
         userModel.setName("usermodel_name");
         userModel.setPassword("usermodel_password");
@@ -74,18 +74,20 @@ public class UserModel extends BaseModel{
         }
         if (object.has(SEX)) {
             bean.setSex(object.getString(SEX));
-        } if (object.has(PHONE)) {
+        }
+        if (object.has(PHONE)) {
             bean.setPhone(object.getString(PHONE));
         }
         return bean;
     }
 
-    public JSONObject toJsonObject() throws JSONException{
+    public JSONObject toJsonObject() throws JSONException {
         JSONObject object = new JSONObject();
         object.put(ID, getId());
         if (name != null) {
             object.put(NAME, getName());
-        }if (password != null) {
+        }
+        if (password != null) {
             object.put(PASSWORD, getPassword());
         }
         if (email != null) {
@@ -93,12 +95,15 @@ public class UserModel extends BaseModel{
         }
         if (firstname != null) {
             object.put(FIRSTNAME, getFirstname());
-        }if (lastname != null) {
+        }
+        if (lastname != null) {
             object.put(LASTNAME, getLastname());
-        }if (sex != null){
-            object.put(SEX,getSex());
-        }if (phone != null){
-            object.put(PHONE,getPhone());
+        }
+        if (sex != null) {
+            object.put(SEX, getSex());
+        }
+        if (phone != null) {
+            object.put(PHONE, getPhone());
         }
         return object;
     }

@@ -645,7 +645,7 @@ public class CustomViewAbove extends ViewGroup {
         switch (action & MotionEventCompat.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
             /*
-			 * If being flinged and user touches, stop the fling. isFinished
+             * If being flinged and user touches, stop the fling. isFinished
 			 * will be false if being flinged.
 			 */
                 completeScroll();

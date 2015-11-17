@@ -10,7 +10,7 @@ import app.utils.ACache;
 import app.utils.SharedPreferencesUtil;
 import app.utils.ShortcutUtil;
 
-public class NotificationActivity extends Activity implements View.OnClickListener{
+public class NotificationActivity extends Activity implements View.OnClickListener {
 
     Button mSure;
     Button mCancel;
@@ -21,20 +21,20 @@ public class NotificationActivity extends Activity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         aCache = ACache.get(this);
-        mSure = (Button)findViewById(R.id.notification_sure);
-        mCancel = (Button)findViewById(R.id.notification_cancel);
+        mSure = (Button) findViewById(R.id.notification_sure);
+        mCancel = (Button) findViewById(R.id.notification_cancel);
         mSure.setOnClickListener(this);
         mCancel.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.notification_sure:
                 SharedPreferencesUtil
                         .setValue(getBaseContext(), "isAlreadyInit"
                                 + ShortcutUtil.getAppVersionCode(getBaseContext()), true);
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 NotificationActivity.this.finish();
                 break;

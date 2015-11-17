@@ -22,24 +22,24 @@ public class HttpUtil {
 
     private static final String base_url = "http://ilab.tongji.edu.cn/pm25/web/restful/";
 
-    public static final String Search_PM_url = base_url+"urban-airs/search";
+    public static final String Search_PM_url = base_url + "urban-airs/search";
 
-    public static final String Register_url = base_url+"users/logon";
+    public static final String Register_url = base_url + "users/logon";
 
-    public static final String Login_url = base_url+"users/login";
+    public static final String Login_url = base_url + "users/login";
 
-    public static final String Upload_url = base_url+"mobile-data/create";
+    public static final String Upload_url = base_url + "mobile-data/create";
 
-    public static final String ReadData_url = base_url+"mobile-datas";
+    public static final String ReadData_url = base_url + "mobile-datas";
 
-    public static final String DeviceData_url = base_url+"device-datas";
+    public static final String DeviceData_url = base_url + "device-datas";
 
     public static final String SearchCity_url = "http://api.map.baidu.com/geocoder?output=json";
 
     private static HttpUtil instance;
 
-    public static HttpUtil Instance(){
-        if (instance == null){
+    public static HttpUtil Instance() {
+        if (instance == null) {
             instance = new HttpUtil();
         }
         return instance;
@@ -74,12 +74,13 @@ public class HttpUtil {
 
     /**
      * Api-1.2
+     *
      * @param mActivity
      * @return
      */
-    public static HttpResult SearchPMRequest(final Activity mActivity,String longitude,String latitude,String time_point){
+    public static HttpResult SearchPMRequest(final Activity mActivity, String longitude, String latitude, String time_point) {
         String url = HttpUtil.Search_PM_url;
-        url = url+"?longitude="+longitude+"&latitude="+latitude+"&time_point="+time_point;
+        url = url + "?longitude=" + longitude + "&latitude=" + latitude + "&time_point=" + time_point;
         final HttpResult result = new HttpResult();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
@@ -101,12 +102,13 @@ public class HttpUtil {
 
     /**
      * Api-2
+     *
      * @param mActivity
      * @param model
      * @return
      * @throws JSONException
      */
-    public static HttpResult logOnRequest(final Activity mActivity,UserModel model) throws JSONException {
+    public static HttpResult logOnRequest(final Activity mActivity, UserModel model) throws JSONException {
         String url = HttpUtil.Register_url;
         final HttpResult result = new HttpResult();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, model.toJsonObject(), new Response.Listener<JSONObject>() {
@@ -165,9 +167,10 @@ public class HttpUtil {
 
     /**
      * Api-4
+     *
      * @throws JSONException
      */
-    public static HttpResult UploadRequest(final Activity mActivity,UploadModel model) throws JSONException{
+    public static HttpResult UploadRequest(final Activity mActivity, UploadModel model) throws JSONException {
         String url = HttpUtil.Upload_url;
         final HttpResult result = new HttpResult();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, model.toJsonObject(), new Response.Listener<JSONObject>() {
@@ -192,14 +195,15 @@ public class HttpUtil {
 
     /**
      * Api-5
+     *
      * @param mActivity
      * @param userid
      * @param time_point
      * @return
      */
-    public static HttpResult ReadData(final Activity mActivity,String userid, String time_point){
+    public static HttpResult ReadData(final Activity mActivity, String userid, String time_point) {
         String url = HttpUtil.ReadData_url;
-        url = url + "?userid="+userid+"&time_point="+time_point;
+        url = url + "?userid=" + userid + "&time_point=" + time_point;
         final HttpResult result = new HttpResult();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
@@ -222,14 +226,15 @@ public class HttpUtil {
 
     /**
      * Api-6
+     *
      * @param mActivity
      * @param devid
      * @param time_point
      * @return
      */
-    public static HttpResult GetDevice(final Activity mActivity,String devid, String time_point){
+    public static HttpResult GetDevice(final Activity mActivity, String devid, String time_point) {
         String url = HttpUtil.DeviceData_url;
-        url = url + "?devid="+devid+"&time_point="+time_point;
+        url = url + "?devid=" + devid + "&time_point=" + time_point;
         final HttpResult result = new HttpResult();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override

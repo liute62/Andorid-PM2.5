@@ -5,9 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
-import java.util.Map;
 
-import app.utils.DataGenerator;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.view.ColumnChartView;
@@ -24,7 +22,7 @@ public class ChartsPagerAdapter extends PagerAdapter {
     private ColumnChartData columnChartData;
     private LineChartData lineChartData;
 
-    public ChartsPagerAdapter(List<View> mViews,List<Integer> mTypes){
+    public ChartsPagerAdapter(List<View> mViews, List<Integer> mTypes) {
         this.viewList = mViews;
         this.typeList = mTypes;
     }
@@ -45,7 +43,7 @@ public class ChartsPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position,
                             Object object) {
-        container.removeView((View)(viewList.get(position)));
+        container.removeView((View) (viewList.get(position)));
 
     }
 
@@ -57,11 +55,11 @@ public class ChartsPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-         int type = typeList.get(position);
-         ColumnChartView view = (ColumnChartView)viewList.get(position);
-         container.addView(view);
-         view.setColumnChartData(null);
-         return viewList.get(position);
+        int type = typeList.get(position);
+        ColumnChartView view = (ColumnChartView) viewList.get(position);
+        container.addView(view);
+        view.setColumnChartData(null);
+        return viewList.get(position);
     }
 
- }
+}

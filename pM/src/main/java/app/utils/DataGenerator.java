@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter;
 import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.Line;
@@ -109,38 +111,170 @@ public class DataGenerator {
         return Color.GRAY;
     }
 
-    public static Map<Integer,Float> generateDataForChart1(){
-        Map<Integer,Float> map = new HashMap<>();
-        map.put(1,78.5f);
-        map.put(10,23.5f);
+    //ex. 10:30am = 10*2+1 = 21
+    public static Map<Integer, Float> generateDataForChart1() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(20, 3.5f);
+        map.put(21, 4.5f);
+        map.put(22, 5.5f);
+        map.put(23, 4.3f);
+        map.put(24, 3.8f);
+        map.put(25, 7.9f);
+        map.put(26, 4.3f);
+        map.put(27, 2.4f);
+        map.put(28, 8.5f);
+        map.put(29, 6.5f);
+        map.put(30, 3.4f);
+        map.put(31, 3.9f);
+        map.put(32, 6.7f);
+        map.put(33, 7.8f);
+        map.put(34, 4.3f);
+        map.put(35, 7.2f);
+        map.put(36, 8.1f);
+        map.put(37, 1.9f);
         return map;
     }
 
-    public static Map<Integer,Float> generateDataForChart2(){
-        Map<Integer,Float> map = new HashMap<>();
-        map.put(1,78.5f);
-        map.put(9,43.5f);
-        map.put(13,63.5f);
-        map.put(19,13.5f);
+    //ex. 10:30am = 10*2+1 = 21
+    public static Map<Integer, Float> generateDataForChart2() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(20, 73.5f);
+        map.put(21, 74.5f);
+        map.put(22, 75.5f);
+        map.put(23, 74.3f);
+        map.put(24, 63.8f);
+        map.put(25, 67.9f);
+        map.put(26, 64.3f);
+        map.put(27, 72.4f);
+        map.put(28, 88.5f);
+        map.put(29, 86.5f);
+        map.put(30, 73.4f);
+        map.put(31, 53.9f);
+        map.put(32, 76.7f);
+        map.put(33, 77.8f);
+        map.put(34, 64.3f);
+        map.put(35, 77.2f);
+        map.put(36, 88.1f);
+        map.put(37, 91.9f);
         return map;
     }
 
-    public static Map<Integer,Float> generateDataForChart3(){
-        Map<Integer,Float> map = new HashMap<>();
-        map.put(20,178.5f);
+    //Ex. 20 means 20:00pm
+    public static Map<Integer, Float> generateDataForChart3() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(20, 178.5f);
         return map;
     }
 
-    public static Map<Integer,Float> generateDataForChart4(){
-        Map<Integer,Float> map = new HashMap<>();
-        map.put(Integer.valueOf(ChartsConst.Chart_X[4][1]),78.5f);
-        map.put(Integer.valueOf(ChartsConst.Chart_X[4][3]),78.5f);
-        map.put(Integer.valueOf(ChartsConst.Chart_X[4][5]),78.5f);
-        map.put(Integer.valueOf(ChartsConst.Chart_X[4][7]),79.5f);
-        map.put(Integer.valueOf(ChartsConst.Chart_X[4][10]),88.5f);
-        map.put(Integer.valueOf(ChartsConst.Chart_X[4][12]),88.5f);
-        map.put(Integer.valueOf(ChartsConst.Chart_X[4][19]),78.5f);
+    //EX. 1 means 5min; 3 means 15min; 24 means 120min
+    public static Map<Integer, Float> generateDataForChart4() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(1, 78.5f);
+        map.put(2, 78.5f);
+        map.put(3, 78.5f);
+        map.put(4, 79.5f);
+        map.put(5, 88.5f);
+        map.put(8, 88.5f);
+        map.put(10, 78.5f);
+        map.put(23, 58.5f);
+        map.put(24, 48.5f);
         return map;
+    }
+
+    //EX. 1 means 5min; 3 means 15min; 24 means 120min
+    public static Map<Integer, Float> generateDataForChart5() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(1, 0.15f);
+        map.put(2, 0.25f);
+        map.put(3, 0.24f);
+        map.put(5, 0.24f);
+        map.put(7, 0.04f);
+        map.put(8, 0.24f);
+        map.put(12, 0.25f);
+        map.put(14, 0.22f);
+        map.put(15, 0.23f);
+        map.put(19, 0.35f);
+        return map;
+    }
+
+    //ex. 10:30am = 10*2+1 = 21
+    public static Map<Integer, Float> generateDataForChart6() {
+        Map<Integer, Float> map = new HashMap<>();
+        for (int i = 0; i != 48; i++) {
+            map.put(i, (float) Math.random() * 100);
+        }
+        return map;
+    }
+
+    //ex. 0 means day1
+    public static Map<Integer, Float> generateDataForChart7() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(0, 428.5f);
+        map.put(1, 143.5f);
+        map.put(2, 293.5f);
+        map.put(3, 353.5f);
+        map.put(4, 193.5f);
+        map.put(5, 353.5f);
+        map.put(6, 553.5f);
+        return map;
+    }
+
+    public static List<String> generateChart7Date() {
+        List data = new ArrayList();
+        data.add("11.11");
+        data.add("11.12");
+        data.add("11.13");
+        data.add("11.14");
+        data.add("11.15");
+        data.add("11.16");
+        data.add("11.17");
+        return data;
+    }
+
+    //EX. 1 means 5min; 3 means 15min; 24 means 120min
+    public static Map<Integer, Float> generateDataForChart8() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(1, 6.1f);
+        map.put(2, 6.4f);
+        map.put(3, 6.4f);
+        map.put(5, 4.4f);
+        map.put(7, 5.4f);
+        map.put(8, 6.8f);
+        map.put(12, 5.5f);
+        map.put(14, 6.7f);
+        map.put(15, 8.2f);
+        map.put(19, 8.3f);
+        map.put(21, 7.3f);
+        map.put(22, 6.8f);
+        map.put(24, 5.3f);
+        return map;
+    }
+
+    public static Map<Integer, Float> generateDataForChart10() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(24, 278.5f);
+        return map;
+    }
+
+    public static Map<Integer, Float> generateDataForChart12() {
+        Map<Integer, Float> map = new HashMap<>();
+        map.put(1, 28.5f);
+        map.put(2, 43.5f);
+        map.put(3, 93.5f);
+        map.put(4, 53.5f);
+        return map;
+    }
+
+    public static List<String> generateChart12Date() {
+        List data = new ArrayList();
+        data.add("11.11");
+        data.add("11.12");
+        data.add("11.13");
+        data.add("11.14");
+        data.add("11.15");
+        data.add("11.16");
+        data.add("11.17");
+        return data;
     }
 
     public static LineChartData setDataForChart1() {
@@ -199,4 +333,361 @@ public class DataGenerator {
         data.setBaseValue(Float.NEGATIVE_INFINITY);
         return data;
     }
+
+    public static ColumnChartData chart1DataGenerator(Map<Integer, Float> maps) {
+        ColumnChartData data;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numColumns = ChartsConst.Chart_X[1].length;
+        for (int i = 0; i != numColumns; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[1][i]));
+        }
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<SubcolumnValue>();
+            SubcolumnValue value;
+            if (maps.containsKey(i)) {
+                float input = maps.get(i).floatValue();
+                value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
+            } else {
+                value = new SubcolumnValue(0.0f);
+            }
+
+            values.add(value);
+            Column column = new Column(values);
+            column.setHasLabels(false);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
+        data.setAxisYLeft(axisY);
+        return data;
+    }
+
+    public static LineChartData chart2DataGenerator(Map<Integer, Float> map) {
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numberOfLines = 1;
+        int numberOfPoints = ChartsConst.Chart_X[2].length;
+        for (int i = 0; i != numberOfPoints; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[2][i]));
+        }
+        int maxNumberOfLines = 1;
+        float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
+        ValueShape shape = ValueShape.CIRCLE;
+        LineChartData data;
+        //data generation
+        for (int j = 0; j < numberOfPoints; ++j) {
+            if (map.containsKey(j)) {
+                randomNumbersTab[0][j] = map.get(j).floatValue();
+            } else {
+                randomNumbersTab[0][j] = 0;
+            }
+        }
+        List<Line> lines = new ArrayList<Line>();
+        for (int i = 0; i < numberOfLines; ++i) {
+            List<PointValue> values = new ArrayList<PointValue>();
+            for (int j = 0; j < numberOfPoints; ++j) {
+                values.add(new PointValue(j, randomNumbersTab[i][j]));
+            }
+
+            Line line = new Line(values);
+            line.setColor(ChartUtils.COLOR_BLUE);
+            line.setShape(shape);
+            line.setFilled(false);
+            line.setHasLines(true);
+            line.setHasPoints(false);
+            lines.add(line);
+        }
+
+        data = new LineChartData(lines);
+        Axis axisX = new Axis(axisValues);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        data.setBaseValue(Float.NEGATIVE_INFINITY);
+        return data;
+    }
+
+    public static LineChartData chart3DataGenerator(int time, float result) {
+        Line line;
+        List<PointValue> values;
+        List<Line> lines = new ArrayList<Line>();
+        // Height line, add it as first line to be drawn in the background.
+        values = new ArrayList<PointValue>();
+        values.add(new PointValue(0, 0));
+        values.add(new PointValue(time, result));
+        line = new Line(values);
+        line.setColor(Color.BLUE);
+        line.setHasPoints(false);
+        line.setFilled(true);
+        line.setStrokeWidth(1);
+        lines.add(line);
+        // Data and axes
+        LineChartData data = new LineChartData(lines);
+        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
+        // value.
+        Axis distanceAxis = new Axis();
+        distanceAxis.setName("时间");
+        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
+        distanceAxis.setMaxLabelChars(4);
+        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("点".toCharArray()));
+        distanceAxis.setHasLines(true);
+        distanceAxis.setInside(true);
+        data.setAxisXBottom(distanceAxis);
+        // Speed axis
+        data.setAxisYLeft(new Axis().setName("毫克").setHasLines(true).setMaxLabelChars(3)
+                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+
+        return data;
+    }
+
+    public static LineChartData chart4DataGenerator(Map<Integer, Float> map) {
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numberOfLines = 1;
+        int numberOfPoints = ChartsConst.Chart_X[4].length;
+        for (int i = 0; i != numberOfPoints; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[4][i]));
+        }
+        int maxNumberOfLines = 1;
+        float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
+        ValueShape shape = ValueShape.CIRCLE;
+        LineChartData data;
+        //data generation
+        for (int j = 0; j < numberOfPoints; ++j) {
+            if (map.containsKey(j)) {
+                randomNumbersTab[0][j] = map.get(j).floatValue();
+            } else {
+                randomNumbersTab[0][j] = 0;
+            }
+        }
+        List<Line> lines = new ArrayList<Line>();
+        for (int i = 0; i < numberOfLines; ++i) {
+            List<PointValue> values = new ArrayList<PointValue>();
+            for (int j = 0; j < numberOfPoints; ++j) {
+                values.add(new PointValue(j, randomNumbersTab[i][j]));
+            }
+
+            Line line = new Line(values);
+            line.setColor(ChartUtils.COLOR_BLUE);
+            line.setShape(shape);
+            line.setFilled(false);
+            line.setHasLines(true);
+            line.setHasPoints(false);
+            lines.add(line);
+        }
+
+        data = new LineChartData(lines);
+        Axis axisX = new Axis(axisValues);
+        axisX.setFormatter(new SimpleAxisValueFormatter().setAppendedText("分钟".toCharArray()));
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        data.setBaseValue(Float.NEGATIVE_INFINITY);
+        return data;
+    }
+
+    public static ColumnChartData chart5DataGenerator(Map<Integer, Float> maps) {
+        ColumnChartData data;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numColumns = ChartsConst.Chart_X[5].length;
+        for (int i = 0; i != numColumns; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[5][i]));
+        }
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<SubcolumnValue>();
+            SubcolumnValue value;
+            if (maps.containsKey(i)) {
+                float input = maps.get(i).floatValue();
+                value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
+            } else {
+                value = new SubcolumnValue(0.0f);
+            }
+
+            values.add(value);
+            Column column = new Column(values);
+            column.setHasLabels(false);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
+        data.setAxisYLeft(axisY);
+        return data;
+    }
+
+    public static ColumnChartData chart6DataGenerator(Map<Integer, Float> maps) {
+        ColumnChartData data;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numColumns = ChartsConst.Chart_X[6].length;
+        for (int i = 0; i != numColumns; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[6][i]));
+        }
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<SubcolumnValue>();
+            SubcolumnValue value;
+            if (maps.containsKey(i)) {
+                float input = maps.get(i).floatValue();
+                value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
+            } else {
+                value = new SubcolumnValue(0.0f);
+            }
+
+            values.add(value);
+            Column column = new Column(values);
+            column.setHasLabels(false);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
+        data.setAxisYLeft(axisY);
+        return data;
+    }
+
+    public static ColumnChartData chart7DataGenerator(Map<Integer, Float> maps, List<String> date) {
+        ColumnChartData data;
+        int numSubcolumns = 1;
+        int numColumns = ChartsConst.Chart_X[7].length;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        for (int i = 0; i != numColumns; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+        }
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<SubcolumnValue>();
+            SubcolumnValue value;
+            if (maps.containsKey(i)) {
+                float input = maps.get(i).floatValue();
+                value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
+            } else {
+                value = new SubcolumnValue(0.0f);
+            }
+
+            values.add(value);
+            Column column = new Column(values);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisX = new Axis(axisValues).setHasLines(true);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        return data;
+    }
+
+    public static ColumnChartData chart8DataGenerator(Map<Integer, Float> maps) {
+        ColumnChartData data;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numColumns = ChartsConst.Chart_X[8].length;
+        for (int i = 0; i != numColumns; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[8][i]));
+        }
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<SubcolumnValue>();
+            SubcolumnValue value;
+            if (maps.containsKey(i)) {
+                float input = maps.get(i).floatValue();
+                value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
+            } else {
+                value = new SubcolumnValue(0.0f);
+            }
+
+            values.add(value);
+            Column column = new Column(values);
+            column.setHasLabels(false);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
+        data.setAxisYLeft(axisY);
+        return data;
+    }
+
+    public static LineChartData chart10DataGenerator(int time, float result) {
+        Line line;
+        List<PointValue> values;
+        List<Line> lines = new ArrayList<Line>();
+
+        // Height line, add it as first line to be drawn in the background.
+        values = new ArrayList<PointValue>();
+        values.add(new PointValue(0, 0));
+        values.add(new PointValue(time, result));
+        line = new Line(values);
+        line.setColor(Color.BLUE);
+        line.setHasPoints(false);
+        line.setFilled(true);
+        line.setStrokeWidth(1);
+        lines.add(line);
+        // Data and axes
+        LineChartData data = new LineChartData(lines);
+        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
+        // value.
+        Axis distanceAxis = new Axis();
+        distanceAxis.setName("时间");
+        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
+        distanceAxis.setMaxLabelChars(4);
+        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("点".toCharArray()));
+        distanceAxis.setHasLines(true);
+        distanceAxis.setInside(true);
+        data.setAxisXBottom(distanceAxis);
+        // Speed axis
+        data.setAxisYLeft(new Axis().setName("升").setHasLines(true).setMaxLabelChars(3)
+                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+
+        return data;
+    }
+
+    public static ColumnChartData chart12DataGenerator(Map<Integer, Float> maps, List<String> date) {
+        ColumnChartData data;
+        int numSubcolumns = 1;
+        int numColumns = ChartsConst.Chart_X[12].length;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        for (int i = 0; i != numColumns; i++) {
+            axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+        }
+        // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
+        List<Column> columns = new ArrayList<Column>();
+        List<SubcolumnValue> values;
+        for (int i = 0; i < numColumns; ++i) {
+            values = new ArrayList<SubcolumnValue>();
+            SubcolumnValue value;
+            if (maps.containsKey(i)) {
+                float input = maps.get(i).floatValue();
+                value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
+            } else {
+                value = new SubcolumnValue(0.0f);
+            }
+
+            values.add(value);
+            Column column = new Column(values);
+            columns.add(column);
+        }
+
+        data = new ColumnChartData(columns);
+        Axis axisX = new Axis(axisValues).setHasLines(true);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        return data;
+    }
+
 }

@@ -9,7 +9,7 @@ import app.Entity.State;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
- /**
+ * /**
  * Created by sweet on 15-10-4.
  */
 public class DBHelper extends SQLiteOpenHelper {

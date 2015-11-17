@@ -18,7 +18,7 @@
         <TextView
             android:id="@+id/textView1"
             style="@style/main_top_center_style"
-            android:text="@string/main_top_title"/>
+            android:text="@string/main_top_title" />
 
         <ImageView
             android:id="@+id/main_hot_map"
@@ -205,20 +205,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_1_change"
-            android:visibility="invisible"/>
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:visibility="invisible" />
 
         <lecho.lib.hellocharts.view.LineChartView
             android:id="@+id/main_chart_1_line"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_1_change"
-            android:visibility="invisible"/>
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:visibility="invisible" />
 
         <!--<android.support.v4.view.ViewPager-->
-            <!--android:id="@+id/main_chart_viewpager_1"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_below="@+id/main_chart_1_change"/>-->
+        <!--android:id="@+id/main_chart_viewpager_1"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@+id/main_chart_1_change"/>-->
 
     </RelativeLayout>
 
@@ -251,20 +255,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_2_change"
-            android:visibility="invisible"/>
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:visibility="invisible" />
 
         <lecho.lib.hellocharts.view.LineChartView
             android:id="@+id/main_chart_2_line"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_2_change"
-            android:visibility="invisible"/>
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="5dip"
+            android:visibility="invisible" />
 
         <!--<android.support.v4.view.ViewPager-->
-            <!--android:id="@+id/main_chart_viewpager_2"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_below="@+id/main_chart_2_change"/>-->
+        <!--android:id="@+id/main_chart_viewpager_2"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@+id/main_chart_2_change"/>-->
 
     </RelativeLayout>
 

@@ -70,7 +70,7 @@ public class PMModel {
 
     private String pm_breath_week;
 
-    public PMModel(){
+    public PMModel() {
         pm25 = "0";
         pm10 = "0";
         status = "0";
@@ -94,31 +94,44 @@ public class PMModel {
         PMModel bean = new PMModel();
         if (object.has(PM25)) {
             bean.setPm25(object.getString(PM25));
-        }if(object.has(PM10)){
+        }
+        if (object.has(PM10)) {
             bean.setPm10(object.getString(PM10));
-        }if(object.has(STATUS)){
+        }
+        if (object.has(STATUS)) {
             bean.setStatus(object.getString(STATUS));
-        }if(object.has(TEMPERATURE)){
+        }
+        if (object.has(TEMPERATURE)) {
             bean.setTemperature(object.getString(TEMPERATURE));
-        }if(object.has(HUMIDITY)){
+        }
+        if (object.has(HUMIDITY)) {
             bean.setHumidity(object.getString(HUMIDITY));
-        }if(object.has(UPDATETIME)){
+        }
+        if (object.has(UPDATETIME)) {
             bean.setUpdate_time(object.getString(UPDATETIME));
-        }if(object.has(ZEROTHREE)){
+        }
+        if (object.has(ZEROTHREE)) {
             bean.setZero_three(object.getString(ZEROTHREE));
-        }if(object.has(AQI)){
+        }
+        if (object.has(AQI)) {
             bean.setAqi(object.getString(AQI));
-        }if(object.has(NAME)){
+        }
+        if (object.has(NAME)) {
             bean.setName(object.getString(NAME));
-        }if(object.has(SO2)){
+        }
+        if (object.has(SO2)) {
             bean.setSo2(object.getString(SO2));
-        }if(object.has(NO2)){
+        }
+        if (object.has(NO2)) {
             bean.setNo2(object.getString(NO2));
-        }if(object.has(CO)){
+        }
+        if (object.has(CO)) {
             bean.setCo(object.getString(CO));
-        }if(object.has(PRESSURE)){
+        }
+        if (object.has(PRESSURE)) {
             bean.setPressure(object.getString(PRESSURE));
-        }if(object.has(WIND)){
+        }
+        if (object.has(WIND)) {
             bean.setWind(object.getString(WIND));
         }
         return bean;

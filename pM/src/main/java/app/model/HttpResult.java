@@ -30,7 +30,7 @@ public class HttpResult extends BaseModel {
         this.isSuccess = isSuccess;
     }
 
-    public JSONObject toJsonObject(){
+    public JSONObject toJsonObject() {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(resultBody);
@@ -40,10 +40,10 @@ public class HttpResult extends BaseModel {
         return jsonObject;
     }
 
-    public LogInModel toLogInModel(){
+    public LogInModel toLogInModel() {
         try {
             if (isSuccess == true)
-             return LogInModel.parse(new JSONObject(resultBody));
+                return LogInModel.parse(new JSONObject(resultBody));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -6,7 +6,7 @@ import org.json.JSONObject;
 /**
  * Created by liuhaodong1 on 15/11/10.
  */
-public class UploadModel extends BaseModel{
+public class UploadModel extends BaseModel {
 
     public static final String USERID = "userid";
 
@@ -52,7 +52,7 @@ public class UploadModel extends BaseModel{
 
     private String source;
 
-    public static UploadModel AddDataForTest(){
+    public static UploadModel AddDataForTest() {
         UploadModel model = new UploadModel();
         model.setUserID("55");
         model.setTimePoint("2013-08-20 12:00:00");
@@ -90,43 +90,56 @@ public class UploadModel extends BaseModel{
         }
         if (object.has(STEPS)) {
             bean.setSteps(object.getString(STEPS));
-        } if (object.has(AVG_RATE)) {
+        }
+        if (object.has(AVG_RATE)) {
             bean.setAvgRate(object.getString(AVG_RATE));
         }
         if (object.has(VENTILATION_VOLUME)) {
             bean.setVentilationVolume(object.getString(VENTILATION_VOLUME));
-        } if (object.has(PM25)) {
+        }
+        if (object.has(PM25)) {
             bean.setPm25(object.getString(PM25));
-        } if (object.has(SOURCE)) {
+        }
+        if (object.has(SOURCE)) {
             bean.setSource(object.getString(SOURCE));
         }
         return bean;
     }
 
-    public JSONObject toJsonObject() throws JSONException{
+    public JSONObject toJsonObject() throws JSONException {
         JSONObject object = new JSONObject();
         if (userID != null) {
             object.put(USERID, getUserID());
-        }if (timePoint != null) {
+        }
+        if (timePoint != null) {
             object.put(TIME_POINT, getTimePoint());
-        }if (longitude != null) {
+        }
+        if (longitude != null) {
             object.put(LONGITUDE, getLongitude());
-        }if (latitude != null) {
+        }
+        if (latitude != null) {
             object.put(LATITUDE, getLatitude());
-        }if (outdoor != null) {
+        }
+        if (outdoor != null) {
             object.put(OUTDOOR, getOutdoor());
-        }if (status != null){
-            object.put(STATUS,getStatus());
-        }if (steps != null){
-            object.put(STEPS,getSteps());
-        }if (avgRate != null){
-            object.put(AVG_RATE,getAvgRate());
-        }if (ventilationVolume != null){
-            object.put(VENTILATION_VOLUME,getVentilationVolume());
-        }if (pm25 != null){
-            object.put(PM25,getPm25());
-        }if (source != null){
-            object.put(SOURCE,getSource());
+        }
+        if (status != null) {
+            object.put(STATUS, getStatus());
+        }
+        if (steps != null) {
+            object.put(STEPS, getSteps());
+        }
+        if (avgRate != null) {
+            object.put(AVG_RATE, getAvgRate());
+        }
+        if (ventilationVolume != null) {
+            object.put(VENTILATION_VOLUME, getVentilationVolume());
+        }
+        if (pm25 != null) {
+            object.put(PM25, getPm25());
+        }
+        if (source != null) {
+            object.put(SOURCE, getSource());
         }
         return object;
     }

@@ -36,16 +36,17 @@ public class ProfileFragment extends Fragment implements
     Button mTurnOffService;
     ACache aCache;
 
-    Handler loginHandler = new Handler(){
+    Handler loginHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == Const.Handler_Login_Success){
-               mLogin.setOnClickListener(null);
-               mLogin.setText("退出登陆");
+            if (msg.what == Const.Handler_Login_Success) {
+                mLogin.setOnClickListener(null);
+                mLogin.setText("退出登陆");
             }
         }
     };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,25 +62,25 @@ public class ProfileFragment extends Fragment implements
         mHead = (ImageView) view.findViewById(R.id.profile_background_img);
         mScrollView = (PullScrollView) view.findViewById(R.id.profile_scroll_view);
         mScrollView.setHeader(mHead);
-        mLogin = (Button)view.findViewById(R.id.profile_login);
-        mLogout = (Button)view.findViewById(R.id.profile_logout);
-        mTurnOffUpload = (Button)view.findViewById(R.id.profile_turnoff_upload);
-        mTurnOffService = (Button)view.findViewById(R.id.profile_turnoff_service);
-        mClear = (Button)view.findViewById(R.id.profile_clear_data);
-        mRegister = (Button)view.findViewById(R.id.profile_rigister);
+        mLogin = (Button) view.findViewById(R.id.profile_login);
+        mLogout = (Button) view.findViewById(R.id.profile_logout);
+        mTurnOffUpload = (Button) view.findViewById(R.id.profile_turnoff_upload);
+        mTurnOffService = (Button) view.findViewById(R.id.profile_turnoff_service);
+        mClear = (Button) view.findViewById(R.id.profile_clear_data);
+        mRegister = (Button) view.findViewById(R.id.profile_rigister);
         checkCache();
         setListener();
         return view;
     }
 
-    private void checkCache(){
+    private void checkCache() {
         String userId = aCache.getAsString(Const.Cache_User_Id);
-        if (userId != null && !userId.equals("")){
+        if (userId != null && !userId.equals("")) {
             mLogin.setVisibility(View.INVISIBLE);
         }
     }
 
-    private void setListener(){
+    private void setListener() {
         mScrollView.setOnTurnListener(this);
         mLogin.setOnClickListener(this);
         mLogout.setOnClickListener(this);
@@ -88,6 +89,7 @@ public class ProfileFragment extends Fragment implements
         mClear.setOnClickListener(this);
         mRegister.setOnClickListener(this);
     }
+
     @Override
     public void onTurn() {
         // TODO Auto-generated method stub
@@ -97,9 +99,9 @@ public class ProfileFragment extends Fragment implements
     @Override
     public void onClick(View v) {
         // TODO Auto-generated method stub
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.profile_login:
-                LoginDialog loginDialog = new LoginDialog(getActivity(),loginHandler);
+                LoginDialog loginDialog = new LoginDialog(getActivity(), loginHandler);
                 loginDialog.show();
                 break;
             case R.id.profile_logout:
@@ -107,31 +109,31 @@ public class ProfileFragment extends Fragment implements
                 getActivity().finish();
                 break;
             case R.id.profile_turnoff_service:
-                if(v.getTag() == null || v.getTag().equals("on")){
+                if (v.getTag() == null || v.getTag().equals("on")) {
                     v.setTag("off");
-                    Intent intent = new Intent(mActivity,DBService.class);
+                    Intent intent = new Intent(mActivity, DBService.class);
                     mActivity.stopService(intent);
-                    ((TextView)v).setText(Const.Info_Turn_On_Service);
-                    Toast.makeText(mActivity,Const.Info_Turn_Off_Service,Toast.LENGTH_SHORT).show();
-                }else if(v.getTag().equals("off")){
+                    ((TextView) v).setText(Const.Info_Turn_On_Service);
+                    Toast.makeText(mActivity, Const.Info_Turn_Off_Service, Toast.LENGTH_SHORT).show();
+                } else if (v.getTag().equals("off")) {
                     v.setTag("on");
-                    Intent intent = new Intent(mActivity,DBService.class);
+                    Intent intent = new Intent(mActivity, DBService.class);
                     mActivity.startService(intent);
-                    ((TextView)v).setText(Const.Info_Turn_Off_Service);
-                    Toast.makeText(mActivity,Const.Info_Turn_On_Service,Toast.LENGTH_SHORT).show();
+                    ((TextView) v).setText(Const.Info_Turn_Off_Service);
+                    Toast.makeText(mActivity, Const.Info_Turn_On_Service, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.profile_turnoff_upload:
-                if(v.getTag() == null || v.getTag().equals("on")){
+                if (v.getTag() == null || v.getTag().equals("on")) {
                     v.setTag("off");
-                    ((TextView)v).setText(Const.Info_Turn_On_Upload);
-                    Toast.makeText(mActivity,Const.Info_Turn_Off_Upload,Toast.LENGTH_SHORT).show();
-                }else if(v.getTag().equals("off")){
+                    ((TextView) v).setText(Const.Info_Turn_On_Upload);
+                    Toast.makeText(mActivity, Const.Info_Turn_Off_Upload, Toast.LENGTH_SHORT).show();
+                } else if (v.getTag().equals("off")) {
                     v.setTag("on");
-                    Intent intent = new Intent(mActivity,DBService.class);
+                    Intent intent = new Intent(mActivity, DBService.class);
                     mActivity.startService(intent);
-                    ((TextView)v).setText(Const.Info_Turn_Off_Upload);
-                    Toast.makeText(mActivity,Const.Info_Turn_On_Upload,Toast.LENGTH_SHORT).show();
+                    ((TextView) v).setText(Const.Info_Turn_Off_Upload);
+                    Toast.makeText(mActivity, Const.Info_Turn_On_Upload, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.profile_clear_data:
@@ -141,7 +143,7 @@ public class ProfileFragment extends Fragment implements
         }
     }
 
-    private void clearCache(){
+    private void clearCache() {
         aCache.remove(Const.Cache_User_Id);
         aCache.remove(Const.Cache_Access_Token);
         aCache.remove(Const.Cache_PM_State);

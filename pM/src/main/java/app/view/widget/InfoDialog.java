@@ -13,7 +13,7 @@ import com.example.pm.R;
 /**
  * Created by liuhaodong1 on 15/11/12.
  */
-public class InfoDialog extends Dialog{
+public class InfoDialog extends Dialog {
 
     Activity mActivity;
     Button mSure;
@@ -34,27 +34,29 @@ public class InfoDialog extends Dialog{
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.widget_dialog_info);
-        mSure = (Button)findViewById(R.id.dialog_info_sure);
-        mCancel = (Button)findViewById(R.id.dialog_info_cancel);
-        mContent = (TextView)findViewById(R.id.dialog_info_content);
-        if(content != null){
+        mSure = (Button) findViewById(R.id.dialog_info_sure);
+        mCancel = (Button) findViewById(R.id.dialog_info_cancel);
+        mContent = (TextView) findViewById(R.id.dialog_info_content);
+        if (content != null) {
             mContent.setText(content);
-        }if (cancelListener != null){
+        }
+        if (cancelListener != null) {
             mCancel.setOnClickListener(cancelListener);
-        }if (sureListener != null){
+        }
+        if (sureListener != null) {
             mSure.setOnClickListener(sureListener);
         }
     }
 
-    public void setContent(String text){
-       content = text;
+    public void setContent(String text) {
+        content = text;
     }
 
-    public void setSureClickListener(View.OnClickListener listener){
-       sureListener = listener;
+    public void setSureClickListener(View.OnClickListener listener) {
+        sureListener = listener;
     }
 
-    public void setCancelClickListener(View.OnClickListener listener){
+    public void setCancelClickListener(View.OnClickListener listener) {
         cancelListener = listener;
     }
 

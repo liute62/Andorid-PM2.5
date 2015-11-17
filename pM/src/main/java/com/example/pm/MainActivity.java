@@ -9,9 +9,10 @@ import android.util.Log;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 
-public class MainActivity extends SlidingActivity{
+public class MainActivity extends SlidingActivity {
 
     Fragment newFragment;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -65,24 +66,24 @@ public class MainActivity extends SlidingActivity{
 
     @Override
     protected void onPause() {
-        Log.e("MainActivity","onPause1");
+        Log.e("MainActivity", "onPause1");
         super.onPause();
-        Log.e("MainActivity","onPause1");
+        Log.e("MainActivity", "onPause1");
 
     }
 
     @Override
     protected void onResume() {
-        Log.e("MainActivity","onResume1");
+        Log.e("MainActivity", "onResume1");
         super.onResume();
-        Log.e("MainActivity","onResume2");
+        Log.e("MainActivity", "onResume2");
     }
 
     @Override
     protected void onDestroy() {
-        Log.e("MainActivity","onDestroy1");
+        Log.e("MainActivity", "onDestroy1");
         super.onDestroy();
-        Log.e("MainActivity","onDestroy2");
+        Log.e("MainActivity", "onDestroy2");
     }
 
     @Override

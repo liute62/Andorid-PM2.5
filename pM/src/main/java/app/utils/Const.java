@@ -28,7 +28,9 @@ public class Const {
 
     public static boolean CURRENT_DB_RUNNING = false;
 
-    /**Cache**/
+    /**
+     * Cache*
+     */
     public static final String Cache_App_Initialized = "Cache_App_Initialized";
 
     public static final String Cache_User_Id = "Cache_User_Id";
@@ -41,14 +43,18 @@ public class Const {
 
     public static final String Cache_Latitude = "Cache_Latitude";
 
-    /**Handler Code**/
+    /**
+     * Handler Code*
+     */
     public static final int Handler_Login_Success = 100001;
 
     public static final int Handler_PM_Density = 100002;
 
     public static final int Handler_PM_Data = 100003;
 
-    /**Intent Tag Code**/
+    /**
+     * Intent Tag Code*
+     */
     public static final String Intent_PM_Id = "Intent_PM_Id";
 
     public static final String Intent_PM_Density = "Intent_PM_Density";
@@ -67,16 +73,22 @@ public class Const {
 
     public static final String Intent_Main_Location = "Intent_Main_Location";
 
-    /**Service & Activity Code**/
+    /**
+     * Service & Activity Code*
+     */
     public static final String Action_DB_MAIN_PMResult = "Action_DB_MAIN_PMResult";
 
     public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
 
 
-    /**GPS**/
+    /**
+     * GPS*
+     */
     public static final String APP_MAP_KEY = "";
 
-    /**Time related values**/
+    /**
+     * Time related values*
+     */
     public final static int DB_PM_Search_INTERVAL = 1000 * 5;//1Hour
 
     public final static int DB_Location_INTERVAL = 1000 * 5;
@@ -97,8 +109,10 @@ public class Const {
     public static final double bicycle_breath = 2.1 * static_breath;
     public static final double run_breath = 6 * static_breath;
 
-    /**Movement**/
-    public static enum MotionStatus{
+    /**
+     * Movement*
+     */
+    public static enum MotionStatus {
         NULL, STATIC, WALK, RUN
     }
 
@@ -168,8 +182,8 @@ public class Const {
     };
 
     public static String[] downloadPeriod = {
-      "0:10","1:10","2:10","3:10","4:10","5:10","6:10","7:10","8:10",
-       "9:10","10:10","11:10","12:10","13:10","14:10","15:10","16:10","17:10",
-       "18:10","19:10","20:10","21:10","22:10","23:10"
+            "0:10", "1:10", "2:10", "3:10", "4:10", "5:10", "6:10", "7:10", "8:10",
+            "9:10", "10:10", "11:10", "12:10", "13:10", "14:10", "15:10", "16:10", "17:10",
+            "18:10", "19:10", "20:10", "21:10", "22:10", "23:10"
     };
 }

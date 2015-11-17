@@ -4,19 +4,18 @@
     android:layout_width="400dip"
     android:layout_height="280dip"
     android:background="@color/White"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="20dip"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:orientation="vertical"></LinearLayout>
 
     <LinearLayout
         android:id="@+id/dialogname"
         android:layout_width="300dip"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/activitytitle_title"
@@ -34,7 +33,7 @@
         android:id="@+id/dialognum"
         android:layout_width="300dip"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/login_password"
@@ -71,7 +70,7 @@
     <LinearLayout
         android:layout_width="327dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/contact_info_gender"

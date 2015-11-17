@@ -47,7 +47,7 @@ public class ShortcutUtil {
             }
         }
 
-       if (user.length() < 8 || pass.length() < 8) {
+        if (user.length() < 8 || pass.length() < 8) {
             return 1;
         }
         return 3;
@@ -117,11 +117,12 @@ public class ShortcutUtil {
 
     /**
      * transfer the ug scale to mg scale
+     *
      * @param ugNumber the ug number
      * @param scale
      * @return
      */
-    public static String ugToMg(Double ugNumber,int scale){
+    public static String ugToMg(Double ugNumber, int scale) {
         BigDecimal bd = new BigDecimal(ugNumber / 1000);
         BigDecimal setScale = bd.setScale(scale, bd.ROUND_DOWN);
         return String.valueOf(setScale.doubleValue());

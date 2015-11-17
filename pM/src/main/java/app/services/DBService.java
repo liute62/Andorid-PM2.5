@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -48,8 +47,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 /**
  * Created by liuhaodong1 on 15/11/10.
  */
-public class DBService extends Service
-{
+public class DBService extends Service {
     public static final String ACTION = "app.services.DBService";
 
     private DBHelper dbHelper;
@@ -83,12 +81,12 @@ public class DBService extends Service
         @Override
         public void run() {
             //addPM25();
-            if(DBCanRun) {
+            if (DBCanRun) {
                 State state = calculatePM25(longitude, latitude);
                 insertState(state); //insert the information into database
                 state.print();
                 Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
-                intent.putExtra(Const.Intent_PM_Id,idToday);
+                intent.putExtra(Const.Intent_PM_Id, idToday);
                 intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM("Han"));
                 intent.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                 intent.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
@@ -110,7 +108,7 @@ public class DBService extends Service
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("DBService","OnCreate");
+        Log.e("DBService", "OnCreate");
         DBInitial();
         sensorInitial();
         GPSInitial();
@@ -123,7 +121,7 @@ public class DBService extends Service
         DBRunnable = null;
     }
 
-    private void DBInitial(){
+    private void DBInitial() {
         dbHelper = new DBHelper(getApplicationContext());
         db = dbHelper.getReadableDatabase();
 
@@ -164,7 +162,7 @@ public class DBService extends Service
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("PM2.5")
-                        .setContentText(" 服务运行中")
+                        .setContentText("服务运行中")
                         .setContentIntent(pendingIntent)
                         .setOngoing(true);
 
@@ -174,11 +172,12 @@ public class DBService extends Service
     /**
      * density: (ug/m3)
      * breath:  (L/min)
+     *
      * @param longi
      * @param lati
      * @return
      */
-    private State calculatePM25(double longi,double lati) {
+    private State calculatePM25(double longi, double lati) {
         Double breath = 0.0;
         Double density = PM25Density;
         //Double density = Double.valueOf(Const.CURRENT_PM_MODEL.getPm25());
@@ -194,23 +193,23 @@ public class DBService extends Service
         }
         venVolToday += breath;
         breath = breath / 1000; //change L/min to m3/min
-        PM25Today += density*breath;
+        PM25Today += density * breath;
 
-        State state = new State(idToday,"0", Long.toString(System.currentTimeMillis()),
+        State state = new State(idToday, "0", Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
-                Const.CURRENT_INDOOR? "1":"0",
-                mMotionStatus == Const.MotionStatus.STATIC? "1" : mMotionStatus == Const.MotionStatus.WALK? "2" : "3",
+                Const.CURRENT_INDOOR ? "1" : "0",
+                mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
                 Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1");
         return state;
     }
 
-    private String calLastWeekAvgPM(){
+    private String calLastWeekAvgPM() {
         Double result = 0.0;
-        return  String.valueOf(result);
+        return String.valueOf(result);
     }
 
-    private String calLastHourPM(String tag){
+    private String calLastHourPM(String tag) {
         Double result = 0.0;
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -223,23 +222,23 @@ public class DBService extends Service
         Long nextTime = calendar.getTime().getTime();
 
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
-        if(states.isEmpty()){
+        if (states.isEmpty()) {
             return String.valueOf(result);
-        }else if(states.size() == 1){
+        } else if (states.size() == 1) {
             return states.get(states.size() - 1).getPm25();
-        }else {
+        } else {
 
             State state1 = states.get(states.size() - 1);
             State state2 = states.get(states.size() - 2);
             result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
         }
-        Log.e("calLast"+tag,String.valueOf(result));
+        Log.e("calLast" + tag, String.valueOf(result));
         return String.valueOf(result);
     }
 
-   private void sensorInitial(){
+    private void sensorInitial() {
         numSteps = 0;
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         simpleStepDetector = new SimpleStepDetector();
         simpleStepDetector.registerListener(new StepListener() {
@@ -258,10 +257,10 @@ public class DBService extends Service
                 }
 
                 long time2 = System.currentTimeMillis();
-                if(time2 - time1 > 5000){
+                if (time2 - time1 > 5000) {
                     if (numSteps > 70)
                         mMotionStatus = Const.MotionStatus.RUN;
-                    else if(numSteps <= 70 && numSteps >= 30)
+                    else if (numSteps <= 70 && numSteps >= 30)
                         mMotionStatus = Const.MotionStatus.WALK;
                     else
                         mMotionStatus = Const.MotionStatus.STATIC;
@@ -274,26 +273,26 @@ public class DBService extends Service
             public void onAccuracyChanged(Sensor sensor, int i) {
 
             }
-        }, mAccelerometer,SensorManager.SENSOR_DELAY_NORMAL);
+        }, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private void GPSInitial(){
-        mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+    private void GPSInitial() {
+        mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if(location != null) {
+                if (location != null) {
                     longitude = location.getLongitude();
                     latitude = location.getLatitude();
-                    if(last_long == longitude && last_lati == latitude){
+                    if (last_long == longitude && last_lati == latitude) {
                         //means no changes
-                    }else {
+                    } else {
                         //location has been changed
                         last_lati = latitude;
                         last_long = longitude;
-                        if (isPMSearchRun == false){
-                            Log.e("onLocationChanged","searchPMRequest");
-                            searchPMRequest(String.valueOf(longitude),String.valueOf(latitude));
+                        if (isPMSearchRun == false) {
+                            Log.e("onLocationChanged", "searchPMRequest");
+                            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                         }
                     }
                 }
@@ -307,12 +306,12 @@ public class DBService extends Service
 
             @Override
             public void onProviderEnabled(String s) {
-                Log.e("onProviderEnabled",s);
+                Log.e("onProviderEnabled", s);
             }
 
             @Override
             public void onProviderDisabled(String s) {
-                Log.e("onProviderDisabled",s);
+                Log.e("onProviderDisabled", s);
                 Toast.makeText(getApplicationContext(), Const.ERROR_NO_GPS,
                         Toast.LENGTH_SHORT).show();
             }
@@ -332,6 +331,7 @@ public class DBService extends Service
 
     /**
      * DB Operations
+     *
      * @param state
      */
     private void insertState(State state) {
@@ -340,7 +340,7 @@ public class DBService extends Service
         idToday++;
     }
 
-    private void searchState(){
+    private void searchState() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -351,8 +351,8 @@ public class DBService extends Service
         calendar.set(year, month, day, 23, 59, 59);
         Long nextTime = calendar.getTime().getTime();
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
-        if(!states.isEmpty()){
-            for (int i = 0; i != states.size(); i++){
+        if (!states.isEmpty()) {
+            for (int i = 0; i != states.size(); i++) {
                 states.get(i).print();
             }
         }
@@ -360,13 +360,14 @@ public class DBService extends Service
 
     /**
      * Get and Update Current PM info.
+     *
      * @param longitude
      * @param latitude
      */
-    private void searchPMRequest(String longitude,String latitude){
+    private void searchPMRequest(String longitude, String latitude) {
         isPMSearchRun = true;
         String url = HttpUtil.Search_PM_url;
-        url = url+"?longitude="+longitude+"&latitude="+latitude;
+        url = url + "?longitude=" + longitude + "&latitude=" + latitude;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -374,7 +375,7 @@ public class DBService extends Service
                 try {
                     pmModel = PMModel.parse(response);
                     Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
-                    intent.putExtra(Const.Intent_PM_Density,pmModel.getPm25());
+                    intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
                     //set current pm density for calculation
                     PM25Density = Double.valueOf(pmModel.getPm25());
                     sendBroadcast(intent);
@@ -388,7 +389,7 @@ public class DBService extends Service
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                isPMSearchRun  = false;
+                isPMSearchRun = false;
                 Toast.makeText(getApplicationContext(), "Data Get Fail!", Toast.LENGTH_SHORT).show();
             }
 

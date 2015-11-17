@@ -19,7 +19,7 @@ public class ChartFragment extends Fragment {
 
     int pos;
 
-    public ChartFragment(){
+    public ChartFragment() {
 
     }
 

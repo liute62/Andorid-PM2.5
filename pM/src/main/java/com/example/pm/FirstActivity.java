@@ -2,17 +2,15 @@ package com.example.pm;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.WindowManager;
 
 import app.utils.SharedPreferencesUtil;
 import app.utils.ShortcutUtil;
 
-public class FirstActivity extends Activity{
+public class FirstActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -23,7 +21,7 @@ public class FirstActivity extends Activity{
         mHandler.sendEmptyMessageDelayed(0, 1000);
     }
 
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
@@ -46,7 +44,7 @@ public class FirstActivity extends Activity{
                 startActivity(new Intent(FirstActivity.this,
                         MainActivity.class));
             }
-           FirstActivity.this.finish();
+            FirstActivity.this.finish();
         }
     };
 }

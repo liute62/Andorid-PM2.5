@@ -4,15 +4,17 @@
     android:layout_width="400dip"
     android:layout_height="wrap_content"
     android:background="@color/White"
-    android:orientation="vertical" >
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dip"></LinearLayout>
+
     <LinearLayout
         android:id="@+id/dialogname"
         android:layout_width="320dip"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <TextView
             android:layout_marginLeft="@dimen/login_dialog_left2"
@@ -42,7 +44,7 @@
         android:background="@drawable/btn_feed_attention_click"
         android:text="取消"
         android:textColor="@color/White" />
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dip"></LinearLayout>
