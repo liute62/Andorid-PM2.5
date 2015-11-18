@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -126,5 +127,53 @@ public class ShortcutUtil {
         BigDecimal bd = new BigDecimal(ugNumber / 1000);
         BigDecimal setScale = bd.setScale(scale, bd.ROUND_DOWN);
         return String.valueOf(setScale.doubleValue());
+    }
+
+    public static String ugScale(double number,int scale){
+        BigDecimal bd = new BigDecimal(number / 1000);
+        BigDecimal setScale = bd.setScale(scale, bd.ROUND_DOWN);
+        return String.valueOf(setScale.doubleValue());
+    }
+
+    /**
+     * Ex. xxxxYxxMxxD 22:31 returns 22*1+1 = 43
+     * @param currentTime
+     * @return
+     */
+    public static int timeToPoint(long currentTime){
+       String date = refFormatNowDate(currentTime);
+       int tmp1 = 0,tmp2 = -1,tmp3 = 0;
+        Log.e("date",date);
+       for(int i = 0; i != date.length(); i++){
+           if(date.charAt(i) == '-'){
+               tmp1 = i;
+           }if(date.charAt(i) == ':'){
+               if(tmp2 == -1){
+                   tmp2 = i;
+               }else {
+                   tmp3 = i;
+               }
+           }
+       }
+       String hour = date.substring(tmp1+4,tmp2);
+       String min = date.substring(tmp2+1,tmp3);
+       int add = 0;
+       if(Integer.valueOf(min) >= 30){
+          add = 1;
+       }else {
+           add = 0;
+       }
+       return Integer.valueOf(hour) * 2 + add;
+    }
+
+    public static float avgOfArrayNum(Object[] array){
+
+        int num = array.length;
+        if (num == 0) return 0;
+        float sum = 0;
+        for (int i = 0; i != num; i++){
+            sum += (Float)array[0];
+        }
+        return sum / num;
     }
 }

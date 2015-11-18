@@ -3,6 +3,7 @@ package app.Entity;
 import android.util.Log;
 
 import app.utils.DBConstants;
+import app.utils.ShortcutUtil;
 import nl.qbusict.cupboard.annotation.Column;
 
 /**
@@ -60,6 +61,7 @@ public class State {
         Log.e("id", String.valueOf(id));
         Log.e("userid", String.valueOf(userid));
         Log.e("time_point", String.valueOf(time_point));
+        Log.e("time_point_format", ShortcutUtil.refFormatNowDate(Long.valueOf(time_point)));
         Log.e("longtitude", String.valueOf(longtitude));
         Log.e("latitude", String.valueOf(latitude));
         Log.e("outdoor", String.valueOf(outdoor));

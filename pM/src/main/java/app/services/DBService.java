@@ -30,8 +30,12 @@ import com.example.pm.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.Entity.State;
 import app.model.PMModel;
@@ -40,6 +44,7 @@ import app.movement.StepListener;
 import app.utils.Const;
 import app.utils.DBHelper;
 import app.utils.HttpUtil;
+import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
@@ -76,6 +81,8 @@ public class DBService extends Service {
     private Handler DBHandler = new Handler();
 
     private boolean DBCanRun = false;
+    private int DBRunTime = 0;
+    private boolean ChartTaskCanRun = false;
     private Runnable DBRunnable = new Runnable() {
 
         @Override
@@ -93,6 +100,20 @@ public class DBService extends Service {
                 intent.putExtra(Const.Intent_DB_PM_TIME, state.getTime_point());
                 intent.putExtra(Const.Intent_DB_Ven_Volume, state.getVentilation_volume());
                 sendBroadcast(intent);
+                DBRunTime++;
+                if(DBRunTime == 5){
+                    DBRunTime = 0;
+                    ChartTaskCanRun = true;
+                }
+            }
+            if (ChartTaskCanRun){
+                ChartTaskCanRun = false;
+                Intent intent = new Intent(Const.Action_Chart_Result);
+                Bundle mBundle = new Bundle();
+                mBundle.putSerializable(Const.Intent_chart1_data,calChart1Data());
+                intent.putExtras(mBundle);
+                sendBroadcast(intent);
+                Log.e("ChartTaskCanRun","ChartTaskCanRun");
             }
             //searchState();
             //upload(state);
@@ -234,6 +255,45 @@ public class DBService extends Service {
         }
         Log.e("calLast" + tag, String.valueOf(result));
         return String.valueOf(result);
+    }
+
+    private HashMap<Integer,Float> calChart1Data(){
+        HashMap<Integer,Float> map = new HashMap<>();
+        Double result = 0.0;
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(year, month, day, 0, 0, 0);
+
+        Long nowTime = calendar.getTime().getTime();
+        calendar.set(year, month, day, 23, 59, 59);
+        Long nextTime = calendar.getTime().getTime();
+
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
+        Map<Integer,Float> tmpMap = new HashMap<>();
+        if (states.isEmpty()){
+            return map;
+        }
+        for(int i = 0; i != states.size(); i++){
+            State state = states.get(i);
+            int index = ShortcutUtil.timeToPoint(Long.valueOf(state.getTime_point()));
+            float pm25;
+            if(i == 0){
+                pm25 = Float.valueOf(state.getPm25());
+            }else {
+                pm25 = Float.valueOf(state.getPm25()) - Float.valueOf(states.get(i-1).getPm25());
+            }
+            //now we get the index of time and the pm25 of that point
+            tmpMap.put(index, pm25);
+        }
+        //now calculate the avg value
+        for (int i = 0; i != 48; i++) {
+            if (tmpMap.containsKey(i)) {
+                map.put(i,ShortcutUtil.avgOfArrayNum(tmpMap.values().toArray()));
+            }
+        }
+        return map;
     }
 
     private void sensorInitial() {

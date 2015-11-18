@@ -73,6 +73,8 @@ public class Const {
 
     public static final String Intent_Main_Location = "Intent_Main_Location";
 
+    public static final String Intent_chart1_data = "Intent_chart1_data";
+
     /**
      * Service & Activity Code*
      */
@@ -80,6 +82,7 @@ public class Const {
 
     public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
 
+    public static final String Action_Chart_Result = "Action_Chart_Result";
 
     /**
      * GPS*
@@ -93,7 +96,7 @@ public class Const {
 
     public final static int DB_Location_INTERVAL = 1000 * 5;
 
-    public final static int DB_PM_Cal_INTERVAL = 1000 * 60; //1min
+    public final static int DB_PM_Cal_INTERVAL = 1000 * 5; //1min
 
     public static final String ERROR_NO_GPS = "请先打开定位！";
 

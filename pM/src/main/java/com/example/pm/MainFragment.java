@@ -33,6 +33,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+
 import app.model.PMModel;
 import app.services.DBService;
 import app.utils.ACache;
@@ -97,6 +99,8 @@ public class MainFragment extends Fragment implements OnClickListener {
     LineChartView mChart1line;
     ColumnChartView mChart2column;
     LineChartView mChart2line;
+    /**Charts data**/
+    HashMap<Integer,Float> chartData1;
 
     private DBServiceReceiver dbReceiver;
     Handler mClockHandler = new Handler() {
@@ -147,6 +151,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter = new IntentFilter();
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
+            intentFilter.addAction(Const.Action_Chart_Result);
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
         super.onResume();
@@ -156,6 +161,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+        chartData1 = new HashMap<>();
         current_chart1_index = 1;
         current_chart2_index = 2;
         isClockTaskRun = false;
@@ -169,6 +175,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter = new IntentFilter();
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
+            intentFilter.addAction(Const.Action_Chart_Result);
             mActivity.registerReceiver(dbReceiver, intentFilter);
             Intent mIntent = new Intent(mActivity, DBService.class);
             mActivity.startService(mIntent);
@@ -315,8 +322,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
         mHint.setTextColor(DataGenerator.setHeathHintColor(PMDensity));
-        mHourPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheHour, 1)) + " 毫克");
-        mDayPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheDay, 1)) + " 毫克");
+        mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) + " 微克");
+        mDayPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheDay, 2)) + " 毫克");
         mWeekPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheWeekAvg, 1)) + " 毫克");
     }
 
@@ -418,6 +425,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.e("OnReceive",intent.getAction().toString());
             if (intent.getAction().equals(Const.Action_DB_MAIN_PMDensity)) {
                 //Update the density of PM
                 PMModel model = new PMModel();
@@ -437,6 +445,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 data.what = Const.Handler_PM_Data;
                 data.obj = model;
                 mDataHandler.sendMessage(data);
+            } else if(intent.getAction().equals(Const.Action_Chart_Result)){
+                Log.e("Action_Chart_Result","Action_Chart_Result");
+                HashMap data1 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart1_data);
+                chartData1 = data1;
+                chartInitial(current_chart1_index,current_chart2_index);
             }
         }
     }
@@ -444,7 +457,8 @@ public class MainFragment extends Fragment implements OnClickListener {
     private Object setChartDataByIndex(int index) {
         switch (index) {
             case 1:
-                return DataGenerator.chart1DataGenerator(DataGenerator.generateDataForChart1());
+//                return DataGenerator.chart1DataGenerator(DataGenerator.generateDataForChart1());
+                  return DataGenerator.chart1DataGenerator(chartData1);
             case 2:
                 return DataGenerator.chart2DataGenerator(DataGenerator.generateDataForChart2());
             case 3:
