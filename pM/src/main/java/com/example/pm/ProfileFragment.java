@@ -139,6 +139,8 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_clear_data:
                 break;
             case R.id.profile_rigister:
+                Intent intent = new Intent(mActivity,RegisterActivity.class);
+                startActivity(intent);
                 break;
         }
     }

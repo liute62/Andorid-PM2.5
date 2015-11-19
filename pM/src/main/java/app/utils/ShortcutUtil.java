@@ -130,7 +130,7 @@ public class ShortcutUtil {
     }
 
     public static String ugScale(double number,int scale){
-        BigDecimal bd = new BigDecimal(number / 1000);
+        BigDecimal bd = new BigDecimal(number);
         BigDecimal setScale = bd.setScale(scale, bd.ROUND_DOWN);
         return String.valueOf(setScale.doubleValue());
     }

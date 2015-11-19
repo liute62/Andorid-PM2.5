@@ -104,6 +104,7 @@ public class Const {
 
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 
+    public static final String ERROR_REGISTER_WRONG = "无法注册,请检查当前网络状态";
     //breath according to state
     public static final double boy_breath = 6.6; // L/min
     public static final double girl_breath = 6.0; // L/min
@@ -129,6 +130,10 @@ public class Const {
     public static final String Info_Turn_Off_Upload = "关闭数据上传";
 
     public static final String Info_Turn_On_Upload = "开启数据上传";
+
+    public static final String Info_Register_Success = "注册用户成功";
+
+    public static final String Info_Register_Failed = "注册用户失败";
 
     public static String[] cityName =
             {
