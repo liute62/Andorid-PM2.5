@@ -61,29 +61,22 @@ public class MainActivity extends SlidingActivity {
                 .replace(R.id.content, fragment)
                 .commit();
         getSlidingMenu().showContent();
-        Log.e("switchContent", "yes");
     }
 
     @Override
     protected void onPause() {
-        Log.e("MainActivity", "onPause1");
         super.onPause();
-        Log.e("MainActivity", "onPause1");
 
     }
 
     @Override
     protected void onResume() {
-        Log.e("MainActivity", "onResume1");
         super.onResume();
-        Log.e("MainActivity", "onResume2");
     }
 
     @Override
     protected void onDestroy() {
-        Log.e("MainActivity", "onDestroy1");
         super.onDestroy();
-        Log.e("MainActivity", "onDestroy2");
     }
 
     @Override

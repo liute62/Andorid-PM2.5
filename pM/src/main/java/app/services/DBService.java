@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -30,27 +29,38 @@ import com.example.pm.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import app.Entity.State;
 import app.model.PMModel;
 import app.movement.SimpleStepDetector;
 import app.movement.StepListener;
+import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBHelper;
+import app.utils.DataCalculator;
 import app.utils.HttpUtil;
-import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by liuhaodong1 on 15/11/10.
+ * DBService Sequences
+ * -----Oncreate-----
+ * 1.params Initial
+ * 2.DB Initial: get the value of last hour, today, last week avg pm from database and set cache.
+ * 3.Sensor Initial
+ * 4.GPS Initial:
+ *   For location changed:
+ *    1.Location is not null, means currently GPS begin work, set isLocationChanged = true.
+ *    2.last time lati&longi equals current lati&longi, means no change, don't need search result from internet.
+ * 5.DB Runnable begin running.
+ * -----DB Runnable-----
+ * 1. isLocationChanged = false, that means user's GPS not work, we want to use user last time lati&longi as the default.
+ * 2. DBCanRun means after get data from server, we get the density we need, it can work.
+ * 3  ChartTaskCanRun means whether we want to update the chart in mainfragment, most of time it will updated after 10 times of DBTask executed.
  */
 public class DBService extends Service {
     public static final String ACTION = "app.services.DBService";
@@ -60,11 +70,13 @@ public class DBService extends Service {
 
     double longitude = 0.0;  //the newest longitude
     double latitude = 0.0;  // the newest latitude
-    double last_long = -1.0; // the last time longitude
-    double last_lati = -1.0; // the last time latitude
+    double last_long;    // the last time longitude
+    double last_lati;   // the last time latitude
     double PM25Density;
     long idToday = 0;
     double PM25Today;
+   // double PM25LastHour;
+    //double PM25LastWeekAvg;
     double venVolToday;
 
     private LocationManager mManager;
@@ -83,23 +95,30 @@ public class DBService extends Service {
     private boolean DBCanRun = false;
     private int DBRunTime = 0;
     private boolean ChartTaskCanRun = false;
+    private boolean isLocationChanged;
+    ACache aCache;
+
     private Runnable DBRunnable = new Runnable() {
 
         @Override
         public void run() {
             //addPM25();
+            if (!isLocationChanged){
+                searchPMRequest(String.valueOf(Const.Lasttime_LONGITUDE), String.valueOf(Const.Lasttime_LATITUDE) );
+            }
             if (DBCanRun) {
                 State state = calculatePM25(longitude, latitude);
                 insertState(state); //insert the information into database
-                state.print();
+                //state.print();
                 Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
                 intent.putExtra(Const.Intent_PM_Id, idToday);
-                intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM("Han"));
+                intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                 intent.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                 intent.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
                 intent.putExtra(Const.Intent_DB_PM_TIME, state.getTime_point());
                 intent.putExtra(Const.Intent_DB_Ven_Volume, state.getVentilation_volume());
                 sendBroadcast(intent);
+
                 DBRunTime++;
                 if(DBRunTime == 5){
                     DBRunTime = 0;
@@ -110,10 +129,17 @@ public class DBService extends Service {
                 ChartTaskCanRun = false;
                 Intent intent = new Intent(Const.Action_Chart_Result);
                 Bundle mBundle = new Bundle();
-                mBundle.putSerializable(Const.Intent_chart1_data,calChart1Data());
+                DataCalculator.getIntance(db).updateState();
+                mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
                 intent.putExtras(mBundle);
                 sendBroadcast(intent);
-                Log.e("ChartTaskCanRun","ChartTaskCanRun");
             }
             //searchState();
             //upload(state);
@@ -129,7 +155,10 @@ public class DBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("DBService", "OnCreate");
+        last_lati = -0.1;
+        last_long = -0.1;
+        aCache = ACache.get(getApplicationContext());
+        isLocationChanged = false;
         DBInitial();
         sensorInitial();
         GPSInitial();
@@ -156,6 +185,7 @@ public class DBService extends Service {
         calendar.set(year, month, day, 23, 59, 59);
         Long nextTime = calendar.getTime().getTime();
 
+        /**Get states of today **/
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
         if (states.isEmpty()) {
             PM25Today = 0.0;
@@ -167,14 +197,31 @@ public class DBService extends Service {
             venVolToday = Double.parseDouble(state.getVentilation_volume());
             idToday = state.getId();
         }
-
-
-        /** data initial for main fragment**/
-        //Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
-        //intent.putExtra(Const.Intent_DB_PM_Hour,calLastHourPM("Ini"));
-        //intent.putExtra(Const.Intent_DB_PM_Day, PM25Today);
-        //intent.putExtra(Const.Intent_DB_PM_Week,calLastWeekAvgPM());
-        //LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        aCache.put(Const.Cache_PM_LastDay, String.valueOf(PM25Today));
+        // TODO: 11/20/2015
+//        /**Get states of last hour**/
+//        Long currentTime = null;
+//        Long lastHourTime = null;
+//        List<State> stateHour = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?",lastHourTime.toString(),currentTime.toString()).list();
+//        if(stateHour.isEmpty()){
+//            PM25LastHour = 0.0;
+//        }else {
+//            if(stateHour.size() > 1){
+//                PM25LastHour = Double.valueOf(stateHour.get(stateHour.size() - 1).getPm25()) - Double.valueOf(stateHour.get(0).getPm25());
+//            }else{
+//                PM25LastHour = Double.valueOf(stateHour.get(0).getPm25());
+//            }
+//        }
+//        aCache.put(Const.Cache_PM_LastHour,PM25LastHour);
+//        /**Get states of last seven days**/
+//        Long lastWeekTime = null;
+//        List<State> stateWeek = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?",lastWeekTime.toString(),currentTime.toString()).list();
+//        if(stateWeek.isEmpty()){
+//            PM25LastWeekAvg = 0.0;
+//        }else {
+//            PM25LastWeekAvg = Double.valueOf(stateWeek.get(stateWeek.size() - 1).getPm25()) / stateWeek.size();
+//        }
+//        aCache.put(Const.Cache_PM_LastWeek,PM25LastWeekAvg);
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -188,112 +235,6 @@ public class DBService extends Service {
                         .setOngoing(true);
 
         startForeground(12450, mBuilder.build());
-    }
-
-    /**
-     * density: (ug/m3)
-     * breath:  (L/min)
-     *
-     * @param longi
-     * @param lati
-     * @return
-     */
-    private State calculatePM25(double longi, double lati) {
-        Double breath = 0.0;
-        Double density = PM25Density;
-        //Double density = Double.valueOf(Const.CURRENT_PM_MODEL.getPm25());
-        if (Const.CURRENT_INDOOR) {
-            density /= 3;
-        }
-        if (mMotionStatus == Const.MotionStatus.STATIC) {
-            breath = Const.static_breath;
-        } else if (mMotionStatus == Const.MotionStatus.WALK) {
-            breath = Const.walk_breath;
-        } else if (mMotionStatus == Const.MotionStatus.RUN) {
-            breath = Const.run_breath;
-        }
-        venVolToday += breath;
-        breath = breath / 1000; //change L/min to m3/min
-        PM25Today += density * breath;
-
-        State state = new State(idToday, "0", Long.toString(System.currentTimeMillis()),
-                String.valueOf(longi),
-                String.valueOf(lati),
-                Const.CURRENT_INDOOR ? "1" : "0",
-                mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1");
-        return state;
-    }
-
-    private String calLastWeekAvgPM() {
-        Double result = 0.0;
-        return String.valueOf(result);
-    }
-
-    private String calLastHourPM(String tag) {
-        Double result = 0.0;
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 0, 0, 0);
-
-        Long nowTime = calendar.getTime().getTime();
-        calendar.set(year, month, day, 23, 59, 59);
-        Long nextTime = calendar.getTime().getTime();
-
-        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
-        if (states.isEmpty()) {
-            return String.valueOf(result);
-        } else if (states.size() == 1) {
-            return states.get(states.size() - 1).getPm25();
-        } else {
-
-            State state1 = states.get(states.size() - 1);
-            State state2 = states.get(states.size() - 2);
-            result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
-        }
-        Log.e("calLast" + tag, String.valueOf(result));
-        return String.valueOf(result);
-    }
-
-    private HashMap<Integer,Float> calChart1Data(){
-        HashMap<Integer,Float> map = new HashMap<>();
-        Double result = 0.0;
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 0, 0, 0);
-
-        Long nowTime = calendar.getTime().getTime();
-        calendar.set(year, month, day, 23, 59, 59);
-        Long nextTime = calendar.getTime().getTime();
-
-        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
-        Map<Integer,Float> tmpMap = new HashMap<>();
-        if (states.isEmpty()){
-            return map;
-        }
-        for(int i = 0; i != states.size(); i++){
-            State state = states.get(i);
-            int index = ShortcutUtil.timeToPoint(Long.valueOf(state.getTime_point()));
-            float pm25;
-            if(i == 0){
-                pm25 = Float.valueOf(state.getPm25());
-            }else {
-                pm25 = Float.valueOf(state.getPm25()) - Float.valueOf(states.get(i-1).getPm25());
-            }
-            //now we get the index of time and the pm25 of that point
-            tmpMap.put(index, pm25);
-        }
-        //now calculate the avg value
-        for (int i = 0; i != 48; i++) {
-            if (tmpMap.containsKey(i)) {
-                map.put(i,ShortcutUtil.avgOfArrayNum(tmpMap.values().toArray()));
-            }
-        }
-        return map;
     }
 
     private void sensorInitial() {
@@ -342,6 +283,7 @@ public class DBService extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 if (location != null) {
+                    isLocationChanged = true;
                     longitude = location.getLongitude();
                     latitude = location.getLatitude();
                     if (last_long == longitude && last_lati == latitude) {
@@ -351,7 +293,6 @@ public class DBService extends Service {
                         last_lati = latitude;
                         last_long = longitude;
                         if (isPMSearchRun == false) {
-                            Log.e("onLocationChanged", "searchPMRequest");
                             searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                         }
                     }
@@ -360,33 +301,96 @@ public class DBService extends Service {
 
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
-                Log.e("onStatusChanged", s);
-
             }
 
             @Override
             public void onProviderEnabled(String s) {
-                Log.e("onProviderEnabled", s);
+                Toast.makeText(getApplicationContext(), Const.Info_GPS_Open,
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onProviderDisabled(String s) {
-                Log.e("onProviderDisabled", s);
-                Toast.makeText(getApplicationContext(), Const.ERROR_NO_GPS,
+                Toast.makeText(getApplicationContext(), Const.Info_GPS_Turnoff,
                         Toast.LENGTH_SHORT).show();
             }
         };
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);  //模糊模式
-        criteria.setAltitudeRequired(false);             //不提供海拔信息
-        criteria.setBearingRequired(false);              //不提供方向信息
-        criteria.setCostAllowed(true);                   //允许运营商计费
-        criteria.setPowerRequirement(Criteria.POWER_LOW);//低电池消耗
-        criteria.setSpeedRequired(false);                //不提供位置信息
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setSpeedRequired(false);
 
         String provider = mManager.getBestProvider(criteria, true);
         mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 Const.DB_Location_INTERVAL, 0, locationListener);
+    }
+
+    /**
+     * density: (ug/m3)
+     * breath:  (L/min)
+     * Calculate today the number of pm2.5 breathed until now
+     * @param longi
+     * @param lati
+     * @return
+     */
+    private State calculatePM25(double longi, double lati) {
+        Double breath = 0.0;
+        Double density = PM25Density;
+        if (Const.CURRENT_INDOOR) {
+            density /= 3;
+        }
+        if (mMotionStatus == Const.MotionStatus.STATIC) {
+            breath = Const.static_breath;
+        } else if (mMotionStatus == Const.MotionStatus.WALK) {
+            breath = Const.walk_breath;
+        } else if (mMotionStatus == Const.MotionStatus.RUN) {
+            breath = Const.run_breath;
+        }
+        venVolToday += breath;
+        breath = breath / 1000; //change L/min to m3/min
+        PM25Today += density * breath;
+
+        State state = new State(idToday, Const.CURRENT_USER_ID, Long.toString(System.currentTimeMillis()),
+                String.valueOf(longi),
+                String.valueOf(lati),
+                Const.CURRENT_INDOOR ? "1" : "0",
+                mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
+                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1");
+        return state;
+    }
+
+    private String calLastWeekAvgPM() {
+        Double result = 0.0;
+        return String.valueOf(result);
+    }
+
+    private String calLastHourPM() {
+        Double result = 0.0;
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(year, month, day, 0, 0, 0);
+
+        Long nowTime = calendar.getTime().getTime();
+        calendar.set(year, month, day, 23, 59, 59);
+        Long nextTime = calendar.getTime().getTime();
+
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
+        if (states.isEmpty()) {
+            return String.valueOf(result);
+        } else if (states.size() == 1) {
+            return states.get(states.size() - 1).getPm25();
+        } else {
+
+            State state1 = states.get(states.size() - 1);
+            State state2 = states.get(states.size() - 2);
+            result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
+        }
+        return String.valueOf(result);
     }
 
     /**
@@ -443,14 +447,14 @@ public class DBService extends Service {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.e("searchPMRequest resp", response.toString());
-                Toast.makeText(getApplicationContext(), "Data Get Success!", Toast.LENGTH_LONG).show();
+                //Log.e("searchPMRequest resp", response.toString());
+                //Toast.makeText(getApplicationContext(), "Data Get Success!", Toast.LENGTH_LONG).show();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 isPMSearchRun = false;
-                Toast.makeText(getApplicationContext(), "Data Get Fail!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Data Get Fail!", Toast.LENGTH_SHORT).show();
             }
 
         });

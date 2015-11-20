@@ -4,13 +4,13 @@ import app.model.PMModel;
 
 public class Const {
 
-    public static String CURRENT_USER_ID = "";
+    public static String CURRENT_USER_ID = "0";
 
-    public static String CURRENT_ACCESS_TOKEN = "";
+    public static String CURRENT_ACCESS_TOKEN = "-1";
 
-    //public static double CURRENT_LONGITUDE = 0;
+    public static double Lasttime_LONGITUDE = 121.41;
 
-    //public static double CURRENT_LATITUDE = 0;
+    public static double Lasttime_LATITUDE = 31.14; //default is shanghai
 
     public static PMModel CURRENT_PM_MODEL;
 
@@ -37,12 +37,19 @@ public class Const {
 
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
-    public static final String Cache_PM_State = "Cache_PM_State";
+    public static final String Cache_PM_Density = "Cache_PM_Density";
+
+    public static final String Cache_PM_LastHour = "Cache_PM_LastHour";
+
+    public static final String Cache_PM_LastDay = "Cache_PM_LastDay";
+
+    public static final String Cache_PM_LastWeek = "Cache_PM_LastWeek";
 
     public static final String Cache_Longitude = "Cache_Longitude";
 
     public static final String Cache_Latitude = "Cache_Latitude";
 
+    public static final String Cache_City = "Cache_City";
     /**
      * Handler Code*
      */
@@ -51,6 +58,8 @@ public class Const {
     public static final int Handler_PM_Density = 100002;
 
     public static final int Handler_PM_Data = 100003;
+
+    public static final int Handler_Modify_Pwd_Success = 100004;
 
     /**
      * Intent Tag Code*
@@ -75,6 +84,23 @@ public class Const {
 
     public static final String Intent_chart1_data = "Intent_chart1_data";
 
+    public static final String Intent_chart2_data = "Intent_chart2_data";
+
+    public static final String Intent_chart3_data = "Intent_chart3_data";
+
+    public static final String Intent_chart4_data = "Intent_chart4_data";
+
+    public static final String Intent_chart5_data = "Intent_chart5_data";
+
+    public static final String Intent_chart6_data = "Intent_chart6_data";
+
+    public static final String Intent_chart7_data = "Intent_chart7_data";
+
+    public static final String Intent_chart8_data = "Intent_chart8_data";
+
+    public static final String Intent_chart10_data = "Intent_chart10_data";
+
+    public static final String Intent_chart12_data = "Intent_chart12_data";
     /**
      * Service & Activity Code*
      */
@@ -98,10 +124,6 @@ public class Const {
 
     public final static int DB_PM_Cal_INTERVAL = 1000 * 5; //1min
 
-    public static final String ERROR_NO_GPS = "请先打开定位！";
-
-    public static final String ERROR_NO_PM_DATA = "本地暂无PM数据!";
-
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 
     public static final String ERROR_REGISTER_WRONG = "无法注册,请检查当前网络状态";
@@ -121,6 +143,8 @@ public class Const {
     }
 
     /****/
+    public static final String Info_No_Network = "无法连接服务器，请检查网络设置";
+
     public static final String Info_No_Initial = "系统检测到本机并无数据，请确保网络和GPS正常，按确认键进行初始化。";
 
     public static final String Info_Turn_Off_Service = "关闭后台服务";
@@ -134,6 +158,26 @@ public class Const {
     public static final String Info_Register_Success = "注册用户成功";
 
     public static final String Info_Register_Failed = "注册用户失败";
+
+    public static final String Info_Login_Success = "登录成功";
+
+    public static final String Info_Login_Failed = "登录失败";
+
+    public static final String Info_GPS_Open = "定位服务已打开!";
+
+    public static final String Info_GPS_Turnoff = "请先打开定位!";
+
+    public static final String Info_Login_Empty = "用户名或密码为空";
+
+    public static final String Info_Login_Short = "用户名或密码长度过短";
+
+    public static final String Info_Login_Space = "用户名或密码中有空格";
+
+    public static final String Info_Modify_Pwd_Success = "修改密码成功";
+
+    public static final String Info_Modify_Pwd_Error = "用户不存在或验证失败";
+
+    public static final String Info_Login_First = "请先登录";
 
     public static String[] cityName =
             {

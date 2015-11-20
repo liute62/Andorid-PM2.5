@@ -93,13 +93,13 @@ public class LoginDialog extends Dialog implements OnClickListener {
                     }
                 }
                 if (result == 0) {
-                    Toast.makeText(mActivity.getApplicationContext(), "用户名或密码为空", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity.getApplicationContext(),Const.Info_Login_Empty, Toast.LENGTH_SHORT).show();
                 }
                 if (result == 1) {
-                    Toast.makeText(mActivity.getApplicationContext(), "用户名或密码长度过短", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity.getApplicationContext(),Const.Info_Login_Short, Toast.LENGTH_SHORT).show();
                 }
                 if (result == 2) {
-                    Toast.makeText(mActivity.getApplicationContext(), "用户名或密码中有空格", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Space, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.activitytitle_cancel:
@@ -123,7 +123,7 @@ public class LoginDialog extends Dialog implements OnClickListener {
                 result.setIsSuccess(true);
                 result.setResultBody(response.toString());
                 if (result.toLogInModel().getStatus().equals("1")) {
-                    Toast.makeText(mActivity.getApplicationContext(), "Login Success!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Success, Toast.LENGTH_SHORT).show();
                     Const.CURRENT_USER_ID = result.toLogInModel().getUserid();
                     Const.CURRENT_ACCESS_TOKEN = result.toLogInModel().getAccess_token();
                     aCache.put(Const.Cache_User_Id, Const.Cache_User_Id);
@@ -134,14 +134,14 @@ public class LoginDialog extends Dialog implements OnClickListener {
                     LoginDialog.this.dismiss();
                 } else {
                     mLoadingDialog.dismiss();
-                    Toast.makeText(mActivity.getApplicationContext(), "InValid Password or Username!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Failed, Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mLoadingDialog.dismiss();
-                Toast.makeText(mActivity.getApplicationContext(), "Network Failed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.getApplicationContext(), Const.Info_No_Network, Toast.LENGTH_SHORT).show();
 
             }
         });

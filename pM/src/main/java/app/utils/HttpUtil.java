@@ -30,6 +30,10 @@ public class HttpUtil {
 
     public static final String Upload_url = base_url + "mobile-data/create";
 
+    public static final String Modify_Pwd_url = base_url + "users/updatepassword";
+
+    public static final String Email_Pwd_url = base_url + "users/resetpassword?name=";
+
     public static final String ReadData_url = base_url + "mobile-datas";
 
     public static final String DeviceData_url = base_url + "device-datas";

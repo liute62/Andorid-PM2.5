@@ -86,6 +86,9 @@ public class ACache {
     }
 
 
+    public void put(String key,Double value){
+        put(key,String.valueOf(value));
+    }
     // =======================================
     // ========== String类型 读写 ==========
     // =======================================

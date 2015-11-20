@@ -16,10 +16,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import app.bluetooth.BluetoothActivity;
 import app.services.DBService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.view.widget.LoginDialog;
+import app.view.widget.ModifyPwdDialog;
 import app.view.widget.PullScrollView;
 
 public class ProfileFragment extends Fragment implements
@@ -34,6 +36,8 @@ public class ProfileFragment extends Fragment implements
     Button mClear;
     Button mRegister;
     Button mTurnOffService;
+    Button mBluetooth;
+    Button mModifyPwd;
     ACache aCache;
 
     Handler loginHandler = new Handler() {
@@ -44,6 +48,14 @@ public class ProfileFragment extends Fragment implements
                 mLogin.setOnClickListener(null);
                 mLogin.setText("退出登陆");
             }
+        }
+    };
+
+    Handler modifyPwdHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
         }
     };
 
@@ -68,6 +80,8 @@ public class ProfileFragment extends Fragment implements
         mTurnOffService = (Button) view.findViewById(R.id.profile_turnoff_service);
         mClear = (Button) view.findViewById(R.id.profile_clear_data);
         mRegister = (Button) view.findViewById(R.id.profile_rigister);
+        mBluetooth = (Button)view.findViewById(R.id.profile_bluetooth);
+        mModifyPwd = (Button)view.findViewById(R.id.profile_modify_password);
         checkCache();
         setListener();
         return view;
@@ -88,6 +102,8 @@ public class ProfileFragment extends Fragment implements
         mTurnOffUpload.setOnClickListener(this);
         mClear.setOnClickListener(this);
         mRegister.setOnClickListener(this);
+        mBluetooth.setOnClickListener(this);
+        mModifyPwd.setOnClickListener(this);
     }
 
     @Override
@@ -142,12 +158,23 @@ public class ProfileFragment extends Fragment implements
                 Intent intent = new Intent(mActivity,RegisterActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.profile_bluetooth:
+                Intent intent1 = new Intent(mActivity,BluetoothActivity.class);
+                startActivity(intent1);
+                break;
+            case R.id.profile_modify_password:
+                if(! Const.CURRENT_ACCESS_TOKEN.equals("-1")){
+                    ModifyPwdDialog modifyPwdDialog = new ModifyPwdDialog(mActivity,modifyPwdHandler);
+                    modifyPwdDialog.show();
+                }else {
+                    Toast.makeText(mActivity.getApplicationContext(),Const.Info_Login_First,Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
     private void clearCache() {
         aCache.remove(Const.Cache_User_Id);
         aCache.remove(Const.Cache_Access_Token);
-        aCache.remove(Const.Cache_PM_State);
     }
 }

@@ -1,7 +1,6 @@
 package com.example.pm;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +17,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import app.model.PMModel;
 import app.model.UserModel;
 import app.utils.Const;
 import app.utils.HttpUtil;
@@ -110,7 +108,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
                     e.printStackTrace();
                 }
                 Log.e("register resp", response.toString());
-                Toast.makeText(getApplicationContext(), Const.Info_Register_Success, Toast.LENGTH_LONG).show();
             }
         }, new Response.ErrorListener() {
             @Override

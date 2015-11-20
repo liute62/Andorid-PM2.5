@@ -136,11 +136,12 @@ public class ShortcutUtil {
     }
 
     /**
+     * A method to transfer current time to a point of a day
      * Ex. xxxxYxxMxxD 22:31 returns 22*1+1 = 43
      * @param currentTime
      * @return
      */
-    public static int timeToPoint(long currentTime){
+    public static int timeToPointOfDay(long currentTime){
        String date = refFormatNowDate(currentTime);
        int tmp1 = 0,tmp2 = -1,tmp3 = 0;
         Log.e("date",date);
@@ -166,14 +167,38 @@ public class ShortcutUtil {
        return Integer.valueOf(hour) * 2 + add;
     }
 
-    public static float avgOfArrayNum(Object[] array){
+    public static int timeToPointOfTwoHour(long startTime,long currentTime){
+        long diff = currentTime - startTime;
+        long twoHour = 2 * 60 * 60 * 1000; //2 hour * 60min * 60 sec * 1000 ms
+        double mul = diff / twoHour;
+        int sec = 60 * 2 / 5;   //2 hour and 5 min a section
+        int index = (int)(mul * sec);
+        return index;
+    }
 
+    public static int timeToPointOfWeek(){
+        return 1;
+    }
+
+    public static float sumOfArrayNum(Object[] array){
         int num = array.length;
-        if (num == 0) return 0;
+        if(num == 0) return 0;
         float sum = 0;
-        for (int i = 0; i != num; i++){
+        for(int i = 0; i != num; i++){
             sum += (Float)array[0];
         }
-        return sum / num;
+        return sum;
+    }
+
+    public static float avgOfArrayNum(Object[] array){
+
+        return sumOfArrayNum(array) / array.length;
+    }
+
+    public static boolean isStringOK(String str){
+        if(str == null || str.trim().equals("")){
+            return false;
+        }
+        return true;
     }
 }

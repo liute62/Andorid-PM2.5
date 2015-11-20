@@ -133,9 +133,14 @@
                 android:text="清空本地数据" />
 
             <Button
-                android:id="@+id/personal_info_modify_password"
+                android:id="@+id/profile_modify_password"
                 style="@style/main_left_button_style"
                 android:text="修改密码" />
+
+            <Button
+                android:id="@+id/profile_bluetooth"
+                style="@style/main_left_button_style"
+                android:text="开启蓝牙" />
 
             <Button
                 android:id="@+id/profile_logout"
