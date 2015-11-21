@@ -28,13 +28,16 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import app.model.PMModel;
 import app.services.DBService;
 import app.utils.ACache;
 import app.utils.ChartsConst;
 import app.utils.Const;
+import app.utils.DataCalculator;
 import app.utils.DataGenerator;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
@@ -75,7 +78,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     TextView mChart1Title;
     TextView mChart2Title;
 
-    int PMDensity;
+    Double PMDensity;
     Double PMBreatheHour;
     Double PMBreatheDay;
     Double PMBreatheWeekAvg;
@@ -108,9 +111,11 @@ public class MainFragment extends Fragment implements OnClickListener {
     HashMap<Integer,Float> chartData5; //data for chart 5
     HashMap<Integer,Float> chartData6; //data for chart 6
     HashMap<Integer,Float> chartData7; //data for chart 7
+    List<String> chart7Date;           //date for chart 7
     HashMap<Integer,Float> chartData8; //data for chart 8
     HashMap<Integer,Float> chartData10; //data for chart 10
     HashMap<Integer,Float> chartData12; //data for chart 12
+    List<String> chart12Date;           //date for chart 12
 
     private DBServiceReceiver dbReceiver;
     Handler mClockHandler = new Handler() {
@@ -134,7 +139,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             super.handleMessage(msg);
             if (msg.what == Const.Handler_PM_Density) {
                 PMModel data = (PMModel) msg.obj;
-                PMDensity = Integer.valueOf(data.getPm25());
+                PMDensity = Double.valueOf(data.getPm25());
                 dataInitial();
             }
             if (msg.what == Const.Handler_PM_Data) {
@@ -142,6 +147,10 @@ public class MainFragment extends Fragment implements OnClickListener {
                 PMBreatheHour = Double.valueOf(data.getPm_breath_hour());
                 PMBreatheDay = Double.valueOf(data.getPm_breath_today());
                 PMBreatheWeekAvg = Double.valueOf(data.getPm_breath_week());
+                //meanwhile update the cache
+                aCache.put(Const.Cache_PM_LastHour,PMBreatheHour);
+                aCache.put(Const.Cache_PM_LastDay,PMBreatheDay);
+                aCache.put(Const.Cache_PM_LastWeek,PMBreatheWeekAvg);
                 dataInitial();
             }
         }
@@ -160,7 +169,9 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter = new IntentFilter();
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
-            intentFilter.addAction(Const.Action_Chart_Result);
+            intentFilter.addAction(Const.Action_Chart_Result_1);
+            intentFilter.addAction(Const.Action_Chart_Result_2);
+            intentFilter.addAction(Const.Action_Chart_Result_3);
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
         super.onResume();
@@ -170,7 +181,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = getActivity();
-        PMDensity = 0;
+        PMDensity = 0.0;
         PMBreatheDay = 0.0;
         PMBreatheHour = 0.0;
         PMBreatheWeekAvg = 0.0;
@@ -180,6 +191,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         current_chart1_index = 1;
         current_chart2_index = 2;
         isClockTaskRun = false;
+        chart7Date = new ArrayList<>();
+        chart12Date = new ArrayList<>();
         chartData1 = new HashMap<>();
         chartData2 = new HashMap<>();
         chartData3 = new HashMap<>();
@@ -199,7 +212,9 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter = new IntentFilter();
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
-            intentFilter.addAction(Const.Action_Chart_Result);
+            intentFilter.addAction(Const.Action_Chart_Result_1);
+            intentFilter.addAction(Const.Action_Chart_Result_2);
+            intentFilter.addAction(Const.Action_Chart_Result_3);
             mActivity.registerReceiver(dbReceiver, intentFilter);
             Intent mIntent = new Intent(mActivity, DBService.class);
             mActivity.startService(mIntent);
@@ -276,7 +291,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
 
         if (ShortcutUtil.isStringOK(density)){
-            PMDensity = Integer.valueOf(density);
+            PMDensity = Double.valueOf(density);
         }if(ShortcutUtil.isStringOK(pm_hour)){
             PMBreatheHour = Double.valueOf(pm_hour);
         }if(ShortcutUtil.isStringOK(pm_day)){
@@ -290,6 +305,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         }if (ShortcutUtil.isStringOK(city)){
             currentCity = city;
         }
+
     }
 
     private void dataInitial() {
@@ -308,8 +324,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
         mHint.setTextColor(DataGenerator.setHeathHintColor(PMDensity));
         mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) + " 微克");
-        mDayPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheDay, 2)) + " 毫克");
-        mWeekPM.setText(String.valueOf(ShortcutUtil.ugToMg(PMBreatheWeekAvg, 1)) + " 毫克");
+        mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " 微克");
+        mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1)) + " 微克");
     }
 
     private void chartInitial(int chart1_index, int chart2_index) {
@@ -457,26 +473,30 @@ public class MainFragment extends Fragment implements OnClickListener {
                 data.what = Const.Handler_PM_Data;
                 data.obj = model;
                 mDataHandler.sendMessage(data);
-            } else if(intent.getAction().equals(Const.Action_Chart_Result)){
+            } else if(intent.getAction().equals(Const.Action_Chart_Result_1)){
 //                Log.e("Action_Chart_Result","Action_Chart_Result");
+                HashMap data4 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart4_data);
+                chartData4 = data4;
+                HashMap data5 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart5_data);
+                chartData5 = data5;
+                HashMap data8 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart8_data);
+                chartData8 = data8;
+                chartInitial(current_chart1_index,current_chart2_index);
+            }else if(intent.getAction().equals(Const.Action_Chart_Result_3)){
                 HashMap data1 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart1_data);
                 chartData1 = data1;
                 HashMap data2 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart2_data);
                 chartData2 = data2;
                 HashMap data3 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart3_data);
                 chartData3 = data3;
-                HashMap data4 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart4_data);
-                chartData4 = data4;
-                HashMap data5 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart5_data);
-                chartData5 = data5;
                 HashMap data6 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart6_data);
                 chartData6 = data6;
-                HashMap data7 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart7_data);
-                chartData7 = data7;
-                HashMap data8 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart8_data);
-                chartData8 = data8;
                 HashMap data10 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart10_data);
                 chartData10 = data10;
+                chartInitial(current_chart1_index,current_chart2_index);
+            }else if(intent.getAction().equals(Const.Action_Chart_Result_3)){
+                HashMap data7 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart7_data);
+                chartData7 = data7;
                 HashMap data12 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart12_data);
                 chartData12 = data12;
                 chartInitial(current_chart1_index,current_chart2_index);
@@ -497,18 +517,19 @@ public class MainFragment extends Fragment implements OnClickListener {
 //                        (float) DataGenerator.generateDataForChart3().values().toArray()[0]);
                  if(chartData3.isEmpty())
                      return DataGenerator.chart3DataGenerator(0,0.0f);
-                  return DataGenerator.chart3DataGenerator((int) chartData3.keySet().toArray()[0], (float)chartData3.values().toArray()[0]);
+                  return DataGenerator.chart3DataGenerator((int) chartData3.keySet().toArray()[0], (float) chartData3.values().toArray()[0]);
             case 4:
 //                return DataGenerator.chart4DataGenerator(DataGenerator.generateDataForChart4());
                   return DataGenerator.chart4DataGenerator(chartData4);
             case 5:
-                return DataGenerator.chart5DataGenerator(chartData5);
 //                return DataGenerator.chart5DataGenerator(DataGenerator.generateDataForChart5());
+                return DataGenerator.chart5DataGenerator(chartData5);
             case 6:
-                return  DataGenerator.chart6DataGenerator(chartData6);
 //                return DataGenerator.chart6DataGenerator(DataGenerator.generateDataForChart6());
+                return  DataGenerator.chart6DataGenerator(chartData6);
             case 7:
-                return DataGenerator.chart7DataGenerator(DataGenerator.generateDataForChart7(), DataGenerator.generateChart7Date());
+//                return DataGenerator.chart7DataGenerator(DataGenerator.generateDataForChart7(), DataGenerator.generateChart7Date());
+                return DataGenerator.chart7DataGenerator(chartData7,chart7Date);
             case 8:
 //                return DataGenerator.chart8DataGenerator(DataGenerator.generateDataForChart8());
                 return DataGenerator.chart8DataGenerator(chartData8);
@@ -519,7 +540,8 @@ public class MainFragment extends Fragment implements OnClickListener {
                     return DataGenerator.chart3DataGenerator(0,0.0f);
                 return DataGenerator.chart3DataGenerator((int) chartData10.keySet().toArray()[0], (float)chartData10.values().toArray()[0]);
             case 12:
-                return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
+                 return DataGenerator.chart12DataGenerator(chartData12, chart12Date);
+//                return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
         }
         return null;
     }

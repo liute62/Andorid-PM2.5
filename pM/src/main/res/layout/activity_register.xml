@@ -218,7 +218,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dip"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:textColor="@color/White"/>
 
         <TextView
@@ -229,7 +229,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dip"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:textColor="@color/White"/>
     </RelativeLayout>
 </RelativeLayout>

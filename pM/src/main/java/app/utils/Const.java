@@ -40,27 +40,18 @@ public class Const {
     public static final String Cache_App_Initialized = "Cache_App_Initialized";
 
     public static final String Cache_User_Id = "Cache_User_Id";
-
     public static final String Cache_User_Name = "Cache_User_Name";
-
     public static final String Cache_User_Nickname = "Cache_User_Nickname";
-
     public static final String Cache_User_Gender = "Cache_User_Gender";
-
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
     public static final String Cache_PM_Density = "Cache_PM_Density";
-
     public static final String Cache_PM_LastHour = "Cache_PM_LastHour";
-
     public static final String Cache_PM_LastDay = "Cache_PM_LastDay";
-
     public static final String Cache_PM_LastWeek = "Cache_PM_LastWeek";
 
     public static final String Cache_Longitude = "Cache_Longitude";
-
     public static final String Cache_Latitude = "Cache_Latitude";
-
     public static final String Cache_City = "Cache_City";
     /**
      * Handler Code*
@@ -120,7 +111,11 @@ public class Const {
 
     public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
 
-    public static final String Action_Chart_Result = "Action_Chart_Result";
+    public static final String Action_Chart_Result_1 = "Action_Chart_Result_1";
+
+    public static final String Action_Chart_Result_2 = "Action_Chart_Result_2";
+
+    public static final String Action_Chart_Result_3 = "Action_Chart_Result_3";
 
     public static final int Action_Profile_Register = 200001;
 
@@ -132,7 +127,7 @@ public class Const {
     /**
      * Time related values*
      */
-    public final static int DB_PM_Search_INTERVAL = 1000 * 5;//1Hour
+    public final static int DB_PM_Search_INTERVAL = 1000 * 60 * 60;//1Hour
 
     public final static int DB_Location_INTERVAL = 1000 * 5;
 

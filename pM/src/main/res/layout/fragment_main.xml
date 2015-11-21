@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dip"
         android:layout_below="@id/main_top_layout"
-        android:layout_marginTop="20dip">
+        android:layout_marginTop="5dip">
 
         <RelativeLayout
             android:id="@+id/main_info_layout_1"
@@ -176,10 +176,17 @@
         </RelativeLayout>
     </RelativeLayout>
 
+    <LinearLayout
+        android:layout_below="@+id/main_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
     <RelativeLayout
+        android:layout_weight="1"
         android:id="@+id/main_fig_layout_1"
         android:layout_width="match_parent"
-        android:layout_height="160dip"
+        android:layout_height="165dip"
         android:layout_below="@id/main_info_layout">
 
         <TextView
@@ -205,8 +212,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_1_change"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="8dip"
             android:visibility="invisible" />
 
         <lecho.lib.hellocharts.view.LineChartView
@@ -214,8 +222,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_1_change"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="8dip"
             android:visibility="invisible" />
 
         <!--<android.support.v4.view.ViewPager-->
@@ -227,10 +236,12 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:layout_weight="1"
         android:id="@+id/main_fig_layout_2"
         android:layout_width="match_parent"
-        android:layout_height="160dip"
-        android:layout_below="@+id/main_fig_layout_1">
+        android:layout_height="165dip"
+        android:layout_below="@+id/main_fig_layout_1"
+        android:layout_marginTop="10dip">
 
         <TextView
             android:layout_width="wrap_content"
@@ -255,8 +266,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_2_change"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="8dip"
             android:visibility="invisible" />
 
         <lecho.lib.hellocharts.view.LineChartView
@@ -264,16 +276,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_2_change"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="8dip"
             android:visibility="invisible" />
 
-        <!--<android.support.v4.view.ViewPager-->
-        <!--android:id="@+id/main_chart_viewpager_2"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_below="@+id/main_chart_2_change"/>-->
-
     </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

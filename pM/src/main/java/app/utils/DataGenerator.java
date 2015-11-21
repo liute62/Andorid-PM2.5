@@ -58,6 +58,10 @@ public class DataGenerator {
         return Const.airQuality[5];
     }
 
+    public static String setAirQualityText(double pm) {
+        return setAirQualityText((int) pm);
+    }
+
     public static int setAirQualityColor(int pm) {
         if (pm < 50) {
             return Color.GREEN;
@@ -73,6 +77,10 @@ public class DataGenerator {
         return Color.BLACK;
     }
 
+    public static int setAirQualityColor(double pm) {
+       return setAirQualityColor((int) pm);
+    }
+
     public static String setHeathHintText(int pm) {
         if (pm < 50) {
             return Const.heathHint[0];
@@ -84,6 +92,10 @@ public class DataGenerator {
         return Const.heathHint[3];
     }
 
+    public static String setHeathHintText(double pm) {
+        return setHeathHintText((int) pm);
+    }
+
     public static int setHeathHintColor(int pm) {
         if (pm < 50) {
             return Color.GREEN;
@@ -93,6 +105,10 @@ public class DataGenerator {
             return Color.argb(255, 255, 165, 0); //Orange
         }
         return Color.argb(255, 139, 35, 35); //Brown
+    }
+
+    public static int setHeathHintColor(double pm) {
+        return setHeathHintColor((int) pm);
     }
 
     public static String setRingState1Text() {
@@ -560,8 +576,11 @@ public class DataGenerator {
         int numSubcolumns = 1;
         int numColumns = ChartsConst.Chart_X[7].length;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        for (int i = 0; i != numColumns; i++) {
-            axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+        if(!date.isEmpty()) {
+            for (int i = 0; i != numColumns; i++) {
+                if (date.get(i) == null) break;
+                axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+            }
         }
         // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
         List<Column> columns = new ArrayList<Column>();
@@ -661,8 +680,11 @@ public class DataGenerator {
         int numSubcolumns = 1;
         int numColumns = ChartsConst.Chart_X[12].length;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        for (int i = 0; i != numColumns; i++) {
-            axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+        if(! date.isEmpty()) {
+            for (int i = 0; i != numColumns; i++) {
+                if (date.get(i) == null) break;
+                axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+            }
         }
         // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
         List<Column> columns = new ArrayList<Column>();

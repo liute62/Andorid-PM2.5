@@ -144,7 +144,7 @@ public class ShortcutUtil {
     public static int timeToPointOfDay(long currentTime){
        String date = refFormatNowDate(currentTime);
        int tmp1 = 0,tmp2 = -1,tmp3 = 0;
-        Log.e("date",date);
+//        Log.e("date",date);
        for(int i = 0; i != date.length(); i++){
            if(date.charAt(i) == '-'){
                tmp1 = i;

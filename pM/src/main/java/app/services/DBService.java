@@ -16,7 +16,10 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.Time;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -29,6 +32,7 @@ import com.example.pm.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -40,6 +44,7 @@ import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBHelper;
 import app.utils.DataCalculator;
+import app.utils.DataGenerator;
 import app.utils.HttpUtil;
 import app.utils.VolleyQueue;
 
@@ -63,6 +68,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * 3  ChartTaskCanRun means whether we want to update the chart in mainfragment, most of time it will updated after 10 times of DBTask executed.
  */
 public class DBService extends Service {
+
     public static final String ACTION = "app.services.DBService";
 
     private DBHelper dbHelper;
@@ -73,10 +79,8 @@ public class DBService extends Service {
     double last_long;    // the last time longitude
     double last_lati;   // the last time latitude
     double PM25Density;
-    long idToday = 0;
     double PM25Today;
-   // double PM25LastHour;
-    //double PM25LastWeekAvg;
+    Long IDToday;
     double venVolToday;
 
     private LocationManager mManager;
@@ -94,6 +98,8 @@ public class DBService extends Service {
 
     private boolean DBCanRun = false;
     private int DBRunTime = 0;
+    private int ChartRunTime = 0;
+    private int ChartRunTime2 = 0;
     private boolean ChartTaskCanRun = false;
     private boolean isLocationChanged;
     ACache aCache;
@@ -111,12 +117,9 @@ public class DBService extends Service {
                 insertState(state); //insert the information into database
                 //state.print();
                 Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
-                intent.putExtra(Const.Intent_PM_Id, idToday);
                 intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                 intent.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                 intent.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                intent.putExtra(Const.Intent_DB_PM_TIME, state.getTime_point());
-                intent.putExtra(Const.Intent_DB_Ven_Volume, state.getVentilation_volume());
                 sendBroadcast(intent);
 
                 DBRunTime++;
@@ -127,19 +130,38 @@ public class DBService extends Service {
             }
             if (ChartTaskCanRun){
                 ChartTaskCanRun = false;
-                Intent intent = new Intent(Const.Action_Chart_Result);
-                Bundle mBundle = new Bundle();
-                DataCalculator.getIntance(db).updateState();
-                mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
-                mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
-                mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
-                mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
-                mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
-                mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
-                mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
-                mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
-                intent.putExtras(mBundle);
-                sendBroadcast(intent);
+                ChartRunTime++;
+                if(ChartRunTime2 == 2) {
+                    ChartRunTime2 = 0;
+                    Intent intent = new Intent(Const.Action_Chart_Result_3);
+                    Bundle mBundle = new Bundle();
+                    DataCalculator.getIntance(db).updateLastWeekState();
+                    mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                    mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                    intent.putExtras(mBundle);
+                    sendBroadcast(intent);
+                }if(ChartRunTime == 1){
+                    ChartRunTime2++;
+                    ChartRunTime = 0;
+                    Intent intent = new Intent(Const.Action_Chart_Result_2);
+                    Bundle mBundle = new Bundle();
+                    DataCalculator.getIntance(db).updateState();
+                    mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                    mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                    mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                    mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                    mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
+                    intent.putExtras(mBundle);
+                    sendBroadcast(intent);
+                }
+                    Intent intent = new Intent(Const.Action_Chart_Result_1);
+                    Bundle mBundle = new Bundle();
+                    DataCalculator.getIntance(db).updateState();
+                    mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                    mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                    mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                    intent.putExtras(mBundle);
+                    sendBroadcast(intent);
             }
             //searchState();
             //upload(state);
@@ -190,38 +212,14 @@ public class DBService extends Service {
         if (states.isEmpty()) {
             PM25Today = 0.0;
             venVolToday = 0.0;
-            idToday = 0;
+            IDToday = Long.valueOf(0);
         } else {
             State state = states.get(states.size() - 1);
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
-            idToday = state.getId();
+            IDToday = Long.valueOf(state.getId());
         }
-        aCache.put(Const.Cache_PM_LastDay, String.valueOf(PM25Today));
-        // TODO: 11/20/2015
-//        /**Get states of last hour**/
-//        Long currentTime = null;
-//        Long lastHourTime = null;
-//        List<State> stateHour = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?",lastHourTime.toString(),currentTime.toString()).list();
-//        if(stateHour.isEmpty()){
-//            PM25LastHour = 0.0;
-//        }else {
-//            if(stateHour.size() > 1){
-//                PM25LastHour = Double.valueOf(stateHour.get(stateHour.size() - 1).getPm25()) - Double.valueOf(stateHour.get(0).getPm25());
-//            }else{
-//                PM25LastHour = Double.valueOf(stateHour.get(0).getPm25());
-//            }
-//        }
-//        aCache.put(Const.Cache_PM_LastHour,PM25LastHour);
-//        /**Get states of last seven days**/
-//        Long lastWeekTime = null;
-//        List<State> stateWeek = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?",lastWeekTime.toString(),currentTime.toString()).list();
-//        if(stateWeek.isEmpty()){
-//            PM25LastWeekAvg = 0.0;
-//        }else {
-//            PM25LastWeekAvg = Double.valueOf(stateWeek.get(stateWeek.size() - 1).getPm25()) / stateWeek.size();
-//        }
-//        aCache.put(Const.Cache_PM_LastWeek,PM25LastWeekAvg);
+        //send chart result to initialize the chart
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -353,7 +351,7 @@ public class DBService extends Service {
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
 
-        State state = new State(idToday, Const.CURRENT_USER_ID, Long.toString(System.currentTimeMillis()),
+        State state = new State(IDToday, Const.CURRENT_USER_ID, Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR ? "1" : "0",
@@ -364,7 +362,23 @@ public class DBService extends Service {
 
     private String calLastWeekAvgPM() {
         Double result = 0.0;
-        return String.valueOf(result);
+        Double tmp;
+        int num = 0;
+        List<List<State>> datas = DataCalculator.getIntance(db).getLastWeekStates();
+        if (datas.isEmpty()){
+            return String.valueOf(result);
+        }
+        for (int i = 0; i != datas.size(); i++){
+            List<State> states = datas.get(i);
+            if (states.isEmpty()){
+                break;
+            }else {
+                num++;
+                tmp = Double.valueOf(states.get(states.size() - 1).getPm25());
+                result += tmp;
+            }
+        }
+        return String.valueOf(result / num);
     }
 
     private String calLastHourPM() {
@@ -373,21 +387,26 @@ public class DBService extends Service {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 0, 0, 0);
-
+        Time t = new Time();
+        t.setToNow();
+        int currentHour = t.hour;
+        int currentMin = t.minute;
+        calendar.set(year, month, day, currentHour, currentMin, 0);
         Long nowTime = calendar.getTime().getTime();
-        calendar.set(year, month, day, 23, 59, 59);
-        Long nextTime = calendar.getTime().getTime();
+        int lastHourH = currentHour - 1;
+        if(lastHourH < 0) lastHourH = 0;
+        calendar.set(year, month, day, lastHourH, currentMin, 0);
+        Long lastTime = calendar.getTime().getTime();
 
-        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", lastTime.toString(), nowTime.toString()).list();
         if (states.isEmpty()) {
             return String.valueOf(result);
         } else if (states.size() == 1) {
             return states.get(states.size() - 1).getPm25();
         } else {
 
-            State state1 = states.get(states.size() - 1);
-            State state2 = states.get(states.size() - 2);
+            State state1 = states.get(states.size() - 1); // the last one
+            State state2 = states.get(0); //the first one
             result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
         }
         return String.valueOf(result);
@@ -401,7 +420,7 @@ public class DBService extends Service {
     private void insertState(State state) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         cupboard().withDatabase(db).put(state);
-        idToday++;
+        IDToday++;
     }
 
     private void searchState() {
@@ -442,6 +461,7 @@ public class DBService extends Service {
                     intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
                     //set current pm density for calculation
                     PM25Density = Double.valueOf(pmModel.getPm25());
+                    aCache.put(Const.Cache_PM_Density,PM25Density);
                     sendBroadcast(intent);
                     DBCanRun = true;
                 } catch (JSONException e) {
@@ -453,6 +473,8 @@ public class DBService extends Service {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                DBCanRun = true;
+
                 isPMSearchRun = false;
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
             }

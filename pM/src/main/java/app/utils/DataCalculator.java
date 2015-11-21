@@ -6,6 +6,7 @@ import android.text.format.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +19,10 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  */
 public class DataCalculator {
     SQLiteDatabase db;
-    List<State> todayStates;
-    List<State> lastTwoHourStates;
+    private List<State> todayStates;
+    private List<State> lastTwoHourStates;
+    private List<List<State>> lastWeekStates;
+    private List<String> lastWeekDate;
 
     private static DataCalculator instance = null;
 
@@ -32,16 +35,21 @@ public class DataCalculator {
 
     private DataCalculator(SQLiteDatabase db){
         this.db = db;
-        this.todayStates = getTodayStates();
-        this.lastTwoHourStates = getLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok.
+        this.todayStates = calTodayStates();
+        this.lastTwoHourStates = calLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok.
+        this.lastWeekStates = calLastWeekStates();
     }
 
     public void updateState(){
-        this.todayStates = getTodayStates();
-        this.lastTwoHourStates = getLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok.
+        this.todayStates = calTodayStates();
+        this.lastTwoHourStates = calLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok
     }
 
-    private List<State> getTodayStates(){
+    public void updateLastWeekState(){
+        this.lastWeekStates = calLastWeekStates();
+    }
+
+    private List<State> calTodayStates(){
         if(db == null) return new ArrayList<State>();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -56,7 +64,7 @@ public class DataCalculator {
         return states;
     }
 
-    private List<State> getLastTwoHourStates(){
+    private List<State> calLastTwoHourStates(){
         if(db == null) return new ArrayList<State>();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -76,6 +84,83 @@ public class DataCalculator {
         return states;
     }
 
+    private List<List<State>> calLastWeekStates(){
+        List<List<State>> mData = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        int yearOrigin = calendar.get(Calendar.YEAR);
+        int monthOrigin = calendar.get(Calendar.MONTH);
+        int dayOrigin = calendar.get(Calendar.DAY_OF_MONTH);
+        lastWeekDate = new ArrayList<>();
+        for(int i = 0; i != 7; i++){
+            int day = dayOrigin;
+            int month = monthOrigin;
+            int year = yearOrigin;
+            if(day - i < 1){
+                //this time I don't take the different number day of a month into consideration
+                //Ex. 11.1: 1 - 7 = -6, actually date should be 10.(30+1-7)
+                month = month - 1;
+                day = 30 + day - i;
+                if(month < 1){
+                    year = year - 1;
+                    month = 12;
+                }
+            }else {
+                day = day - i;
+            }
+            lastWeekDate.add(i,String.valueOf(month)+"."+String.valueOf(day));
+            calendar.set(year, month, day, 0, 0, 0);
+            Long TodayNowTime = calendar.getTime().getTime();
+            calendar.set(year, month, day, 23, 59, 59);
+            Long TodayNextTime = calendar.getTime().getTime();
+            List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", TodayNowTime.toString(), TodayNextTime.toString()).list();
+            if(states == null || states.isEmpty()){
+                states = new ArrayList<>();
+            }
+            mData.add(i,states);
+        }
+        return mData;
+    }
+
+    public SQLiteDatabase getDb() {
+        return db;
+    }
+
+    public void setDb(SQLiteDatabase db) {
+        this.db = db;
+    }
+
+    public void setLastWeekStates(List<List<State>> lastWeekStates) {
+        this.lastWeekStates = lastWeekStates;
+    }
+
+    public void setTodayStates(List<State> todayStates) {
+        this.todayStates = todayStates;
+    }
+
+    public void setLastTwoHourStates(List<State> lastTwoHourStates) {
+        this.lastTwoHourStates = lastTwoHourStates;
+    }
+
+    public List<State> getTodayStates() {
+        return todayStates;
+    }
+
+    public List<State> getLastTwoHourStates() {
+        return lastTwoHourStates;
+    }
+
+    public List<List<State>> getLastWeekStates() {
+        return lastWeekStates;
+    }
+
+    public List<String> getLastWeekDate() {
+        return lastWeekDate;
+    }
+
+    public void setLastWeekDate(List<String> lastWeekDate) {
+        this.lastWeekDate = lastWeekDate;
+    }
+
     /**return a map contains today pm breathed of each time point**/
     public HashMap<Integer,Float> calChart1Data(){
         HashMap<Integer,Float> map = new HashMap<>();
@@ -84,7 +169,6 @@ public class DataCalculator {
         if (states.isEmpty()){
             return map;
         }
-        Map<Integer,Float> tmpMap = new HashMap<>();
         for(int i = 0; i != states.size(); i++){
             State state = states.get(i);
             int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
@@ -95,12 +179,11 @@ public class DataCalculator {
                 pm25 = Float.valueOf(state.getPm25()) - Float.valueOf(states.get(i-1).getPm25());
             }
             //now we get the index of time and the pm25 of that point
-            tmpMap.put(index, pm25);
-        }
-        //now calculate the sum of value
-        for (int i = 0; i != 48; i++) {
-            if (tmpMap.containsKey(i)) {
-                map.put(i,ShortcutUtil.sumOfArrayNum(tmpMap.values().toArray()));
+            if(map.containsKey(index)){
+               float tmp = map.get(index).floatValue() + pm25;
+                map.put(index,tmp);
+            }else {
+                map.put(index,pm25);
             }
         }
         return map;
@@ -230,14 +313,20 @@ public class DataCalculator {
     }
 
 
+    /**Return a map contains last week pm breathed of each day. today's index is 0 **/
     public HashMap<Integer,Float> calChart7Data(){
         HashMap<Integer,Float> map = new HashMap<>();
         if(db == null) return map;
-        List<State> states = todayStates;
-        if (states.isEmpty()){
-            return map;
+        List<List<State>> datas = getLastWeekStates();
+        if (datas.isEmpty()) return map;
+        for(int i = 0; i != datas.size(); i++){
+            List<State> state = datas.get(i);
+            if (state.isEmpty()) {
+                map.put(i,0.0f);
+                break;
+            }
+            map.put(i,Float.valueOf(state.get(state.size() - 1).getPm25()));
         }
-        Map<Integer,Float> tmpMap = new HashMap<>();
         return map;
     }
 
@@ -282,15 +371,20 @@ public class DataCalculator {
         return map;
     }
 
-
+    /**Return a map contains last week air breathed of each day. today's index is 0 **/
     public HashMap<Integer,Float> calChart12Data(){
         HashMap<Integer,Float> map = new HashMap<>();
         if(db == null) return map;
-        List<State> states = todayStates;
-        if (states.isEmpty()){
-            return map;
+        List<List<State>> datas = getLastWeekStates();
+        if (datas.isEmpty()) return map;
+        for(int i = 0; i != datas.size(); i++){
+            List<State> state = datas.get(i);
+            if (state.isEmpty()) {
+                map.put(i,0.0f);
+                break;
+            }
+            map.put(i,Float.valueOf(state.get(state.size() - 1).getVentilation_volume()));
         }
-        Map<Integer,Float> tmpMap = new HashMap<>();
         return map;
     }
 }
