@@ -8,6 +8,12 @@ public class Const {
 
     public static String CURRENT_ACCESS_TOKEN = "-1";
 
+    public static String CURRENT_USER_NAME = "-1";
+
+    public static String CURRENT_USER_NICKNAME = "-1";
+
+    public static String CURRENT_USER_GENDER = "-1";
+
     public static double Lasttime_LONGITUDE = 121.41;
 
     public static double Lasttime_LATITUDE = 31.14; //default is shanghai
@@ -34,6 +40,12 @@ public class Const {
     public static final String Cache_App_Initialized = "Cache_App_Initialized";
 
     public static final String Cache_User_Id = "Cache_User_Id";
+
+    public static final String Cache_User_Name = "Cache_User_Name";
+
+    public static final String Cache_User_Nickname = "Cache_User_Nickname";
+
+    public static final String Cache_User_Gender = "Cache_User_Gender";
 
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
@@ -110,6 +122,8 @@ public class Const {
 
     public static final String Action_Chart_Result = "Action_Chart_Result";
 
+    public static final int Action_Profile_Register = 200001;
+
     /**
      * GPS*
      */
@@ -159,13 +173,13 @@ public class Const {
 
     public static final String Info_Register_Failed = "注册用户失败";
 
+    public static final String Info_Register_pwdError = "两次输入的密码不一致";
+
+    public static final String Info_Register_InputEmpty = "请填入必要信息";
+
     public static final String Info_Login_Success = "登录成功";
 
     public static final String Info_Login_Failed = "登录失败";
-
-    public static final String Info_GPS_Open = "定位服务已打开!";
-
-    public static final String Info_GPS_Turnoff = "请先打开定位!";
 
     public static final String Info_Login_Empty = "用户名或密码为空";
 
@@ -173,11 +187,27 @@ public class Const {
 
     public static final String Info_Login_Space = "用户名或密码中有空格";
 
+    public static final String Info_Login_First = "请先登录";
+
+    public static final String Info_GPS_Open = "定位服务已打开!";
+
+    public static final String Info_GPS_Turnoff = "请先打开定位!";
+
+    public static final String Info_PMDATA_Failed = "获取PM2.5数据失败";
+
     public static final String Info_Modify_Pwd_Success = "修改密码成功";
 
     public static final String Info_Modify_Pwd_Error = "用户不存在或验证失败";
 
-    public static final String Info_Login_First = "请先登录";
+    public static final String Info_Reset_Confirm = "是否发送重置密码邮件？";
+
+    public static final String Info_Reset_Success = "发送重置密码邮件成功";
+
+    public static final String Info_Reset_Username_Fail = "缺少用户名参数";
+
+    public static final String Info_Reset_NoUser_Fail = "用户名不存在";
+
+    public static final String Info_Reset_Unknown_Fail = "发送重置密码邮件失败";
 
     public static String[] cityName =
             {

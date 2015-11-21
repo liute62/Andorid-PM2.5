@@ -454,7 +454,7 @@ public class DBService extends Service {
             @Override
             public void onErrorResponse(VolleyError error) {
                 isPMSearchRun = false;
-                //Toast.makeText(getApplicationContext(), "Data Get Fail!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
             }
 
         });

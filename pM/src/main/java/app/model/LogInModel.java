@@ -14,11 +14,23 @@ public class LogInModel extends BaseModel {
 
     public static final String USERID = "userid";
 
+    public static final String LASTNAME = "lastname";
+
+    public static final String FIRSTNAME = "firstname";
+
+    public static final String GENDER = "sex";
+
     private String status;
 
     private String access_token;
 
     private String userid;
+
+    private String lastname;
+
+    private String firstname;
+
+    private String gender;
 
     public static LogInModel parse(JSONObject object) throws JSONException {
         LogInModel bean = new LogInModel();
@@ -30,6 +42,12 @@ public class LogInModel extends BaseModel {
         }
         if (object.has(USERID)) {
             bean.setUserid(object.getString(USERID));
+        }if (object.has(LASTNAME)){
+            bean.setLastname(object.getString(LASTNAME));
+        }if (object.has(FIRSTNAME)){
+            bean.setFirstname(object.getString(FIRSTNAME));
+        }if (object.has(GENDER)){
+            bean.setGender(object.getString(GENDER));
         }
         return bean;
     }
@@ -56,5 +74,29 @@ public class LogInModel extends BaseModel {
 
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }

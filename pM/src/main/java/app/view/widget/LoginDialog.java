@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import app.model.HttpResult;
+import app.model.LogInModel;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.HttpUtil;
@@ -61,7 +62,6 @@ public class LoginDialog extends Dialog implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.widget_dialog_login);
@@ -76,7 +76,6 @@ public class LoginDialog extends Dialog implements OnClickListener {
 
     @Override
     public void onClick(View arg0) {
-        // TODO Auto-generated method stub
         switch (arg0.getId()) {
             case R.id.activitytitle_sure:
                 username = mUser.getText().toString();
@@ -110,7 +109,7 @@ public class LoginDialog extends Dialog implements OnClickListener {
         }
     }
 
-    private void login(String name, String password) throws JSONException {
+    private void login(final String name, String password) throws JSONException {
         String url = HttpUtil.Login_url;
         JSONObject object = new JSONObject();
         object.put("name", name);
@@ -122,12 +121,19 @@ public class LoginDialog extends Dialog implements OnClickListener {
                 HttpResult result = new HttpResult();
                 result.setIsSuccess(true);
                 result.setResultBody(response.toString());
+                LogInModel model = result.toLogInModel();
                 if (result.toLogInModel().getStatus().equals("1")) {
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Success, Toast.LENGTH_SHORT).show();
-                    Const.CURRENT_USER_ID = result.toLogInModel().getUserid();
-                    Const.CURRENT_ACCESS_TOKEN = result.toLogInModel().getAccess_token();
+                    Const.CURRENT_USER_ID = model.getUserid();
+                    Const.CURRENT_ACCESS_TOKEN = model.getAccess_token();
+                    Const.CURRENT_USER_NAME = username;
+                    Const.CURRENT_USER_NICKNAME = model.getLastname() + model.getFirstname();
+                    Const.CURRENT_USER_GENDER = model.getGender();
                     aCache.put(Const.Cache_User_Id, Const.Cache_User_Id);
                     aCache.put(Const.Cache_Access_Token, Const.CURRENT_ACCESS_TOKEN);
+                    aCache.put(Const.Cache_User_Name, Const.CURRENT_USER_NAME);
+                    aCache.put(Const.Cache_User_Nickname,Const.CURRENT_USER_NICKNAME);
+                    aCache.put(Const.Cache_User_Gender,Const.CURRENT_USER_GENDER);
                     if (parentHandler != null) {
                         parentHandler.sendEmptyMessage(Const.Handler_Login_Success);
                     }

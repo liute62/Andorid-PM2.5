@@ -44,27 +44,27 @@
                     android:background="@drawable/card_avatar_bar">
 
                     <TextView
-                        android:id="@+id/personal_info_username"
+                        android:id="@+id/profile_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="103dp"
                         android:layout_marginTop="4dp"
                         android:singleLine="true"
                         android:ellipsize="end"
-                        android:text="username"
+                        android:text="Username"
                         android:textSize="12sp"
                         android:textColor="#A1A1A1" />
 
                     <TextView
-                        android:id="@+id/personal_info_gender"
+                        android:id="@+id/profile_gender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/personal_info_username"
+                        android:layout_below="@id/profile_username"
                         android:layout_marginLeft="103dp"
                         android:layout_marginTop="4dp"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:text="gender"
+                        android:text="Gender"
                         android:textColor="#A1A1A1"
                         android:textSize="12sp" />
 
@@ -78,7 +78,19 @@
                         android:id="@+id/profile_login"
                         android:textColor="@color/White"
                         android:text="登陆"
-                        android:background="@drawable/main_top_bg" />
+                        android:background="@drawable/main_top_bg"/>
+
+                    <TextView
+                        android:id="@+id/profile_reset_pwd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="30dip"
+                        android:layout_marginRight="20dip"
+                        android:textSize="15sp"
+                        android:text="重置密码"
+                        android:textColor="@color/AccentBlue"
+                        android:visibility="invisible"/>
 
 
                 </RelativeLayout>
@@ -94,7 +106,7 @@
                     android:src="@drawable/avatar_default" />
 
                 <TextView
-                    android:id="@+id/personal_info_name"
+                    android:id="@+id/profile_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/user_avatar"
@@ -105,7 +117,7 @@
                     android:shadowDx="3.0"
                     android:shadowDy="3.0"
                     android:shadowRadius="5.0"
-                    android:text="name"
+                    android:text="Name"
                     android:textSize="20sp"
                     android:textColor="@android:color/white" />
 

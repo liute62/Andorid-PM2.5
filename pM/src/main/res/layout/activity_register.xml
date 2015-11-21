@@ -132,7 +132,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="姓名"
+        android:text="姓"
         android:id="@+id/textView7"
         android:layout_below="@+id/textView6"
         android:layout_alignLeft="@+id/textView6"
@@ -142,9 +142,29 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/register_name"
-        android:minWidth="220dip"
+        android:id="@+id/register_lastname"
+        android:minWidth="50dip"
         android:layout_alignLeft="@+id/register_confirm_pwd"
+        android:layout_alignBaseline="@+id/textView7"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="名"
+        android:id="@+id/textView7_2"
+        android:layout_below="@+id/textView6"
+        android:layout_toRightOf="@id/register_lastname"
+        android:layout_marginLeft="20dip"
+        android:layout_marginTop="30dip"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/register_firstname"
+        android:minWidth="110dip"
+        android:layout_toRightOf="@id/textView7_2"
+        android:layout_marginLeft="20dip"
         android:layout_alignBaseline="@+id/textView7"/>
 
     <TextView
@@ -162,7 +182,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/register_phone"
         android:minWidth="220dip"
-        android:layout_alignLeft="@+id/register_name"
+        android:layout_alignLeft="@+id/register_lastname"
         android:layout_alignBaseline="@+id/textView8"/>
 
     <TextView
@@ -180,7 +200,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/register_mail"
         android:minWidth="220dip"
-        android:layout_alignLeft="@+id/register_name"
+        android:layout_alignLeft="@+id/register_lastname"
         android:layout_alignBaseline="@+id/textView9"/>
 
 

@@ -24,8 +24,7 @@
             android:layout_marginLeft="@dimen/login_dialog_left"
             android:layout_marginTop="@dimen/login_dialog_top"
             android:hint="账号"
-            android:text="test1"
-            android:inputType="number|phone" />
+            android:inputType="text" />
 
     </LinearLayout>
 
@@ -42,7 +41,6 @@
             android:layout_marginLeft="@dimen/login_dialog_left"
             android:layout_marginTop="@dimen/login_dialog_top"
             android:hint="密码"
-            android:text="test1"
             android:inputType="textPassword" />
 
     </LinearLayout>

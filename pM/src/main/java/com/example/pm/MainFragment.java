@@ -252,6 +252,10 @@ public class MainFragment extends Fragment implements OnClickListener {
     private void cacheInitial() {
         String access_token = aCache.getAsString(Const.Cache_Access_Token);
         String user_id = aCache.getAsString(Const.Cache_User_Id);
+        String user_name = aCache.getAsString(Const.Cache_User_Name);
+        String user_nickname = aCache.getAsString(Const.Cache_User_Nickname);
+        String user_gender = aCache.getAsString(Const.Cache_User_Gender);
+
         String density = aCache.getAsString(Const.Cache_PM_Density);
         String pm_hour = aCache.getAsString(Const.Cache_PM_LastHour);
         String pm_day = aCache.getAsString(Const.Cache_PM_LastDay);
@@ -263,7 +267,14 @@ public class MainFragment extends Fragment implements OnClickListener {
             Const.CURRENT_ACCESS_TOKEN = access_token;
         }if(ShortcutUtil.isStringOK(user_id)){
             Const.CURRENT_USER_ID = user_id;
+        }if(ShortcutUtil.isStringOK(user_name)){
+            Const.CURRENT_USER_NAME = user_name;
+        }if (ShortcutUtil.isStringOK(user_nickname)){
+            Const.CURRENT_USER_NICKNAME = user_nickname;
+        }if(ShortcutUtil.isStringOK(user_gender)){
+            Const.CURRENT_USER_GENDER = user_gender;
         }
+
         if (ShortcutUtil.isStringOK(density)){
             PMDensity = Integer.valueOf(density);
         }if(ShortcutUtil.isStringOK(pm_hour)){
