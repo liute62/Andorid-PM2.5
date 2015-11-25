@@ -155,26 +155,25 @@ public class ProfileFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
-        Intent intent = null;
         switch (v.getId()) {
             case R.id.profile_login:
                 LoginDialog loginDialog = new LoginDialog(getActivity(), loginHandler);
                 loginDialog.show();
                 break;
             case R.id.profile_logout:
-                clearLoginCache();
+                clearCache();
                 getActivity().finish();
                 break;
             case R.id.profile_turnoff_service:
                 if (v.getTag() == null || v.getTag().equals("on")) {
                     v.setTag("off");
-                    intent = new Intent(mActivity, DBService.class);
+                    Intent intent = new Intent(mActivity, DBService.class);
                     mActivity.stopService(intent);
                     ((TextView) v).setText(Const.Info_Turn_On_Service);
                     Toast.makeText(mActivity, Const.Info_Turn_Off_Service, Toast.LENGTH_SHORT).show();
                 } else if (v.getTag().equals("off")) {
                     v.setTag("on");
-                    intent = new Intent(mActivity, DBService.class);
+                    Intent intent = new Intent(mActivity, DBService.class);
                     mActivity.startService(intent);
                     ((TextView) v).setText(Const.Info_Turn_Off_Service);
                     Toast.makeText(mActivity, Const.Info_Turn_On_Service, Toast.LENGTH_SHORT).show();
@@ -187,22 +186,16 @@ public class ProfileFragment extends Fragment implements
                     Toast.makeText(mActivity, Const.Info_Turn_Off_Upload, Toast.LENGTH_SHORT).show();
                 } else if (v.getTag().equals("off")) {
                     v.setTag("on");
-                    intent = new Intent(mActivity, DBService.class);
+                    Intent intent = new Intent(mActivity, DBService.class);
                     mActivity.startService(intent);
                     ((TextView) v).setText(Const.Info_Turn_Off_Upload);
                     Toast.makeText(mActivity, Const.Info_Turn_On_Upload, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.profile_clear_data:
-                clearCache();
-                getActivity().finish();
-                if(ShortcutUtil.isServiceWork(mActivity,Const.Name_DB_Service)) {
-                    intent = new Intent(mActivity, DBService.class);
-                    mActivity.stopService(intent);
-                }
                 break;
             case R.id.profile_rigister:
-                intent = new Intent(mActivity,RegisterActivity.class);
+                Intent intent = new Intent(mActivity,RegisterActivity.class);
                 startActivityForResult(intent,Const.Action_Profile_Register);
                 break;
             case R.id.profile_bluetooth:
@@ -244,27 +237,12 @@ public class ProfileFragment extends Fragment implements
         }
     }
 
-    private void clearLoginCache(){
+    private void clearCache() {
         aCache.remove(Const.Cache_User_Id);
         aCache.remove(Const.Cache_Access_Token);
         aCache.remove(Const.Cache_User_Name);
         aCache.remove(Const.Cache_User_Nickname);
         aCache.remove(Const.Cache_User_Gender);
-    }
-
-    private void clearCache() {
-        aCache.remove(Const.Cache_Chart_1);
-        aCache.remove(Const.Cache_Chart_2);
-        aCache.remove(Const.Cache_Chart_3);
-        aCache.remove(Const.Cache_Chart_4);
-        aCache.remove(Const.Cache_Chart_5);
-        aCache.remove(Const.Cache_Chart_6);
-        aCache.remove(Const.Cache_Chart_7);
-        aCache.remove(Const.Cache_Chart_7_Date);
-        aCache.remove(Const.Cache_Chart_8);
-        aCache.remove(Const.Cache_Chart_10);
-        aCache.remove(Const.Cache_Chart_12);
-        aCache.remove(Const.Cache_Chart_12_Date);
     }
 
     private class ResetPwdListener implements OnClickListener{

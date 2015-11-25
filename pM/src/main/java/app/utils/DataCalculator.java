@@ -22,7 +22,7 @@ public class DataCalculator {
     private List<State> todayStates;
     private List<State> lastTwoHourStates;
     private List<List<State>> lastWeekStates;
-    private ArrayList<String> lastWeekDate;
+    private List<String> lastWeekDate;
 
     private static DataCalculator instance = null;
 
@@ -40,12 +40,9 @@ public class DataCalculator {
         this.lastWeekStates = calLastWeekStates();
     }
 
-    public void updateLastDayState(){
+    public void updateState(){
         this.todayStates = calTodayStates();
-    }
-
-    public void updateLastTwoHourState(){
-        this.lastTwoHourStates = calLastTwoHourStates();
+        this.lastTwoHourStates = calLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok
     }
 
     public void updateLastWeekState(){
@@ -156,11 +153,11 @@ public class DataCalculator {
         return lastWeekStates;
     }
 
-    public ArrayList<String> getLastWeekDate() {
+    public List<String> getLastWeekDate() {
         return lastWeekDate;
     }
 
-    public void setLastWeekDate(ArrayList<String> lastWeekDate) {
+    public void setLastWeekDate(List<String> lastWeekDate) {
         this.lastWeekDate = lastWeekDate;
     }
 
@@ -270,7 +267,7 @@ public class DataCalculator {
         Map<Integer,Float> tmpMap = new HashMap<>();
         for(int i = 0; i != states.size(); i++){
             State state = states.get(i);
-            int index = ShortcutUtil.timeToPointOfTwoHour(Long.valueOf(states.get(0).getTime_point()), Long.valueOf(state.getTime_point()));
+            int index = ShortcutUtil.timeToPointOfTwoHour(Long.valueOf(states.get(0).getTime_point()),Long.valueOf(state.getTime_point()));
             Float pm25Density;
             pm25Density = Float.valueOf(state.getDensity());
             //now we get the index of time and the pm25 density of that point

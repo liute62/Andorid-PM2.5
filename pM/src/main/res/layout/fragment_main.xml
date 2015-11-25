@@ -267,8 +267,8 @@
             android:layout_height="match_parent"
             android:layout_below="@id/main_chart_2_change"
             android:layout_marginTop="5dip"
-            android:layout_marginLeft="25dip"
-            android:layout_marginRight="15dip"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="8dip"
             android:visibility="invisible" />
 
         <lecho.lib.hellocharts.view.LineChartView
