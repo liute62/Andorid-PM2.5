@@ -131,6 +131,9 @@ public class ShortcutUtil {
     }
 
     public static String ugScale(double number,int scale){
+        if(String.valueOf(number).equals("NaN")){
+            number = 0.0;
+        }
         BigDecimal bd = new BigDecimal(number);
         BigDecimal setScale = bd.setScale(scale, bd.ROUND_DOWN);
         return String.valueOf(setScale.doubleValue());

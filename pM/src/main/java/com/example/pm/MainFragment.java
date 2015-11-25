@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -531,7 +532,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 chartData8 = data8;
                 aCache.put(Const.Cache_Chart_8,chartData8);
                 chartInitial(current_chart1_index,current_chart2_index);
-            }else if(intent.getAction().equals(Const.Action_Chart_Result_3)){
+            }else if(intent.getAction().equals(Const.Action_Chart_Result_2)){
                 HashMap data1 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart1_data);
                 chartData1 = data1;
                 aCache.put(Const.Cache_Chart_1,chartData1);
@@ -553,7 +554,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 ArrayList date7 = (ArrayList)intent.getExtras().getSerializable(Const.Intent_chart_7_data_date);
                 chartData7 = data7;
                 aCache.put(Const.Cache_Chart_7,chartData7);
-                aCache.put(Const.Cache_Chart_7_Date,data7);
+                aCache.put(Const.Cache_Chart_7_Date,date7);
                 HashMap data12 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart12_data);
                 ArrayList date12 = (ArrayList)intent.getExtras().getSerializable(Const.Intent_chart_12_data_date);
                 chartData12 = data12;

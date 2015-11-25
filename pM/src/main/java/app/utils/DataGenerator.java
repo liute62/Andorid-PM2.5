@@ -373,7 +373,7 @@ public class DataGenerator {
 
             values.add(value);
             Column column = new Column(values);
-            column.setHasLabels(false);
+            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 
@@ -586,7 +586,7 @@ public class DataGenerator {
         // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = numColumns - 1; i >= 0; i--) {
             values = new ArrayList<SubcolumnValue>();
             SubcolumnValue value;
             if (maps.containsKey(i)) {

@@ -2,6 +2,7 @@ package app.utils;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.Time;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -94,6 +95,7 @@ public class DataCalculator {
         int monthOrigin = calendar.get(Calendar.MONTH);
         int dayOrigin = calendar.get(Calendar.DAY_OF_MONTH);
         lastWeekDate = new ArrayList<>();
+//        Log.e("yearOrigin",String.valueOf(yearOrigin));
         for(int i = 0; i != 7; i++){
             int day = dayOrigin;
             int month = monthOrigin;
@@ -110,7 +112,7 @@ public class DataCalculator {
             }else {
                 day = day - i;
             }
-            lastWeekDate.add(i,String.valueOf(month)+"."+String.valueOf(day));
+            lastWeekDate.add(i,String.valueOf(month+1)+"."+String.valueOf(day));
             calendar.set(year, month, day, 0, 0, 0);
             Long TodayNowTime = calendar.getTime().getTime();
             calendar.set(year, month, day, 23, 59, 59);

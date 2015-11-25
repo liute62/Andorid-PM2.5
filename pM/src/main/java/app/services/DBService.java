@@ -10,30 +10,30 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Criteria;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.provider.ContactsContract;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
+import android.util.Log;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.pm.MainActivity;
 import com.example.pm.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
-
 import app.Entity.State;
 import app.model.PMModel;
 import app.movement.SimpleStepDetector;
@@ -44,25 +44,37 @@ import app.utils.DBHelper;
 import app.utils.DataCalculator;
 import app.utils.HttpUtil;
 import app.utils.VolleyQueue;
-
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by liuhaodong1 on 15/11/10.
+ *
  * DBService Sequences
  * -----Oncreate-----
- * 1.params Initial
- * 2.DB Initial: get the value of last hour, today, last week avg pm from database and set cache.
- * 3.Sensor Initial
- * 4.GPS Initial:
+ * 1.params Initial.
+ * 2.Get default PM density from cache.
+ * 3.DB Initial: get the value of last hour, today, last week avg pm from database and set cache.
+ * 4.Sensor Initial
+ * 5.GPS Initial:
+ *   Location Initial:
+ *    1.Success, lati&longi are set to  getLastKnownLocation
+ *    2.Failed,  lati&longi are set to  Shanghai location
  *   For location changed:
- *    1.Location is not null, means currently GPS begin work, set isLocationChanged = true.
- *    2.last time lati&longi equals current lati&longi, means no change, don't need search result from internet.
+ *    1.last time lati&longi equals current lati&longi, means no change, don't need search result from internet.
+ *    2.If location changed, download pm density from server.
  * 5.DB Runnable begin running.
  * -----DB Runnable-----
- * 1. isLocationChanged = false, that means user's GPS not work, we want to use user last time lati&longi as the default.
- * 2. DBCanRun means after get data from server, we get the density we need, it can work.
- * 3  ChartTaskCanRun means whether we want to update the chart in mainfragment, most of time it will updated after 10 times of DBTask executed.
+ * 1. searchPMRequest, two ways
+ *    1.Initial time, search pm density
+ *    2.After DB Runnable last a hour
+ * 2. ChartTaskCanRun means whether to update the chart in mainfragment, default : true,
+ *    ChartRunTime = -1,initialize data for chart, meanwhile set cache.
+ *    ChartRunTime = 0,1,2,4,5, update chart4,5,8 -- Two Hour Data, set cache
+ *    ChartRunTime = 3, update chart1,2,3,6,10 -- A Day data, set cache
+ *    ChartRunTime = 6, update chart7,12 -- A Week Data, set cache
+ * 3. DBCanRun, the default is false
+ *    True:  Only after getting PM Density at first or in running.
+ *    False: Search PM Density Failed
  */
 public class DBService extends Service {
 
@@ -71,10 +83,10 @@ public class DBService extends Service {
     private DBHelper dbHelper;
     private SQLiteDatabase db;
 
-    double longitude = 0.0;  //the newest longitude
-    double latitude = 0.0;  // the newest latitude
-    double last_long;    // the last time longitude
-    double last_lati;   // the last time latitude
+    double longitude;  //the newest longitude
+    double latitude;  // the newest latitude
+    double last_long;  // the last time longitude
+    double last_lati;  // the last time latitude
     double PM25Density;
     double PM25Today;
     Long IDToday;
@@ -91,20 +103,24 @@ public class DBService extends Service {
     PMModel pmModel;
     private Handler DBHandler = new Handler();
     boolean isPMSearchRun;
-    private boolean DBCanRun = false;
+    private boolean DBCanRun;
     private boolean ChartTaskCanRun;
     private boolean isLocationChanged;
-    private int DBRunTime = 0;
-    private int ChartRunTime = -1;
+    private int DBRunTime;
+    private int ChartRunTime;
     ACache aCache;
 
     private Runnable DBRunnable = new Runnable() {
 
         @Override
         public void run() {
-           //default is true, but next updation will be after 5 times DB updated
+            int mul = Const.DB_PM_Search_INTERVAL / Const.DB_PM_Cal_INTERVAL;
+            if(DBRunTime == mul || ChartRunTime == -1){
+                //every a hour search pm density automatically
+                searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+            }
             if (ChartTaskCanRun){
-                ChartTaskCanRun = false;
+//                ChartTaskCanRun = false;
                 Intent intent;
                 Bundle mBundle = new Bundle();
                 switch (ChartRunTime){
@@ -125,17 +141,16 @@ public class DBService extends Service {
                             aCache.put(Const.Cache_Chart_6, DataCalculator.getIntance(db).calChart6Data());
                         if(aCache.getAsObject(Const.Cache_Chart_7) == null) {
                             aCache.put(Const.Cache_Chart_7, DataCalculator.getIntance(db).calChart7Data());
-                            aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());
-                        }
+                            aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());}
                         if(aCache.getAsObject(Const.Cache_Chart_8) == null)
                             aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
                         if(aCache.getAsObject(Const.Cache_Chart_10) == null)
                             aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
-                        if(aCache.getAsObject(Const.Cache_Chart_12) == null)
+                        if(aCache.getAsObject(Const.Cache_Chart_12) == null){
                             aCache.put(Const.Cache_Chart_12, DataCalculator.getIntance(db).calChart12Data());
-                            aCache.put(Const.Cache_Chart_12_Date, DataCalculator.getIntance(db).getLastWeekDate());
+                            aCache.put(Const.Cache_Chart_12_Date, DataCalculator.getIntance(db).getLastWeekDate());}
                         break;
-                    case 1:
+                    case 3:
                         intent = new Intent(Const.Action_Chart_Result_2);
                         DataCalculator.getIntance(db).updateLastDayState();
                         mBundle.putSerializable(Const.Intent_chart1_data,  DataCalculator.getIntance(db).calChart1Data());
@@ -144,13 +159,14 @@ public class DBService extends Service {
                         mBundle.putSerializable(Const.Intent_chart6_data,  DataCalculator.getIntance(db).calChart6Data());
                         mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
                         break;
-                    case 2:
+                    case 6:
                         intent = new Intent(Const.Action_Chart_Result_3);
                         DataCalculator.getIntance(db).updateLastWeekState();
                         mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
                         mBundle.putSerializable(Const.Intent_chart_7_data_date,  DataCalculator.getIntance(db).getLastWeekDate());
                         mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
                         mBundle.putSerializable(Const.Intent_chart_12_data_date,  DataCalculator.getIntance(db).getLastWeekDate());
+                        ChartRunTime = 0;
                         break;
                     default:
                         intent = new Intent(Const.Action_Chart_Result_1);
@@ -164,22 +180,21 @@ public class DBService extends Service {
                 intent.putExtras(mBundle);
                 sendBroadcast(intent);
             }
-//            if(!isPMSearchRun){
-//                searchPMRequest(String.valueOf(Const.Lasttime_LONGITUDE), String.valueOf(Const.Lasttime_LATITUDE));
-//            }
             if (DBCanRun) {
                 State state = calculatePM25(longitude, latitude);
                 insertState(state); //insert the information into database
                 //state.print();
                 Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
+//                Log.e("hour",calLastHourPM());
                 intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                 intent.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                 intent.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
                 sendBroadcast(intent);
                 DBRunTime++;
-                if(DBRunTime == 5){
-                    ChartTaskCanRun = true;
-                }
+//                if(DBRunTime == 1){
+////                    ChartTaskCanRun = true;
+//                    DBRunTime = 0;
+//                }
             }
             //searchState();
             //upload(state);
@@ -195,12 +210,20 @@ public class DBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        longitude = 0.0;
+        latitude = 0.0;
         last_lati = -0.1;
         last_long = -0.1;
+        DBCanRun = false;
+        DBRunTime = 0;
+        ChartRunTime = -1;
         isPMSearchRun = false;
         isLocationChanged = false;
         ChartTaskCanRun = true;
         aCache = ACache.get(getApplicationContext());
+        if(aCache.getAsString(Const.Cache_PM_Density) != null){
+            PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
+        }
         DBInitial();
         sensorInitial();
         GPSInitial();
@@ -297,10 +320,42 @@ public class DBService extends Service {
 
     private void GPSInitial() {
         mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location location= mManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(location == null){
+            longitude = Const.Default_LONGITUDE;
+            latitude = Const.Default_LATITUDE;
+            Toast.makeText(getApplicationContext(),Const.Info_GPS_No_Cache,Toast.LENGTH_SHORT).show();
+        }else {
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+        }
+        GpsStatus.Listener gpsStatusListener=new GpsStatus.Listener() {
+            public void onGpsStatusChanged(int event) {
+                if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
+                    //第一次定位
+                } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
+                    //卫星状态改变
+                    GpsStatus gpsStatus = mManager.getGpsStatus(null); // 取当前状态
+                    int maxSatellites = gpsStatus.getMaxSatellites(); //获取卫星颗数的默认最大值
+                    Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();//创建一个迭代器保存所有卫星
+                    int count = 0;
+                    while (it.hasNext() && count <= maxSatellites) {
+                        count++;
+                        GpsSatellite s = it.next();
+                    }
+                } else if (event == GpsStatus.GPS_EVENT_STARTED) {
+                    //定位启动
+                } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
+                    //定位结束
+                }
+            }
+        };
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if (location != null) {
+                    Log.e(String.valueOf(latitude),String.valueOf(longitude));
                     isLocationChanged = true;
                     longitude = location.getLongitude();
                     latitude = location.getLatitude();
@@ -310,17 +365,24 @@ public class DBService extends Service {
                         //location has been changed
                         last_lati = latitude;
                         last_long = longitude;
-                        Const.Lasttime_LATITUDE = latitude;
-                        Const.Lasttime_LONGITUDE = longitude;
-//                        if (isPMSearchRun == false) {
-//                            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
-//                        }
+                        Const.Default_LATITUDE = latitude;
+                        Const.Default_LONGITUDE = longitude;
+                        if (isPMSearchRun == false) {
+                            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                        }
                     }
                 }
             }
 
             @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
+            public void onStatusChanged(String s, int status, Bundle bundle) {
+                if(status==LocationProvider.AVAILABLE){
+                    Toast.makeText(getApplicationContext(),Const.Info_GPS_Available,Toast.LENGTH_SHORT).show();
+                }else if(status== LocationProvider.OUT_OF_SERVICE){
+                    Toast.makeText(getApplicationContext(),Const.Info_GPS_OutOFService,Toast.LENGTH_SHORT).show();
+                }else if(status==LocationProvider.TEMPORARILY_UNAVAILABLE){
+                    Toast.makeText(getApplicationContext(),Const.Info_GPS_Pause,Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -344,6 +406,7 @@ public class DBService extends Service {
         criteria.setSpeedRequired(false);
 
         String provider = mManager.getBestProvider(criteria, true);
+        mManager.addGpsStatusListener(gpsStatusListener);
         mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 Const.DB_Location_INTERVAL, 0, locationListener);
     }
@@ -404,6 +467,7 @@ public class DBService extends Service {
     }
 
     private String calLastHourPM() {
+        boolean firstHour = false;
         Double result = 0.0;
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -413,23 +477,30 @@ public class DBService extends Service {
         t.setToNow();
         int currentHour = t.hour;
         int currentMin = t.minute;
-        calendar.set(year, month, day, currentHour, currentMin, 0);
+        calendar.set(year, month, day, currentHour, currentMin, 59);
         Long nowTime = calendar.getTime().getTime();
         int lastHourH = currentHour - 1;
         if(lastHourH < 0) lastHourH = 0;
-        calendar.set(year, month, day, lastHourH, currentMin, 0);
+        calendar.set(year, month, day, lastHourH, currentMin,0);
         Long lastTime = calendar.getTime().getTime();
-
+        calendar.set(year,month,day,0,0,0);
+        Long originTime = calendar.getTime().getTime();
+        List<State> test = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", originTime.toString(), lastTime.toString()).list();
+        if(test.isEmpty()) firstHour = true;
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", lastTime.toString(), nowTime.toString()).list();
         if (states.isEmpty()) {
             return String.valueOf(result);
         } else if (states.size() == 1) {
             return states.get(states.size() - 1).getPm25();
         } else {
-
             State state1 = states.get(states.size() - 1); // the last one
-            State state2 = states.get(0); //the first one
-            result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
+            Log.e("state1",state1.getPm25());
+            if(firstHour){
+                result = Double.valueOf(state1.getPm25()) - 0;
+            }else {
+                State state2 = states.get(0); //the first one
+                result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
+            }
         }
         return String.valueOf(result);
     }
@@ -489,13 +560,13 @@ public class DBService extends Service {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //Log.e("searchPMRequest resp", response.toString());
-                //Toast.makeText(getApplicationContext(), "Data Get Success!", Toast.LENGTH_LONG).show();
+                Log.e("searchPMRequest resp", response.toString());
+                Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                DBCanRun = true;
+                DBCanRun = false;
                 isPMSearchRun = false;
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
             }
@@ -504,4 +575,4 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-}
+        }

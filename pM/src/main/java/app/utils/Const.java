@@ -16,9 +16,9 @@ public class Const {
 
     public static String CURRENT_USER_GENDER = "-1";
 
-    public static double Lasttime_LONGITUDE = 121.41;
+    public static double Default_LONGITUDE = 121.41;
 
-    public static double Lasttime_LATITUDE = 31.14; //default is shanghai
+    public static double Default_LATITUDE = 31.14; //default is shanghai
 
     public static PMModel CURRENT_PM_MODEL;
 
@@ -155,7 +155,7 @@ public class Const {
 
     public final static int DB_Location_INTERVAL = 1000 * 5;
 
-    public final static int DB_PM_Cal_INTERVAL = 1000 * 5; //1min
+    public final static int DB_PM_Cal_INTERVAL = 1000 * 5 ; //1min
 
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 
@@ -212,6 +212,8 @@ public class Const {
 
     public static final String Info_GPS_Turnoff = "请先打开定位!";
 
+    public static final String Info_PMDATA_Success = "获取PM2.5数据成功";
+
     public static final String Info_PMDATA_Failed = "获取PM2.5数据失败";
 
     public static final String Info_Modify_Pwd_Success = "修改密码成功";
@@ -227,6 +229,14 @@ public class Const {
     public static final String Info_Reset_NoUser_Fail = "用户名不存在";
 
     public static final String Info_Reset_Unknown_Fail = "发送重置密码邮件失败";
+
+    public static final String Info_GPS_Available = "当前GPS状态：可用的";
+
+    public static final String Info_GPS_OutOFService = "当前GPS状态：服务区外";
+
+    public static final String Info_GPS_Pause = "当前GPS状态：暂停服务";
+
+    public static final String Info_GPS_No_Cache = "当前经纬度设为预设城市：上海";
 
     public static String[] cityName =
             {
