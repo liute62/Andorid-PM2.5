@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liuhaodong1 on 15/11/10.
@@ -200,5 +201,16 @@ public class ShortcutUtil {
             return false;
         }
         return true;
+    }
+
+    public static Float getMaxValueFromMap(Map<Integer,Float> map){
+        Float max = 0.0f;
+        for(int i = 0; i != map.keySet().size(); i++){
+            Float tmp = (Float)map.get(i);
+            if(tmp > max){
+                max = tmp;
+            };
+        }
+        return max;
     }
 }
