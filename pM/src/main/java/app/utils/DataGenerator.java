@@ -1,6 +1,7 @@
 package app.utils;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -577,15 +578,15 @@ public class DataGenerator {
         int numColumns = ChartsConst.Chart_X[7].length;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
         if(!date.isEmpty()) {
-            for (int i = 0; i != numColumns; i++) {
+            for (int i = numColumns - 1; i >= 0; i--) {
                 if (date.get(i) == null) break;
-                axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+                axisValues.add(numColumns - i - 1, new AxisValue(i).setLabel(date.get(numColumns - i - 1)));
             }
         }
         // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
-        for (int i = 0; i < numColumns; ++i) {
+        for (int i = 0; i < numColumns; i++) {
             values = new ArrayList<SubcolumnValue>();
             SubcolumnValue value;
             if (maps.containsKey(i)) {
@@ -597,6 +598,7 @@ public class DataGenerator {
 
             values.add(value);
             Column column = new Column(values);
+            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 
@@ -680,27 +682,30 @@ public class DataGenerator {
         int numSubcolumns = 1;
         int numColumns = ChartsConst.Chart_X[12].length;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
+
         if(! date.isEmpty()) {
-            for (int i = 0; i != numColumns; i++) {
+            for (int i = numColumns - 1; i >= 0 ; i--) {
                 if (date.get(i) == null) break;
-                axisValues.add(i, new AxisValue(i).setLabel(date.get(i)));
+                axisValues.add(numColumns - i - 1, new AxisValue(i).setLabel(date.get(numColumns - i - 1)));
             }
         }
+
         // Column can have many subcolumns, here by default I use 1 subcolumn in each of 8 columns.
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
-        for (int i = 0; i < numColumns; ++i) {
+        for (int i = numColumns - 1; i >= 0; i--) {
             values = new ArrayList<SubcolumnValue>();
             SubcolumnValue value;
             if (maps.containsKey(i)) {
                 float input = maps.get(i).floatValue();
+                Log.e("chart12DataGenerator",String.valueOf(input));
                 value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
             } else {
                 value = new SubcolumnValue(0.0f);
             }
-
             values.add(value);
             Column column = new Column(values);
+            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 

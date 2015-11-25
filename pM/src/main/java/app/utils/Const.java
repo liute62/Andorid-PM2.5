@@ -4,6 +4,8 @@ import app.model.PMModel;
 
 public class Const {
 
+    public static String Name_DB_Service = "app.services.DBService";
+
     public static String CURRENT_USER_ID = "0";
 
     public static String CURRENT_ACCESS_TOKEN = "-1";
@@ -53,6 +55,21 @@ public class Const {
     public static final String Cache_Longitude = "Cache_Longitude";
     public static final String Cache_Latitude = "Cache_Latitude";
     public static final String Cache_City = "Cache_City";
+
+    public static final String Cache_Chart_1 = "Cache_Chart_1";
+    public static final String Cache_Chart_2 = "Cache_Chart_2";
+    public static final String Cache_Chart_3 = "Cache_Chart_3";
+    public static final String Cache_Chart_4 = "Cache_Chart_4";
+    public static final String Cache_Chart_5 = "Cache_Chart_5";
+    public static final String Cache_Chart_6 = "Cache_Chart_6";
+    public static final String Cache_Chart_7 = "Cache_Chart_7";
+    public static final String Cache_Chart_7_Date = "Cache_Chart_7_Date";
+    public static final String Cache_Chart_8 = "Cache_Chart_8";
+    public static final String Cache_Chart_10 = "Cache_Chart_10";
+    public static final String Cache_Chart_12 = "Cache_Chart_12";
+    public static final String Cache_Chart_12_Date = "Cache_Chart_12_Date";
+
+
     /**
      * Handler Code*
      */
@@ -99,17 +116,24 @@ public class Const {
 
     public static final String Intent_chart7_data = "Intent_chart7_data";
 
+    public static final String Intent_chart_7_data_date = "Intent_chart_7_data_date";
+
     public static final String Intent_chart8_data = "Intent_chart8_data";
 
     public static final String Intent_chart10_data = "Intent_chart10_data";
 
     public static final String Intent_chart12_data = "Intent_chart12_data";
+
+    public static final String Intent_chart_12_data_date = "Intent_chart_12_data_date";
+
     /**
      * Service & Activity Code*
      */
     public static final String Action_DB_MAIN_PMResult = "Action_DB_MAIN_PMResult";
 
     public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
+
+    public static final String Action_Chart_Cache = "Action_Chart_Cache";
 
     public static final String Action_Chart_Result_1 = "Action_Chart_Result_1";
 
