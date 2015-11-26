@@ -150,7 +150,7 @@ public class ProfileFragment extends Fragment implements
 
     @Override
     public void onTurn() {
-        mHead.setImageResource(R.drawable.beijing);
+        mHead.setImageResource(Const.profileImg[ (int)(Math.random() * 2)]);
     }
 
     @Override

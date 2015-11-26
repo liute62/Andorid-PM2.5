@@ -36,12 +36,16 @@ public class State {
     private String pm25;
     @Column(DBConstants.DB_MetaData.STATE_SOURCE_COL)
     private String source;
+    @Column(DBConstants.DB_MetaData.STATE_HAS_UPLOAD)
+    private int upload; //0 not upload, 1 upload success
 
     public State() {
 
     }
 
-    public State(Long id, String userid, String time_point, String longtitude, String latitude, String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source) {
+    public State(Long id, String userid, String time_point, String longtitude, String latitude,
+                 String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source,
+                 int upload) {
         this.id = id;
         this.userid = userid;
         this.time_point = time_point;
@@ -55,6 +59,7 @@ public class State {
         this.density = density;
         this.pm25 = pm25;
         this.source = source;
+        this.upload = upload;
     }
 
     public void print() {
@@ -72,6 +77,7 @@ public class State {
         Log.e("density", String.valueOf(density));
         Log.e("pm25", String.valueOf(pm25));
         Log.e("source", String.valueOf(source));
+        Log.e("upload", String.valueOf(upload));
     }
 
     public Long getId() {
@@ -176,5 +182,13 @@ public class State {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public int getUpload() {
+        return upload;
+    }
+
+    public void setUpload(int upload) {
+        this.upload = upload;
     }
 }

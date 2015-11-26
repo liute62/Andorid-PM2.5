@@ -40,6 +40,7 @@ import app.movement.SimpleStepDetector;
 import app.movement.StepListener;
 import app.utils.ACache;
 import app.utils.Const;
+import app.utils.DBConstants;
 import app.utils.DBHelper;
 import app.utils.DataCalculator;
 import app.utils.HttpUtil;
@@ -60,12 +61,12 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  *    1.Success, lati&longi are set to  getLastKnownLocation
  *    2.Failed,  lati&longi are set to  Shanghai location
  *   For location changed:
- *    1.last time lati&longi equals current lati&longi, means no change, don't need search result from internet.
+ *    1.last time lati&longi equals current lati&longi, means no change, don't need search result from server.
  *    2.If location changed, download pm density from server.
  * 5.DB Runnable begin running.
  * -----DB Runnable-----
- * 1. searchPMRequest, two ways
- *    1.Initial time, search pm density
+ * 1. searchPMRequest,checkDBForUpload two ways
+ *    1.Initial time, search pm density, check database, upload unSuccess data.
  *    2.After DB Runnable last a hour
  * 2. ChartTaskCanRun means whether to update the chart in mainfragment, default : true,
  *    ChartRunTime = -1,initialize data for chart, meanwhile set cache.
@@ -74,6 +75,9 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  *    ChartRunTime = 6, update chart7,12 -- A Week Data, set cache
  * 3. DBCanRun, the default is false
  *    True:  Only after getting PM Density at first or in running.
+ *     1.if current no upload task and user access_token is not null, upload data and insert data to database
+ *       (make sure time for accessing server <= 1 min for DB run)
+ *     2.else insert data directly
  *    False: Search PM Density Failed
  */
 public class DBService extends Service {
@@ -106,6 +110,7 @@ public class DBService extends Service {
     private boolean DBCanRun;
     private boolean ChartTaskCanRun;
     private boolean isLocationChanged;
+    private boolean isUploadRun;
     private int DBRunTime;
     private int ChartRunTime;
     ACache aCache;
@@ -123,6 +128,7 @@ public class DBService extends Service {
             if(DBRunTime == mul || ChartRunTime == -1){
                 //every a hour search pm density automatically
                 searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                checkPMDataForUpload();
             }
             if (ChartTaskCanRun){
 //                ChartTaskCanRun = false;
@@ -190,7 +196,7 @@ public class DBService extends Service {
             }
             if (DBCanRun) {
                 State state = calculatePM25(longitude, latitude);
-                insertState(state); //insert the information into database
+                insertState(state);
                 //state.print();
                 Intent intent = new Intent(Const.Action_DB_MAIN_PMResult);
 //                Log.e("hour",calLastHourPM());
@@ -228,6 +234,7 @@ public class DBService extends Service {
         DBRunTime = 0;
         ChartRunTime = -1;
         isPMSearchRun = false;
+        isUploadRun = false;
         isLocationChanged = false;
         ChartTaskCanRun = true;
         aCache = ACache.get(getApplicationContext());
@@ -448,7 +455,7 @@ public class DBService extends Service {
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR ? "1" : "0",
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1");
+                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1",0);
         return state;
     }
 
@@ -582,4 +589,36 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-        }
+    public void uploadPMData(final State state){
+        isUploadRun = true;
+        String url = HttpUtil.Upload_url;
+        JSONObject object = new JSONObject();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,object,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                isUploadRun = false;
+                State tmp;
+                tmp = state;
+                tmp.setUpload(1);
+                //insertState(tmp);
+                Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                isUploadRun = false;
+                Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+                //insertState(state);
+            }
+
+        });
+        VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    /**
+     * Check DB if there are some data for uploading
+     */
+    public void checkPMDataForUpload(){
+
+    }
+}

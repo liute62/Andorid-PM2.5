@@ -1,5 +1,7 @@
 package app.utils;
 
+import com.example.pm.R;
+
 import app.model.PMModel;
 
 public class Const {
@@ -220,6 +222,10 @@ public class Const {
 
     public static final String Info_PMDATA_Failed = "获取PM2.5数据失败";
 
+    public static final String Info_Upload_Success = "上传PM2.5数据成功";
+
+    public static final String Info_Upload_Failed = "上传PM2.5数据失败";
+
     public static final String Info_Modify_Pwd_Success = "修改密码成功";
 
     public static final String Info_Modify_Pwd_Error = "用户不存在或验证失败";
@@ -300,5 +306,9 @@ public class Const {
             "0:10", "1:10", "2:10", "3:10", "4:10", "5:10", "6:10", "7:10", "8:10",
             "9:10", "10:10", "11:10", "12:10", "13:10", "14:10", "15:10", "16:10", "17:10",
             "18:10", "19:10", "20:10", "21:10", "22:10", "23:10"
+    };
+
+    public static int[] profileImg = {
+            R.drawable.shanghai,R.drawable.beijing
     };
 }
