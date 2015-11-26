@@ -435,7 +435,7 @@ public class DataGenerator {
         // Height line, add it as first line to be drawn in the background.
         values = new ArrayList<PointValue>();
         values.add(new PointValue(0, 0));
-        values.add(new PointValue(time, result));
+        values.add(new PointValue(Float.valueOf(ChartsConst.Chart_X[1][time]), result));
         line = new Line(values);
         line.setColor(Color.BLUE);
         line.setHasPoints(false);
@@ -637,7 +637,7 @@ public class DataGenerator {
         }
 
         data = new ColumnChartData(columns);
-        Axis axisY = new Axis().setHasLines(true);
+        Axis axisY = new Axis().setHasLines(true).setMaxLabelChars(4);
         data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
         data.setAxisYLeft(axisY);
         return data;
@@ -651,7 +651,7 @@ public class DataGenerator {
         // Height line, add it as first line to be drawn in the background.
         values = new ArrayList<PointValue>();
         values.add(new PointValue(0, 0));
-        values.add(new PointValue(time, result));
+        values.add(new PointValue(Float.valueOf(ChartsConst.Chart_X[1][time]), result));
         line = new Line(values);
         line.setColor(Color.BLUE);
         line.setHasPoints(false);
@@ -711,7 +711,7 @@ public class DataGenerator {
 
         data = new ColumnChartData(columns);
         Axis axisX = new Axis(axisValues).setHasLines(true);
-        Axis axisY = new Axis().setHasLines(true);
+        Axis axisY = new Axis().setHasLines(true).setMaxLabelChars(4);
         data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
         return data;

@@ -157,9 +157,9 @@ public class Const {
      */
     public final static int DB_PM_Search_INTERVAL = 1000 * 60 * 60;//1Hour
 
-    public final static int DB_Location_INTERVAL = 1000 * 5;
+    public final static int DB_Location_INTERVAL = 1000 * 5 * 10; //110s
 
-    public final static int DB_PM_Cal_INTERVAL = 1000 * 5 ; //1min
+    public final static int DB_PM_Cal_INTERVAL = 1000 * 5 * 12 ; //1min
 
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 

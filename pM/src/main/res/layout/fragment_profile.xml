@@ -159,18 +159,6 @@
                 style="@style/main_left_button_style"
                 android:text="退出登录" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="longitude"
-                android:id="@+id/profile_longitude" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="latitude"
-                android:id="@+id/profile_latitude" />
-
         </LinearLayout>
     </app.view.widget.PullScrollView>
 

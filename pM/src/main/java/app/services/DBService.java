@@ -131,6 +131,7 @@ public class DBService extends Service {
                 switch (ChartRunTime){
                     //The initial state
                     case -1:
+                        Log.e("DB","initial");
                         intent = new Intent(Const.Action_Chart_Cache);
                         if(aCache.getAsObject(Const.Cache_Chart_1) == null)
                             aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());

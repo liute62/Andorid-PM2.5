@@ -600,8 +600,8 @@ public class MainFragment extends Fragment implements OnClickListener {
 //                return DataGenerator.chart10DataGenerator((int) DataGenerator.generateDataForChart10().keySet().toArray()[0],
 //                        (float) DataGenerator.generateDataForChart10().values().toArray()[0]);
                 if(chartData10.isEmpty())
-                    return DataGenerator.chart3DataGenerator(0,0.0f);
-                return DataGenerator.chart3DataGenerator((int) chartData10.keySet().toArray()[0], (float)chartData10.values().toArray()[0]);
+                    return DataGenerator.chart10DataGenerator(0,0.0f);
+                return DataGenerator.chart10DataGenerator((int) chartData10.keySet().toArray()[0], (float)chartData10.values().toArray()[0]);
             case 12:
                  return DataGenerator.chart12DataGenerator(chartData12, chart12Date);
 //                return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());

@@ -373,6 +373,7 @@ public class DataCalculator {
         }
         State state = states.get(states.size() - 1);
         int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
+        Log.e("calChart10Data",String.valueOf(index));
         Float air = Float.valueOf(state.getVentilation_volume());
         map.put(index,air);
         return map;
