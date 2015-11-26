@@ -5,6 +5,8 @@
       <root url="file://$PROJECT_DIR$/pM/build/intermediates/exploded-aar/com.github.lecho/hellocharts-library/1.5.8/res" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.lecho/hellocharts-library/1.5.8/51798d4793c333553a68292ee3a47b4758c2ec47/hellocharts-library-1.5.8-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>

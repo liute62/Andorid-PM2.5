@@ -161,6 +161,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     @Override
     public void onPause() {
         mActivity.unregisterReceiver(dbReceiver);
+        aCache.put(Const.Cache_Is_Background, "true");
         super.onPause();
     }
 
@@ -175,6 +176,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter.addAction(Const.Action_Chart_Result_1);
             intentFilter.addAction(Const.Action_Chart_Result_2);
             intentFilter.addAction(Const.Action_Chart_Result_3);
+            aCache.put(Const.Cache_Is_Background,"false");
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
         super.onResume();

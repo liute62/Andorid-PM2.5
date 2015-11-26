@@ -115,6 +115,11 @@ public class DBService extends Service {
         @Override
         public void run() {
             int mul = Const.DB_PM_Search_INTERVAL / Const.DB_PM_Cal_INTERVAL;
+            String isBackgound = aCache.getAsString(Const.Cache_Is_Background);
+            if(isBackgound == null){
+                isBackgound = "false";
+                aCache.put(Const.Cache_Is_Background,isBackgound);
+            }
             if(DBRunTime == mul || ChartRunTime == -1){
                 //every a hour search pm density automatically
                 searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
@@ -177,8 +182,10 @@ public class DBService extends Service {
                         break;
                 }
                 ChartRunTime++;
-                intent.putExtras(mBundle);
-                sendBroadcast(intent);
+                if(isBackgound.equals("false")) {
+                    intent.putExtras(mBundle);
+                    sendBroadcast(intent);
+                }
             }
             if (DBCanRun) {
                 State state = calculatePM25(longitude, latitude);
@@ -189,7 +196,9 @@ public class DBService extends Service {
                 intent.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                 intent.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                 intent.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                sendBroadcast(intent);
+                if(isBackgound.equals("false")) {
+                    sendBroadcast(intent);
+                }
                 DBRunTime++;
 //                if(DBRunTime == 1){
 ////                    ChartTaskCanRun = true;
@@ -333,21 +342,18 @@ public class DBService extends Service {
         GpsStatus.Listener gpsStatusListener=new GpsStatus.Listener() {
             public void onGpsStatusChanged(int event) {
                 if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
-                    //第一次定位
                 } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
-                    //卫星状态改变
-                    GpsStatus gpsStatus = mManager.getGpsStatus(null); // 取当前状态
-                    int maxSatellites = gpsStatus.getMaxSatellites(); //获取卫星颗数的默认最大值
-                    Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();//创建一个迭代器保存所有卫星
+                    GpsStatus gpsStatus = mManager.getGpsStatus(null);
+                    int maxSatellites = gpsStatus.getMaxSatellites();
+                    Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();
                     int count = 0;
                     while (it.hasNext() && count <= maxSatellites) {
                         count++;
                         GpsSatellite s = it.next();
                     }
                 } else if (event == GpsStatus.GPS_EVENT_STARTED) {
-                    //定位启动
                 } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
-                    //定位结束
+
                 }
             }
         };

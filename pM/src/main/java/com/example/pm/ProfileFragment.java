@@ -57,6 +57,8 @@ public class ProfileFragment extends Fragment implements
     ACache aCache;
     InfoDialog infoDialog;
     boolean infoDialogShow;
+    TextView mLongitude;
+    TextView mLatigude;
 
     Handler loginHandler = new Handler() {
         @Override
@@ -104,6 +106,8 @@ public class ProfileFragment extends Fragment implements
         mBluetooth = (Button)view.findViewById(R.id.profile_bluetooth);
         mModifyPwd = (Button)view.findViewById(R.id.profile_modify_password);
         mResetPwd = (TextView)view.findViewById(R.id.profile_reset_pwd);
+        mLatigude = (TextView)view.findViewById(R.id.profile_latitude);
+        mLongitude = (TextView)view.findViewById(R.id.profile_longitude);
         checkCache();
         setListener();
         return view;

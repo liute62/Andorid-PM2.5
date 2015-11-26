@@ -16,6 +16,10 @@ public class Const {
 
     public static String CURRENT_USER_GENDER = "-1";
 
+    public static double CURRENT_LONGITUDE = 0.0; //Only for profile textview test
+
+    public static double CURRENT_LATITUDE = 0.0; //Only for profile textview test
+
     public static double Default_LONGITUDE = 121.41;
 
     public static double Default_LATITUDE = 31.14; //default is shanghai
@@ -40,7 +44,7 @@ public class Const {
      * Cache*
      */
     public static final String Cache_App_Initialized = "Cache_App_Initialized";
-
+    public static final String Cache_Is_Background = "Cache_Is_Background";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";
