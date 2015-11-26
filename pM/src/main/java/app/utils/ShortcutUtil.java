@@ -174,7 +174,7 @@ public class ShortcutUtil {
     public static int timeToPointOfTwoHour(long startTime,long currentTime){
         long diff = currentTime - startTime;
         long twoHour = 2 * 60 * 60 * 1000; //2 hour * 60min * 60 sec * 1000 ms
-        double mul = diff / twoHour;
+        double mul = Double.valueOf(diff) / Double.valueOf(twoHour);
         int sec = 60 * 2 / 5;   //2 hour and 5 min a section
         int index = (int)(mul * sec);
         return index;

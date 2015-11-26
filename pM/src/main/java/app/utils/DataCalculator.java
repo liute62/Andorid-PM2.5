@@ -81,10 +81,10 @@ public class DataCalculator {
         int lastTwoHour = currentHour - 2;
         if(lastTwoHour < 0) lastTwoHour = 0;
         calendar.set(year, month, day, lastTwoHour, 0, 0);
-        Long nowTime = calendar.getTime().getTime();
+        Long lastTime = calendar.getTime().getTime();
         calendar.set(year, month, day, currentHour, currentMin, 59);
-        Long nextTime = calendar.getTime().getTime();
-        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
+        Long nowTime = calendar.getTime().getTime();
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", lastTime.toString(), nowTime.toString()).list();
         return states;
     }
 
@@ -272,7 +272,9 @@ public class DataCalculator {
         Map<Integer,Float> tmpMap = new HashMap<>();
         for(int i = 0; i != states.size(); i++){
             State state = states.get(i);
+            //Log.e("calChart5Data index"+String.valueOf(i),state.getTime_point());
             int index = ShortcutUtil.timeToPointOfTwoHour(Long.valueOf(states.get(0).getTime_point()), Long.valueOf(state.getTime_point()));
+            //Log.e("calChart5Data index",String.valueOf(index));
             Float pm25Density;
             pm25Density = Float.valueOf(state.getDensity());
             //now we get the index of time and the pm25 density of that point
