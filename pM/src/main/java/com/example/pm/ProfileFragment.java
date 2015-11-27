@@ -150,7 +150,7 @@ public class ProfileFragment extends Fragment implements
 
     @Override
     public void onTurn() {
-        mHead.setImageResource(Const.profileImg[ (int)(Math.random() * 2)]);
+        mHead.setImageResource(Const.profileImg[(int) (Math.random() * 2)]);
     }
 
     @Override
@@ -162,8 +162,7 @@ public class ProfileFragment extends Fragment implements
                 loginDialog.show();
                 break;
             case R.id.profile_logout:
-                clearLoginCache();
-                getActivity().finish();
+                logOff();
                 break;
             case R.id.profile_turnoff_service:
                 if (v.getTag() == null || v.getTag().equals("on")) {
@@ -267,6 +266,14 @@ public class ProfileFragment extends Fragment implements
         aCache.remove(Const.Cache_Chart_12_Date);
     }
 
+    private void logOff(){
+        clearLoginCache();
+        //turn off the running service
+        Intent intent = new Intent(mActivity, DBService.class);
+        mActivity.stopService(intent);
+        getActivity().finish();
+    }
+
     private class ResetPwdListener implements OnClickListener{
 
         int type; // 1 sure, 2 cancel
@@ -299,6 +306,7 @@ public class ProfileFragment extends Fragment implements
                         Toast.makeText(mActivity.getApplicationContext(), Const.Info_Reset_Success, Toast.LENGTH_SHORT).show();
                         infoDialog.dismiss();
                         infoDialogShow = false;
+                        logOff();
                     } else if(status.equals("-1")){
                         Toast.makeText(mActivity.getApplicationContext(), Const.Info_Reset_Username_Fail, Toast.LENGTH_SHORT).show();
                     } else if(status.equals("0")){
