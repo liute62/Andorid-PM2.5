@@ -40,6 +40,8 @@ public class HttpUtil {
 
     public static final String SearchCity_url = "http://api.map.baidu.com/geocoder?output=json";
 
+    public static final String MonitorLocation_url = base_url + "area-positions";
+
     private static HttpUtil instance;
 
     public static HttpUtil Instance() {
