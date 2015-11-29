@@ -2,6 +2,12 @@ package app.Entity;
 
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.PortUnreachableException;
+
+import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.ShortcutUtil;
 import nl.qbusict.cupboard.annotation.Column;
@@ -36,12 +42,16 @@ public class State {
     private String pm25;
     @Column(DBConstants.DB_MetaData.STATE_SOURCE_COL)
     private String source;
+    @Column(DBConstants.DB_MetaData.STATE_HAS_UPLOAD)
+    private int upload; //0 not upload, 1 upload success
 
     public State() {
 
     }
 
-    public State(Long id, String userid, String time_point, String longtitude, String latitude, String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source) {
+    public State(Long id, String userid, String time_point, String longtitude, String latitude,
+                 String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source,
+                 int upload) {
         this.id = id;
         this.userid = userid;
         this.time_point = time_point;
@@ -55,6 +65,7 @@ public class State {
         this.density = density;
         this.pm25 = pm25;
         this.source = source;
+        this.upload = upload;
     }
 
     public void print() {
@@ -72,6 +83,27 @@ public class State {
         Log.e("density", String.valueOf(density));
         Log.e("pm25", String.valueOf(pm25));
         Log.e("source", String.valueOf(source));
+        Log.e("upload", String.valueOf(upload));
+    }
+
+    public static JSONObject toJsonobject(State state,String user_id){
+        JSONObject object = new JSONObject();
+        try {
+            object.put("userid", user_id);
+            object.put("time_point",ShortcutUtil.refFormatNowDate(Long.valueOf(state.getTime_point())).substring(0,19));
+            object.put("longitude",state.getLongtitude());
+            object.put("latitude",state.getLatitude());
+            object.put("outdoor",state.getOutdoor());
+            object.put("status",state.getStatus());
+            object.put("steps",state.getSteps());
+            object.put("avg_rate",state.getAvg_rate());
+            object.put("ventilation_volume",state.getVentilation_volume());
+            object.put("pm25",state.getPm25());
+            object.put("source",state.getSource());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
     }
 
     public Long getId() {
@@ -176,5 +208,13 @@ public class State {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public int getUpload() {
+        return upload;
+    }
+
+    public void setUpload(int upload) {
+        this.upload = upload;
     }
 }

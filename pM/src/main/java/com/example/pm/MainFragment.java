@@ -287,8 +287,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         String city = aCache.getAsString(Const.Cache_City);
         if(ShortcutUtil.isStringOK(access_token)){
             Const.CURRENT_ACCESS_TOKEN = access_token;
-        }if(ShortcutUtil.isStringOK(user_id)){
-            Const.CURRENT_USER_ID = user_id;
         }if(ShortcutUtil.isStringOK(user_name)){
             Const.CURRENT_USER_NAME = user_name;
         }if (ShortcutUtil.isStringOK(user_nickname)){

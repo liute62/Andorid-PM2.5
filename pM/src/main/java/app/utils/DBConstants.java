@@ -19,6 +19,7 @@ public class DBConstants {
         public static final String STATE_DENSITY_COL = "density";
         public static final String STATE_PM25_COL = "pm25";
         public static final String STATE_SOURCE_COL = "source";
+        public static final String STATE_HAS_UPLOAD = "upload";
         public static final String DEFAULT_ORDER = "_id desc";
     }
 

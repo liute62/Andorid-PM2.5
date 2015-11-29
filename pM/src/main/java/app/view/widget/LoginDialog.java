@@ -124,12 +124,11 @@ public class LoginDialog extends Dialog implements OnClickListener {
                 LogInModel model = result.toLogInModel();
                 if (result.toLogInModel().getStatus().equals("1")) {
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Success, Toast.LENGTH_SHORT).show();
-                    Const.CURRENT_USER_ID = model.getUserid();
                     Const.CURRENT_ACCESS_TOKEN = model.getAccess_token();
                     Const.CURRENT_USER_NAME = username;
                     Const.CURRENT_USER_NICKNAME = model.getLastname() + model.getFirstname();
                     Const.CURRENT_USER_GENDER = model.getGender();
-                    aCache.put(Const.Cache_User_Id, Const.Cache_User_Id);
+                    aCache.put(Const.Cache_User_Id, model.getUserid());
                     aCache.put(Const.Cache_Access_Token, Const.CURRENT_ACCESS_TOKEN);
                     aCache.put(Const.Cache_User_Name, Const.CURRENT_USER_NAME);
                     aCache.put(Const.Cache_User_Nickname,Const.CURRENT_USER_NICKNAME);

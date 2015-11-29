@@ -146,14 +146,13 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
                     String access_token = response.getString("access_token");
                     String user_id = response.getString("userid");
                     if (status.equals("1")){
-                        Const.CURRENT_USER_ID = user_id;
-                        Const.CURRENT_ACCESS_TOKEN = access_token;
+                       Const.CURRENT_ACCESS_TOKEN = access_token;
                         Const.CURRENT_USER_NAME = userModel.getName();
                         Const.CURRENT_USER_NICKNAME = userModel.getLastname() + userModel.getFirstname();
                         Const.CURRENT_USER_GENDER = userModel.getSex();
                         ACache aCache = ACache.get(RegisterActivity.this);
                         aCache.put(Const.Cache_Access_Token,Const.CURRENT_ACCESS_TOKEN);
-                        aCache.put(Const.Cache_User_Id,Const.CURRENT_USER_ID);
+                        aCache.put(Const.Cache_User_Id,user_id);
                         aCache.put(Const.Cache_User_Name,Const.CURRENT_USER_NAME);
                         aCache.put(Const.Cache_User_Nickname,Const.CURRENT_USER_NICKNAME);
                         aCache.put(Const.Cache_User_Gender,Const.CURRENT_USER_GENDER);

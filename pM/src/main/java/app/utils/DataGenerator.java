@@ -698,7 +698,7 @@ public class DataGenerator {
             SubcolumnValue value;
             if (maps.containsKey(i)) {
                 float input = maps.get(i).floatValue();
-                Log.e("chart12DataGenerator",String.valueOf(input));
+                //Log.e("chart12DataGenerator",String.valueOf(input));
                 value = new SubcolumnValue(input, ChartUtils.COLOR_BLUE);
             } else {
                 value = new SubcolumnValue(0.0f);

@@ -1,12 +1,14 @@
 package app.utils;
 
+import com.example.pm.R;
+
 import app.model.PMModel;
 
 public class Const {
 
     public static String Name_DB_Service = "app.services.DBService";
 
-    public static String CURRENT_USER_ID = "0";
+//    public static String CURRENT_USER_ID = "0";
 
     public static String CURRENT_ACCESS_TOKEN = "-1";
 
@@ -159,7 +161,7 @@ public class Const {
 
     public final static int DB_Location_INTERVAL = 1000 * 5 * 10; //110s
 
-    public final static int DB_PM_Cal_INTERVAL = 1000 * 5 * 12 ; //1min
+    public final static int DB_Run_Time_INTERVAL = 1000 * 5 ; //5s
 
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 
@@ -220,6 +222,10 @@ public class Const {
 
     public static final String Info_PMDATA_Failed = "获取PM2.5数据失败";
 
+    public static final String Info_Upload_Success = "上传PM2.5数据成功";
+
+    public static final String Info_Upload_Failed = "上传PM2.5数据失败";
+
     public static final String Info_Modify_Pwd_Success = "修改密码成功";
 
     public static final String Info_Modify_Pwd_Error = "用户不存在或验证失败";
@@ -241,6 +247,8 @@ public class Const {
     public static final String Info_GPS_Pause = "当前GPS状态：暂停服务";
 
     public static final String Info_GPS_No_Cache = "当前经纬度设为预设城市：上海";
+
+    public static final String Info_DB_Not_Running = "数据无法计算，请确保当前能获取到有关GPS信息";
 
     public static String[] cityName =
             {
@@ -302,4 +310,7 @@ public class Const {
             "18:10", "19:10", "20:10", "21:10", "22:10", "23:10"
     };
 
+    public static int[] profileImg = {
+            R.drawable.shanghai,R.drawable.beijing
+    };
 }
