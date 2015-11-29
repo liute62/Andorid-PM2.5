@@ -411,7 +411,8 @@ public class MainFragment extends Fragment implements OnClickListener {
                 mainActivity.toggle();
                 break;
             case R.id.main_hot_map:
-
+                Intent intent = new Intent(getActivity(),MapActivity.class);
+                startActivity(intent);
                 break;
             case R.id.main_chart_1_change:
                 if (current_chart1_index == 7) {
