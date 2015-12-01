@@ -204,7 +204,6 @@ public class DBService extends Service {
                         }
                         break;
                 }
-
                 if (DBRunTime % 12 == 0) {
                     //every 1 min to calculate
                     state = calculatePM25(longitude, latitude);

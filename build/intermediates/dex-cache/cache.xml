@@ -2,53 +2,88 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\com.mcxiaoke.volley\library\1.0.18\38da306aafee11459cd935a01d2c92a98dc670a4\library-1.0.18.jar"
+        jar="C:\Users\Jason\.gradle\caches\modules-2\files-2.1\com.mcxiaoke.volley\library\1.0.18\38da306aafee11459cd935a01d2c92a98dc670a4\library-1.0.18.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\library-1.0.18-b1a2008231d51f8c72918a90038fc32a12e31c85.jar" />
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\library-1.0.18-1d3bf1a73e103c40fe97af0e42f64a2700824df6.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.github.lecho\hellocharts-library\1.5.8\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="56c6a22c42588628903e9dda5d8f3aa1c1b4372f">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-0a9cb645f31d1eeb5b22ff7a32a7737268d9d326.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\nl.qbusict\cupboard\2.1.2\aa2654568535e3a29af7a3b86453b8ff85af6d12\cupboard-2.1.2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\cupboard-2.1.2-efbe7a181d0b668fd2c95e0dc8f538b5e868ca9d.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\PM2.5\slidingmenu_library\unspecified\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="f3156780e24a28a237d9b269c81b7a3f1e026c11">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-87f0e8e14f90ff46900283b90756b410e0a6a51d.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.0\support-annotations-23.1.0.jar"
+        jar="D:\Program Files\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.0\support-annotations-23.1.0.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="92e3fc113ec3ee36b64603a38857b95700025633">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\support-annotations-23.1.0-a27c3f024e51ace21f3d1dd13012f4f9d527fafe.jar" />
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\support-annotations-23.1.0-be66d58ad893d4648b9c6df22586fa137ab45eff.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
+        jar="D:\workspace\GitHub\PM2.5\pM\src\main\jniLibs\locSDK_6.03.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="f97b00e2e5a384be96ab4d668fa3e2ff62cdbbb7">
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\locSDK_6.03-47ed21ea9a4dc2acb1c7b484d7b49f068016ce5b.jar" />
+    </item>
+    <item
+        jar="D:\workspace\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.github.lecho\hellocharts-library\1.5.8\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="56c6a22c42588628903e9dda5d8f3aa1c1b4372f">
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-13475c4e183006f1a84179ce7fcd74fddcaf3f5c.jar" />
+    </item>
+    <item
+        jar="D:\workspace\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-3bbb7b92e6f228f4a1419749cf529fd3f6cecb8b.jar" />
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-3c174cb2582ddef3c2cc72ad9d3ab88e25f61fcc.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
+        jar="D:\workspace\GitHub\PM2.5\pM\src\main\jniLibs\BaiduLBS_Android.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="bb71d6cfe5166741a0a99e85471a8b90e97f5228">
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\BaiduLBS_Android-f88e5ea0a0d50aaf5bb9a6c25e01b27ce206142c.jar" />
+    </item>
+    <item
+        jar="D:\workspace\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\internal_impl-23.1.0-e82e236e7b11336d79f3643c13a81c3aebeaa7eb.jar" />
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\internal_impl-23.1.0-b34f0650d72856a0bd4b73d78c8420b1a9b83633.jar" />
+    </item>
+    <item
+        jar="D:\workspace\GitHub\PM2.5\slidingmenu_library\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
+        <dex dex="D:\workspace\GitHub\PM2.5\slidingmenu_library\build\intermediates\pre-dexed\androidTest\debug\internal_impl-23.1.0-80a2dea760dbda5a88d3100640c84a91fa00a18f.jar" />
+    </item>
+    <item
+        jar="D:\workspace\GitHub\PM2.5\pM\build\intermediates\exploded-aar\PM2.5\slidingmenu_library\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="e49a8e654a9458a5d4caeb14f5b6d9fd345a162c">
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-711c701aa2d725c153ca666e5bca8656840eca86.jar" />
+    </item>
+    <item
+        jar="D:\workspace\GitHub\PM2.5\slidingmenu_library\build\intermediates\bundles\debug\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="48566bfe031e85845a6f2edaf6af23f3204ecf4c">
+        <dex dex="D:\workspace\GitHub\PM2.5\slidingmenu_library\build\intermediates\pre-dexed\androidTest\debug\classes-f8a3c3658ac96d4f81207a0a73a448e0670c22ae.jar" />
+    </item>
+    <item
+        jar="D:\workspace\GitHub\PM2.5\slidingmenu_library\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
+        <dex dex="D:\workspace\GitHub\PM2.5\slidingmenu_library\build\intermediates\pre-dexed\androidTest\debug\classes-016171308c0c01d4aac41c577941156b86ee61a4.jar" />
+    </item>
+    <item
+        jar="C:\Users\Jason\.gradle\caches\modules-2\files-2.1\nl.qbusict\cupboard\2.1.2\aa2654568535e3a29af7a3b86453b8ff85af6d12\cupboard-2.1.2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
+        <dex dex="D:\workspace\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\cupboard-2.1.2-833269c9170f35c53213a46aaa2d83d4c95f5245.jar" />
     </item>
 
 </items>

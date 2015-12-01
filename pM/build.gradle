@@ -35,4 +35,6 @@ dependencies {
     compile 'com.mcxiaoke.volley:library:1.0.18'
     compile 'nl.qbusict:cupboard:2.1.2'
     compile files('/Users/liuhaodong1/Documents/Git/PM/Android_Map_V3.0.20150831.jar')
+    compile files('src/main/jniLibs/locSDK_6.03.jar')
+    compile files('src/main/jniLibs/BaiduLBS_Android.jar')
 }
