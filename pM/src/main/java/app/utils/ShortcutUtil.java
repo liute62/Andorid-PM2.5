@@ -11,6 +11,7 @@ import android.util.Log;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,7 @@ public class ShortcutUtil {
     }
 
     /**
-     * A method to transfer current time to a point of a day
+     * A method to transform current time to a point of a day
      * Ex. xxxxYxxMxxD 22:31 returns 22*1+1 = 43
      * @param currentTime
      * @return
@@ -171,6 +172,12 @@ public class ShortcutUtil {
        return Integer.valueOf(hour) * 2 + add;
     }
 
+    /**
+     * A method to transform current time to a point of last two hours
+     * @param startTime
+     * @param currentTime
+     * @return
+     */
     public static int timeToPointOfTwoHour(long startTime,long currentTime){
         long diff = currentTime - startTime;
         long twoHour = 2 * 60 * 60 * 1000; //2 hour * 60min * 60 sec * 1000 ms
@@ -215,5 +222,18 @@ public class ShortcutUtil {
             };
         }
         return max;
+    }
+
+    public static Float getMinusFromMaxToMin(ArrayList<Float> data){
+        if(data.size() == 0) return 0f;
+        Float max = data.get(0);
+        Float min = data.get(0);
+        Float tmp = 0f;
+        for(int i = 0; i != data.size(); i++){
+            tmp = data.get(i);
+            if(tmp < min) min = tmp;
+            if(tmp > max) max = tmp;
+        }
+        return max - min;
     }
 }

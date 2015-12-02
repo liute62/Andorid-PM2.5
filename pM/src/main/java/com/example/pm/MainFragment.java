@@ -192,7 +192,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         PMBreatheWeekAvg = 0.0;
         currentLongitude = null;
         currentLatitude = null;
-        currentCity = "无";
+        currentCity = "北京";
         current_chart1_index = 1;
         current_chart2_index = 2;
         isClockTaskRun = false;

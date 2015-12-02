@@ -1,9 +1,11 @@
 package app.utils;
 
 import android.graphics.Color;
+import android.text.format.Time;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -416,6 +418,8 @@ public class DataGenerator {
             line.setFilled(false);
             line.setHasLines(true);
             line.setHasPoints(false);
+            line.setHasLabelsOnlyForSelected(true);
+            line.setStrokeWidth(2);
             lines.add(line);
         }
 
@@ -562,6 +566,7 @@ public class DataGenerator {
             values.add(value);
             Column column = new Column(values);
             column.setHasLabels(false);
+            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 
@@ -633,6 +638,7 @@ public class DataGenerator {
             values.add(value);
             Column column = new Column(values);
             column.setHasLabels(false);
+            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 
@@ -715,6 +721,13 @@ public class DataGenerator {
         data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
         return data;
+    }
+
+    public static double genDensityForTest(int currentHour){
+        Log.e("currentHour",String.valueOf(currentHour));
+        double pm1[] = new double[]{3,0,0,0,0,0,0,0,4,7,4,3,0,492,584,619,619,618
+        ,528,552,542,434,410,223};
+        return pm1[currentHour];
     }
 
 }

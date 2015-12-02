@@ -47,6 +47,7 @@ import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBHelper;
 import app.utils.DataCalculator;
+import app.utils.DataGenerator;
 import app.utils.HttpUtil;
 import app.utils.VolleyQueue;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
@@ -158,7 +159,8 @@ public class DBService extends Service {
             /***** DB Running Normally *****/
             if(DBCanRun) {
                 if(DBRunTime == 0){ //Initialize the state when DB start
-                    state = calculatePM25(longitude, latitude);
+                    //state = calculatePM25(longitude, latitude);
+                    state = calculatePM25(116.329,39.987);
                     //insertState(state);
                     state.print();
                     DBRunTime = 1;
@@ -199,15 +201,15 @@ public class DBService extends Service {
                         mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
                         mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
                         if (isBackgound.equals("false")) {
-                            intentChart.putExtras(mBundle);
+                             intentChart.putExtras(mBundle);
                             sendBroadcast(intentChart);
                         }
                         break;
                 }
-
                 if (DBRunTime % 12 == 0) {
                     //every 1 min to calculate
-                    state = calculatePM25(longitude, latitude);
+                    state = calculatePM25(116.329,39.987);
+                    //state = calculatePM25(longitude, latitude);
                     uploadPMData(state);
                 }
                 //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
@@ -220,10 +222,14 @@ public class DBService extends Service {
                 }
                 if(DBRunTime == 12 * 60){
                     //means a hour
+                    Time t = new Time();
+                    t.setToNow();
+                    int currentHour = t.hour;
+                    PM25Density = DataGenerator.genDensityForTest(currentHour);
                     DBRunTime = 1;
                 }
                 DBRunTime++;
-                Log.e("DBRUNTIME",String.valueOf(DBRunTime));
+                Log.e("DBRUNTIME",String.valueOf(DBRunTime)+" Density"+String.valueOf(PM25Density));
             }else {
                 Toast.makeText(getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
             }
@@ -289,6 +295,9 @@ public class DBService extends Service {
             IDToday = Long.valueOf(0);
         } else {
             State state = states.get(states.size() - 1);
+            Log.e("Today size",String.valueOf(states.size()));
+            Log.e("Today Last state","begin");
+            state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
             IDToday = Long.valueOf(state.getId());
@@ -356,7 +365,20 @@ public class DBService extends Service {
             longitude = Const.Default_LONGITUDE;
             latitude = Const.Default_LATITUDE;
             //stopSelf();
-            Toast.makeText(getApplicationContext(),Const.Info_GPS_No_Cache,Toast.LENGTH_SHORT).show();
+            /***/
+            Time t = new Time();
+            t.setToNow();
+            int currentHour = t.hour;
+            String pm =  String.valueOf(DataGenerator.genDensityForTest(currentHour));
+            Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
+            intent.putExtra(Const.Intent_PM_Density, pm);
+            //set current pm density for calculation
+            PM25Density = Double.valueOf(pm);
+            aCache.put(Const.Cache_PM_Density,PM25Density);
+            sendBroadcast(intent);
+            DBCanRun = true;
+            /***/
+            //Toast.makeText(getApplicationContext(),Const.Info_GPS_No_Cache,Toast.LENGTH_SHORT).show();
         }else {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
