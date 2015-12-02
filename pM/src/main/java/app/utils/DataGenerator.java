@@ -533,7 +533,6 @@ public class DataGenerator {
             values.add(value);
             Column column = new Column(values);
             column.setHasLabels(false);
-            column.setHasLabelsOnlyForSelected(true);
             columns.add(column);
         }
 

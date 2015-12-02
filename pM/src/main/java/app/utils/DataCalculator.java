@@ -79,11 +79,8 @@ public class DataCalculator {
         int currentHour = t.hour;
         int currentMin = t.minute;
         int lastTwoHour = currentHour - 2;
-        if(lastTwoHour < 0){
-            calendar.set(year, month, day, 0, 0, 0);
-        }else {
-            calendar.set(year, month, day, lastTwoHour, currentMin, 0);
-        }
+        if(lastTwoHour < 0) lastTwoHour = 0;
+        calendar.set(year, month, day, lastTwoHour, currentMin, 0);
         Long lastTime = calendar.getTime().getTime();
         calendar.set(year, month, day, currentHour, currentMin, 59);
         Long nowTime = calendar.getTime().getTime();
@@ -269,38 +266,30 @@ public class DataCalculator {
 
     /**return a map contains last two hour pm breathed of each time point**/
     public HashMap<Integer,Float> calChart5Data(){
-        Log.e("calChart5Data","begin");
         HashMap<Integer,Float> map = new HashMap<>();
         if(db == null) return map;
-        Log.e("calChart5Data","db != null");
         List<State> states = lastTwoHourStates;
         if (states.isEmpty()){
-            Log.e("calChart5Data","states is empty");
             return map;
         }
-        Log.e("calChart5Data","state.size: "+String.valueOf(states.size()));
-        HashMap<Integer,Float> tmpMap = new HashMap<>();
-        if(states.size() == 1){
-            tmpMap.put(0,Float.valueOf(states.get(0).getPm25()));
-            return tmpMap;
-        }
-        for(int i = 1; i != states.size(); i++){
+        Map<Integer,Float> tmpMap = new HashMap<>();
+        for(int i = 0; i != states.size(); i++){
             State state = states.get(i);
+            //Log.e("calChart5Data index"+String.valueOf(i),state.getTime_point());
             int index = ShortcutUtil.timeToPointOfTwoHour(Long.valueOf(states.get(0).getTime_point()), Long.valueOf(state.getTime_point()));
-            Float pmNow,pmLast;
-            pmNow = Float.valueOf(state.getPm25());
-            pmLast = Float.valueOf(states.get(i - 1).getPm25());
-            Float result = pmNow - pmLast; //calculate the 1 min air breathed in
-            //Log.e("calChart8Data",String.valueOf(index)+" "+String.valueOf(airNow)+" "+String.valueOf(i) + " "+String.valueOf(result));
-            //now we get the index of time and the air  of that point
-            if(tmpMap.containsKey(index)) {
-                //calculate the sum, since we need 5 min air breathed in
-                tmpMap.put(index,tmpMap.get(index) + result);
-            }else {
-                tmpMap.put(index,result);
+            //Log.e("calChart5Data index",String.valueOf(index));
+            Float pm25Density;
+            pm25Density = Float.valueOf(state.getDensity());
+            //now we get the index of time and the pm25 density of that point
+            tmpMap.put(index, pm25Density);
+        }
+        //now calculate the sum of value
+        for (int i = 0; i != 24; i++) {
+            if (tmpMap.containsKey(i)) {
+                map.put(i,ShortcutUtil.sumOfArrayNum(tmpMap.values().toArray()));
             }
         }
-        return tmpMap;
+        return map;
     }
 
     /**return a map contains today air breathed of each time point**/
@@ -373,7 +362,7 @@ public class DataCalculator {
             airNow = Float.valueOf(state.getVentilation_volume());
             airLast = Float.valueOf(states.get(i - 1).getVentilation_volume());
             Float result = airNow - airLast; //calculate the 1 min air breathed in
-            Log.e("calChart8Data",String.valueOf(index)+" "+String.valueOf(airNow)+" "+String.valueOf(i) + " "+String.valueOf(result));
+            //Log.e("calChart8Data",String.valueOf(index)+" "+String.valueOf(airNow)+" "+String.valueOf(i) + " "+String.valueOf(result));
             //now we get the index of time and the air  of that point
             if(tmpMap.containsKey(index)) {
                 //calculate the sum, since we need 5 min air breathed in
