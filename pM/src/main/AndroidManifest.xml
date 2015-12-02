@@ -33,7 +33,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".NotificationActivity"></activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name="app.bluetooth.BluetoothActivity"></activity>
         <activity android:name=".MapActivity" ></activity>
