@@ -49,6 +49,7 @@ import app.utils.DBHelper;
 import app.utils.DataCalculator;
 import app.utils.DataGenerator;
 import app.utils.HttpUtil;
+import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
@@ -132,24 +133,24 @@ public class DBService extends Service {
             /***** DB Run First time *****/
             if(DBRunTime == 0){   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
-                if (aCache.getAsObject(Const.Cache_Chart_1) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_1) == null)
                     aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
-                if (aCache.getAsObject(Const.Cache_Chart_2) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_2) == null)
                     aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
-                if (aCache.getAsObject(Const.Cache_Chart_3) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_3) == null)
                     aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
-                if (aCache.getAsObject(Const.Cache_Chart_4) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_4) == null)
                     aCache.put(Const.Cache_Chart_4, DataCalculator.getIntance(db).calChart4Data());
-                if (aCache.getAsObject(Const.Cache_Chart_5) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_5) == null)
                     aCache.put(Const.Cache_Chart_5, DataCalculator.getIntance(db).calChart5Data());
-                if (aCache.getAsObject(Const.Cache_Chart_6) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_6) == null)
                     aCache.put(Const.Cache_Chart_6, DataCalculator.getIntance(db).calChart6Data());
                 if (aCache.getAsObject(Const.Cache_Chart_7) == null) {
                     aCache.put(Const.Cache_Chart_7, DataCalculator.getIntance(db).calChart7Data());
                     aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());}
-                if (aCache.getAsObject(Const.Cache_Chart_8) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_8) == null)
                     aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
-                if (aCache.getAsObject(Const.Cache_Chart_10) == null)
+//                if (aCache.getAsObject(Const.Cache_Chart_10) == null)
                     aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
                 if (aCache.getAsObject(Const.Cache_Chart_12) == null) {
                     aCache.put(Const.Cache_Chart_12, DataCalculator.getIntance(db).calChart12Data());
@@ -159,8 +160,8 @@ public class DBService extends Service {
             /***** DB Running Normally *****/
             if(DBCanRun) {
                 if(DBRunTime == 0){ //Initialize the state when DB start
-                    //state = calculatePM25(longitude, latitude);
-                    state = calculatePM25(116.329,39.987);
+                    state = calculatePM25(longitude, latitude);
+                    //state = calculatePM25(116.329,39.987);
                     //insertState(state);
                     state.print();
                     DBRunTime = 1;
@@ -206,17 +207,11 @@ public class DBService extends Service {
                         }
                         break;
                 }
-                if (DBRunTime % 12 == 0) {
-                    //every 1 min to calculate
-                    state = calculatePM25(116.329,39.987);
-                    //state = calculatePM25(longitude, latitude);
-                    uploadPMData(state);
-                }
                 //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
                 intentText = new Intent(Const.Action_DB_MAIN_PMResult);
+                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
                 intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                 intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
-                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
                 if (isBackgound.equals("false")) {
                     sendBroadcast(intentText);
                 }
@@ -227,6 +222,20 @@ public class DBService extends Service {
                     int currentHour = t.hour;
                     PM25Density = DataGenerator.genDensityForTest(currentHour);
                     DBRunTime = 1;
+                }
+                if (DBRunTime % 12 == 0) {
+                    //every 1 min to calculate
+                    State last = state;
+                    //state = calculatePM25(116.329,39.987);
+                    state = calculatePM25(longitude, latitude);
+                    State now = state;
+                    if(!isSurpass(last,now)){
+                        uploadPMData(state);
+                        Log.e("DBService", "notSurpass");
+                    }else {
+                        Log.e("DBService","isSurpass");
+                        reset(DBRunTime);
+                    }
                 }
                 DBRunTime++;
                 Log.e("DBRUNTIME",String.valueOf(DBRunTime)+" Density"+String.valueOf(PM25Density));
@@ -262,6 +271,7 @@ public class DBService extends Service {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
         }
         DBInitial();
+        serviceStateInitial();
         sensorInitial();
         GPSInitial();
         DBRunnable.run();
@@ -302,8 +312,9 @@ public class DBService extends Service {
             venVolToday = Double.parseDouble(state.getVentilation_volume());
             IDToday = Long.valueOf(state.getId());
         }
-        //send chart result to initialize the chart
+    }
 
+    private void serviceStateInitial(){
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
@@ -314,7 +325,6 @@ public class DBService extends Service {
                         .setContentText("Service Running")
                         .setContentIntent(pendingIntent)
                         .setOngoing(true);
-
         startForeground(12450, mBuilder.build());
     }
 
@@ -562,10 +572,21 @@ public class DBService extends Service {
      * @param state
      */
     private void insertState(State state) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        cupboard().withDatabase(db).put(state);
-        Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
-        IDToday++;
+//        //check a conflict,
+//        //ex. 12.2 23.59 - 12.3 0.01 check if current day == insert day, if yes, insert it, else not insert it
+//        String insert = ShortcutUtil.refFormatOnlyDate(Long.valueOf(state.getTime_point()));
+//        Time t = new Time();
+//        t.setToNow();
+//        String now =  ShortcutUtil.refFormatOnlyDate(t.toMillis(true));
+//        //Log.e("insertState","now"+now+"insert"+insert);
+//        if(insert.equals(now)) {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            cupboard().withDatabase(db).put(state);
+            //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
+            IDToday++;
+//        }else {
+//            Toast.makeText(getApplicationContext(),Const.Info_DB_Insert_Date_Conflict,Toast.LENGTH_SHORT);
+//        }
     }
 
     private void searchState() {
@@ -660,5 +681,40 @@ public class DBService extends Service {
      */
     public void checkPMDataForUpload(){
 
+    }
+
+    /**
+     * Check if Service running surpass a day
+     * @param lasttime
+     * @return
+     */
+    private boolean isSurpass(State lasttime,State nowTime){
+        boolean result = false;
+        String last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lasttime.getTime_point()));
+        String now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
+        if(last.equals(now)) result = false;
+        else result = true;
+        return result;
+    }
+
+    /**
+     * if Service running surpass a day, then reset data parmas
+     */
+    private void reset(int runtime){
+        runtime = -1;
+        longitude = 0.0;
+        latitude = 0.0;
+        last_lati = -0.1;
+        last_long = -0.1;
+        DBCanRun = false;
+        DBRunTime = 0;
+        ChartRunTime = -1;
+        isPMSearchRun = false;
+        isUploadRun = false;
+        isLocationChanged = false;
+        ChartTaskCanRun = true;
+        DBInitial();
+        sensorInitial();
+        GPSInitial();
     }
 }

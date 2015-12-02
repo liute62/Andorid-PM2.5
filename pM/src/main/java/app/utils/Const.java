@@ -250,6 +250,8 @@ public class Const {
 
     public static final String Info_DB_Not_Running = "数据无法计算，请确保当前能获取到有关GPS信息";
 
+    public static final String Info_DB_Insert_Date_Conflict = "失败,插入数据库时间与当前时间不一致";
+
     public static String[] cityName =
             {
                     "北京市",

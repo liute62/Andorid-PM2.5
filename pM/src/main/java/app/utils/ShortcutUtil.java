@@ -81,6 +81,13 @@ public class ShortcutUtil {
         return retStrFormatNowDate;
     }
 
+    public static String refFormatOnlyDate(long currentTimeMillis){
+        Date nowTime = new Date(currentTimeMillis);
+        SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd");
+        String retStrFormatNowDate = sdFormatter.format(nowTime);
+        return retStrFormatNowDate;
+    }
+
     public static String getAppVersionName(Context context) {
         try {
             PackageManager pm = context.getPackageManager();
