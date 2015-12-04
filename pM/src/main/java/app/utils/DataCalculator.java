@@ -269,16 +269,16 @@ public class DataCalculator {
 
     /**return a map contains last two hour pm breathed of each time point**/
     public HashMap<Integer,Float> calChart5Data(){
-        Log.e("calChart5Data","begin");
+        //Log.e("calChart5Data","begin");
         HashMap<Integer,Float> map = new HashMap<>();
         if(db == null) return map;
-        Log.e("calChart5Data","db != null");
+        //Log.e("calChart5Data","db != null");
         List<State> states = lastTwoHourStates;
         if (states.isEmpty()){
-            Log.e("calChart5Data","states is empty");
+            //Log.e("calChart5Data","states is empty");
             return map;
         }
-        Log.e("calChart5Data","state.size: "+String.valueOf(states.size()));
+        //Log.e("calChart5Data","state.size: "+String.valueOf(states.size()));
         HashMap<Integer,Float> tmpMap = new HashMap<>();
         if(states.size() == 1){
             tmpMap.put(0,Float.valueOf(states.get(0).getPm25()));
