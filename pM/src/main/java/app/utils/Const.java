@@ -159,7 +159,7 @@ public class Const {
      */
     public final static int DB_PM_Search_INTERVAL = 1000 * 60 * 60;//1Hour
 
-    public final static int DB_Location_INTERVAL = 1000 * 5 * 10; //110s
+    public final static int DB_Location_INTERVAL = 0; //110s
 
     public final static int DB_Run_Time_INTERVAL = 1000 * 5 ; //5s
 
@@ -246,7 +246,7 @@ public class Const {
 
     public static final String Info_GPS_Pause = "当前GPS状态：暂停服务";
 
-    public static final String Info_GPS_No_Cache = "当前经纬度设为预设城市：上海";
+    public static final String Info_GPS_No_Cache = "无法获取上次定位信息";
 
     public static final String Info_DB_Not_Running = "数据无法计算，请确保当前能获取到有关GPS信息";
 

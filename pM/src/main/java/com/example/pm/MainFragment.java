@@ -192,7 +192,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         PMBreatheWeekAvg = 0.0;
         currentLongitude = null;
         currentLatitude = null;
-        currentCity = "北京";
+        currentCity = "无";
         current_chart1_index = 1;
         current_chart2_index = 2;
         isClockTaskRun = false;
@@ -351,6 +351,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             mTime.setText(String.valueOf(currentHour) + ": " + String.valueOf(currentMin));
         }
         mCity.setText(currentCity);
+        PMDensity = 1000.0;
         mAirQuality.setText(DataGenerator.setAirQualityText(PMDensity));
         mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
@@ -591,6 +592,8 @@ public class MainFragment extends Fragment implements OnClickListener {
                 return  DataGenerator.chart6DataGenerator(chartData6);
             case 7:
 //                return DataGenerator.chart7DataGenerator(DataGenerator.generateDataForChart7(), DataGenerator.generateChart7Date());
+//                chartData7 = new HashMap<>(); chartData7.put(0,616.0f);
+//                chart7Date = chart12Date;
                 return DataGenerator.chart7DataGenerator(chartData7,chart7Date);
             case 8:
 //                return DataGenerator.chart8DataGenerator(DataGenerator.generateDataForChart8());
@@ -602,8 +605,10 @@ public class MainFragment extends Fragment implements OnClickListener {
                     return DataGenerator.chart10DataGenerator(0,0.0f);
                 return DataGenerator.chart10DataGenerator((int) chartData10.keySet().toArray()[0], (float)chartData10.values().toArray()[0]);
             case 12:
+//                chartData12 = new HashMap<>(); chartData12.put(0,5000.0f);
+//
                  return DataGenerator.chart12DataGenerator(chartData12, chart12Date);
-//                return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
+//               return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
         }
         return null;
     }

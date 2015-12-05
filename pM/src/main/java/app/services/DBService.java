@@ -19,6 +19,7 @@ import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
@@ -29,7 +30,13 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.location.Poi;
 import com.example.pm.MainActivity;
+import com.example.pm.MyApplication;
 import com.example.pm.R;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,7 +106,6 @@ public class DBService extends Service {
     double venVolToday;
 
     private LocationManager mManager;
-    private LocationListener locationListener;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private SimpleStepDetector simpleStepDetector;
@@ -116,7 +122,6 @@ public class DBService extends Service {
     private int DBRunTime;
     private int ChartRunTime;
     ACache aCache;
-
     private Runnable DBRunnable = new Runnable() {
         State state;
         Intent intentText;
@@ -273,7 +278,8 @@ public class DBService extends Service {
         DBInitial();
         serviceStateInitial();
         sensorInitial();
-        GPSInitial();
+        //GPSInitial();
+        BAIDUMapInitial();
         DBRunnable.run();
     }
 
@@ -374,21 +380,7 @@ public class DBService extends Service {
         if(location == null){
             longitude = Const.Default_LONGITUDE;
             latitude = Const.Default_LATITUDE;
-            //stopSelf();
-            /***/
-            Time t = new Time();
-            t.setToNow();
-            int currentHour = t.hour;
-            String pm =  String.valueOf(DataGenerator.genDensityForTest(currentHour));
-            Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
-            intent.putExtra(Const.Intent_PM_Density, pm);
-            //set current pm density for calculation
-            PM25Density = Double.valueOf(pm);
-            aCache.put(Const.Cache_PM_Density,PM25Density);
-            sendBroadcast(intent);
-            DBCanRun = true;
-            /***/
-            //Toast.makeText(getApplicationContext(),Const.Info_GPS_No_Cache,Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),Const.Info_GPS_No_Cache,Toast.LENGTH_SHORT).show();
         }else {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
@@ -397,7 +389,9 @@ public class DBService extends Service {
         GpsStatus.Listener gpsStatusListener=new GpsStatus.Listener() {
             public void onGpsStatusChanged(int event) {
                 if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
+                    //Log.e("GPS_EVENT_FIRST_FIX","yes");
                 } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
+                    //Log.e("GPS_EVENT_SATELLITE","yes");
                     GpsStatus gpsStatus = mManager.getGpsStatus(null);
                     int maxSatellites = gpsStatus.getMaxSatellites();
                     Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();
@@ -407,14 +401,16 @@ public class DBService extends Service {
                         GpsSatellite s = it.next();
                     }
                 } else if (event == GpsStatus.GPS_EVENT_STARTED) {
+                    //Log.e("GPS_EVENT_STARTED","yes");
                 } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
-
+                    Log.e("GPS_EVENT_STOPPED","yes");
                 }
             }
         };
-        locationListener = new LocationListener() {
+        LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Log.e("onLocationChanged","onLocationChanged");
                 if (location != null) {
                     Log.e(String.valueOf(latitude),String.valueOf(longitude));
                     isLocationChanged = true;
@@ -459,7 +455,7 @@ public class DBService extends Service {
             }
         };
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);
         criteria.setCostAllowed(true);
@@ -467,9 +463,11 @@ public class DBService extends Service {
         criteria.setSpeedRequired(false);
 
         String provider = mManager.getBestProvider(criteria, true);
+        Log.e("provider",provider);
         mManager.addGpsStatusListener(gpsStatusListener);
-        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+        mManager.requestLocationUpdates(provider,
                 Const.DB_Location_INTERVAL, 0, locationListener);
+
     }
 
     /**
@@ -717,4 +715,100 @@ public class DBService extends Service {
         sensorInitial();
         GPSInitial();
     }
+
+    private void BAIDUMapInitial(){
+        LocationService locationService = ((MyApplication) getApplication()).locationService;
+        //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+        locationService.registerListener(mListener);
+        //注册监听
+        locationService.setLocationOption(locationService.getDefaultLocationClientOption());
+        if(Thread.currentThread() == Looper.getMainLooper().getThread() ){
+            Log.e("Mainthread","Mainthread");
+        }
+        locationService.start();// 定位SDK
+        // start之后会默认发起一次定位请求，开发者无须判断isstart并主动调用request
+    }
+
+    /*****
+     * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
+     */
+    private BDLocationListener mListener = new BDLocationListener() {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            Log.e("Lati",String.valueOf(location.getLatitude()));
+            Log.e("Longi",String.valueOf(location.getLongitude()));
+            Log.e("LocType",String.valueOf(location.getLocType()));
+            if (null != location && location.getLocType() != BDLocation.TypeServerError) {
+                StringBuffer sb = new StringBuffer(256);
+                sb.append("time : ");
+                /**
+                 * 时间也可以使用systemClock.elapsedRealtime()方法 获取的是自从开机以来，每次回调的时间；
+                 * location.getTime() 是指服务端出本次结果的时间，如果位置不发生变化，则时间不变
+                 */
+                sb.append(location.getTime());
+                sb.append("\nerror code : ");
+                sb.append(location.getLocType());
+                sb.append("\nlatitude : ");
+                sb.append(location.getLatitude());
+                sb.append("\nlontitude : ");
+                sb.append(location.getLongitude());
+                sb.append("\nradius : ");
+                sb.append(location.getRadius());
+                sb.append("\nCountryCode : ");
+                sb.append(location.getCountryCode());
+                sb.append("\nCountry : ");
+                sb.append(location.getCountry());
+                sb.append("\ncitycode : ");
+                sb.append(location.getCityCode());
+                sb.append("\ncity : ");
+                sb.append(location.getCity());
+                sb.append("\nDistrict : ");
+                sb.append(location.getDistrict());
+                sb.append("\nStreet : ");
+                sb.append(location.getStreet());
+                sb.append("\naddr : ");
+                sb.append(location.getAddrStr());
+                sb.append("\nDescribe: ");
+                sb.append(location.getLocationDescribe());
+                sb.append("\nDirection(not all devices have value): ");
+                sb.append(location.getDirection());
+                sb.append("\nPoi: ");
+                if (location.getPoiList() != null && !location.getPoiList().isEmpty()) {
+                    for (int i = 0; i < location.getPoiList().size(); i++) {
+                        Poi poi = (Poi) location.getPoiList().get(i);
+                        sb.append(poi.getName() + ";");
+                    }
+                }
+                if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
+                    sb.append("\nspeed : ");
+                    sb.append(location.getSpeed());// 单位：km/h
+                    sb.append("\nsatellite : ");
+                    sb.append(location.getSatelliteNumber());
+                    sb.append("\nheight : ");
+                    sb.append(location.getAltitude());// 单位：米
+                    sb.append("\ndescribe : ");
+                    sb.append("gps定位成功");
+                } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
+                    // 运营商信息
+                    sb.append("\noperationers : ");
+                    sb.append(location.getOperators());
+                    sb.append("\ndescribe : ");
+                    sb.append("网络定位成功");
+                } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
+                    sb.append("\ndescribe : ");
+                    sb.append("离线定位成功，离线定位结果也是有效的");
+                } else if (location.getLocType() == BDLocation.TypeServerError) {
+                    sb.append("\ndescribe : ");
+                    sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
+                } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
+                    sb.append("\ndescribe : ");
+                    sb.append("网络不同导致定位失败，请检查网络是否通畅");
+                } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
+                    sb.append("\ndescribe : ");
+                    sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+                }
+            }
+        }
+    };
 }
