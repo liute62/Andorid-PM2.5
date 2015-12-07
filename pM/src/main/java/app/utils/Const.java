@@ -62,6 +62,8 @@ public class Const {
 
     public static final int Handler_Modify_Pwd_Success = 100004;
 
+    public static final int Handler_City_Name = 100005;
+
     /**
      * Intent Tag Code*
      */
