@@ -25,7 +25,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="30dip"
         android:layout_marginLeft="20dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
         android:layout_toRightOf="@+id/textView2"
         android:layout_marginLeft="30dip"
         android:layout_alignBaseline="@+id/textView2"
-        android:layout_below="@id/register_top_layout"/>
+        android:layout_below="@id/register_top_layout" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -45,7 +45,7 @@
         android:layout_below="@+id/textView2"
         android:layout_alignLeft="@+id/textView2"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -55,7 +55,7 @@
         android:layout_toRightOf="@+id/textView3"
         android:layout_marginLeft="30dip"
         android:layout_alignBaseline="@+id/textView3"
-        android:layout_below="@id/register_invite_code"/>
+        android:layout_below="@id/register_invite_code" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -65,7 +65,7 @@
         android:layout_below="@+id/textView3"
         android:layout_alignLeft="@+id/textView3"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -86,7 +86,7 @@
         android:layout_below="@+id/textView4"
         android:layout_alignLeft="@+id/textView4"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -107,7 +107,7 @@
         android:layout_below="@+id/textView5"
         android:layout_alignLeft="@+id/textView5"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -117,7 +117,7 @@
         android:layout_toRightOf="@+id/textView6"
         android:layout_alignLeft="@+id/register_confirm_pwd"
         android:layout_alignBaseline="@+id/textView6"
-        android:layout_below="@id/register_confirm_pwd"/>
+        android:layout_below="@id/register_confirm_pwd" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -127,7 +127,7 @@
         android:layout_toRightOf="@+id/register_gender_male"
         android:layout_marginLeft="20dip"
         android:layout_alignBaseline="@+id/textView6"
-        android:layout_below="@id/register_confirm_pwd"/>
+        android:layout_below="@id/register_confirm_pwd" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -137,7 +137,7 @@
         android:layout_below="@+id/textView6"
         android:layout_alignLeft="@+id/textView6"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -145,7 +145,7 @@
         android:id="@+id/register_lastname"
         android:minWidth="50dip"
         android:layout_alignLeft="@+id/register_confirm_pwd"
-        android:layout_alignBaseline="@+id/textView7"/>
+        android:layout_alignBaseline="@+id/textView7" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -156,7 +156,7 @@
         android:layout_toRightOf="@id/register_lastname"
         android:layout_marginLeft="20dip"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -165,7 +165,7 @@
         android:minWidth="110dip"
         android:layout_toRightOf="@id/textView7_2"
         android:layout_marginLeft="20dip"
-        android:layout_alignBaseline="@+id/textView7"/>
+        android:layout_alignBaseline="@+id/textView7" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -175,7 +175,7 @@
         android:layout_below="@+id/textView7"
         android:layout_alignLeft="@+id/textView7"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -183,7 +183,7 @@
         android:id="@+id/register_phone"
         android:minWidth="220dip"
         android:layout_alignLeft="@+id/register_lastname"
-        android:layout_alignBaseline="@+id/textView8"/>
+        android:layout_alignBaseline="@+id/textView8" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -193,7 +193,7 @@
         android:layout_below="@+id/textView8"
         android:layout_alignLeft="@+id/textView8"
         android:layout_marginTop="30dip"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -201,14 +201,13 @@
         android:id="@+id/register_mail"
         android:minWidth="220dip"
         android:layout_alignLeft="@+id/register_lastname"
-        android:layout_alignBaseline="@+id/textView9"/>
+        android:layout_alignBaseline="@+id/textView9" />
 
 
     <RelativeLayout
         android:id="@+id/register_bottom_layout"
         style="@style/main_top_bg_style"
-        android:layout_alignParentBottom="true"
-       >
+        android:layout_alignParentBottom="true">
 
         <TextView
             android:id="@+id/register_sure"
@@ -219,7 +218,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dip"
             android:textSize="20sp"
-            android:textColor="@color/White"/>
+            android:textColor="@color/White" />
 
         <TextView
             android:id="@+id/register_cancel"
@@ -230,6 +229,6 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dip"
             android:textSize="20sp"
-            android:textColor="@color/White"/>
+            android:textColor="@color/White" />
     </RelativeLayout>
 </RelativeLayout>

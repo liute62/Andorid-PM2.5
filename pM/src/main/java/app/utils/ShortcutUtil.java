@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -81,7 +80,7 @@ public class ShortcutUtil {
         return retStrFormatNowDate;
     }
 
-    public static String refFormatOnlyDate(long currentTimeMillis){
+    public static String refFormatOnlyDate(long currentTimeMillis) {
         Date nowTime = new Date(currentTimeMillis);
         SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd");
         String retStrFormatNowDate = sdFormatter.format(nowTime);
@@ -138,8 +137,8 @@ public class ShortcutUtil {
         return String.valueOf(setScale.doubleValue());
     }
 
-    public static String ugScale(double number,int scale){
-        if(String.valueOf(number).equals("NaN")){
+    public static String ugScale(double number, int scale) {
+        if (String.valueOf(number).equals("NaN")) {
             number = 0.0;
         }
         BigDecimal bd = new BigDecimal(number);
@@ -150,96 +149,100 @@ public class ShortcutUtil {
     /**
      * A method to transform current time to a point of a day
      * Ex. xxxxYxxMxxD 22:31 returns 22*1+1 = 43
+     *
      * @param currentTime
      * @return
      */
-    public static int timeToPointOfDay(long currentTime){
-       String date = refFormatNowDate(currentTime);
-       int tmp1 = 0,tmp2 = -1,tmp3 = 0;
+    public static int timeToPointOfDay(long currentTime) {
+        String date = refFormatNowDate(currentTime);
+        int tmp1 = 0, tmp2 = -1, tmp3 = 0;
 //        Log.e("date",date);
-       for(int i = 0; i != date.length(); i++){
-           if(date.charAt(i) == '-'){
-               tmp1 = i;
-           }if(date.charAt(i) == ':'){
-               if(tmp2 == -1){
-                   tmp2 = i;
-               }else {
-                   tmp3 = i;
-               }
-           }
-       }
-       String hour = date.substring(tmp1+4,tmp2);
-       String min = date.substring(tmp2+1,tmp3);
-       int add = 0;
-       if(Integer.valueOf(min) >= 30){
-          add = 1;
-       }else {
-           add = 0;
-       }
-       return Integer.valueOf(hour) * 2 + add;
+        for (int i = 0; i != date.length(); i++) {
+            if (date.charAt(i) == '-') {
+                tmp1 = i;
+            }
+            if (date.charAt(i) == ':') {
+                if (tmp2 == -1) {
+                    tmp2 = i;
+                } else {
+                    tmp3 = i;
+                }
+            }
+        }
+        String hour = date.substring(tmp1 + 4, tmp2);
+        String min = date.substring(tmp2 + 1, tmp3);
+        int add = 0;
+        if (Integer.valueOf(min) >= 30) {
+            add = 1;
+        } else {
+            add = 0;
+        }
+        return Integer.valueOf(hour) * 2 + add;
     }
 
     /**
      * A method to transform current time to a point of last two hours
+     *
      * @param startTime
      * @param currentTime
      * @return
      */
-    public static int timeToPointOfTwoHour(long startTime,long currentTime){
+    public static int timeToPointOfTwoHour(long startTime, long currentTime) {
         long diff = currentTime - startTime;
         long twoHour = 2 * 60 * 60 * 1000; //2 hour * 60min * 60 sec * 1000 ms
         double mul = Double.valueOf(diff) / Double.valueOf(twoHour);
         int sec = 60 * 2 / 5;   //2 hour and 5 min a section
-        int index = (int)(mul * sec);
+        int index = (int) (mul * sec);
         return index;
     }
 
-    public static int timeToPointOfWeek(){
+    public static int timeToPointOfWeek() {
         return 1;
     }
 
-    public static float sumOfArrayNum(Object[] array){
+    public static float sumOfArrayNum(Object[] array) {
         int num = array.length;
-        if(num == 0) return 0;
+        if (num == 0) return 0;
         float sum = 0;
-        for(int i = 0; i != num; i++){
-            sum += (Float)array[0];
+        for (int i = 0; i != num; i++) {
+            sum += (Float) array[0];
         }
         return sum;
     }
 
-    public static float avgOfArrayNum(Object[] array){
+    public static float avgOfArrayNum(Object[] array) {
 
         return sumOfArrayNum(array) / array.length;
     }
 
-    public static boolean isStringOK(String str){
-        if(str == null || str.trim().equals("")){
+    public static boolean isStringOK(String str) {
+        if (str == null || str.trim().equals("")) {
             return false;
         }
         return true;
     }
 
-    public static Float getMaxValueFromMap(Map<Integer,Float> map){
+    public static Float getMaxValueFromMap(Map<Integer, Float> map) {
         Float max = 0.0f;
-        for(int i = 0; i != map.keySet().size(); i++){
-            Float tmp = (Float)map.get(i);
-            if(tmp > max){
+        for (int i = 0; i != map.keySet().size(); i++) {
+            Float tmp = (Float) map.get(i);
+            if (tmp > max) {
                 max = tmp;
-            };
+            }
+            ;
         }
         return max;
     }
 
-    public static Float getMinusFromMaxToMin(ArrayList<Float> data){
-        if(data.size() == 0) return 0f;
+    public static Float getMinusFromMaxToMin(ArrayList<Float> data) {
+        if (data.size() == 0) return 0f;
         Float max = data.get(0);
         Float min = data.get(0);
         Float tmp = 0f;
-        for(int i = 0; i != data.size(); i++){
+        for (int i = 0; i != data.size(); i++) {
             tmp = data.get(i);
-            if(tmp < min) min = tmp;
-            if(tmp > max) max = tmp;
+            if (tmp < min) min = tmp;
+            if (tmp > max) max = tmp;
         }
         return max - min;
     }

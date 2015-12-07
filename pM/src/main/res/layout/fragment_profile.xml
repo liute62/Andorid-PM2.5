@@ -78,7 +78,7 @@
                         android:id="@+id/profile_login"
                         android:textColor="@color/White"
                         android:text="登陆"
-                        android:background="@drawable/main_top_bg"/>
+                        android:background="@drawable/main_top_bg" />
 
                     <TextView
                         android:id="@+id/profile_reset_pwd"
@@ -90,7 +90,7 @@
                         android:textSize="15sp"
                         android:text="重置密码"
                         android:textColor="@color/AccentBlue"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
 
                 </RelativeLayout>
