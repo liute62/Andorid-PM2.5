@@ -152,7 +152,7 @@
             <Button
                 android:id="@+id/profile_bluetooth"
                 style="@style/main_left_button_style"
-                android:text="开启蓝牙" />
+                android:text="蓝牙" />
 
             <Button
                 android:id="@+id/profile_logout"

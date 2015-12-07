@@ -23,8 +23,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import app.bluetooth.BluetoothActivity;
 import app.services.DBService;
 import app.utils.ACache;
 import app.utils.Const;
@@ -205,8 +203,7 @@ public class ProfileFragment extends Fragment implements
                 startActivityForResult(intent, Const.Action_Profile_Register);
                 break;
             case R.id.profile_bluetooth:
-                Intent intent1 = new Intent(mActivity, BluetoothActivity.class);
-                startActivity(intent1);
+                bluetoothProcess();
                 break;
             case R.id.profile_modify_password:
                 if (!Const.CURRENT_ACCESS_TOKEN.equals("-1")) {
@@ -326,6 +323,16 @@ public class ProfileFragment extends Fragment implements
             }
         });
         VolleyQueue.getInstance(mActivity.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void bluetoothProcess(){
+        Fragment bluetooth = new BluetoothFragment();
+        mActivity.getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content, bluetooth)
+                .commit();
+       MainActivity mainActivity = (MainActivity)mActivity;
+       mainActivity.toggle();
     }
 
 }

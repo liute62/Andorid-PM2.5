@@ -5,7 +5,7 @@
     android:versionName="1.0">
 
     <uses-sdk
-        android:minSdkVersion="17"
+        android:minSdkVersion="18"
         android:targetSdkVersion="20" />
 
     <application
@@ -42,9 +42,8 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".RegisterActivity"></activity>
-        <activity android:name="app.bluetooth.BluetoothActivity"></activity>
         <activity android:name=".MapActivity"></activity>
-
+        <activity android:name="app.bluetooth.DeviceControlActivity"></activity>
         <service
             android:name="app.services.DBService"
             android:exported="true" />

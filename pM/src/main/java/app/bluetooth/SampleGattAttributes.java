@@ -30,13 +30,13 @@ public class SampleGattAttributes {
 
     static {
         // Sample Services.
-        attributes.put("0000180d-0000-1000-8000-00805f9b34fb", "����");
+        attributes.put("0000180d-0000-1000-8000-00805f9b34fb", "Health Rate");
         attributes.put("0000180a-0000-1000-8000-00805f9b34fb", "Device Information Service");
-        attributes.put("0000ffe0-0000-1000-8000-00805f9b34fb", "��������");
+        attributes.put("0000ffe0-0000-1000-8000-00805f9b34fb", "Air Quality");
         // Sample Characteristics.
         //new add
-        attributes.put(FFE0, "Pm2.5��ʾֵ");
-        attributes.put(HEART_RATE_MEASUREMENT, "����ֵ");
+        attributes.put(FFE0, "PM2.5_value");
+        attributes.put(HEART_RATE_MEASUREMENT, "Hearth_value");
         //attributes.put(FFE0, "FFE0");
         attributes.put("00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String");
     }

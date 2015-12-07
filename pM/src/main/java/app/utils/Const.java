@@ -221,6 +221,10 @@ public class Const {
 
     public static final String Info_DB_Insert_Date_Conflict = "失败,插入数据库时间与当前时间不一致";
 
+    public static final String Info_Bluetooth_ptc_Not_Support = "当前设备不支持蓝牙4.3协议";
+
+    public static final String Info_Bluetooth_Not_Support = "当前设备不支持蓝牙";
+
     public static String[] cityName =
             {
                     "北京市",
