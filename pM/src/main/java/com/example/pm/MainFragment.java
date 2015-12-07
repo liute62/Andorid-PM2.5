@@ -475,10 +475,13 @@ public class MainFragment extends Fragment implements OnClickListener {
             public void onResponse(JSONObject response) {
                 //Log.e("searchCityRequest",response.toString());
                 try {
-                    Log.e("searchCityRequest 1",response.toString());
-                    JSONObject component = response.getJSONObject("addressComponent");
+                    //Log.e("searchCityRequest 1",response.toString());
+                    JSONObject result = response.getJSONObject("result");
+                    //Log.e("searchCityRequest resul",result.toString());
+                    JSONObject component = result.getJSONObject("addressComponent");
+                    //Log.e("searchCityRequest comp",component.toString());
                     String cityName = component.getString("city");
-                    Log.e("searchCityRequest city",cityName);
+                    //Log.e("searchCityRequest city",cityName);
                     if(cityName != null && !cityName.trim().equals("")){
                         mCity.setText(cityName);
                     }
