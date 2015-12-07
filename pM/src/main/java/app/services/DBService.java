@@ -584,6 +584,9 @@ public class DBService extends Service {
 //        //Log.e("insertState","now"+now+"insert"+insert);
 //        if(insert.equals(now)) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Log.e("state insert","-------insert ------state --------- begin");
+        state.print();
+        Log.e("state insert", "-------insert ------state --------- finish");
         cupboard().withDatabase(db).put(state);
         //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
         IDToday++;

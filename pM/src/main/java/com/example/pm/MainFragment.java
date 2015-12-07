@@ -156,6 +156,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 aCache.put(Const.Cache_PM_LastWeek, PMBreatheWeekAvg);
                 dataInitial();
             }
+            if(msg.what == Const.Handler_City_Name){
+                String name = (String)msg.obj;
+                currentCity = name;
+                mCity.setText(currentCity);
+            }
         }
     };
 
@@ -364,7 +369,6 @@ public class MainFragment extends Fragment implements OnClickListener {
             mTime.setText(String.valueOf(currentHour) + ": " + String.valueOf(currentMin));
         }
         mCity.setText(currentCity);
-        PMDensity = 1000.0;
         mAirQuality.setText(DataGenerator.setAirQualityText(PMDensity));
         mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
@@ -491,9 +495,12 @@ public class MainFragment extends Fragment implements OnClickListener {
                     JSONObject component = result.getJSONObject("addressComponent");
                     //Log.e("searchCityRequest comp",component.toString());
                     String cityName = component.getString("city");
-                    //Log.e("searchCityRequest city",cityName);
+                    Log.e("searchCityRequest city",cityName);
                     if (cityName != null && !cityName.trim().equals("")) {
-                        mCity.setText(cityName);
+                        Message msg = new Message();
+                        msg.what = Const.Handler_City_Name;
+                        msg.obj = cityName;
+                        mDataHandler.sendMessage(msg);
                         aCache.put(Const.Cache_City, cityName);
                     }
                 } catch (JSONException e) {

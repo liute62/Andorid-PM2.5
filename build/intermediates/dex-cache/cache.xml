@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\com.mcxiaoke.volley\library\1.0.18\38da306aafee11459cd935a01d2c92a98dc670a4\library-1.0.18.jar"
+        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\src\main\jniLibs\BaiduLBS_Android.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\library-1.0.18-b1a2008231d51f8c72918a90038fc32a12e31c85.jar" />
+        sha1="bb71d6cfe5166741a0a99e85471a8b90e97f5228">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\BaiduLBS_Android-bdd770ab19cf71b148288be4c04afb2e054d8f74.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.0\support-annotations-23.1.0.jar"
@@ -16,39 +16,11 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\support-annotations-23.1.0-a27c3f024e51ace21f3d1dd13012f4f9d527fafe.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\src\main\jniLibs\BaiduLBS_Android.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="bb71d6cfe5166741a0a99e85471a8b90e97f5228">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\BaiduLBS_Android-bdd770ab19cf71b148288be4c04afb2e054d8f74.jar" />
-    </item>
-    <item
         jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\src\main\jniLibs\locSDK_6.03.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="f97b00e2e5a384be96ab4d668fa3e2ff62cdbbb7">
         <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\locSDK_6.03-a23d5b0a12d5c88fb5ec605c05f8dacc22ccbc47.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\internal_impl-23.1.0-e82e236e7b11336d79f3643c13a81c3aebeaa7eb.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\nl.qbusict\cupboard\2.1.2\aa2654568535e3a29af7a3b86453b8ff85af6d12\cupboard-2.1.2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\cupboard-2.1.2-efbe7a181d0b668fd2c95e0dc8f538b5e868ca9d.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-3bbb7b92e6f228f4a1419749cf529fd3f6cecb8b.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.github.lecho\hellocharts-library\1.5.8\jars\classes.jar"
@@ -58,11 +30,39 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-0a9cb645f31d1eeb5b22ff7a32a7737268d9d326.jar" />
     </item>
     <item
+        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-3bbb7b92e6f228f4a1419749cf529fd3f6cecb8b.jar" />
+    </item>
+    <item
         jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\PM2.5\slidingmenu_library\unspecified\jars\classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="de4cf90b90b253272b045697ffcb842c21ad2b66">
+        sha1="fdb45ea74f3e4f14b0292605fcc0edb2c769b0a3">
         <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\classes-87f0e8e14f90ff46900283b90756b410e0a6a51d.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\nl.qbusict\cupboard\2.1.2\aa2654568535e3a29af7a3b86453b8ff85af6d12\cupboard-2.1.2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\cupboard-2.1.2-efbe7a181d0b668fd2c95e0dc8f538b5e868ca9d.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\internal_impl-23.1.0-e82e236e7b11336d79f3643c13a81c3aebeaa7eb.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\com.mcxiaoke.volley\library\1.0.18\38da306aafee11459cd935a01d2c92a98dc670a4\library-1.0.18.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\PM2.5\pM\build\intermediates\pre-dexed\debug\library-1.0.18-b1a2008231d51f8c72918a90038fc32a12e31c85.jar" />
     </item>
 
 </items>
