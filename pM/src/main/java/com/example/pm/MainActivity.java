@@ -14,7 +14,6 @@ public class MainActivity extends SlidingActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         MyInitial();

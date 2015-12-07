@@ -27,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -176,6 +177,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter.addAction(Const.Action_Chart_Result_1);
             intentFilter.addAction(Const.Action_Chart_Result_2);
             intentFilter.addAction(Const.Action_Chart_Result_3);
+            intentFilter.addAction(Const.Action_DB_MAIN_Location);
             aCache.put(Const.Cache_Is_Background,"false");
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
@@ -221,6 +223,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter.addAction(Const.Action_Chart_Result_1);
             intentFilter.addAction(Const.Action_Chart_Result_2);
             intentFilter.addAction(Const.Action_Chart_Result_3);
+            intentFilter.addAction(Const.Action_DB_MAIN_Location);
             mActivity.registerReceiver(dbReceiver, intentFilter);
             intentFilter = new IntentFilter();
             Intent mIntent = new Intent(mActivity, DBService.class);
@@ -463,13 +466,25 @@ public class MainFragment extends Fragment implements OnClickListener {
      * @param lati  latitude
      * @param Longi longitude
      */
-    private void searchCityRequest(String lati, String Longi) {
+    private void searchCityRequest(String lati, final String Longi) {
         String url = HttpUtil.SearchCity_url;
-        url = url + "&location=" + lati + "," + Longi + "&key=" + Const.APP_MAP_KEY;
+        url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;
+        Log.e("url",url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
+                //Log.e("searchCityRequest",response.toString());
+                try {
+                    Log.e("searchCityRequest 1",response.toString());
+                    JSONObject component = response.getJSONObject("addressComponent");
+                    String cityName = component.getString("city");
+                    Log.e("searchCityRequest city",cityName);
+                    if(cityName != null && !cityName.trim().equals("")){
+                        mCity.setText(cityName);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -522,7 +537,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 chartData12 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_12);
                 chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
                 chartInitial(current_chart1_index,current_chart2_index);
-            } else if(intent.getAction().equals(Const.Action_Chart_Result_1)){
+            }else if(intent.getAction().equals(Const.Action_DB_MAIN_Location)){
+                String lati = intent.getStringExtra(Const.Intent_DB_PM_Lati);
+                String longi = intent.getStringExtra(Const.Intent_DB_PM_Longi);
+                searchCityRequest(lati,longi);
+            }else if(intent.getAction().equals(Const.Action_Chart_Result_1)){
 //                Log.e("Action_Chart_Cache","Action_Chart_Cache");
                 HashMap data4 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart4_data);
                 chartData4 = data4;
