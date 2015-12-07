@@ -106,6 +106,10 @@ public class Const {
 
     public static final String Intent_DB_PM_Chart1 = "Intent_DB_PM_Chart1";
 
+    public static final String Intent_DB_PM_Lati = "Intent_DB_PM_Lati";
+
+    public static final String Intent_DB_PM_Longi = "Intent_DB_PM_Longi";
+
     public static final String Intent_Main_Location = "Intent_Main_Location";
 
     public static final String Intent_chart1_data = "Intent_chart1_data";
@@ -139,6 +143,8 @@ public class Const {
 
     public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
 
+    public static final String Action_DB_MAIN_Location = "Action_DB_MAIN_Location";
+
     public static final String Action_Chart_Cache = "Action_Chart_Cache";
 
     public static final String Action_Chart_Result_1 = "Action_Chart_Result_1";
@@ -152,7 +158,7 @@ public class Const {
     /**
      * GPS*
      */
-    public static final String APP_MAP_KEY = "";
+    public static final String APP_MAP_KEY = "In8U2gwdA6i5Q0lyDHne342u";
 
     /**
      * Time related values*

@@ -373,7 +373,7 @@ public class DataCalculator {
             airNow = Float.valueOf(state.getVentilation_volume());
             airLast = Float.valueOf(states.get(i - 1).getVentilation_volume());
             Float result = airNow - airLast; //calculate the 1 min air breathed in
-            Log.e("calChart8Data",String.valueOf(index)+" "+String.valueOf(airNow)+" "+String.valueOf(i) + " "+String.valueOf(result));
+            //Log.e("calChart8Data",String.valueOf(index)+" "+String.valueOf(airNow)+" "+String.valueOf(i) + " "+String.valueOf(result));
             //now we get the index of time and the air  of that point
             if(tmpMap.containsKey(index)) {
                 //calculate the sum, since we need 5 min air breathed in

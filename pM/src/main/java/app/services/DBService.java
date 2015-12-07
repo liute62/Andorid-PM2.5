@@ -10,6 +10,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -35,6 +36,8 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.search.core.SearchResult;
 import com.example.pm.MainActivity;
 import com.example.pm.MyApplication;
 import com.example.pm.R;
@@ -43,8 +46,6 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.security.auth.login.LoginException;
 
 import app.Entity.State;
 import app.model.PMModel;
@@ -243,7 +244,16 @@ public class DBService extends Service {
                     }
                 }
                 DBRunTime++;
-                Log.e("DBRUNTIME",String.valueOf(DBRunTime)+" Density"+String.valueOf(PM25Density));
+                Log.e("DBRUNTIME",String.valueOf(DBRunTime)+" Longi"+String.valueOf(longitude)+" Lati"+String.valueOf(latitude)+" Density"+String.valueOf(PM25Density));
+                if(DBRunTime % 5 == 0) {
+                    intentText = new Intent(Const.Action_DB_MAIN_Location);
+                    intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
+                    intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
+                    if (isBackgound.equals("false")) {
+                        sendBroadcast(intentText);
+                    }
+                }
+
             }else {
                 Toast.makeText(getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
             }
@@ -278,8 +288,8 @@ public class DBService extends Service {
         DBInitial();
         serviceStateInitial();
         sensorInitial();
-        //GPSInitial();
-        BAIDUMapInitial();
+        GPSInitial();
+        //BAIDUMapInitial();
         DBRunnable.run();
     }
 
@@ -375,100 +385,97 @@ public class DBService extends Service {
     }
 
     private void GPSInitial() {
+        boolean isGPSRun = false;
         mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location= mManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location= mManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if(location == null){
-            longitude = Const.Default_LONGITUDE;
-            latitude = Const.Default_LATITUDE;
+            isGPSRun = false;
+            mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
             Toast.makeText(getApplicationContext(),Const.Info_GPS_No_Cache,Toast.LENGTH_SHORT).show();
         }else {
+            isGPSRun = true;
             longitude = location.getLongitude();
             latitude = location.getLatitude();
             searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
         }
-        GpsStatus.Listener gpsStatusListener=new GpsStatus.Listener() {
-            public void onGpsStatusChanged(int event) {
-                if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
-                    //Log.e("GPS_EVENT_FIRST_FIX","yes");
-                } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
-                    //Log.e("GPS_EVENT_SATELLITE","yes");
-                    GpsStatus gpsStatus = mManager.getGpsStatus(null);
-                    int maxSatellites = gpsStatus.getMaxSatellites();
-                    Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();
-                    int count = 0;
-                    while (it.hasNext() && count <= maxSatellites) {
-                        count++;
-                        GpsSatellite s = it.next();
-                    }
-                } else if (event == GpsStatus.GPS_EVENT_STARTED) {
-                    //Log.e("GPS_EVENT_STARTED","yes");
-                } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
-                    Log.e("GPS_EVENT_STOPPED","yes");
-                }
-            }
-        };
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.e("onLocationChanged","onLocationChanged");
-                if (location != null) {
-                    Log.e(String.valueOf(latitude),String.valueOf(longitude));
-                    isLocationChanged = true;
-                    longitude = location.getLongitude();
-                    latitude = location.getLatitude();
-                    if (last_long == longitude && last_lati == latitude) {
-                        //means no changes
-                    } else {
-                        //location has been changed
-                        last_lati = latitude;
-                        last_long = longitude;
-                        Const.Default_LATITUDE = latitude;
-                        Const.Default_LONGITUDE = longitude;
-                        if (isPMSearchRun == false) {
-                            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
-                        }
-                    }
-                }
-            }
 
-            @Override
-            public void onStatusChanged(String s, int status, Bundle bundle) {
-                if(status==LocationProvider.AVAILABLE){
-                    Toast.makeText(getApplicationContext(),Const.Info_GPS_Available,Toast.LENGTH_SHORT).show();
-                }else if(status== LocationProvider.OUT_OF_SERVICE){
-                    Toast.makeText(getApplicationContext(),Const.Info_GPS_OutOFService,Toast.LENGTH_SHORT).show();
-                }else if(status==LocationProvider.TEMPORARILY_UNAVAILABLE){
-                    Toast.makeText(getApplicationContext(),Const.Info_GPS_Pause,Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-                Toast.makeText(getApplicationContext(), Const.Info_GPS_Open,
-                        Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Toast.makeText(getApplicationContext(), Const.Info_GPS_Turnoff,
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setSpeedRequired(false);
-
-        String provider = mManager.getBestProvider(criteria, true);
-        Log.e("provider",provider);
         mManager.addGpsStatusListener(gpsStatusListener);
-        mManager.requestLocationUpdates(provider,
-                Const.DB_Location_INTERVAL, 0, locationListener);
+        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+//        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+//                Const.DB_Location_INTERVAL, 0, locationListener);
 
     }
+
+    GpsStatus.Listener gpsStatusListener = new GpsStatus.Listener() {
+
+        public void onGpsStatusChanged(int event) {
+            if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
+                //Log.e("GPS_EVENT_FIRST_FIX","yes");
+            } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
+                //Log.e("GPS_EVENT_SATELLITE","yes");
+                GpsStatus gpsStatus = mManager.getGpsStatus(null);
+                int maxSatellites = gpsStatus.getMaxSatellites();
+                Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();
+                int count = 0;
+                while (it.hasNext() && count <= maxSatellites) {
+                    count++;
+                    GpsSatellite s = it.next();
+                }
+            } else if (event == GpsStatus.GPS_EVENT_STARTED) {
+                //Log.e("GPS_EVENT_STARTED","yes");
+            } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
+                Log.e("GPS_EVENT_STOPPED","yes");
+            }
+        }
+    };
+
+    LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.e("onLocationChanged","onLocationChanged");
+            if (location != null) {
+                Log.e(String.valueOf(latitude),String.valueOf(longitude));
+                isLocationChanged = true;
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+                if (last_long == longitude && last_lati == latitude) {
+                    //means no changes
+                } else {
+                    //location has been changed
+                    last_lati = latitude;
+                    last_long = longitude;
+                    Const.Default_LATITUDE = latitude;
+                    Const.Default_LONGITUDE = longitude;
+                    if (isPMSearchRun == false) {
+                        searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String s, int status, Bundle bundle) {
+            if(status==LocationProvider.AVAILABLE){
+                Toast.makeText(getApplicationContext(),Const.Info_GPS_Available,Toast.LENGTH_SHORT).show();
+            }else if(status== LocationProvider.OUT_OF_SERVICE){
+                Toast.makeText(getApplicationContext(),Const.Info_GPS_OutOFService,Toast.LENGTH_SHORT).show();
+            }else if(status==LocationProvider.TEMPORARILY_UNAVAILABLE){
+                Toast.makeText(getApplicationContext(),Const.Info_GPS_Pause,Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+            Toast.makeText(getApplicationContext(), Const.Info_GPS_Open,
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+            Toast.makeText(getApplicationContext(), Const.Info_GPS_Turnoff,
+                    Toast.LENGTH_SHORT).show();
+        }
+    };
 
     /**
      * density: (ug/m3)
@@ -724,6 +731,7 @@ public class DBService extends Service {
         locationService.setLocationOption(locationService.getDefaultLocationClientOption());
         if(Thread.currentThread() == Looper.getMainLooper().getThread() ){
             Log.e("Mainthread","Mainthread");
+
         }
         locationService.start();// 定位SDK
         // start之后会默认发起一次定位请求，开发者无须判断isstart并主动调用request
