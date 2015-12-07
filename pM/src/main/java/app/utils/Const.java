@@ -2,8 +2,6 @@ package app.utils;
 
 import com.example.pm.R;
 
-import app.model.PMModel;
-
 public class Const {
 
     public static String Name_DB_Service = "app.services.DBService";
@@ -18,34 +16,11 @@ public class Const {
 
     public static String CURRENT_USER_GENDER = "-1";
 
-    public static double CURRENT_LONGITUDE = 0.0; //Only for profile textview test
-
-    public static double CURRENT_LATITUDE = 0.0; //Only for profile textview test
-
-    public static double Default_LONGITUDE = 121.41;
-
-    public static double Default_LATITUDE = 31.14; //default is shanghai
-
-    public static PMModel CURRENT_PM_MODEL;
-
     public static boolean CURRENT_INDOOR = false;
-
-    public static int CURRENT_CHART1_INDEX = 1;
-
-    public static int CURRENT_CHART2_INDEX = 2;
-
-    public static MotionStatus CURRENT_STATUS;
-
-    public static Double CURRENT_VENTILATION_VOLUME = 0.0;
-
-    public static int CURRENT_STEPS_NUM = 0;
-
-    public static boolean CURRENT_DB_RUNNING = false;
 
     /**
      * Cache*
      */
-    public static final String Cache_App_Initialized = "Cache_App_Initialized";
     public static final String Cache_Is_Background = "Cache_Is_Background";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
@@ -90,27 +65,17 @@ public class Const {
     /**
      * Intent Tag Code*
      */
-    public static final String Intent_PM_Id = "Intent_PM_Id";
-
     public static final String Intent_PM_Density = "Intent_PM_Density";
 
     public static final String Intent_DB_PM_Day = "Intent_DB_PM_Day";
 
     public static final String Intent_DB_PM_Hour = "Intent_DB_PM_Hour";
 
-    public static final String Intent_DB_PM_TIME = "Intent_DB_PM_TIME";
-
-    public static final String Intent_DB_Ven_Volume = "Intent_DB_Ven_Volume";
-
     public static final String Intent_DB_PM_Week = "Intent_DB_PM_Week";
-
-    public static final String Intent_DB_PM_Chart1 = "Intent_DB_PM_Chart1";
 
     public static final String Intent_DB_PM_Lati = "Intent_DB_PM_Lati";
 
     public static final String Intent_DB_PM_Longi = "Intent_DB_PM_Longi";
-
-    public static final String Intent_Main_Location = "Intent_Main_Location";
 
     public static final String Intent_chart1_data = "Intent_chart1_data";
 
@@ -163,11 +128,7 @@ public class Const {
     /**
      * Time related values*
      */
-    public final static int DB_PM_Search_INTERVAL = 1000 * 60 * 60;//1Hour
-
-    public final static int DB_Location_INTERVAL = 0; //110s
-
-    public final static int DB_Run_Time_INTERVAL = 1000 * 5 ; //5s
+    public final static int DB_Run_Time_INTERVAL = 1000 * 5; //5s
 
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 
@@ -312,13 +273,7 @@ public class Const {
             "Bio3检测盒未连接", "Bio3检测盒已经连接"
     };
 
-    public static String[] downloadPeriod = {
-            "0:10", "1:10", "2:10", "3:10", "4:10", "5:10", "6:10", "7:10", "8:10",
-            "9:10", "10:10", "11:10", "12:10", "13:10", "14:10", "15:10", "16:10", "17:10",
-            "18:10", "19:10", "20:10", "21:10", "22:10", "23:10"
-    };
-
     public static int[] profileImg = {
-            R.drawable.shanghai,R.drawable.beijing
+            R.drawable.shanghai, R.drawable.beijing
     };
 }

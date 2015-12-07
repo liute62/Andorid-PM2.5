@@ -3,12 +3,9 @@ package app.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.FormatFlagsConversionMismatchException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * Created by Administrator on 11/25/2015.
@@ -17,21 +14,22 @@ public class ChartModel extends BaseModel {
 
     private Map data;
 
-    public ChartModel(){}
+    public ChartModel() {
+    }
 
-    public static JSONObject toJSONObject(ChartModel model){
+    public static JSONObject toJSONObject(ChartModel model) {
         JSONObject object = new JSONObject();
         Map map = model.getData();
         return object;
     }
 
-    public static JSONObject toJSONObject(Map map){
+    public static JSONObject toJSONObject(Map map) {
         JSONObject object = new JSONObject();
         for (Object key : map.keySet()) {
             //default Key: Set<Integer> Value: Float
             Integer tmpkey = (Integer) key;
             try {
-                object.put(String.valueOf(tmpkey),map.get(tmpkey));
+                object.put(String.valueOf(tmpkey), map.get(tmpkey));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -39,15 +37,15 @@ public class ChartModel extends BaseModel {
         return object;
     }
 
-    public static ChartModel Parse(JSONObject object){
+    public static ChartModel Parse(JSONObject object) {
         ChartModel model = new ChartModel();
-        Map<Integer,Float> map = new HashMap<>(); // we just need this type
+        Map<Integer, Float> map = new HashMap<>(); // we just need this type
         Iterator<String> iterator = object.keys();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             String key = iterator.next();
             try {
                 Object value = object.get(key);
-                map.put(Integer.valueOf(key),(Float)value);
+                map.put(Integer.valueOf(key), (Float) value);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

@@ -70,7 +70,7 @@ public class ProfileFragment extends Fragment implements
         }
     };
 
-    Handler modifyPwdHandler = new Handler(){
+    Handler modifyPwdHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -92,18 +92,18 @@ public class ProfileFragment extends Fragment implements
         mHead = (ImageView) view.findViewById(R.id.profile_background_img);
         mScrollView = (PullScrollView) view.findViewById(R.id.profile_scroll_view);
         mScrollView.setHeader(mHead);
-        mName = (TextView)view.findViewById(R.id.profile_name);
-        mUsername = (TextView)view.findViewById(R.id.profile_username);
-        mGender = (TextView)view.findViewById(R.id.profile_gender);
+        mName = (TextView) view.findViewById(R.id.profile_name);
+        mUsername = (TextView) view.findViewById(R.id.profile_username);
+        mGender = (TextView) view.findViewById(R.id.profile_gender);
         mLogin = (Button) view.findViewById(R.id.profile_login);
         mLogout = (Button) view.findViewById(R.id.profile_logout);
         mTurnOffUpload = (Button) view.findViewById(R.id.profile_turnoff_upload);
         mTurnOffService = (Button) view.findViewById(R.id.profile_turnoff_service);
         mClear = (Button) view.findViewById(R.id.profile_clear_data);
         mRegister = (Button) view.findViewById(R.id.profile_rigister);
-        mBluetooth = (Button)view.findViewById(R.id.profile_bluetooth);
-        mModifyPwd = (Button)view.findViewById(R.id.profile_modify_password);
-        mResetPwd = (TextView)view.findViewById(R.id.profile_reset_pwd);
+        mBluetooth = (Button) view.findViewById(R.id.profile_bluetooth);
+        mModifyPwd = (Button) view.findViewById(R.id.profile_modify_password);
+        mResetPwd = (TextView) view.findViewById(R.id.profile_reset_pwd);
         checkCache();
         setListener();
         return view;
@@ -116,16 +116,16 @@ public class ProfileFragment extends Fragment implements
             mLogin.setOnClickListener(null);
             mResetPwd.setVisibility(View.VISIBLE);
             mResetPwd.setOnClickListener(this);
-            if (Const.CURRENT_USER_GENDER.equals("1")){
+            if (Const.CURRENT_USER_GENDER.equals("1")) {
                 mGender.setText("男");
-            }else if(Const.CURRENT_USER_GENDER.equals("2")) {
+            } else if (Const.CURRENT_USER_GENDER.equals("2")) {
                 mGender.setText("女");
-            }else {
+            } else {
                 mGender.setText("Gender");
             }
             mUsername.setText(Const.CURRENT_USER_NAME);
             mName.setText(Const.CURRENT_USER_NICKNAME);
-        }else {
+        } else {
             mLogin.setVisibility(View.VISIBLE);
             mLogin.setOnClickListener(this);
             mResetPwd.setVisibility(View.INVISIBLE);
@@ -195,38 +195,38 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_clear_data:
                 clearCache();
                 getActivity().finish();
-                if(ShortcutUtil.isServiceWork(mActivity,Const.Name_DB_Service)) {
+                if (ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
                     intent = new Intent(mActivity, DBService.class);
                     mActivity.stopService(intent);
                 }
                 break;
             case R.id.profile_rigister:
-                intent = new Intent(mActivity,RegisterActivity.class);
-                startActivityForResult(intent,Const.Action_Profile_Register);
+                intent = new Intent(mActivity, RegisterActivity.class);
+                startActivityForResult(intent, Const.Action_Profile_Register);
                 break;
             case R.id.profile_bluetooth:
-                Intent intent1 = new Intent(mActivity,BluetoothActivity.class);
+                Intent intent1 = new Intent(mActivity, BluetoothActivity.class);
                 startActivity(intent1);
                 break;
             case R.id.profile_modify_password:
-                if(! Const.CURRENT_ACCESS_TOKEN.equals("-1")){
-                    ModifyPwdDialog modifyPwdDialog = new ModifyPwdDialog(mActivity,modifyPwdHandler);
+                if (!Const.CURRENT_ACCESS_TOKEN.equals("-1")) {
+                    ModifyPwdDialog modifyPwdDialog = new ModifyPwdDialog(mActivity, modifyPwdHandler);
                     modifyPwdDialog.show();
-                }else {
-                    Toast.makeText(mActivity.getApplicationContext(),Const.Info_Login_First,Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_First, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.profile_reset_pwd:
-                if(! Const.CURRENT_ACCESS_TOKEN.equals("-1")){
-                    if(!infoDialogShow) {
+                if (!Const.CURRENT_ACCESS_TOKEN.equals("-1")) {
+                    if (!infoDialogShow) {
                         infoDialog = new InfoDialog(mActivity);
                         infoDialog.setContent(Const.Info_Reset_Confirm);
                         infoDialog.setSureClickListener(new ResetPwdListener(1, infoDialog));
                         infoDialog.setCancelClickListener(new ResetPwdListener(2, infoDialog));
                         infoDialog.show();
                     }
-                }else {
-                    Toast.makeText(mActivity.getApplicationContext(),Const.Info_Login_First,Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_First, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -235,15 +235,15 @@ public class ProfileFragment extends Fragment implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Const.Action_Profile_Register){
-            if(resultCode == 1){
+        if (requestCode == Const.Action_Profile_Register) {
+            if (resultCode == 1) {
                 //success
                 checkCache();
             }
         }
     }
 
-    private void clearLoginCache(){
+    private void clearLoginCache() {
         aCache.remove(Const.Cache_User_Id);
         aCache.remove(Const.Cache_Access_Token);
         aCache.remove(Const.Cache_User_Name);
@@ -266,7 +266,7 @@ public class ProfileFragment extends Fragment implements
         aCache.remove(Const.Cache_Chart_12_Date);
     }
 
-    private void logOff(){
+    private void logOff() {
         clearLoginCache();
         //turn off the running service
         Intent intent = new Intent(mActivity, DBService.class);
@@ -274,27 +274,28 @@ public class ProfileFragment extends Fragment implements
         getActivity().finish();
     }
 
-    private class ResetPwdListener implements OnClickListener{
+    private class ResetPwdListener implements OnClickListener {
 
         int type; // 1 sure, 2 cancel
         InfoDialog infoDialog;
-        public ResetPwdListener(int type,InfoDialog infoDialog){
+
+        public ResetPwdListener(int type, InfoDialog infoDialog) {
             this.type = type;
             this.infoDialog = infoDialog;
         }
 
         @Override
         public void onClick(View view) {
-            if(type == 1){
+            if (type == 1) {
                 resetPwd();
-            }else {
+            } else {
                 infoDialog.dismiss();
                 infoDialogShow = false;
             }
         }
     }
 
-    private void resetPwd(){
+    private void resetPwd() {
         String url = HttpUtil.Reset_Pwd_url + Const.CURRENT_USER_NAME;
         JSONObject object = new JSONObject();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, object, new Response.Listener<JSONObject>() {
@@ -302,16 +303,16 @@ public class ProfileFragment extends Fragment implements
             public void onResponse(JSONObject response) {
                 try {
                     String status = response.getString("status");
-                    if(status.equals("1")){
+                    if (status.equals("1")) {
                         Toast.makeText(mActivity.getApplicationContext(), Const.Info_Reset_Success, Toast.LENGTH_SHORT).show();
                         infoDialog.dismiss();
                         infoDialogShow = false;
                         logOff();
-                    } else if(status.equals("-1")){
+                    } else if (status.equals("-1")) {
                         Toast.makeText(mActivity.getApplicationContext(), Const.Info_Reset_Username_Fail, Toast.LENGTH_SHORT).show();
-                    } else if(status.equals("0")){
+                    } else if (status.equals("0")) {
                         Toast.makeText(mActivity.getApplicationContext(), Const.Info_Reset_NoUser_Fail, Toast.LENGTH_SHORT).show();
-                    }else {
+                    } else {
                         Toast.makeText(mActivity.getApplicationContext(), Const.Info_Reset_Unknown_Fail, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {

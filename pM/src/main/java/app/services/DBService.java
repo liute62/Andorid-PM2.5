@@ -9,8 +9,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -26,23 +24,20 @@ import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
-import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.search.core.SearchResult;
 import com.example.pm.MainActivity;
 import com.example.pm.MyApplication;
 import com.example.pm.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
@@ -59,11 +54,12 @@ import app.utils.DataGenerator;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
+
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by liuhaodong1 on 15/11/10.
- *
+ * <p/>
  * DBService Sequences
  * -----Oncreate-----
  * 1.params Initial.
@@ -71,12 +67,12 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * 3.DB Initial: get the value of last hour, today, last week avg pm from database and set cache.
  * 4.Sensor Initial
  * 5.GPS Initial:
- *   Location Initial:
- *    1.Success, lati&longi are set to  getLastKnownLocation
- *    2.Failed,  lati&longi are set to  Shanghai location
- *   For location changed:
- *    1.last time lati&longi equals current lati&longi, means no change, don't need search result from server.
- *    2.If location changed, download pm density from server.
+ * Location Initial:
+ * 1.Success, lati&longi are set to  getLastKnownLocation
+ * 2.Failed,  lati&longi are set to  Shanghai location
+ * For location changed:
+ * 1.last time lati&longi equals current lati&longi, means no change, don't need search result from server.
+ * 2.If location changed, download pm density from server.
  * 5.DB Runnable begin running.
  * -----DB Runnable-----
  * 0. first time running after app installed, set cache to isbackground = false, that means currently App running in front
@@ -85,8 +81,8 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * 3. if DB == 0, initialize the state, and set DB Runtime = 1, The range of DBRuntime is always between 1 and 1 * 12 * 60 (1 hour)
  * 4. For Chart, if DBRuntime =
  * 5. Every a minute to calculate PM Data and upload it
- *    1. if upload success, change the value of upload to 1, and insert it into DB
- *    2. if upload failed, no change and insert it into DB directly
+ * 1. if upload success, change the value of upload to 1, and insert it into DB
+ * 2. if upload failed, no change and insert it into DB directly
  * 6. Every a DBRuntime to update the GUI about PM Info Text, no matter there are newly data calculated or not.
  * 7. Every a hour to upload the data and set DBRuntime = 1
  */
@@ -127,45 +123,48 @@ public class DBService extends Service {
         State state;
         Intent intentText;
         Intent intentChart;
+
         @Override
         public void run() {
             String isBackgound = aCache.getAsString(Const.Cache_Is_Background);
             String userId = aCache.getAsString(Const.Cache_User_Id);
-            if(isBackgound == null){ //App first run
+            if (isBackgound == null) { //App first run
                 isBackgound = "false";
-                aCache.put(Const.Cache_Is_Background,isBackgound);
-                if(userId == null) aCache.put(Const.Cache_User_Id,"0");
+                aCache.put(Const.Cache_Is_Background, isBackgound);
+                if (userId == null) aCache.put(Const.Cache_User_Id, "0");
             }
             /***** DB Run First time *****/
-            if(DBRunTime == 0){   //The initial state, set cache for chart
+            if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
 //                if (aCache.getAsObject(Const.Cache_Chart_1) == null)
-                    aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
+                aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
 //                if (aCache.getAsObject(Const.Cache_Chart_2) == null)
-                    aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
+                aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
 //                if (aCache.getAsObject(Const.Cache_Chart_3) == null)
-                    aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
+                aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
 //                if (aCache.getAsObject(Const.Cache_Chart_4) == null)
-                    aCache.put(Const.Cache_Chart_4, DataCalculator.getIntance(db).calChart4Data());
+                aCache.put(Const.Cache_Chart_4, DataCalculator.getIntance(db).calChart4Data());
 //                if (aCache.getAsObject(Const.Cache_Chart_5) == null)
-                    aCache.put(Const.Cache_Chart_5, DataCalculator.getIntance(db).calChart5Data());
+                aCache.put(Const.Cache_Chart_5, DataCalculator.getIntance(db).calChart5Data());
 //                if (aCache.getAsObject(Const.Cache_Chart_6) == null)
-                    aCache.put(Const.Cache_Chart_6, DataCalculator.getIntance(db).calChart6Data());
+                aCache.put(Const.Cache_Chart_6, DataCalculator.getIntance(db).calChart6Data());
                 if (aCache.getAsObject(Const.Cache_Chart_7) == null) {
                     aCache.put(Const.Cache_Chart_7, DataCalculator.getIntance(db).calChart7Data());
-                    aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());}
+                    aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());
+                }
 //                if (aCache.getAsObject(Const.Cache_Chart_8) == null)
-                    aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
+                aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
 //                if (aCache.getAsObject(Const.Cache_Chart_10) == null)
-                    aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
+                aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
                 if (aCache.getAsObject(Const.Cache_Chart_12) == null) {
                     aCache.put(Const.Cache_Chart_12, DataCalculator.getIntance(db).calChart12Data());
-                    aCache.put(Const.Cache_Chart_12_Date, DataCalculator.getIntance(db).getLastWeekDate());}
+                    aCache.put(Const.Cache_Chart_12_Date, DataCalculator.getIntance(db).getLastWeekDate());
+                }
                 sendBroadcast(intentChart);
             }
             /***** DB Running Normally *****/
-            if(DBCanRun) {
-                if(DBRunTime == 0){ //Initialize the state when DB start
+            if (DBCanRun) {
+                if (DBRunTime == 0) { //Initialize the state when DB start
                     state = calculatePM25(longitude, latitude);
                     //state = calculatePM25(116.329,39.987);
                     //insertState(state);
@@ -208,7 +207,7 @@ public class DBService extends Service {
                         mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
                         mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
                         if (isBackgound.equals("false")) {
-                             intentChart.putExtras(mBundle);
+                            intentChart.putExtras(mBundle);
                             sendBroadcast(intentChart);
                         }
                         break;
@@ -221,7 +220,7 @@ public class DBService extends Service {
                 if (isBackgound.equals("false")) {
                     sendBroadcast(intentText);
                 }
-                if(DBRunTime == 12 * 60){
+                if (DBRunTime == 12 * 60) {
                     //means a hour
                     Time t = new Time();
                     t.setToNow();
@@ -235,17 +234,17 @@ public class DBService extends Service {
                     //state = calculatePM25(116.329,39.987);
                     state = calculatePM25(longitude, latitude);
                     State now = state;
-                    if(!isSurpass(last,now)){
+                    if (!isSurpass(last, now)) {
                         uploadPMData(state);
                         Log.e("DBService", "notSurpass");
-                    }else {
-                        Log.e("DBService","isSurpass");
+                    } else {
+                        Log.e("DBService", "isSurpass");
                         reset(DBRunTime);
                     }
                 }
                 DBRunTime++;
-                Log.e("DBRUNTIME",String.valueOf(DBRunTime)+" Longi"+String.valueOf(longitude)+" Lati"+String.valueOf(latitude)+" Density"+String.valueOf(PM25Density));
-                if(DBRunTime % 5 == 0) {
+                Log.e("DBRUNTIME", String.valueOf(DBRunTime) + " Longi" + String.valueOf(longitude) + " Lati" + String.valueOf(latitude) + " Density" + String.valueOf(PM25Density));
+                if (DBRunTime % 5 == 0) {
                     intentText = new Intent(Const.Action_DB_MAIN_Location);
                     intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
                     intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
@@ -254,8 +253,8 @@ public class DBService extends Service {
                     }
                 }
 
-            }else {
-                Toast.makeText(getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), Const.Info_DB_Not_Running, Toast.LENGTH_SHORT).show();
             }
 
             DBHandler.postDelayed(DBRunnable, Const.DB_Run_Time_INTERVAL);
@@ -282,7 +281,7 @@ public class DBService extends Service {
         isLocationChanged = false;
         ChartTaskCanRun = true;
         aCache = ACache.get(getApplicationContext());
-        if(aCache.getAsString(Const.Cache_PM_Density) != null){
+        if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
         }
         DBInitial();
@@ -321,8 +320,8 @@ public class DBService extends Service {
             IDToday = Long.valueOf(0);
         } else {
             State state = states.get(states.size() - 1);
-            Log.e("Today size",String.valueOf(states.size()));
-            Log.e("Today Last state","begin");
+            Log.e("Today size", String.valueOf(states.size()));
+            Log.e("Today Last state", "begin");
             state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
@@ -330,7 +329,7 @@ public class DBService extends Service {
         }
     }
 
-    private void serviceStateInitial(){
+    private void serviceStateInitial() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
@@ -387,12 +386,12 @@ public class DBService extends Service {
     private void GPSInitial() {
         boolean isGPSRun = false;
         mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location= mManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if(location == null){
+        Location location = mManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (location == null) {
             isGPSRun = false;
-            mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
-            Toast.makeText(getApplicationContext(),Const.Info_GPS_No_Cache,Toast.LENGTH_SHORT).show();
-        }else {
+            mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            Toast.makeText(getApplicationContext(), Const.Info_GPS_No_Cache, Toast.LENGTH_SHORT).show();
+        } else {
             isGPSRun = true;
             longitude = location.getLongitude();
             latitude = location.getLatitude();
@@ -424,7 +423,7 @@ public class DBService extends Service {
             } else if (event == GpsStatus.GPS_EVENT_STARTED) {
                 //Log.e("GPS_EVENT_STARTED","yes");
             } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
-                Log.e("GPS_EVENT_STOPPED","yes");
+                Log.e("GPS_EVENT_STOPPED", "yes");
             }
         }
     };
@@ -432,9 +431,9 @@ public class DBService extends Service {
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            Log.e("onLocationChanged","onLocationChanged");
+            Log.e("onLocationChanged", "onLocationChanged");
             if (location != null) {
-                Log.e(String.valueOf(latitude),String.valueOf(longitude));
+                Log.e(String.valueOf(latitude), String.valueOf(longitude));
                 isLocationChanged = true;
                 longitude = location.getLongitude();
                 latitude = location.getLatitude();
@@ -444,8 +443,6 @@ public class DBService extends Service {
                     //location has been changed
                     last_lati = latitude;
                     last_long = longitude;
-                    Const.Default_LATITUDE = latitude;
-                    Const.Default_LONGITUDE = longitude;
                     if (isPMSearchRun == false) {
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
@@ -455,12 +452,12 @@ public class DBService extends Service {
 
         @Override
         public void onStatusChanged(String s, int status, Bundle bundle) {
-            if(status==LocationProvider.AVAILABLE){
-                Toast.makeText(getApplicationContext(),Const.Info_GPS_Available,Toast.LENGTH_SHORT).show();
-            }else if(status== LocationProvider.OUT_OF_SERVICE){
-                Toast.makeText(getApplicationContext(),Const.Info_GPS_OutOFService,Toast.LENGTH_SHORT).show();
-            }else if(status==LocationProvider.TEMPORARILY_UNAVAILABLE){
-                Toast.makeText(getApplicationContext(),Const.Info_GPS_Pause,Toast.LENGTH_SHORT).show();
+            if (status == LocationProvider.AVAILABLE) {
+                Toast.makeText(getApplicationContext(), Const.Info_GPS_Available, Toast.LENGTH_SHORT).show();
+            } else if (status == LocationProvider.OUT_OF_SERVICE) {
+                Toast.makeText(getApplicationContext(), Const.Info_GPS_OutOFService, Toast.LENGTH_SHORT).show();
+            } else if (status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
+                Toast.makeText(getApplicationContext(), Const.Info_GPS_Pause, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -481,6 +478,7 @@ public class DBService extends Service {
      * density: (ug/m3)
      * breath:  (L/min)
      * Calculate today the number of pm2.5 breathed until now
+     *
      * @param longi
      * @param lati
      * @return
@@ -502,12 +500,12 @@ public class DBService extends Service {
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
 
-        State state = new State(IDToday,aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
+        State state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR ? "1" : "0",
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1",0);
+                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1", 0);
         return state;
     }
 
@@ -516,14 +514,14 @@ public class DBService extends Service {
         Double tmp;
         int num = 0;
         List<List<State>> datas = DataCalculator.getIntance(db).getLastWeekStates();
-        if (datas.isEmpty()){
+        if (datas.isEmpty()) {
             return String.valueOf(result);
         }
-        for (int i = 0; i != datas.size(); i++){
+        for (int i = 0; i != datas.size(); i++) {
             List<State> states = datas.get(i);
-            if (states.isEmpty()){
+            if (states.isEmpty()) {
                 break;
-            }else {
+            } else {
                 num++;
                 tmp = Double.valueOf(states.get(states.size() - 1).getPm25());
                 result += tmp;
@@ -546,13 +544,13 @@ public class DBService extends Service {
         calendar.set(year, month, day, currentHour, currentMin, 59);
         Long nowTime = calendar.getTime().getTime();
         int lastHourH = currentHour - 1;
-        if(lastHourH < 0) lastHourH = 0;
-        calendar.set(year, month, day, lastHourH, currentMin,0);
+        if (lastHourH < 0) lastHourH = 0;
+        calendar.set(year, month, day, lastHourH, currentMin, 0);
         Long lastTime = calendar.getTime().getTime();
-        calendar.set(year,month,day,0,0,0);
+        calendar.set(year, month, day, 0, 0, 0);
         Long originTime = calendar.getTime().getTime();
         List<State> test = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", originTime.toString(), lastTime.toString()).list();
-        if(test.isEmpty()) firstHour = true;
+        if (test.isEmpty()) firstHour = true;
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", lastTime.toString(), nowTime.toString()).list();
         if (states.isEmpty()) {
             return String.valueOf(result);
@@ -561,9 +559,9 @@ public class DBService extends Service {
         } else {
             State state1 = states.get(states.size() - 1); // the last one
             //Log.e("state1",state1.getPm25());
-            if(firstHour){
+            if (firstHour) {
                 result = Double.valueOf(state1.getPm25()) - 0;
-            }else {
+            } else {
                 State state2 = states.get(0); //the first one
                 result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
             }
@@ -585,10 +583,10 @@ public class DBService extends Service {
 //        String now =  ShortcutUtil.refFormatOnlyDate(t.toMillis(true));
 //        //Log.e("insertState","now"+now+"insert"+insert);
 //        if(insert.equals(now)) {
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-            cupboard().withDatabase(db).put(state);
-            //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
-            IDToday++;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        cupboard().withDatabase(db).put(state);
+        //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
+        IDToday++;
 //        }else {
 //            Toast.makeText(getApplicationContext(),Const.Info_DB_Insert_Date_Conflict,Toast.LENGTH_SHORT);
 //        }
@@ -632,7 +630,7 @@ public class DBService extends Service {
                     intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
                     //set current pm density for calculation
                     PM25Density = Double.valueOf(pmModel.getPm25());
-                    aCache.put(Const.Cache_PM_Density,PM25Density);
+                    aCache.put(Const.Cache_PM_Density, PM25Density);
                     sendBroadcast(intent);
                     DBCanRun = true;
                 } catch (JSONException e) {
@@ -653,16 +651,16 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void uploadPMData(final State state){
+    public void uploadPMData(final State state) {
         isUploadRun = true;
         String url = HttpUtil.Upload_url;
-        JSONObject tmp = State.toJsonobject(state,aCache.getAsString(Const.Cache_User_Id));
-        Log.e("json",tmp.toString());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url,tmp,new Response.Listener<JSONObject>() {
+        JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
+        Log.e("json", tmp.toString());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 isUploadRun = false;
-                Log.e("response",response.toString());
+                Log.e("response", response.toString());
                 State tmp;
                 tmp = state;
                 tmp.setUpload(1);
@@ -684,20 +682,21 @@ public class DBService extends Service {
     /**
      * Check DB if there are some data for uploading
      */
-    public void checkPMDataForUpload(){
+    public void checkPMDataForUpload() {
 
     }
 
     /**
      * Check if Service running surpass a day
+     *
      * @param lasttime
      * @return
      */
-    private boolean isSurpass(State lasttime,State nowTime){
+    private boolean isSurpass(State lasttime, State nowTime) {
         boolean result = false;
         String last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lasttime.getTime_point()));
         String now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
-        if(last.equals(now)) result = false;
+        if (last.equals(now)) result = false;
         else result = true;
         return result;
     }
@@ -705,7 +704,7 @@ public class DBService extends Service {
     /**
      * if Service running surpass a day, then reset data parmas
      */
-    private void reset(int runtime){
+    private void reset(int runtime) {
         runtime = -1;
         longitude = 0.0;
         latitude = 0.0;
@@ -723,14 +722,14 @@ public class DBService extends Service {
         GPSInitial();
     }
 
-    private void BAIDUMapInitial(){
+    private void BAIDUMapInitial() {
         LocationService locationService = ((MyApplication) getApplication()).locationService;
         //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
         locationService.registerListener(mListener);
         //注册监听
         locationService.setLocationOption(locationService.getDefaultLocationClientOption());
-        if(Thread.currentThread() == Looper.getMainLooper().getThread() ){
-            Log.e("Mainthread","Mainthread");
+        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+            Log.e("Mainthread", "Mainthread");
 
         }
         locationService.start();// 定位SDK
@@ -744,9 +743,9 @@ public class DBService extends Service {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            Log.e("Lati",String.valueOf(location.getLatitude()));
-            Log.e("Longi",String.valueOf(location.getLongitude()));
-            Log.e("LocType",String.valueOf(location.getLocType()));
+            Log.e("Lati", String.valueOf(location.getLatitude()));
+            Log.e("Longi", String.valueOf(location.getLongitude()));
+            Log.e("LocType", String.valueOf(location.getLocType()));
             if (null != location && location.getLocType() != BDLocation.TypeServerError) {
                 StringBuffer sb = new StringBuffer(256);
                 sb.append("time : ");

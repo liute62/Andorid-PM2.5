@@ -182,106 +182,106 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_weight="1"
-        android:id="@+id/main_fig_layout_1"
-        android:layout_width="match_parent"
-        android:layout_height="165dip"
-        android:layout_below="@id/main_info_layout">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/main_fig_1_title"
-            android:id="@+id/main_chart1_title"
-            android:layout_marginLeft="20dip" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="切换"
-            android:id="@+id/main_chart_1_change"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dip"
-            android:layout_alignTop="@+id/main_chart1_title"
-            android:textColor="@color/AccentBlue"
-            android:textSize="20sp" />
-
-        <lecho.lib.hellocharts.view.ColumnChartView
-            android:id="@+id/main_chart_1_column"
+        <RelativeLayout
+            android:layout_weight="1"
+            android:id="@+id/main_fig_layout_1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/main_chart_1_change"
-            android:layout_marginTop="5dip"
-            android:layout_marginLeft="8dip"
-            android:layout_marginRight="8dip"
-            android:visibility="invisible" />
+            android:layout_height="165dip"
+            android:layout_below="@id/main_info_layout">
 
-        <lecho.lib.hellocharts.view.LineChartView
-            android:id="@+id/main_chart_1_line"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_fig_1_title"
+                android:id="@+id/main_chart1_title"
+                android:layout_marginLeft="20dip" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="切换"
+                android:id="@+id/main_chart_1_change"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dip"
+                android:layout_alignTop="@+id/main_chart1_title"
+                android:textColor="@color/AccentBlue"
+                android:textSize="20sp" />
+
+            <lecho.lib.hellocharts.view.ColumnChartView
+                android:id="@+id/main_chart_1_column"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/main_chart_1_change"
+                android:layout_marginTop="5dip"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:visibility="invisible" />
+
+            <lecho.lib.hellocharts.view.LineChartView
+                android:id="@+id/main_chart_1_line"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/main_chart_1_change"
+                android:layout_marginTop="5dip"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:visibility="invisible" />
+
+            <!--<android.support.v4.view.ViewPager-->
+            <!--android:id="@+id/main_chart_viewpager_1"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_below="@+id/main_chart_1_change"/>-->
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_weight="1"
+            android:id="@+id/main_fig_layout_2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/main_chart_1_change"
-            android:layout_marginTop="5dip"
-            android:layout_marginLeft="8dip"
-            android:layout_marginRight="8dip"
-            android:visibility="invisible" />
+            android:layout_height="165dip"
+            android:layout_below="@+id/main_fig_layout_1"
+            android:layout_marginTop="10dip">
 
-        <!--<android.support.v4.view.ViewPager-->
-        <!--android:id="@+id/main_chart_viewpager_1"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_below="@+id/main_chart_1_change"/>-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_fig_2_title"
+                android:layout_marginLeft="20dip"
+                android:id="@+id/main_chart2_title" />
 
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="切换"
+                android:id="@+id/main_chart_2_change"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dip"
+                android:layout_alignTop="@+id/main_chart2_title"
+                android:textColor="@color/AccentBlue"
+                android:textSize="20sp" />
 
-    <RelativeLayout
-        android:layout_weight="1"
-        android:id="@+id/main_fig_layout_2"
-        android:layout_width="match_parent"
-        android:layout_height="165dip"
-        android:layout_below="@+id/main_fig_layout_1"
-        android:layout_marginTop="10dip">
+            <lecho.lib.hellocharts.view.ColumnChartView
+                android:id="@+id/main_chart_2_column"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/main_chart_2_change"
+                android:layout_marginTop="5dip"
+                android:layout_marginLeft="5dip"
+                android:layout_marginRight="8dip"
+                android:visibility="invisible" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/main_fig_2_title"
-            android:layout_marginLeft="20dip"
-            android:id="@+id/main_chart2_title" />
+            <lecho.lib.hellocharts.view.LineChartView
+                android:id="@+id/main_chart_2_line"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/main_chart_2_change"
+                android:layout_marginTop="5dip"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:visibility="invisible" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="切换"
-            android:id="@+id/main_chart_2_change"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dip"
-            android:layout_alignTop="@+id/main_chart2_title"
-            android:textColor="@color/AccentBlue"
-            android:textSize="20sp" />
-
-        <lecho.lib.hellocharts.view.ColumnChartView
-            android:id="@+id/main_chart_2_column"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/main_chart_2_change"
-            android:layout_marginTop="5dip"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="8dip"
-            android:visibility="invisible" />
-
-        <lecho.lib.hellocharts.view.LineChartView
-            android:id="@+id/main_chart_2_line"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/main_chart_2_change"
-            android:layout_marginTop="5dip"
-            android:layout_marginLeft="8dip"
-            android:layout_marginRight="8dip"
-            android:visibility="invisible" />
-
-    </RelativeLayout>
+        </RelativeLayout>
     </LinearLayout>
 
 </RelativeLayout>

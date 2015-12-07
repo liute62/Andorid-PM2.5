@@ -92,10 +92,10 @@ public class LoginDialog extends Dialog implements OnClickListener {
                     }
                 }
                 if (result == 0) {
-                    Toast.makeText(mActivity.getApplicationContext(),Const.Info_Login_Empty, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Empty, Toast.LENGTH_SHORT).show();
                 }
                 if (result == 1) {
-                    Toast.makeText(mActivity.getApplicationContext(),Const.Info_Login_Short, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Short, Toast.LENGTH_SHORT).show();
                 }
                 if (result == 2) {
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Space, Toast.LENGTH_SHORT).show();
@@ -131,8 +131,8 @@ public class LoginDialog extends Dialog implements OnClickListener {
                     aCache.put(Const.Cache_User_Id, model.getUserid());
                     aCache.put(Const.Cache_Access_Token, Const.CURRENT_ACCESS_TOKEN);
                     aCache.put(Const.Cache_User_Name, Const.CURRENT_USER_NAME);
-                    aCache.put(Const.Cache_User_Nickname,Const.CURRENT_USER_NICKNAME);
-                    aCache.put(Const.Cache_User_Gender,Const.CURRENT_USER_GENDER);
+                    aCache.put(Const.Cache_User_Nickname, Const.CURRENT_USER_NICKNAME);
+                    aCache.put(Const.Cache_User_Gender, Const.CURRENT_USER_GENDER);
                     if (parentHandler != null) {
                         parentHandler.sendEmptyMessage(Const.Handler_Login_Success);
                     }

@@ -3,8 +3,6 @@ package app.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import app.Entity.State;
-
 /**
  * Created by liuhaodong1 on 15/11/11.
  */

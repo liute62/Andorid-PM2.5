@@ -25,8 +25,8 @@
             android:value="In8U2gwdA6i5Q0lyDHne342u"></meta-data>
 
         <!--<meta-data-->
-            <!--android:name="com.baidu.lbsapi.API_KEY"-->
-            <!--android:value="Xl6tX1b2u87cBZgN1erWvDgu" />-->
+        <!--android:name="com.baidu.lbsapi.API_KEY"-->
+        <!--android:value="Xl6tX1b2u87cBZgN1erWvDgu" />-->
 
         <activity
             android:name=".FirstActivity"
@@ -38,12 +38,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".NotificationActivity"></activity>
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait">
-        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name="app.bluetooth.BluetoothActivity"></activity>
-        <activity android:name=".MapActivity" ></activity>
+        <activity android:name=".MapActivity"></activity>
+
         <service
             android:name="app.services.DBService"
             android:exported="true" />
@@ -51,7 +52,9 @@
             android:name="app.bluetooth.BluetoothService"
             android:exported="true" />
     </application>
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
     <!--bluetooth-->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />

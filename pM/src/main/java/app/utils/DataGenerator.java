@@ -1,11 +1,9 @@
 package app.utils;
 
 import android.graphics.Color;
-import android.text.format.Time;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +79,7 @@ public class DataGenerator {
     }
 
     public static int setAirQualityColor(double pm) {
-       return setAirQualityColor((int) pm);
+        return setAirQualityColor((int) pm);
     }
 
     public static String setHeathHintText(int pm) {
@@ -583,7 +581,7 @@ public class DataGenerator {
         int numSubcolumns = 1;
         int numColumns = ChartsConst.Chart_X[7].length;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        if(!date.isEmpty()) {
+        if (!date.isEmpty()) {
             for (int i = numColumns - 1; i >= 0; i--) {
                 if (date.get(i) == null) break;
                 axisValues.add(numColumns - i - 1, new AxisValue(i).setLabel(date.get(numColumns - i - 1)));
@@ -690,8 +688,8 @@ public class DataGenerator {
         int numColumns = ChartsConst.Chart_X[12].length;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
 
-        if(! date.isEmpty()) {
-            for (int i = numColumns - 1; i >= 0 ; i--) {
+        if (!date.isEmpty()) {
+            for (int i = numColumns - 1; i >= 0; i--) {
                 if (date.get(i) == null) break;
                 axisValues.add(numColumns - i - 1, new AxisValue(i).setLabel(date.get(numColumns - i - 1)));
             }
@@ -724,10 +722,10 @@ public class DataGenerator {
         return data;
     }
 
-    public static double genDensityForTest(int currentHour){
-        Log.e("currentHour",String.valueOf(currentHour));
-        double pm1[] = new double[]{3,0,0,0,0,0,0,0,4,7,4,3,0,492,584,619,619,618
-        ,528,552,542,434,410,223};
+    public static double genDensityForTest(int currentHour) {
+        Log.e("currentHour", String.valueOf(currentHour));
+        double pm1[] = new double[]{3, 0, 0, 0, 0, 0, 0, 0, 4, 7, 4, 3, 0, 492, 584, 619, 619, 618
+                , 528, 552, 542, 434, 410, 223};
         return pm1[currentHour];
     }
 

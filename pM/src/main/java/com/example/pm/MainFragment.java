@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import app.model.ChartModel;
 import app.model.PMModel;
 import app.services.DBService;
 import app.utils.ACache;
@@ -47,7 +46,6 @@ import app.utils.VolleyQueue;
 import app.view.widget.LoadingDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.LineChartView;
 
@@ -106,18 +104,20 @@ public class MainFragment extends Fragment implements OnClickListener {
     LineChartView mChart1line;
     ColumnChartView mChart2column;
     LineChartView mChart2line;
-    /**Charts data**/
-    HashMap<Integer,Float> chartData1; //data for chart 1
-    HashMap<Integer,Float> chartData2; //data for chart 2
-    HashMap<Integer,Float> chartData3; //data for chart 3
-    HashMap<Integer,Float> chartData4; //data for chart 4
-    HashMap<Integer,Float> chartData5; //data for chart 5
-    HashMap<Integer,Float> chartData6; //data for chart 6
-    HashMap<Integer,Float> chartData7; //data for chart 7
+    /**
+     * Charts data
+     **/
+    HashMap<Integer, Float> chartData1; //data for chart 1
+    HashMap<Integer, Float> chartData2; //data for chart 2
+    HashMap<Integer, Float> chartData3; //data for chart 3
+    HashMap<Integer, Float> chartData4; //data for chart 4
+    HashMap<Integer, Float> chartData5; //data for chart 5
+    HashMap<Integer, Float> chartData6; //data for chart 6
+    HashMap<Integer, Float> chartData7; //data for chart 7
     List<String> chart7Date;           //date(mm.dd) for chart 7
-    HashMap<Integer,Float> chartData8; //data for chart 8
-    HashMap<Integer,Float> chartData10; //data for chart 10
-    HashMap<Integer,Float> chartData12; //data for chart 12
+    HashMap<Integer, Float> chartData8; //data for chart 8
+    HashMap<Integer, Float> chartData10; //data for chart 10
+    HashMap<Integer, Float> chartData12; //data for chart 12
     List<String> chart12Date;           //date(mm.dd) for chart 12
 
     private DBServiceReceiver dbReceiver;
@@ -151,9 +151,9 @@ public class MainFragment extends Fragment implements OnClickListener {
                 PMBreatheDay = Double.valueOf(data.getPm_breath_today());
                 PMBreatheWeekAvg = Double.valueOf(data.getPm_breath_week());
                 //meanwhile update the cache
-                aCache.put(Const.Cache_PM_LastHour,PMBreatheHour);
-                aCache.put(Const.Cache_PM_LastDay,PMBreatheDay);
-                aCache.put(Const.Cache_PM_LastWeek,PMBreatheWeekAvg);
+                aCache.put(Const.Cache_PM_LastHour, PMBreatheHour);
+                aCache.put(Const.Cache_PM_LastDay, PMBreatheDay);
+                aCache.put(Const.Cache_PM_LastWeek, PMBreatheWeekAvg);
                 dataInitial();
             }
         }
@@ -178,7 +178,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter.addAction(Const.Action_Chart_Result_2);
             intentFilter.addAction(Const.Action_Chart_Result_3);
             intentFilter.addAction(Const.Action_DB_MAIN_Location);
-            aCache.put(Const.Cache_Is_Background,"false");
+            aCache.put(Const.Cache_Is_Background, "false");
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
         super.onResume();
@@ -194,7 +194,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         PMBreatheWeekAvg = 0.0;
         currentLongitude = null;
         currentLatitude = null;
-        currentCity = "无";
         current_chart1_index = 1;
         current_chart2_index = 2;
         isClockTaskRun = false;
@@ -288,30 +287,41 @@ public class MainFragment extends Fragment implements OnClickListener {
         String longitude = aCache.getAsString(Const.Cache_Longitude);
         String latitude = aCache.getAsString(Const.Cache_Latitude);
         String city = aCache.getAsString(Const.Cache_City);
-        if(ShortcutUtil.isStringOK(access_token)){
+        if (ShortcutUtil.isStringOK(access_token)) {
             Const.CURRENT_ACCESS_TOKEN = access_token;
-        }if(ShortcutUtil.isStringOK(user_name)){
+        }
+        if (ShortcutUtil.isStringOK(user_name)) {
             Const.CURRENT_USER_NAME = user_name;
-        }if (ShortcutUtil.isStringOK(user_nickname)){
+        }
+        if (ShortcutUtil.isStringOK(user_nickname)) {
             Const.CURRENT_USER_NICKNAME = user_nickname;
-        }if(ShortcutUtil.isStringOK(user_gender)){
+        }
+        if (ShortcutUtil.isStringOK(user_gender)) {
             Const.CURRENT_USER_GENDER = user_gender;
         }
 
-        if (ShortcutUtil.isStringOK(density)){
+        if (ShortcutUtil.isStringOK(density)) {
             PMDensity = Double.valueOf(density);
-        }if(ShortcutUtil.isStringOK(pm_hour)){
+        }
+        if (ShortcutUtil.isStringOK(pm_hour)) {
             PMBreatheHour = Double.valueOf(pm_hour);
-        }if(ShortcutUtil.isStringOK(pm_day)){
+        }
+        if (ShortcutUtil.isStringOK(pm_day)) {
             PMBreatheDay = Double.valueOf(pm_day);
-        }if(ShortcutUtil.isStringOK(pm_week)){
+        }
+        if (ShortcutUtil.isStringOK(pm_week)) {
             PMBreatheWeekAvg = Double.valueOf(pm_week);
-        }if (ShortcutUtil.isStringOK(longitude)){
+        }
+        if (ShortcutUtil.isStringOK(longitude)) {
             currentLongitude = longitude;
-        }if (ShortcutUtil.isStringOK(latitude)){
+        }
+        if (ShortcutUtil.isStringOK(latitude)) {
             currentLatitude = latitude;
-        }if (ShortcutUtil.isStringOK(city)){
+        }
+        if (ShortcutUtil.isStringOK(city)) {
             currentCity = city;
+        }else {
+            currentCity = "无";
         }
 
         /*********Chart Data Initial**********/
@@ -325,20 +335,20 @@ public class MainFragment extends Fragment implements OnClickListener {
         Object chart8 = aCache.getAsObject(Const.Cache_Chart_8);
         Object chart10 = aCache.getAsObject(Const.Cache_Chart_10);
         Object chart12 = aCache.getAsObject(Const.Cache_Chart_12);
-        if(chart1 != null) chartData1 = (HashMap<Integer,Float>) chart1;
-        if(chart2 != null) chartData2 = (HashMap<Integer,Float>) chart2;
-        if(chart3 != null) chartData3 = (HashMap<Integer,Float>) chart3;
-        if(chart4 != null) chartData4 = (HashMap<Integer,Float>) chart4;
-        if(chart5 != null) chartData5 = (HashMap<Integer,Float>) chart5;
-        if(chart6 != null) chartData6 = (HashMap<Integer,Float>) chart6;
-        if(chart7 != null) {
-            chartData7 = (HashMap<Integer,Float>) chart7;
+        if (chart1 != null) chartData1 = (HashMap<Integer, Float>) chart1;
+        if (chart2 != null) chartData2 = (HashMap<Integer, Float>) chart2;
+        if (chart3 != null) chartData3 = (HashMap<Integer, Float>) chart3;
+        if (chart4 != null) chartData4 = (HashMap<Integer, Float>) chart4;
+        if (chart5 != null) chartData5 = (HashMap<Integer, Float>) chart5;
+        if (chart6 != null) chartData6 = (HashMap<Integer, Float>) chart6;
+        if (chart7 != null) {
+            chartData7 = (HashMap<Integer, Float>) chart7;
             chart7Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_7_Date);
         }
-        if(chart8 != null) chartData8 = (HashMap<Integer,Float>) chart8;
-        if(chart10 != null) chartData10 = (HashMap<Integer,Float>) chart10;
-        if(chart12 != null) {
-            chartData12 = (HashMap<Integer,Float>) chart12;
+        if (chart8 != null) chartData8 = (HashMap<Integer, Float>) chart8;
+        if (chart10 != null) chartData10 = (HashMap<Integer, Float>) chart10;
+        if (chart12 != null) {
+            chartData12 = (HashMap<Integer, Float>) chart12;
             chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
         }
     }
@@ -413,7 +423,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 mainActivity.toggle();
                 break;
             case R.id.main_hot_map:
-                Intent intent = new Intent(getActivity(),MapActivity.class);
+                Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
                 break;
             case R.id.main_chart_1_change:
@@ -469,7 +479,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     private void searchCityRequest(String lati, final String Longi) {
         String url = HttpUtil.SearchCity_url;
         url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;
-        Log.e("url",url);
+        Log.e("url", url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -482,8 +492,9 @@ public class MainFragment extends Fragment implements OnClickListener {
                     //Log.e("searchCityRequest comp",component.toString());
                     String cityName = component.getString("city");
                     //Log.e("searchCityRequest city",cityName);
-                    if(cityName != null && !cityName.trim().equals("")){
+                    if (cityName != null && !cityName.trim().equals("")) {
                         mCity.setText(cityName);
+                        aCache.put(Const.Cache_City, cityName);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -526,64 +537,77 @@ public class MainFragment extends Fragment implements OnClickListener {
                 data.what = Const.Handler_PM_Data;
                 data.obj = model;
                 mDataHandler.sendMessage(data);
-            }else if(intent.getAction().equals(Const.Action_Chart_Cache)){
-                chartData1 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_1);
-                chartData2 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_2);
-                chartData3 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_3);
-                chartData4 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_4);
-                chartData5 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_5);
-                chartData6 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_6);
-                chartData7 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_7);
+            } else if (intent.getAction().equals(Const.Action_Chart_Cache)) {
+                chartData1 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_1);
+                chartData2 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_2);
+                chartData3 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_3);
+                chartData4 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_4);
+                chartData5 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_5);
+                chartData6 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_6);
+                chartData7 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_7);
                 chart7Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_7_Date);
-                chartData8 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_8);
-                chartData10 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_10);
-                chartData12 = (HashMap<Integer,Float>) aCache.getAsObject(Const.Cache_Chart_12);
+                chartData8 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_8);
+                chartData10 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_10);
+                chartData12 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_12);
                 chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
-                chartInitial(current_chart1_index,current_chart2_index);
-            }else if(intent.getAction().equals(Const.Action_DB_MAIN_Location)){
+                chartInitial(current_chart1_index, current_chart2_index);
+            } else if (intent.getAction().equals(Const.Action_DB_MAIN_Location)) {
                 String lati = intent.getStringExtra(Const.Intent_DB_PM_Lati);
                 String longi = intent.getStringExtra(Const.Intent_DB_PM_Longi);
-                searchCityRequest(lati,longi);
-            }else if(intent.getAction().equals(Const.Action_Chart_Result_1)){
+                String last_lati = aCache.getAsString(Const.Cache_Latitude);
+                String last_longi = aCache.getAsString(Const.Cache_Longitude);
+                if (last_lati == null || last_longi == null) {
+                    aCache.put(Const.Cache_Latitude, lati);
+                    aCache.put(Const.Cache_Longitude, longi);
+                    searchCityRequest(lati, longi);
+                } else {
+                    if (last_lati.equals(lati) && last_longi.equals(longi)) {
+                        //no change
+                    } else {
+                        searchCityRequest(lati, longi);
+                    }
+                }
+
+            } else if (intent.getAction().equals(Const.Action_Chart_Result_1)) {
 //                Log.e("Action_Chart_Cache","Action_Chart_Cache");
-                HashMap data4 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart4_data);
+                HashMap data4 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart4_data);
                 chartData4 = data4;
-                aCache.put(Const.Cache_Chart_4,chartData4);
-                HashMap data5 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart5_data);
+                aCache.put(Const.Cache_Chart_4, chartData4);
+                HashMap data5 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart5_data);
                 chartData5 = data5;
-                aCache.put(Const.Cache_Chart_5,chartData5);
-                HashMap data8 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart8_data);
+                aCache.put(Const.Cache_Chart_5, chartData5);
+                HashMap data8 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart8_data);
                 chartData8 = data8;
-                aCache.put(Const.Cache_Chart_8,chartData8);
-                chartInitial(current_chart1_index,current_chart2_index);
-            }else if(intent.getAction().equals(Const.Action_Chart_Result_2)){
-                HashMap data1 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart1_data);
+                aCache.put(Const.Cache_Chart_8, chartData8);
+                chartInitial(current_chart1_index, current_chart2_index);
+            } else if (intent.getAction().equals(Const.Action_Chart_Result_2)) {
+                HashMap data1 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart1_data);
                 chartData1 = data1;
-                aCache.put(Const.Cache_Chart_1,chartData1);
-                HashMap data2 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart2_data);
+                aCache.put(Const.Cache_Chart_1, chartData1);
+                HashMap data2 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart2_data);
                 chartData2 = data2;
-                aCache.put(Const.Cache_Chart_2,chartData2);
-                HashMap data3 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart3_data);
+                aCache.put(Const.Cache_Chart_2, chartData2);
+                HashMap data3 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart3_data);
                 chartData3 = data3;
-                aCache.put(Const.Cache_Chart_3,chartData3);
-                HashMap data6 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart6_data);
+                aCache.put(Const.Cache_Chart_3, chartData3);
+                HashMap data6 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart6_data);
                 chartData6 = data6;
-                aCache.put(Const.Cache_Chart_6,chartData6);
-                HashMap data10 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart10_data);
+                aCache.put(Const.Cache_Chart_6, chartData6);
+                HashMap data10 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart10_data);
                 chartData10 = data10;
-                aCache.put(Const.Cache_Chart_10,chartData10);
-                chartInitial(current_chart1_index,current_chart2_index);
-            }else if(intent.getAction().equals(Const.Action_Chart_Result_3)){
-                HashMap data7 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart7_data);
-                ArrayList date7 = (ArrayList)intent.getExtras().getSerializable(Const.Intent_chart_7_data_date);
+                aCache.put(Const.Cache_Chart_10, chartData10);
+                chartInitial(current_chart1_index, current_chart2_index);
+            } else if (intent.getAction().equals(Const.Action_Chart_Result_3)) {
+                HashMap data7 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart7_data);
+                ArrayList date7 = (ArrayList) intent.getExtras().getSerializable(Const.Intent_chart_7_data_date);
                 chartData7 = data7;
-                aCache.put(Const.Cache_Chart_7,chartData7);
-                aCache.put(Const.Cache_Chart_7_Date,date7);
-                HashMap data12 = (HashMap)intent.getExtras().getSerializable(Const.Intent_chart12_data);
-                ArrayList date12 = (ArrayList)intent.getExtras().getSerializable(Const.Intent_chart_12_data_date);
+                aCache.put(Const.Cache_Chart_7, chartData7);
+                aCache.put(Const.Cache_Chart_7_Date, date7);
+                HashMap data12 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart12_data);
+                ArrayList date12 = (ArrayList) intent.getExtras().getSerializable(Const.Intent_chart_12_data_date);
                 chartData12 = data12;
-                aCache.put(Const.Cache_Chart_12,chartData12);
-                aCache.put(Const.Cache_Chart_12_Date,date12);
+                aCache.put(Const.Cache_Chart_12, chartData12);
+                aCache.put(Const.Cache_Chart_12_Date, date12);
                 chartInitial(current_chart1_index, current_chart2_index);
             }
         }
@@ -593,43 +617,43 @@ public class MainFragment extends Fragment implements OnClickListener {
         switch (index) {
             case 1:
 //                return DataGenerator.chart1DataGenerator(DataGenerator.generateDataForChart1());
-                  return DataGenerator.chart1DataGenerator(chartData1);
+                return DataGenerator.chart1DataGenerator(chartData1);
             case 2:
 //                return DataGenerator.chart2DataGenerator(DataGenerator.generateDataForChart2());
-                  return DataGenerator.chart2DataGenerator(chartData2);
+                return DataGenerator.chart2DataGenerator(chartData2);
             case 3:
 //                return DataGenerator.chart3DataGenerator((int) DataGenerator.generateDataForChart3().keySet().toArray()[0],
 //                        (float) DataGenerator.generateDataForChart3().values().toArray()[0]);
-                 if(chartData3.isEmpty())
-                     return DataGenerator.chart3DataGenerator(0,0.0f);
-                  return DataGenerator.chart3DataGenerator((int) chartData3.keySet().toArray()[0], (float) chartData3.values().toArray()[0]);
+                if (chartData3.isEmpty())
+                    return DataGenerator.chart3DataGenerator(0, 0.0f);
+                return DataGenerator.chart3DataGenerator((int) chartData3.keySet().toArray()[0], (float) chartData3.values().toArray()[0]);
             case 4:
 //                return DataGenerator.chart4DataGenerator(DataGenerator.generateDataForChart4());
-                  return DataGenerator.chart4DataGenerator(chartData4);
+                return DataGenerator.chart4DataGenerator(chartData4);
             case 5:
 //                return DataGenerator.chart5DataGenerator(DataGenerator.generateDataForChart5());
                 return DataGenerator.chart5DataGenerator(chartData5);
             case 6:
 //                return DataGenerator.chart6DataGenerator(DataGenerator.generateDataForChart6());
-                return  DataGenerator.chart6DataGenerator(chartData6);
+                return DataGenerator.chart6DataGenerator(chartData6);
             case 7:
 //                return DataGenerator.chart7DataGenerator(DataGenerator.generateDataForChart7(), DataGenerator.generateChart7Date());
 //                chartData7 = new HashMap<>(); chartData7.put(0,616.0f);
 //                chart7Date = chart12Date;
-                return DataGenerator.chart7DataGenerator(chartData7,chart7Date);
+                return DataGenerator.chart7DataGenerator(chartData7, chart7Date);
             case 8:
 //                return DataGenerator.chart8DataGenerator(DataGenerator.generateDataForChart8());
                 return DataGenerator.chart8DataGenerator(chartData8);
             case 10:
 //                return DataGenerator.chart10DataGenerator((int) DataGenerator.generateDataForChart10().keySet().toArray()[0],
 //                        (float) DataGenerator.generateDataForChart10().values().toArray()[0]);
-                if(chartData10.isEmpty())
-                    return DataGenerator.chart10DataGenerator(0,0.0f);
-                return DataGenerator.chart10DataGenerator((int) chartData10.keySet().toArray()[0], (float)chartData10.values().toArray()[0]);
+                if (chartData10.isEmpty())
+                    return DataGenerator.chart10DataGenerator(0, 0.0f);
+                return DataGenerator.chart10DataGenerator((int) chartData10.keySet().toArray()[0], (float) chartData10.values().toArray()[0]);
             case 12:
 //                chartData12 = new HashMap<>(); chartData12.put(0,5000.0f);
 //
-                 return DataGenerator.chart12DataGenerator(chartData12, chart12Date);
+                return DataGenerator.chart12DataGenerator(chartData12, chart12Date);
 //               return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
         }
         return null;

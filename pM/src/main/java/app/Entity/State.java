@@ -5,9 +5,6 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.PortUnreachableException;
-
-import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.ShortcutUtil;
 import nl.qbusict.cupboard.annotation.Column;
@@ -86,20 +83,20 @@ public class State {
         Log.e("upload", String.valueOf(upload));
     }
 
-    public static JSONObject toJsonobject(State state,String user_id){
+    public static JSONObject toJsonobject(State state, String user_id) {
         JSONObject object = new JSONObject();
         try {
             object.put("userid", user_id);
-            object.put("time_point",ShortcutUtil.refFormatNowDate(Long.valueOf(state.getTime_point())).substring(0,19));
-            object.put("longitude",state.getLongtitude());
-            object.put("latitude",state.getLatitude());
-            object.put("outdoor",state.getOutdoor());
-            object.put("status",state.getStatus());
-            object.put("steps",state.getSteps());
-            object.put("avg_rate",state.getAvg_rate());
-            object.put("ventilation_volume",state.getVentilation_volume());
-            object.put("pm25",state.getPm25());
-            object.put("source",state.getSource());
+            object.put("time_point", ShortcutUtil.refFormatNowDate(Long.valueOf(state.getTime_point())).substring(0, 19));
+            object.put("longitude", state.getLongtitude());
+            object.put("latitude", state.getLatitude());
+            object.put("outdoor", state.getOutdoor());
+            object.put("status", state.getStatus());
+            object.put("steps", state.getSteps());
+            object.put("avg_rate", state.getAvg_rate());
+            object.put("ventilation_volume", state.getVentilation_volume());
+            object.put("pm25", state.getPm25());
+            object.put("source", state.getSource());
         } catch (JSONException e) {
             e.printStackTrace();
         }

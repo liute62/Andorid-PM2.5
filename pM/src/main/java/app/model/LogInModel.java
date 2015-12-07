@@ -42,11 +42,14 @@ public class LogInModel extends BaseModel {
         }
         if (object.has(USERID)) {
             bean.setUserid(object.getString(USERID));
-        }if (object.has(LASTNAME)){
+        }
+        if (object.has(LASTNAME)) {
             bean.setLastname(object.getString(LASTNAME));
-        }if (object.has(FIRSTNAME)){
+        }
+        if (object.has(FIRSTNAME)) {
             bean.setFirstname(object.getString(FIRSTNAME));
-        }if (object.has(GENDER)){
+        }
+        if (object.has(GENDER)) {
             bean.setGender(object.getString(GENDER));
         }
         return bean;
