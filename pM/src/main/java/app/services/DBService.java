@@ -136,25 +136,17 @@ public class DBService extends Service {
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
-//                if (aCache.getAsObject(Const.Cache_Chart_1) == null)
                 aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
-//                if (aCache.getAsObject(Const.Cache_Chart_2) == null)
                 aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
-//                if (aCache.getAsObject(Const.Cache_Chart_3) == null)
                 aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
-//                if (aCache.getAsObject(Const.Cache_Chart_4) == null)
                 aCache.put(Const.Cache_Chart_4, DataCalculator.getIntance(db).calChart4Data());
-//                if (aCache.getAsObject(Const.Cache_Chart_5) == null)
                 aCache.put(Const.Cache_Chart_5, DataCalculator.getIntance(db).calChart5Data());
-//                if (aCache.getAsObject(Const.Cache_Chart_6) == null)
                 aCache.put(Const.Cache_Chart_6, DataCalculator.getIntance(db).calChart6Data());
                 if (aCache.getAsObject(Const.Cache_Chart_7) == null) {
                     aCache.put(Const.Cache_Chart_7, DataCalculator.getIntance(db).calChart7Data());
                     aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());
                 }
-//                if (aCache.getAsObject(Const.Cache_Chart_8) == null)
                 aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
-//                if (aCache.getAsObject(Const.Cache_Chart_10) == null)
                 aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
                 if (aCache.getAsObject(Const.Cache_Chart_12) == null) {
                     aCache.put(Const.Cache_Chart_12, DataCalculator.getIntance(db).calChart12Data());

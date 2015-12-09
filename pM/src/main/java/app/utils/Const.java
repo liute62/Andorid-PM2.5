@@ -18,6 +18,10 @@ public class Const {
 
     public static boolean CURRENT_INDOOR = false;
 
+    public static final double longitude_for_test = 116.304521;
+
+    public static final double latitude_for_test = 39.972465;
+
     /**
      * Cache*
      */

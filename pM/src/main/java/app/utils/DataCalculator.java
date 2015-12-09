@@ -2,12 +2,15 @@ package app.utils;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.Time;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import app.Entity.State;
 
@@ -230,18 +233,57 @@ public class DataCalculator {
     /**
      * return a map contains today newest time point's pm breathed result
      **/
-    public HashMap<Integer, Float> calChart3Data() {
+//    public HashMap<Integer, Float> calChart3Data() {
+//        HashMap<Integer, Float> map = new HashMap<>();
+//        if (db == null) return map;
+//        List<State> states = todayStates;
+//        if (states.isEmpty()) {
+//            return map;
+//        }
+//        State state = states.get(states.size() - 1);
+//        int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
+//        Float pm25 = Float.valueOf(state.getPm25());
+//        map.put(index, pm25);
+//        return map;
+//    }
+
+    public HashMap<Integer,Float> calChart3Data(){
         HashMap<Integer, Float> map = new HashMap<>();
         if (db == null) return map;
         List<State> states = todayStates;
         if (states.isEmpty()) {
             return map;
         }
-        State state = states.get(states.size() - 1);
-        int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
-        Float pm25 = Float.valueOf(state.getPm25());
-        map.put(index, pm25);
-        return map;
+        ArrayList<Integer> tmpIndex = new ArrayList<>();
+        for (int i = 0; i != states.size(); i++) {
+            State state = states.get(i);
+            int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
+            float pm25;
+            if (i == 0) {
+                pm25 = Float.valueOf(state.getPm25());
+            } else {
+                pm25 = Float.valueOf(state.getPm25()) - Float.valueOf(states.get(i - 1).getPm25());
+            }
+            //now we get the index of time and the pm25 of that point
+            if (map.containsKey(index)) {
+                float tmp = map.get(index).floatValue() + pm25;
+                map.put(index, tmp);
+            } else {
+                map.put(index, pm25);
+            }
+        }
+        //now accumulated
+        for(Integer key: map.keySet()){
+            tmpIndex.add(key);
+        }
+        Collections.sort(tmpIndex); //now a ascending list
+        HashMap<Integer, Float> result = new HashMap<>();
+        float sum = 0;
+        for(int i = 0; i != tmpIndex.size(); i ++){
+            sum += map.get(tmpIndex.get(i));
+            result.put(tmpIndex.get(i),sum);
+        }
+        return result;
     }
 
     /**
@@ -380,6 +422,7 @@ public class DataCalculator {
             tmpMap.put(0, Float.valueOf(states.get(0).getVentilation_volume()));
             return tmpMap;
         }
+        HashMap<Integer,Integer> tmpNumMap = new HashMap<>();
         for (int i = 1; i != states.size(); i++) {
             State state = states.get(i);
             int index = ShortcutUtil.timeToPointOfTwoHour(Long.valueOf(states.get(0).getTime_point()), Long.valueOf(state.getTime_point()));
@@ -390,32 +433,82 @@ public class DataCalculator {
             //Log.e("calChart8Data",String.valueOf(index)+" "+String.valueOf(airNow)+" "+String.valueOf(i) + " "+String.valueOf(result));
             //now we get the index of time and the air  of that point
             if (tmpMap.containsKey(index)) {
-                //calculate the sum, since we need 5 min air breathed in
+                //calculate the sum, but we need avg value of 5 min air breathed in
                 tmpMap.put(index, tmpMap.get(index) + result);
+                int tmp = tmpNumMap.get(index);
+                tmp++;
+                tmpNumMap.put(index,tmp);
             } else {
                 tmpMap.put(index, result);
+                tmpNumMap.put(index,1);
             }
         }
+        //now calculate the avg value of each point
+        for(Integer key : tmpMap.keySet()){
+            Float sum = tmpMap.get(key);
+            int num = tmpNumMap.get(key);
+            tmpMap.put(key, sum / num);
+        }
+        //DebugUtil.printMap("sss",tmpNumMap);
         return tmpMap;
     }
 
     /**
      * return a map contains today newest time point's air breathed result
      **/
-    public HashMap<Integer, Float> calChart10Data() {
+    public HashMap<Integer,Float> calChart10Data(){
         HashMap<Integer, Float> map = new HashMap<>();
         if (db == null) return map;
         List<State> states = todayStates;
         if (states.isEmpty()) {
             return map;
         }
-        State state = states.get(states.size() - 1);
-        int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
-        //Log.e("calChart10Data",String.valueOf(index));
-        Float air = Float.valueOf(state.getVentilation_volume());
-        map.put(index, air);
-        return map;
+        ArrayList<Integer> tmpIndex = new ArrayList<>();
+        for (int i = 0; i != states.size(); i++) {
+            State state = states.get(i);
+            int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
+            float air;
+            if (i == 0) {
+                air = Float.valueOf(state.getVentilation_volume());
+            } else {
+                air = Float.valueOf(state.getVentilation_volume()) - Float.valueOf(states.get(i - 1).getVentilation_volume());
+            }
+            //now we get the index of time and the air of that point
+            if (map.containsKey(index)) {
+                float tmp = map.get(index).floatValue() + air;
+                map.put(index, tmp);
+            } else {
+                map.put(index, air);
+            }
+        }
+        //now accumulated
+        for(Integer key: map.keySet()){
+            tmpIndex.add(key);
+        }
+        Collections.sort(tmpIndex); //now a ascending list
+        HashMap<Integer, Float> result = new HashMap<>();
+        float sum = 0;
+        for(int i = 0; i != tmpIndex.size(); i ++){
+            sum += map.get(tmpIndex.get(i));
+            result.put(tmpIndex.get(i),sum);
+        }
+        return result;
     }
+
+//    public HashMap<Integer, Float> calChart10Data() {
+//        HashMap<Integer, Float> map = new HashMap<>();
+//        if (db == null) return map;
+//        List<State> states = todayStates;
+//        if (states.isEmpty()) {
+//            return map;
+//        }
+//        State state = states.get(states.size() - 1);
+//        int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
+//        //Log.e("calChart10Data",String.valueOf(index));
+//        Float air = Float.valueOf(state.getVentilation_volume());
+//        map.put(index, air);
+//        return map;
+//    }
 
     /**
      * Return a map contains last week air breathed of each day. today's index is 0

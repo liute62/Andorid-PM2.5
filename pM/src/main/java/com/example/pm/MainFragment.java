@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -631,9 +632,8 @@ public class MainFragment extends Fragment implements OnClickListener {
             case 3:
 //                return DataGenerator.chart3DataGenerator((int) DataGenerator.generateDataForChart3().keySet().toArray()[0],
 //                        (float) DataGenerator.generateDataForChart3().values().toArray()[0]);
-                if (chartData3.isEmpty())
-                    return DataGenerator.chart3DataGenerator(0, 0.0f);
-                return DataGenerator.chart3DataGenerator((int) chartData3.keySet().toArray()[0], (float) chartData3.values().toArray()[0]);
+                return DataGenerator.chart3DataGenerator(chartData3);
+                //return DataGenerator.chart3DataGenerator(DataGenerator.generateDataForChart3());
             case 4:
 //                return DataGenerator.chart4DataGenerator(DataGenerator.generateDataForChart4());
                 return DataGenerator.chart4DataGenerator(chartData4);
@@ -654,9 +654,8 @@ public class MainFragment extends Fragment implements OnClickListener {
             case 10:
 //                return DataGenerator.chart10DataGenerator((int) DataGenerator.generateDataForChart10().keySet().toArray()[0],
 //                        (float) DataGenerator.generateDataForChart10().values().toArray()[0]);
-                if (chartData10.isEmpty())
-                    return DataGenerator.chart10DataGenerator(0, 0.0f);
-                return DataGenerator.chart10DataGenerator((int) chartData10.keySet().toArray()[0], (float) chartData10.values().toArray()[0]);
+                return DataGenerator.chart10DataGenerator(chartData10);
+//                return DataGenerator.chart10DataGenerator((int) chartData10.keySet().toArray()[0], (float) chartData10.values().toArray()[0]);
             case 12:
 //                chartData12 = new HashMap<>(); chartData12.put(0,5000.0f);
 //
