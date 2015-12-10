@@ -839,7 +839,7 @@ public class DataGenerator {
     }
 
     public static double genDensityForTest(int currentHour) {
-        Log.e("currentHour", String.valueOf(currentHour));
+        //Log.e("currentHour", String.valueOf(currentHour));
         double pm1[] = new double[]{3, 0, 0, 0, 0, 0, 0, 0, 4, 7, 4, 3, 0, 492, 584, 619, 619, 618
                 , 528, 552, 542, 434, 410, 223};
         return pm1[currentHour];

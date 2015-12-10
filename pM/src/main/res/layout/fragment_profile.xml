@@ -130,6 +130,11 @@
                 android:text="注册账户" />
 
             <Button
+                android:id="@+id/profile_share"
+                style="@style/main_left_button_style"
+                android:text="分享" />
+
+            <Button
                 android:id="@+id/profile_turnoff_upload"
                 style="@style/main_left_button_style"
                 android:text="关闭数据上传" />

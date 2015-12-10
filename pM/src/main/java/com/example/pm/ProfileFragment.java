@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.SyncStateContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,6 +21,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.umeng.socialize.controller.UMServiceFactory;
+import com.umeng.socialize.controller.UMSocialService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,6 +54,7 @@ public class ProfileFragment extends Fragment implements
     Button mTurnOffService;
     Button mBluetooth;
     Button mModifyPwd;
+    Button mShare;
     TextView mResetPwd;
     ACache aCache;
     InfoDialog infoDialog;
@@ -102,6 +106,7 @@ public class ProfileFragment extends Fragment implements
         mBluetooth = (Button) view.findViewById(R.id.profile_bluetooth);
         mModifyPwd = (Button) view.findViewById(R.id.profile_modify_password);
         mResetPwd = (TextView) view.findViewById(R.id.profile_reset_pwd);
+        mShare = (Button)view.findViewById(R.id.profile_share);
         checkCache();
         setListener();
         return view;
@@ -144,6 +149,7 @@ public class ProfileFragment extends Fragment implements
         mRegister.setOnClickListener(this);
         mBluetooth.setOnClickListener(this);
         mModifyPwd.setOnClickListener(this);
+        mShare.setOnClickListener(this);
     }
 
     @Override
@@ -158,6 +164,9 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_login:
                 LoginDialog loginDialog = new LoginDialog(getActivity(), loginHandler);
                 loginDialog.show();
+                break;
+            case R.id.profile_share:
+                shareProcess();
                 break;
             case R.id.profile_logout:
                 logOff();
@@ -333,6 +342,11 @@ public class ProfileFragment extends Fragment implements
                 .commit();
        MainActivity mainActivity = (MainActivity)mActivity;
        mainActivity.toggle();
+    }
+
+
+    private void shareProcess(){
+
     }
 
 }
