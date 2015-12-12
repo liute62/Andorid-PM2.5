@@ -278,4 +278,9 @@ public class Const {
     public static int[] profileImg = {
             R.drawable.shanghai, R.drawable.beijing
     };
+
+    public static String[] airDensity = {
+            "0", "50", "100", "150", "200", "300","浓度"
+    };
+
 }
