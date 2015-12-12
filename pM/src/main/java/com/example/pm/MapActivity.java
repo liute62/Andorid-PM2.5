@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.view.View;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
@@ -14,13 +15,20 @@ import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.PolygonOptions;
 import com.baidu.mapapi.map.PolylineOptions;
+import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.utils.CoordinateConverter;
+import com.baidu.mapapi.utils.DistanceUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
+import app.utils.Const;
 
 
 public class MapActivity extends Activity {
@@ -30,6 +38,7 @@ public class MapActivity extends Activity {
 
     private LatLng currentPoint;
     private HashMap<LatLng, Double> monitorPoints;
+    private HashMap<LatLng, Double> radiusPoints;
     private List<LatLng> trajectoryPoints;
     private int zooms[] = new int[]{50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000};
     public boolean ViewSettingDone = false;
@@ -37,7 +46,7 @@ public class MapActivity extends Activity {
     private int lastZoom = 15;
 
     //monitor locations
-    private static final int Location_TIME_INTERVAL = 1 * 1000;//1分钟
+    private static final int Location_TIME_INTERVAL = 100 * 1000;//1分钟
     private Handler LocationHandler = new Handler();
     private Runnable LocationRunnable = new Runnable() {
         @Override
@@ -48,7 +57,7 @@ public class MapActivity extends Activity {
     };
 
     //trajectory
-    private static final int Trajectory_TIME_INTERVAL = 1 * 1000;//1分钟
+    private static final int Trajectory_TIME_INTERVAL = 100 * 1000;//1分钟
     private Handler TrajectoryHandler = new Handler();
     private Runnable TrajectoryRunnable = new Runnable() {
         @Override
@@ -65,7 +74,8 @@ public class MapActivity extends Activity {
         setContentView(R.layout.activity_map);
 
         mMapView = (MapView) this.findViewById(R.id.bmapView);
-
+        mMapView.showZoomControls(false);
+        mMapView.showScaleControl(false);
 
         mBaiduMap = mMapView.getMap();
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
@@ -73,8 +83,8 @@ public class MapActivity extends Activity {
 
         trajectoryPoints = new ArrayList<LatLng>();
         monitorPoints = new HashMap<LatLng, Double>();
+        radiusPoints = new HashMap<>();
         simulate();
-
         //start the thread to update the location
         HandlerThread thread = new HandlerThread("MapActivity");
         thread.start();
@@ -84,6 +94,7 @@ public class MapActivity extends Activity {
         LocationHandler = new Handler(thread.getLooper());
         LocationHandler.post(LocationRunnable);
 
+        drawLegend();
 
         mBaiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
     }
@@ -168,6 +179,27 @@ public class MapActivity extends Activity {
         monitorPoints.put(p7, 240.0);
         monitorPoints.put(p8, 280.0);
         monitorPoints.put(p9, 320.0);
+
+        for (LatLng point : monitorPoints.keySet()) {
+            double distance = getMinimumDistance(point,monitorPoints.keySet());
+            Log.d("","distance"+distance);
+            radiusPoints.put(point, distance / 2);
+        }
+    }
+
+    private double getMinimumDistance(LatLng point, Set<LatLng> latLngs) {
+        double minDistance = 1000000;
+        for (LatLng latLng : latLngs) {
+            double distance = this.getDistance(point,latLng);
+            if (distance!=0&&distance<minDistance) {
+                minDistance = distance;
+            }
+        }
+        return minDistance;
+    }
+
+    private double getDistance(LatLng point, LatLng latLng) {
+        return DistanceUtil.getDistance(point,latLng);
     }
 
     private int chooseColor(double density) {
@@ -186,10 +218,55 @@ public class MapActivity extends Activity {
         }
     }
 
+    private void drawLegend() {
+        LatLngBounds bounds = mMapView.getMap().getMapStatus().bound;
+        LatLng southwest = bounds.southwest;
+        LatLng northeast = bounds.northeast;
+        double widthGPS = northeast.longitude - southwest.longitude;
+        double heightGPS = northeast.latitude - southwest.latitude;
+        String densities[] = Const.airDensity;
+        int size = densities.length;
+        double averageWidth = widthGPS/size;
+        LatLng center = mMapView.getMap().getMapStatus().target;
+        Log.d("","latlng"+southwest.latitude+" "+southwest.longitude+ " "+center.latitude);
+        LatLng startPoint = new LatLng(southwest.latitude+heightGPS/20,southwest.longitude+widthGPS/50);
+        averageWidth = averageWidth;
+        int i = 0;
+        for (i=0;i<densities.length-1;i++) {
+            LatLng endPoint = new LatLng(startPoint.latitude,startPoint.longitude+averageWidth);
+            int color = this.chooseColor(Double.valueOf(densities[i])) + 0xD0000000;
+            this.plotLine(startPoint,endPoint,color);
+            this.plotText(new LatLng(startPoint.latitude-heightGPS/80,startPoint.longitude),densities[i],0xFF000000);
+            startPoint = endPoint;
+        }
+
+        this.plotText(new LatLng(startPoint.latitude-heightGPS/80,startPoint.longitude), densities[i], 0xFF000000);
+
+    }
+
+    private void plotLine(LatLng startPoint,LatLng endPoint,int color) {
+        //add a line
+        List<LatLng> points = new ArrayList<>();
+        points.add(startPoint);points.add(endPoint);
+        OverlayOptions ooPolyline = new PolylineOptions().width(5).color(color).points(points);
+        mBaiduMap.addOverlay(ooPolyline);
+    }
+
+    private void plotText(LatLng startPoint,String text,int color) {
+        //构建文字Option对象，用于在地图上添加文字
+        OverlayOptions textOption = new TextOptions()
+                .fontSize(40)
+                .fontColor(color)
+                .text(text)
+                .position(startPoint);
+        //在地图上添加该文字对象并显示
+        mBaiduMap.addOverlay(textOption);
+    }
+
     private void drawLocation() {
         mBaiduMap.clear();
         drawTrajectory();
-
+        drawLegend();
         int zoom = (int) mBaiduMap.getMapStatus().zoom;
         int maxZoomLevel = (int) mBaiduMap.getMaxZoomLevel();
         int index = maxZoomLevel - zoom;
@@ -198,13 +275,19 @@ public class MapActivity extends Activity {
         } else if (index >= zooms.length) {
             index = zooms.length - 1;
         }
-        int radius = zooms[index] / 5;
 
         for (LatLng point : monitorPoints.keySet()) {
+            int radius = zooms[index]/5;
             double density = monitorPoints.get(point);
             int color = this.chooseColor(density);
             LatLng toPoint = this.convert(point);
-            Log.d("radius", zoom + " " + radius + " " + mBaiduMap.getMaxZoomLevel() + " " + mBaiduMap.getMinZoomLevel());
+            int maxRadius = (int) radiusPoints.get(point).doubleValue();
+            Log.d("radius", zoom + " " + maxRadius + " " + radius + " " + mBaiduMap.getMaxZoomLevel() + " " + mBaiduMap.getMinZoomLevel());
+
+            if (radius>maxRadius) {
+                radius = maxRadius;
+            }
+
             OverlayOptions ooPolyline = new CircleOptions().center(toPoint).radius(radius).fillColor(color);
             mBaiduMap.addOverlay(ooPolyline);
         }
