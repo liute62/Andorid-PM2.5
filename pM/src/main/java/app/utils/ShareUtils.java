@@ -2,6 +2,7 @@ package app.utils;
 
 import android.app.Activity;
 
+import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.controller.UMServiceFactory;
 import com.umeng.socialize.controller.UMSocialService;
 import com.umeng.socialize.media.QZoneShareContent;
@@ -18,6 +19,11 @@ public class ShareUtils {
 
     String shareContent = "shareContent";
     Activity mActivity;
+    private String QQ_APP_ID = "100424468";
+    private String QQ_APP_KEY = "c7394704798a158208a74ab60104f0ba";
+    private String WEIXIN_APP_ID = "100424468";
+    private String WEIXIN_APP_SECRETE = "c7394704798a158208a74ab60104f0ba";
+
     private final UMSocialService mController = UMServiceFactory
             .getUMSocialService("com.umeng.share");
 
@@ -40,10 +46,16 @@ public class ShareUtils {
         addWXPlatform();
     }
 
+    public void share(){
+        mController.getConfig().removePlatform( SHARE_MEDIA.RENREN, SHARE_MEDIA.DOUBAN);
+        mController.openShare(mActivity,false);
+    }
+
     private void setShareContent() {
         mController.getConfig().setSsoHandler(new SinaSsoHandler());
+        //参数1为当前Activity，参数2为开发者在QQ互联申请的APP ID，参数3为开发者在QQ互联申请的APP kEY.
         QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(mActivity,
-                "100424468", "c7394704798a158208a74ab60104f0ba");
+                QQ_APP_ID, QQ_APP_KEY);
         qZoneSsoHandler.addToSocialSDK();
         mController.setShareContent(shareContent);
 
@@ -64,8 +76,8 @@ public class ShareUtils {
     }
 
     private void addQQQZonePlatform() {
-        String appId = "100424468";
-        String appKey = "c7394704798a158208a74ab60104f0ba";
+        String appId = QQ_APP_ID;
+        String appKey = QQ_APP_KEY;
         // 添加QQ支持, 并且设置QQ分享内容的target url
         UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(mActivity,
                 appId, appKey);
@@ -84,8 +96,8 @@ public class ShareUtils {
     private void addWXPlatform() {
         // 注意：在微信授权的时候，必须传递appSecret
         // wx967daebe835fbeac是你在微信开发平台注册应用的AppID, 这里需要替换成你注册的AppID
-        String appId = "wx967daebe835fbeac";
-        String appSecret = "5bb696d9ccd75a38c8a0bfe0675559b3";
+        String appId = WEIXIN_APP_ID;
+        String appSecret = WEIXIN_APP_SECRETE;
         // 添加微信平台
         UMWXHandler wxHandler = new UMWXHandler(mActivity, appId, appSecret);
         wxHandler.addToSocialSDK();

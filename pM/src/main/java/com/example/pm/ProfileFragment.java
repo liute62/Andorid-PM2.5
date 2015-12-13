@@ -30,6 +30,7 @@ import app.services.DBService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.HttpUtil;
+import app.utils.ShareUtils;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.InfoDialog;
@@ -346,7 +347,8 @@ public class ProfileFragment extends Fragment implements
 
 
     private void shareProcess(){
-
+        ShareUtils shareUtils = new ShareUtils(mActivity);
+        shareUtils.share();
     }
 
 }

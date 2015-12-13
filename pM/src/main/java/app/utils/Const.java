@@ -4,6 +4,10 @@ import com.example.pm.R;
 
 public class Const {
 
+    public static String APP_KEY_UMENG = "566d299367e58e44cb005fe2";
+
+    public static String APP_KEY_BAIDU = "In8U2gwdA6i5Q0lyDHne342u";
+
     public static String Name_DB_Service = "app.services.DBService";
 
 //    public static String CURRENT_USER_ID = "0";
