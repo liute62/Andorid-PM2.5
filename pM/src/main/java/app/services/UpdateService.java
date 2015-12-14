@@ -32,6 +32,7 @@ import app.Entity.State;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBConstants;
+import app.utils.DBHelper;
 import app.utils.HttpUtil;
 import app.utils.VolleyQueue;
 import nl.qbusict.cupboard.QueryResultIterable;
@@ -40,14 +41,26 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by Jason on 2015/12/14.
+ * Step 1: get all not upload
+ * Step 2: get real density
+ * Step 3: insert into the database with real density
+ * Step 4: update the whole pm25
+ * Step 5: upload the real state
  */
 public class UpdateService extends Service {
-
+    private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        dbHelper = new DBHelper(getApplicationContext());
+        db = dbHelper.getReadableDatabase();
     }
 
     private void run() {
@@ -196,7 +209,7 @@ public class UpdateService extends Service {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),  new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                updateStateHasUpload(state,1);
+                updateStateHasUpload(state, 1);
                 Log.d("upload","Upload Success");
             }
         }, new Response.ErrorListener() {
