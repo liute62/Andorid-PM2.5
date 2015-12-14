@@ -63,6 +63,7 @@ public class UpdateService extends Service {
         db = dbHelper.getReadableDatabase();
     }
 
+    //main process
     private void run() {
         boolean isConnected = isNetworkAvailable(this);
         String userid = aCache.getAsString(Const.Cache_User_Id);
@@ -193,20 +194,9 @@ public class UpdateService extends Service {
     public void upload(final State state)  {
         String url = HttpUtil.Upload_url;
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("userid", state.getUserid());
-        params.put("time_point", state.getTime_point());
-        params.put("longitude", state.getLongtitude());
-        params.put("latitude", state.getLatitude());
-        params.put("outdoor", state.getOutdoor());
-        params.put("status", state.getStatus());
-        params.put("steps", state.getSteps());
-        params.put("avg_rate", state.getAvg_rate());
-        params.put("ventilation_volume", state.getVentilation_volume());
-        params.put("pm25", state.getDensity());
-        params.put("source", "2");
+        JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),  new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp,  new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 updateStateHasUpload(state, 1);
