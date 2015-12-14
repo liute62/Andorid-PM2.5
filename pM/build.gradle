@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.pm"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 23
     }
 
@@ -36,4 +36,5 @@ dependencies {
     compile 'nl.qbusict:cupboard:2.1.2'
     compile files('src/main/jniLibs/BaiduLBS_Android.jar')
     compile files('src/main/jniLibs/locSDK_6.03.jar')
+    compile project(':umeng_share_library')
 }

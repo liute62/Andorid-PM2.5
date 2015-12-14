@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
+import com.umeng.socialize.bean.SocializeConfig;
+import com.umeng.socialize.sso.UMSsoHandler;
 
 public class MainActivity extends SlidingActivity {
 
@@ -47,6 +49,15 @@ public class MainActivity extends SlidingActivity {
 
         //使用左上方icon可点，这样在onOptionsItemSelected里面才可以监听到R.id.home
         //getActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMSsoHandler ssoHandler = SocializeConfig.getSocializeConfig().getSsoHandler(requestCode);
+        if (ssoHandler != null) {
+            ssoHandler.authorizeCallBack(requestCode, resultCode, data);
+        }
     }
 
     /**

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.SyncStateContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,15 +21,16 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.umeng.socialize.controller.UMServiceFactory;
+import com.umeng.socialize.controller.UMSocialService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import app.bluetooth.BluetoothActivity;
 import app.services.DBService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.HttpUtil;
+import app.utils.ShareUtils;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.InfoDialog;
@@ -53,6 +55,7 @@ public class ProfileFragment extends Fragment implements
     Button mTurnOffService;
     Button mBluetooth;
     Button mModifyPwd;
+    Button mShare;
     TextView mResetPwd;
     ACache aCache;
     InfoDialog infoDialog;
@@ -104,6 +107,7 @@ public class ProfileFragment extends Fragment implements
         mBluetooth = (Button) view.findViewById(R.id.profile_bluetooth);
         mModifyPwd = (Button) view.findViewById(R.id.profile_modify_password);
         mResetPwd = (TextView) view.findViewById(R.id.profile_reset_pwd);
+        mShare = (Button)view.findViewById(R.id.profile_share);
         checkCache();
         setListener();
         return view;
@@ -146,6 +150,7 @@ public class ProfileFragment extends Fragment implements
         mRegister.setOnClickListener(this);
         mBluetooth.setOnClickListener(this);
         mModifyPwd.setOnClickListener(this);
+        mShare.setOnClickListener(this);
     }
 
     @Override
@@ -160,6 +165,9 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_login:
                 LoginDialog loginDialog = new LoginDialog(getActivity(), loginHandler);
                 loginDialog.show();
+                break;
+            case R.id.profile_share:
+                shareProcess();
                 break;
             case R.id.profile_logout:
                 logOff();
@@ -205,8 +213,7 @@ public class ProfileFragment extends Fragment implements
                 startActivityForResult(intent, Const.Action_Profile_Register);
                 break;
             case R.id.profile_bluetooth:
-                Intent intent1 = new Intent(mActivity, BluetoothActivity.class);
-                startActivity(intent1);
+                bluetoothProcess();
                 break;
             case R.id.profile_modify_password:
                 if (!Const.CURRENT_ACCESS_TOKEN.equals("-1")) {
@@ -326,6 +333,22 @@ public class ProfileFragment extends Fragment implements
             }
         });
         VolleyQueue.getInstance(mActivity.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void bluetoothProcess(){
+        Fragment bluetooth = new BluetoothFragment();
+        mActivity.getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content, bluetooth)
+                .commit();
+       MainActivity mainActivity = (MainActivity)mActivity;
+       mainActivity.toggle();
+    }
+
+
+    private void shareProcess(){
+        ShareUtils shareUtils = new ShareUtils(mActivity);
+        shareUtils.share();
     }
 
 }

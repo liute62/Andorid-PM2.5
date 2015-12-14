@@ -4,6 +4,10 @@ import com.example.pm.R;
 
 public class Const {
 
+    public static String APP_KEY_UMENG = "566d299367e58e44cb005fe2";
+
+    public static String APP_KEY_BAIDU = "In8U2gwdA6i5Q0lyDHne342u";
+
     public static String Name_DB_Service = "app.services.DBService";
 
 //    public static String CURRENT_USER_ID = "0";
@@ -17,6 +21,10 @@ public class Const {
     public static String CURRENT_USER_GENDER = "-1";
 
     public static boolean CURRENT_INDOOR = false;
+
+    public static final double longitude_for_test = 116.304521;
+
+    public static final double latitude_for_test = 39.972465;
 
     /**
      * Cache*
@@ -220,6 +228,10 @@ public class Const {
     public static final String Info_DB_Not_Running = "数据无法计算，请确保当前能获取到有关GPS信息";
 
     public static final String Info_DB_Insert_Date_Conflict = "失败,插入数据库时间与当前时间不一致";
+
+    public static final String Info_Bluetooth_ptc_Not_Support = "当前设备不支持蓝牙4.3协议";
+
+    public static final String Info_Bluetooth_Not_Support = "当前设备不支持蓝牙";
 
     public static String[] cityName =
             {

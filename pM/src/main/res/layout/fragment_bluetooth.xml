@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+
+<RelativeLayout
+    tools:context=".MainActivity"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:id="@+id/main_top_layout"
+        style="@style/main_top_bg_style">
+
+        <ImageView
+            android:id="@+id/bluetooth_profile"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginLeft="5dip"
+            android:src="@drawable/bt_localsonglist_move_press" />
+
+        <TextView
+            android:id="@+id/textView1"
+            style="@style/main_top_center_style"
+            android:text="蓝牙" />
+
+        <ImageView
+            android:id="@+id/bluetooth_back"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginRight="5dip"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_clear_white_48dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bluetooth_middle_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_top_layout">
+
+        <RelativeLayout
+            android:id="@+id/bluetooth_layout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="36dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/bluetooth_scan"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/ic_perm_scan_wifi_black_48dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="扫描"
+                android:layout_below="@+id/bluetooth_scan"
+                android:layout_marginTop="3dp"
+                android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/bluetooth_layout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@id/bluetooth_layout1">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bluetooth_refresh"
+            android:src="@drawable/ic_refresh_48pt" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="刷新"
+            android:id="@+id/textView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="3dp"
+            android:layout_below="@+id/bluetooth_refresh"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/bluetooth_layout3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="36dp"
+            android:layout_alignBottom="@id/bluetooth_layout1">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/bluetooth_stop"
+                android:src="@drawable/ic_clear_48pt" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="停止"
+                android:id="@+id/textView2"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="3dp"
+                android:layout_below="@+id/bluetooth_stop"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_below="@+id/bluetooth_middle_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设备列表"
+            android:textColor="@color/AccentBlue"
+            android:layout_marginLeft="18dp"
+            android:layout_marginTop="18dp"
+            android:id="@+id/textView12" />
+
+        <ListView
+            android:layout_below="@+id/textView12"
+            android:layout_marginLeft="18dp"
+            android:layout_marginRight="18dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bluetooth_device_list" />
+    </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/bluetooth_progressbar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:visibility="visible"/>
+    </FrameLayout>
+
+</RelativeLayout>

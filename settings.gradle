@@ -1,2 +1,2 @@
-include ':slidingmenu_library'
+include ':slidingmenu_library', ':umeng_share_library'
 include ':pM'

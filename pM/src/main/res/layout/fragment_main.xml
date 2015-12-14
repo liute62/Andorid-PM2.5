@@ -213,8 +213,9 @@
                 android:layout_height="match_parent"
                 android:layout_below="@id/main_chart_1_change"
                 android:layout_marginTop="5dip"
-                android:layout_marginLeft="8dip"
-                android:layout_marginRight="8dip"
+                android:paddingLeft="18dp"
+                android:paddingRight="18dp"
+                android:paddingTop="8dp"
                 android:visibility="invisible" />
 
             <lecho.lib.hellocharts.view.LineChartView
@@ -222,9 +223,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/main_chart_1_change"
+                android:paddingRight="18dp"
                 android:layout_marginTop="5dip"
-                android:layout_marginLeft="8dip"
-                android:layout_marginRight="8dip"
+                android:paddingLeft="18dp"
+                android:paddingTop="8dp"
                 android:visibility="invisible" />
 
             <!--<android.support.v4.view.ViewPager-->
@@ -266,9 +268,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/main_chart_2_change"
-                android:layout_marginTop="5dip"
-                android:layout_marginLeft="5dip"
-                android:layout_marginRight="8dip"
+                android:paddingTop="8dp"
+                android:paddingLeft="18dp"
+                android:paddingRight="18dp"
                 android:visibility="invisible" />
 
             <lecho.lib.hellocharts.view.LineChartView
@@ -276,9 +278,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/main_chart_2_change"
-                android:layout_marginTop="5dip"
-                android:layout_marginLeft="8dip"
-                android:layout_marginRight="8dip"
+                android:paddingTop="8dp"
+                android:paddingRight="18dp"
+                android:paddingLeft="18dp"
                 android:visibility="invisible" />
 
         </RelativeLayout>

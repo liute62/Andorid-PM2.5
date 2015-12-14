@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,7 +181,23 @@ public class DataGenerator {
     //Ex. 20 means 20:00pm
     public static Map<Integer, Float> generateDataForChart3() {
         Map<Integer, Float> map = new HashMap<>();
-        map.put(20, 178.5f);
+        map.put(0, 3.5f);
+        map.put(21, 14.5f);
+        map.put(22, 25.5f);
+        map.put(23, 34.3f);
+        map.put(24, 43.8f);
+        map.put(25, 57.9f);
+        map.put(26, 64.3f);
+        map.put(27, 72.4f);
+        map.put(28, 88.5f);
+        map.put(29, 96.5f);
+        map.put(30, 103.4f);
+        map.put(31, 113.9f);
+        map.put(32, 126.7f);
+        map.put(33, 137.8f);
+        map.put(34, 144.3f);
+        map.put(35, 157.2f);
+        map.put(36, 188.1f);
         return map;
     }
 
@@ -430,38 +448,87 @@ public class DataGenerator {
         return data;
     }
 
-    public static LineChartData chart3DataGenerator(int time, float result) {
-        Line line;
-        List<PointValue> values;
-        List<Line> lines = new ArrayList<Line>();
-        // Height line, add it as first line to be drawn in the background.
-        values = new ArrayList<PointValue>();
-        values.add(new PointValue(0, 0));
-        values.add(new PointValue(Float.valueOf(ChartsConst.Chart_X[1][time]), result));
-        line = new Line(values);
-        line.setColor(Color.BLUE);
-        line.setHasPoints(false);
-        line.setFilled(true);
-        line.setStrokeWidth(1);
-        lines.add(line);
-        // Data and axes
-        LineChartData data = new LineChartData(lines);
-        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
-        // value.
-        Axis distanceAxis = new Axis();
-        distanceAxis.setName("时间");
-        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
-        distanceAxis.setMaxLabelChars(4);
-        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("点".toCharArray()));
-        distanceAxis.setHasLines(true);
-        distanceAxis.setInside(true);
-        data.setAxisXBottom(distanceAxis);
-        // Speed axis
-        data.setAxisYLeft(new Axis().setName("毫克").setHasLines(true).setMaxLabelChars(3)
-                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+    public static LineChartData chart3DataGenerator(Map<Integer, Float> maps) {
+        ArrayList<Integer> tmpKey = new ArrayList<>();
+        LineChartData data;
+        int num = 0;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numPoints = maps.size();
+        for(Integer key: maps.keySet()){
+            tmpKey.add(key);
+            axisValues.add(null);
+        }
+        Collections.sort(tmpKey);
+        for(Integer key: maps.keySet()) {
+            int index = Arrays.binarySearch(tmpKey.toArray(),key);
+            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][key]));
+        }
+        int maxNumberOfLines = 1;
+        float[][] randomNumbersTab = new float[maxNumberOfLines][numPoints];
+        //data generation
+        for (Integer key: maps.keySet()) {
+            int index = Arrays.binarySearch(tmpKey.toArray(),key);
+            randomNumbersTab[0][index] = maps.get(key).floatValue();
+        }
 
+        List<Line> lines = new ArrayList<Line>();
+        for (int i = 0; i < maxNumberOfLines; ++i) {
+            List<PointValue> values = new ArrayList<PointValue>();
+            for (int j = 0; j < numPoints; ++j) {
+                values.add(new PointValue(j, randomNumbersTab[i][j]));
+            }
+
+            Line line = new Line(values);
+            line.setColor(ChartUtils.COLOR_BLUE);
+            line.setFilled(true);
+            line.setHasLines(true);
+            //line.setHasPoints(true);
+            line.setHasLabelsOnlyForSelected(true);
+            line.setStrokeWidth(2);
+            lines.add(line);
+        }
+
+        data = new LineChartData(lines);
+        Axis axisX = new Axis(axisValues);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        data.setBaseValue(Float.NEGATIVE_INFINITY);
         return data;
     }
+
+//    public static LineChartData chart3DataGenerator(int time, float result) {
+//        Line line;
+//        List<PointValue> values;
+//        List<Line> lines = new ArrayList<Line>();
+//        // Height line, add it as first line to be drawn in the background.
+//        values = new ArrayList<PointValue>();
+//        values.add(new PointValue(0, 0));
+//        values.add(new PointValue(Float.valueOf(ChartsConst.Chart_X[1][time]), result));
+//        line = new Line(values);
+//        line.setColor(Color.BLUE);
+//        line.setHasPoints(false);
+//        line.setFilled(true);
+//        line.setStrokeWidth(1);
+//        lines.add(line);
+//        // Data and axes
+//        LineChartData data = new LineChartData(lines);
+//        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
+//        // value.
+//        Axis distanceAxis = new Axis();
+//        distanceAxis.setName("时间");
+//        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
+//        distanceAxis.setMaxLabelChars(4);
+//        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("点".toCharArray()));
+//        distanceAxis.setHasLines(true);
+//        distanceAxis.setInside(true);
+//        data.setAxisXBottom(distanceAxis);
+//        // Speed axis
+//        data.setAxisYLeft(new Axis().setName("毫克").setHasLines(true).setMaxLabelChars(3)
+//                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+//
+//        return data;
+//    }
 
     public static LineChartData chart4DataGenerator(Map<Integer, Float> map) {
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
@@ -648,39 +715,88 @@ public class DataGenerator {
         return data;
     }
 
-    public static LineChartData chart10DataGenerator(int time, float result) {
-        Line line;
-        List<PointValue> values;
+    public static LineChartData chart10DataGenerator(Map<Integer, Float> maps) {
+        ArrayList<Integer> tmpKey = new ArrayList<>();
+        LineChartData data;
+        int num = 0;
+        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+        int numPoints = maps.size();
+        for(Integer key: maps.keySet()){
+            tmpKey.add(key);
+            axisValues.add(null);
+        }
+        Collections.sort(tmpKey);
+        for(Integer key: maps.keySet()) {
+            int index = Arrays.binarySearch(tmpKey.toArray(),key);
+            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][key]));
+        }
+        int maxNumberOfLines = 1;
+        float[][] randomNumbersTab = new float[maxNumberOfLines][numPoints];
+        //data generation
+        for (Integer key: maps.keySet()) {
+            int index = Arrays.binarySearch(tmpKey.toArray(),key);
+            randomNumbersTab[0][index] = maps.get(key).floatValue();
+        }
+
         List<Line> lines = new ArrayList<Line>();
+        for (int i = 0; i < maxNumberOfLines; ++i) {
+            List<PointValue> values = new ArrayList<PointValue>();
+            for (int j = 0; j < numPoints; ++j) {
+                values.add(new PointValue(j, randomNumbersTab[i][j]));
+            }
 
-        // Height line, add it as first line to be drawn in the background.
-        values = new ArrayList<PointValue>();
-        values.add(new PointValue(0, 0));
-        values.add(new PointValue(Float.valueOf(ChartsConst.Chart_X[1][time]), result));
-        line = new Line(values);
-        line.setColor(Color.BLUE);
-        line.setHasPoints(false);
-        line.setFilled(true);
-        line.setStrokeWidth(1);
-        lines.add(line);
-        // Data and axes
-        LineChartData data = new LineChartData(lines);
-        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
-        // value.
-        Axis distanceAxis = new Axis();
-        distanceAxis.setName("时间");
-        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
-        distanceAxis.setMaxLabelChars(4);
-        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("点".toCharArray()));
-        distanceAxis.setHasLines(true);
-        distanceAxis.setInside(true);
-        data.setAxisXBottom(distanceAxis);
-        // Speed axis
-        data.setAxisYLeft(new Axis().setName("升").setHasLines(true).setMaxLabelChars(3)
-                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+            Line line = new Line(values);
+            line.setColor(ChartUtils.COLOR_BLUE);
+            line.setFilled(true);
+            line.setHasLines(true);
+            line.setHasPoints(false);
+            line.setHasLabelsOnlyForSelected(true);
+            line.setStrokeWidth(2);
+            lines.add(line);
+        }
 
+        data = new LineChartData(lines);
+        Axis axisX = new Axis(axisValues);
+        Axis axisY = new Axis().setHasLines(true);
+        data.setAxisXBottom(axisX);
+        data.setAxisYLeft(axisY);
+        data.setBaseValue(Float.NEGATIVE_INFINITY);
         return data;
     }
+
+//    public static LineChartData chart10DataGenerator(int time, float result) {
+//        Line line;
+//        List<PointValue> values;
+//        List<Line> lines = new ArrayList<Line>();
+//
+//        // Height line, add it as first line to be drawn in the background.
+//        values = new ArrayList<PointValue>();
+//        values.add(new PointValue(0, 0));
+//        values.add(new PointValue(Float.valueOf(ChartsConst.Chart_X[1][time]), result));
+//        line = new Line(values);
+//        line.setColor(Color.BLUE);
+//        line.setHasPoints(false);
+//        line.setFilled(true);
+//        line.setStrokeWidth(1);
+//        lines.add(line);
+//        // Data and axes
+//        LineChartData data = new LineChartData(lines);
+//        // Distance axis(bottom X) with formatter that will ad [km] to values, remember to modify max label charts
+//        // value.
+//        Axis distanceAxis = new Axis();
+//        distanceAxis.setName("时间");
+//        distanceAxis.setTextColor(ChartUtils.COLOR_ORANGE);
+//        distanceAxis.setMaxLabelChars(4);
+//        distanceAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText("点".toCharArray()));
+//        distanceAxis.setHasLines(true);
+//        distanceAxis.setInside(true);
+//        data.setAxisXBottom(distanceAxis);
+//        // Speed axis
+//        data.setAxisYLeft(new Axis().setName("升").setHasLines(true).setMaxLabelChars(3)
+//                .setTextColor(ChartUtils.COLOR_BLUE).setInside(true));
+//
+//        return data;
+//    }
 
     public static ColumnChartData chart12DataGenerator(Map<Integer, Float> maps, List<String> date) {
         ColumnChartData data;
@@ -723,7 +839,7 @@ public class DataGenerator {
     }
 
     public static double genDensityForTest(int currentHour) {
-        Log.e("currentHour", String.valueOf(currentHour));
+        //Log.e("currentHour", String.valueOf(currentHour));
         double pm1[] = new double[]{3, 0, 0, 0, 0, 0, 0, 0, 4, 7, 4, 3, 0, 492, 584, 619, 619, 618
                 , 528, 552, 542, 434, 410, 223};
         return pm1[currentHour];
