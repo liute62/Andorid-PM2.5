@@ -41,6 +41,8 @@ public class State {
     private String source;
     @Column(DBConstants.DB_MetaData.STATE_HAS_UPLOAD)
     private int upload; //0 not upload, 1 upload success
+    @Column(DBConstants.DB_MetaData.STATE_CONNECTION)
+    private int connection;//0 not connect to network, 1 connect to network
 
     public State() {
 
@@ -49,6 +51,12 @@ public class State {
     public State(Long id, String userid, String time_point, String longtitude, String latitude,
                  String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source,
                  int upload) {
+        this(id, userid, time_point, longtitude, latitude, outdoor, status, steps, avg_rate, ventilation_volume, density, pm25, source, upload,1);
+    }
+
+    public State(Long id, String userid, String time_point, String longtitude, String latitude,
+                 String outdoor, String status, String steps, String avg_rate, String ventilation_volume, String density, String pm25, String source,
+                 int upload,int connection) {
         this.id = id;
         this.userid = userid;
         this.time_point = time_point;
@@ -214,4 +222,13 @@ public class State {
     public void setUpload(int upload) {
         this.upload = upload;
     }
+
+    public int getConnection() {
+        return  connection;
+    }
+
+    public void setConnection(int connection) {
+        this.connection = connection;
+    }
+
 }
