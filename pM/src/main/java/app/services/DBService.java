@@ -15,6 +15,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,6 +40,8 @@ import com.example.pm.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
@@ -481,9 +485,23 @@ public class DBService extends Service {
     private State calculatePM25(double longi, double lati) {
         Double breath = 0.0;
         Double density = PM25Density;
-        if (Const.CURRENT_INDOOR) {
-            density /= 3;
+
+        boolean isConnected = isNetworkAvailable(this);
+        double ratio = 1;
+        if (!isConnected) {
+            ratio = this.getLastSevenDaysInOutRatio();
+            density = ratio * density + (1-ratio)*density/3;
+            if (ratio>0.5) {
+                Const.CURRENT_INDOOR = true;
+            } else {
+                Const.CURRENT_INDOOR = false;
+            }
+        } else {
+            if (Const.CURRENT_INDOOR) {
+                density /= 3;
+            }
         }
+
         if (mMotionStatus == Const.MotionStatus.STATIC) {
             breath = Const.static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {
@@ -500,8 +518,58 @@ public class DBService extends Service {
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR ? "1" : "0",
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1", 0);
+                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1", 0, isConnected ? 1 : 0);
         return state;
+    }
+
+    /*
+    check the availabilty of the network
+     */
+    private boolean isNetworkAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) {
+        } else {
+            NetworkInfo[] info = cm.getAllNetworkInfo();
+            if (info != null) {
+                for (int i = 0; i < info.length; i++) {
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private double getLastSevenDaysInOutRatio() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        List<State> states = new ArrayList<State>();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        for (int i=1;i<=7;i++) {
+            Calendar nowTime = Calendar.getInstance();
+            nowTime.add(Calendar.DAY_OF_MONTH,-i);
+            nowTime.add(Calendar.MINUTE,-5);
+            String left = formatter.format(nowTime.getTime());
+            nowTime.add(Calendar.MINUTE, 10);
+            String right = formatter.format(nowTime.getTime());
+            List<State> temp = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", left, right).list();
+            states.addAll(temp);
+        }
+        int count = 0;
+        for (State state: states) {
+            if (state.getOutdoor().equals("1")) {
+                count++;
+            }
+        }
+        if (states.size()==0) {
+            return 0.5;
+        }
+        double ratio = count*1.0/states.size();
+        System.out.println(ratio);
+        return ratio;
     }
 
     private String calLastWeekAvgPM() {
