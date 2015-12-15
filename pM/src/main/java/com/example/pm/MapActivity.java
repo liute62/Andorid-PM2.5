@@ -7,6 +7,12 @@ import android.os.HandlerThread;
 import android.util.Log;
 import android.view.View;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.CircleOptions;
@@ -23,11 +29,19 @@ import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.mapapi.utils.DistanceUtil;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
+import app.model.Polution;
+import app.model.Position;
 import app.utils.Const;
 
 
@@ -66,6 +80,10 @@ public class MapActivity extends Activity {
             TrajectoryHandler.postDelayed(TrajectoryRunnable, Trajectory_TIME_INTERVAL);
         }
     };
+
+    private String position_result = "";
+    private String polution_result = "";
+    private String city = "上海";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +162,128 @@ public class MapActivity extends Activity {
                 lastZoom = (int) mapStatus.zoom;
         }
     };
+
+    private void sendAllpositionsRequest() {
+        RequestQueue mQueue = Volley.newRequestQueue(this);
+        String url = "http://ilab.tongji.edu.cn/pm25/web/restful/area-positions";
+        JsonObjectRequest position = new JsonObjectRequest(url,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("position", response.toString());
+                        position_result = response.toString();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("TAG", error.getMessage(), error);
+            }
+        });
+        mQueue.add(position);
+        mQueue.start();
+    }
+
+    private void sendPolutionRequest() {
+        RequestQueue mQueue = Volley.newRequestQueue(this);
+        String city = "上海";
+        String url = "http://ilab.tongji.edu.cn/pm25/web/restful/air-qualities" + "?area=" + city;
+        Log.e("url", url);
+        JsonArrayRequest polution = new JsonArrayRequest(url,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d("polution", response.toString());
+                        polution_result = response.toString();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("TAG", "Error: " + error.getMessage());
+            }
+        });
+        mQueue.add(polution);
+    }
+
+    private void getLocationDensity() {
+        Vector<Polution> polutions = getPolution(city, polution_result);
+        HashMap<String,Vector<Position>> areas = getAllPositions(position_result);
+        Vector<Position> positions = areas.get(city);
+        for (Polution polution:polutions) {
+            for (Position position:positions) {
+                if (polution.getPosition_name().equals(position.getName())) {
+                    LatLng point = new LatLng(position.getLatitude(),position.getLongtitude());
+                    monitorPoints.put(point,new Double(polution.getPM2_5()));
+                }
+            }
+        }
+        for (LatLng point : monitorPoints.keySet()) {
+            double distance = getMinimumDistance(point,monitorPoints.keySet());
+            Log.d("","distance"+distance);
+            radiusPoints.put(point, distance / 2);
+        }
+    }
+
+    private HashMap<String,Vector<Position>> getAllPositions(String result) {
+        HashMap<String,Vector<Position>> areas = new HashMap<String,Vector<Position>>();
+
+        JSONObject object;
+        try {
+            object = new JSONObject(result);
+            Iterator<String> keys = object.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                JSONArray array = object.getJSONArray(key);
+                Vector<Position> positions = new Vector<Position>();
+                for(int i=0 ; i < array.length();i++)
+                {
+                    JSONObject myjObject = array.getJSONObject(i);
+                    String position_name = myjObject.getString("position_name");
+                    double latitude = myjObject.getDouble("latitude");
+                    double longtitude = myjObject.getDouble("longtitude");
+                    String alias = myjObject.getString("alias");
+                    positions.add(new Position(position_name,latitude,longtitude,alias));
+                }
+                areas.put(key, positions);
+            }
+            return areas;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Vector<Polution> getPolution(String location,String result) {
+        if (location==null) {
+            return null;
+        }
+        Vector<Polution> polutions = new Vector<Polution>();
+        try {
+            System.out.println(result);
+            JSONArray array;
+            array = new JSONArray(result);
+            for(int i=0 ; i < array.length();i++)
+            {
+                JSONObject myjObject = array.getJSONObject(i);
+                int id = myjObject.getInt("id");
+                int aqi = myjObject.getInt("aqi");
+                String area = myjObject.getString("area");
+                String position_name = myjObject.getString("position_name");
+                String station_code = myjObject.getString("station_code");
+                int pm2_5 = myjObject.getInt("pm2_5");
+                int pm2_5_24h = myjObject.getInt("pm2_5_24h");
+                String primary_pollutant = myjObject.getString("primary_pollutant");
+                String quality = myjObject.getString("quality");
+                String time_point = myjObject.getString("time_point");
+
+                polutions.add(new Polution(id, aqi, area,position_name,station_code, pm2_5,
+                        pm2_5_24h,primary_pollutant, quality, time_point));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return polutions;
+    }
 
     //simulate the trajectory
     private void simulate() {
@@ -238,7 +378,7 @@ public class MapActivity extends Activity {
             startPoint = endPoint;
         }
 
-        this.plotText(new LatLng(startPoint.latitude-heightGPS/80,startPoint.longitude), densities[i], 0xFF000000);
+        this.plotText(new LatLng(startPoint.latitude - heightGPS / 80, startPoint.longitude), densities[i], 0xFF000000);
 
     }
 
@@ -273,7 +413,7 @@ public class MapActivity extends Activity {
         } else if (index >= zooms.length) {
             index = zooms.length - 1;
         }
-
+        initMonitorPoints();
         for (LatLng point : monitorPoints.keySet()) {
             int radius = zooms[index]/5;
             double density = monitorPoints.get(point);
@@ -288,6 +428,25 @@ public class MapActivity extends Activity {
 
             OverlayOptions ooPolyline = new CircleOptions().center(toPoint).radius(radius).fillColor(color);
             mBaiduMap.addOverlay(ooPolyline);
+        }
+    }
+
+    private void initMonitorPoints() {
+        position_result = "";
+        polution_result = "";
+        long start = System.currentTimeMillis()/1000/60;
+        this.sendAllpositionsRequest();
+        this.sendPolutionRequest();
+        long end = System.currentTimeMillis()/1000/60;
+        while (position_result==""||polution_result=="") {
+            if (end-start>2) {
+                break;
+            }
+            end = System.currentTimeMillis()/1000/60;
+        }
+        if (position_result!=""&& polution_result!="") {
+            monitorPoints.clear();
+            getLocationDensity();
         }
     }
 
@@ -324,4 +483,6 @@ public class MapActivity extends Activity {
         LatLng to = converter.coord(from).from(CoordinateConverter.CoordType.GPS).convert();
         return to;
     }
+
+
 }
