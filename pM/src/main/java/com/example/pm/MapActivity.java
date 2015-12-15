@@ -94,7 +94,7 @@ public class MapActivity extends Activity {
         LocationHandler = new Handler(thread.getLooper());
         LocationHandler.post(LocationRunnable);
 
-        drawLegend();
+        //drawLegend();
 
         mBaiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
     }
@@ -139,11 +139,9 @@ public class MapActivity extends Activity {
 
         @Override
         public void onMapStatusChangeFinish(MapStatus mapStatus) {
-            if (lastZoom != mapStatus.zoom) {
                 Log.d("zoom", "zoom is changed");
                 drawLocation();
                 lastZoom = (int) mapStatus.zoom;
-            }
         }
     };
 
