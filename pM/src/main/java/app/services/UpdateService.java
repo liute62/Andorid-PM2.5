@@ -41,7 +41,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by Jason on 2015/12/14.
- * Step 1: get all not upload
+ * Step 1: get all not connection
  * Step 2: get real density
  * Step 3: insert into the database with real density
  * Step 4: update the whole pm25
@@ -59,45 +59,51 @@ public class UpdateService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        aCache = ACache.get(getApplicationContext());
         dbHelper = new DBHelper(getApplicationContext());
         db = dbHelper.getReadableDatabase();
+        run();
     }
 
     //main process
     private void run() {
         boolean isConnected = isNetworkAvailable(this);
-        String userid = aCache.getAsString(Const.Cache_User_Id);
-        if (userid != null && !userid.equals("")) {
-            if (isConnected) {
-                synchronized (this) {
-                    List<State> states = this.getAllNotUpload();
-                    if (states != null) {
-                        while (states.size() > 0 && isConnected) {
-                            State s = states.remove(0);
-                            UpdateDensity(s);
-                        }
+        if (!isConnected) {
+            Log.d("connection","update is not start cause no network");
+            return;
+        }
+        Log.d("connection","update starts with network");
+        if (isConnected) {
+            synchronized (this) {
+                List<State> states = this.getAllNotConnection();
+                if (states != null) {
+                    while (states.size() > 0 && isConnected) {
+                        State s = states.remove(0);
+                        UpdateDensity(s);
                     }
                 }
             }
         }
+
     }
 
     /*
     get all not uploaded
      */
-    private List<State> getAllNotUpload() {
+    private List<State> getAllNotConnection() {
         Cursor c = cupboard().withDatabase(db).query(State.class).getCursor();
         QueryResultIterable<State> itr = cupboard().withCursor(c).iterate(State.class);
         try{
             List<State> siList = new ArrayList<State>();
+            Log.d("connection","not connection "+siList.size());
             for (State state:itr) {
-                if (state.getUpload()==0) {
+                if (state.getConnection()==0) {
                     siList.add(state);
                 }
             }
             return siList;
         } catch(Exception e) {
-            Log.e("error","update is fail");
+            Log.e("error","get connection is failed");
         }finally{
             c.close();
         }
@@ -107,6 +113,12 @@ public class UpdateService extends Service {
     private void updateStateDensity(State state,String density) {
         ContentValues values = new ContentValues();
         values.put(DBConstants.DB_MetaData.STATE_DENSITY_COL, density);
+        cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
+    }
+
+    private void updateStateConnection(State state,int connection) {
+        ContentValues values = new ContentValues();
+        values.put(DBConstants.DB_MetaData.STATE_CONNECTION, connection);
         cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
     }
 
@@ -139,7 +151,7 @@ public class UpdateService extends Service {
     /*
     update state with real density
      */
-    public void UpdateDensity(State state) {
+    public void UpdateDensity(final State state) {
         String url = HttpUtil.Search_PM_url + "?longitude=" + state.getLongtitude() + "&latitude=" + state.getLatitude()
                 + "&time_point=" + state.getTime_point();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
@@ -149,6 +161,8 @@ public class UpdateService extends Service {
                     String mDensity = String.valueOf(response.getDouble("PM25"));
                     //update density
                     updateStateDensity(state, mDensity);
+                    //update connection
+                    updateStateConnection(state, 1);
                     //update total pm25 volume
                     updateTotalPM25(state,mDensity);
                     //upload state and check whether upload success
