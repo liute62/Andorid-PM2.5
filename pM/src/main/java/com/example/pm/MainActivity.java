@@ -4,11 +4,12 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
-import com.umeng.socialize.bean.SocializeConfig;
-import com.umeng.socialize.sso.UMSsoHandler;
+
+import app.services.UpdateService;
 
 public class MainActivity extends SlidingActivity {
 
@@ -51,15 +52,6 @@ public class MainActivity extends SlidingActivity {
         //getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        UMSsoHandler ssoHandler = SocializeConfig.getSocializeConfig().getSsoHandler(requestCode);
-        if (ssoHandler != null) {
-            ssoHandler.authorizeCallBack(requestCode, resultCode, data);
-        }
-    }
-
     /**
      * 各个fragment间的切换
      */
@@ -81,6 +73,9 @@ public class MainActivity extends SlidingActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("resume","resume");
+        Intent intent = new Intent(MainActivity.this, UpdateService.class);
+        startService(intent);
     }
 
     @Override
@@ -92,4 +87,6 @@ public class MainActivity extends SlidingActivity {
     public boolean stopService(Intent name) {
         return super.stopService(name);
     }
+
+
 }
