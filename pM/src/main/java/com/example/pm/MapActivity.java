@@ -70,6 +70,15 @@ public class MapActivity extends Activity {
         }
     };
 
+    private  static final int Monitor_TIME_INTERVAL = 100 * 1000;
+    private Handler monitorHandler = new Handler();
+    private Runnable monitorRunnable = new Runnable() {
+        @Override
+        public void run() {
+            initMonitorPoints();
+            monitorHandler.postDelayed(monitorRunnable,Monitor_TIME_INTERVAL);
+        }
+    };
     //trajectory
     private static final int Trajectory_TIME_INTERVAL = 100 * 1000;//1分钟
     private Handler TrajectoryHandler = new Handler();
@@ -111,6 +120,9 @@ public class MapActivity extends Activity {
 
         LocationHandler = new Handler(thread.getLooper());
         LocationHandler.post(LocationRunnable);
+
+        monitorHandler = new Handler(thread.getLooper());
+        monitorHandler.post(monitorRunnable);
 
         //drawLegend();
 
@@ -208,6 +220,9 @@ public class MapActivity extends Activity {
     private void getLocationDensity() {
         Vector<Polution> polutions = getPolution(city, polution_result);
         HashMap<String,Vector<Position>> areas = getAllPositions(position_result);
+        if (areas==null) {
+            return;
+        }
         Vector<Position> positions = areas.get(city);
         for (Polution polution:polutions) {
             for (Position position:positions) {
@@ -413,7 +428,6 @@ public class MapActivity extends Activity {
         } else if (index >= zooms.length) {
             index = zooms.length - 1;
         }
-        initMonitorPoints();
         for (LatLng point : monitorPoints.keySet()) {
             int radius = zooms[index]/5;
             double density = monitorPoints.get(point);
@@ -432,18 +446,20 @@ public class MapActivity extends Activity {
     }
 
     private void initMonitorPoints() {
+        Log.d("monitor","initial monitor points");
         position_result = "";
         polution_result = "";
-        long start = System.currentTimeMillis()/1000/60;
+        long start = System.currentTimeMillis()/1000;
         this.sendAllpositionsRequest();
         this.sendPolutionRequest();
-        long end = System.currentTimeMillis()/1000/60;
+        long end = System.currentTimeMillis()/1000;
         while (position_result==""||polution_result=="") {
-            if (end-start>2) {
+            if (end-start>10) {
                 break;
             }
             end = System.currentTimeMillis()/1000/60;
         }
+        Log.d("result",polution_result+" "+position_result);
         if (position_result!=""&& polution_result!="") {
             monitorPoints.clear();
             getLocationDensity();
