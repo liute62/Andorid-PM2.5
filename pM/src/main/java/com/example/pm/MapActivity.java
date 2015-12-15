@@ -167,7 +167,7 @@ public class MapActivity extends Activity {
         LatLng p6 = new LatLng(31.230895349134, 121.63848131409);
         LatLng p7 = new LatLng(31.282497228987, 121.49191854079);
         LatLng p8 = new LatLng(31.137700846982, 121.01851301174);
-        LatLng p9 = new LatLng(31.235380803488, 121.454755557);
+        LatLng p9 = new LatLng(31.235380803488, 121.454755567);
         monitorPoints.put(p1, 20.0);
         monitorPoints.put(p2, 60.0);
         monitorPoints.put(p3, 100.0);
