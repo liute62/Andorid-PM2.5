@@ -246,4 +246,26 @@ public class ShortcutUtil {
         }
         return max - min;
     }
+
+    public static int getMaxIndexFromMap(Map<Integer,Float> map){
+        if (map.size() == 0) return 0;
+        int max = 0;
+        for (Integer key : map.keySet()){
+            if(key > max){
+                max = key;
+            }
+        }
+        return max;
+    }
+
+    public static int getMinIndexFromMap(Map<Integer,Float> map){
+        if (map.size() == 0) return 0;
+        int min = Integer.MAX_VALUE;
+        for (Integer key : map.keySet()){
+            if(key < min){
+                min = key;
+            }
+        }
+        return min;
+    }
 }

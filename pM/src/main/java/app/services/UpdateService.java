@@ -47,27 +47,34 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Step 4: update the whole pm25
  * Step 5: upload the real state
  */
-public class UpdateService extends Service {
+public class UpdateService {
+    private static UpdateService instance = null;
+    boolean isRunning;
+    private Context mContext;
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+
+    public static void run(Context context,ACache aCache,DBHelper dbHelper){
+        if(instance == null){
+            instance = new UpdateService(context,aCache,dbHelper);
+        }
+        if(instance.isRunning == false){
+            instance.runInner();
+        }
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        aCache = ACache.get(getApplicationContext());
-        dbHelper = new DBHelper(getApplicationContext());
+    private UpdateService(Context context,ACache aCache,DBHelper dbHelper){
+        this.mContext = context;
+        this.aCache = aCache;
+        this.dbHelper = dbHelper;
         db = dbHelper.getReadableDatabase();
-        run();
     }
 
     //main process
-    private void run() {
-        boolean isConnected = isNetworkAvailable(this);
+    private void runInner() {
+        isRunning = true;
+        boolean isConnected = isNetworkAvailable(mContext);
         if (!isConnected) {
             Log.d("connection","update is not start cause no network");
             return;
@@ -84,7 +91,7 @@ public class UpdateService extends Service {
                 }
             }
         }
-
+        isRunning = false;
     }
 
     /*
@@ -175,11 +182,11 @@ public class UpdateService extends Service {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
             }
         });
 
-        VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        VolleyQueue.getInstance(mContext.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     /*
@@ -229,7 +236,7 @@ public class UpdateService extends Service {
                 return headers;
             }
         };
-        VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        VolleyQueue.getInstance(mContext.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
 }

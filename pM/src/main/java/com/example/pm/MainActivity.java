@@ -73,9 +73,7 @@ public class MainActivity extends SlidingActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("resume","resume");
-        Intent intent = new Intent(MainActivity.this, UpdateService.class);
-        startService(intent);
+        Log.d("resume", "resume");
     }
 
     @Override

@@ -403,9 +403,12 @@ public class DataGenerator {
     }
 
     public static LineChartData chart2DataGenerator(Map<Integer, Float> map) {
+       int maxIndex = ShortcutUtil.getMaxIndexFromMap(map);
+//            int minIndex = ShortcutUtil.getMinIndexFromMap(map);
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
         int numberOfLines = 1;
-        int numberOfPoints = ChartsConst.Chart_X[2].length;
+       // int numberOfPoints = ChartsConst.Chart_X[2].length;
+            int numberOfPoints = maxIndex+1;
         for (int i = 0; i != numberOfPoints; i++) {
             axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[2][i]));
         }
@@ -434,6 +437,7 @@ public class DataGenerator {
             line.setFilled(false);
             line.setHasLines(true);
             line.setHasPoints(false);
+            line.setCubic(true);
             line.setHasLabelsOnlyForSelected(true);
             line.setStrokeWidth(2);
             lines.add(line);
@@ -447,6 +451,52 @@ public class DataGenerator {
         data.setBaseValue(Float.NEGATIVE_INFINITY);
         return data;
     }
+
+//    public static LineChartData chart2DataGenerator(Map<Integer, Float> map) {
+//        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+//        int numberOfLines = 1;
+//        int numberOfPoints = ChartsConst.Chart_X[2].length;
+//        for (int i = 0; i != numberOfPoints; i++) {
+//            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[2][i]));
+//        }
+//        int maxNumberOfLines = 1;
+//        float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
+//        ValueShape shape = ValueShape.CIRCLE;
+//        LineChartData data;
+//        //data generation
+//        for (int j = 0; j < numberOfPoints; ++j) {
+//            if (map.containsKey(j)) {
+//                randomNumbersTab[0][j] = map.get(j).floatValue();
+//            } else {
+//                randomNumbersTab[0][j] = 0;
+//            }
+//        }
+//        List<Line> lines = new ArrayList<Line>();
+//        for (int i = 0; i < numberOfLines; ++i) {
+//            List<PointValue> values = new ArrayList<PointValue>();
+//            for (int j = 0; j < numberOfPoints; ++j) {
+//                values.add(new PointValue(j, randomNumbersTab[i][j]));
+//            }
+//
+//            Line line = new Line(values);
+//            line.setColor(ChartUtils.COLOR_BLUE);
+//            line.setShape(shape);
+//            line.setFilled(false);
+//            line.setHasLines(true);
+//            line.setHasPoints(false);
+//            line.setHasLabelsOnlyForSelected(true);
+//            line.setStrokeWidth(2);
+//            lines.add(line);
+//        }
+//
+//        data = new LineChartData(lines);
+//        Axis axisX = new Axis(axisValues);
+//        Axis axisY = new Axis().setHasLines(true);
+//        data.setAxisXBottom(axisX);
+//        data.setAxisYLeft(axisY);
+//        data.setBaseValue(Float.NEGATIVE_INFINITY);
+//        return data;
+//    }
 
     public static LineChartData chart3DataGenerator(Map<Integer, Float> maps) {
         ArrayList<Integer> tmpKey = new ArrayList<>();
@@ -482,7 +532,7 @@ public class DataGenerator {
             line.setColor(ChartUtils.COLOR_BLUE);
             line.setFilled(true);
             line.setHasLines(true);
-            //line.setHasPoints(true);
+            line.setHasPoints(false);
             line.setHasLabelsOnlyForSelected(true);
             line.setStrokeWidth(2);
             lines.add(line);

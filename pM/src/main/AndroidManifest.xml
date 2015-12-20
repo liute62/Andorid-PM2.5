@@ -94,9 +94,6 @@
         <service
             android:name="app.bluetooth.BluetoothService"
             android:exported="true" />
-        <service
-            android:name="app.services.UpdateService"
-            android:exported="true" />
     </application>
 
     <uses-feature

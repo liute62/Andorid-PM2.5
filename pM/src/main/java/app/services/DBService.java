@@ -63,7 +63,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by liuhaodong1 on 15/11/10.
- * <p/>
+ *
  * DBService Sequences
  * -----Oncreate-----
  * 1.params Initial.
@@ -123,6 +123,14 @@ public class DBService extends Service {
     private int DBRunTime;
     private int ChartRunTime;
     ACache aCache;
+    private final int GPS_Min_Frequency = 1000 * 60 * 59;
+    private final int GPS_Min_Distance = 100;
+    private final int Indoor_Outdoor_Frequency = 1;
+    private final int upload_Frequency = 1;
+    private final int State_Much_Index = 100;
+    private final int DB_Chart_Loop = 24;
+    Location mLastLocation;
+
     private Runnable DBRunnable = new Runnable() {
         State state;
         Intent intentText;
@@ -140,7 +148,7 @@ public class DBService extends Service {
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
-                if(state != null && state.getId() > 500){
+                if(state != null && state.getId() > State_Much_Index){
                     //so many data stored, don't want to refresh every time after starting
                 }else {
                     aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
@@ -165,14 +173,16 @@ public class DBService extends Service {
             /***** DB Running Normally *****/
             if (DBCanRun) {
                 if (DBRunTime == 0) { //Initialize the state when DB start
-                    state = calculatePM25(longitude, latitude);
-                    //state = calculatePM25(116.329,39.987);
-                    //insertState(state);
-                    state.print();
-                    DBRunTime = 1;
+                    if(state != null && state.getId() > State_Much_Index){
+                        DBRunTime = 1;
+                    }else {
+                        state = calculatePM25(longitude, latitude);
+                        state.print();
+                        DBRunTime = 1;
+                    }
                 }
                 Bundle mBundle = new Bundle();
-                switch (DBRunTime % 12) { //Send chart data to mainfragment
+                switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                     case 5:
                         intentChart = new Intent(Const.Action_Chart_Result_2);
                         DataCalculator.getIntance(db).updateLastDayState();
@@ -212,12 +222,20 @@ public class DBService extends Service {
                         }
                         break;
                 }
+                boolean isUpdate = true;
                 //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
-                intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
-                intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
-                if (isBackgound.equals("false")) {
+                if(state != null && state.getId() > State_Much_Index){
+                    //to much data here, we need to slow it down, every 1 min to check it
+                    if (DBRunTime % 12 == 0)
+                        isUpdate = true;
+                    else isUpdate = false;
+                }else {
+                    intentText = new Intent(Const.Action_DB_MAIN_PMResult);
+                    intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                    intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                    intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                }
+                if (isUpdate && isBackgound.equals("false")) {
                     sendBroadcast(intentText);
                 }
                 if (DBRunTime == 12 * 60) {
@@ -254,6 +272,7 @@ public class DBService extends Service {
                 }
 
             } else {
+
                 Toast.makeText(getApplicationContext(), Const.Info_DB_Not_Running, Toast.LENGTH_SHORT).show();
             }
 
@@ -269,6 +288,7 @@ public class DBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mLastLocation = null;
         longitude = 0.0;
         latitude = 0.0;
         last_lati = -0.1;
@@ -288,7 +308,9 @@ public class DBService extends Service {
         serviceStateInitial();
         sensorInitial();
         GPSInitial();
-        //BAIDUMapInitial();
+        if (mLastLocation != null){
+            mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_Min_Frequency,GPS_Min_Distance, locationListener);
+        }
         DBRunnable.run();
     }
 
@@ -336,7 +358,7 @@ public class DBService extends Service {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("PM2.5")
+                        .setContentTitle("Bio3Air")
                         .setContentText("Service Running")
                         .setContentIntent(pendingIntent)
                         .setOngoing(true);
@@ -386,8 +408,8 @@ public class DBService extends Service {
     private void GPSInitial() {
         boolean isGPSRun = false;
         mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location = mManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if (location == null) {
+        mLastLocation = mManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (mLastLocation == null) {
             isGPSRun = false;
             mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
             Toast.makeText(getApplicationContext(), Const.Info_GPS_No_Cache, Toast.LENGTH_SHORT).show();
@@ -396,13 +418,13 @@ public class DBService extends Service {
 //            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
         } else {
             isGPSRun = true;
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
+            longitude = mLastLocation.getLongitude();
+            latitude = mLastLocation.getLatitude();
             searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
         }
 
         mManager.addGpsStatusListener(gpsStatusListener);
-        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, locationListener);
 //        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 //                Const.DB_Location_INTERVAL, 0, locationListener);
 
@@ -414,19 +436,19 @@ public class DBService extends Service {
             if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
                 //Log.e("GPS_EVENT_FIRST_FIX","yes");
             } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
-                //Log.e("GPS_EVENT_SATELLITE","yes");
-                GpsStatus gpsStatus = mManager.getGpsStatus(null);
-                int maxSatellites = gpsStatus.getMaxSatellites();
-                Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();
-                int count = 0;
-                while (it.hasNext() && count <= maxSatellites) {
-                    count++;
-                    GpsSatellite s = it.next();
-                }
+//                //Log.e("GPS_EVENT_SATELLITE","yes");
+//                GpsStatus gpsStatus = mManager.getGpsStatus(null);
+//                int maxSatellites = gpsStatus.getMaxSatellites();
+//                Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();
+//                int count = 0;
+//                while (it.hasNext() && count <= maxSatellites) {
+//                    count++;
+//                    GpsSatellite s = it.next();
+//                }
             } else if (event == GpsStatus.GPS_EVENT_STARTED) {
                 //Log.e("GPS_EVENT_STARTED","yes");
             } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
-                Log.e("GPS_EVENT_STOPPED", "yes");
+              //  Log.e("GPS_EVENT_STOPPED", "yes");
             }
         }
     };
@@ -438,6 +460,7 @@ public class DBService extends Service {
             if (location != null) {
                 Log.e(String.valueOf(latitude), String.valueOf(longitude));
                 isLocationChanged = true;
+                mLastLocation = location;
                 longitude = location.getLongitude();
                 latitude = location.getLatitude();
                 if (last_long == longitude && last_lati == latitude) {
