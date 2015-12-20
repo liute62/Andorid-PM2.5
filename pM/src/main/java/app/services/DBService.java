@@ -140,23 +140,27 @@ public class DBService extends Service {
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
-                aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
-                aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
-                aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
-                aCache.put(Const.Cache_Chart_4, DataCalculator.getIntance(db).calChart4Data());
-                aCache.put(Const.Cache_Chart_5, DataCalculator.getIntance(db).calChart5Data());
-                aCache.put(Const.Cache_Chart_6, DataCalculator.getIntance(db).calChart6Data());
-                if (aCache.getAsObject(Const.Cache_Chart_7) == null) {
-                    aCache.put(Const.Cache_Chart_7, DataCalculator.getIntance(db).calChart7Data());
-                    aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());
+                if(state != null && state.getId() > 500){
+                    //so many data stored, don't want to refresh every time after starting
+                }else {
+                    aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
+                    aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
+                    aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
+                    aCache.put(Const.Cache_Chart_4, DataCalculator.getIntance(db).calChart4Data());
+                    aCache.put(Const.Cache_Chart_5, DataCalculator.getIntance(db).calChart5Data());
+                    aCache.put(Const.Cache_Chart_6, DataCalculator.getIntance(db).calChart6Data());
+                    if (aCache.getAsObject(Const.Cache_Chart_7) == null) {
+                        aCache.put(Const.Cache_Chart_7, DataCalculator.getIntance(db).calChart7Data());
+                        aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());
+                    }
+                    aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
+                    aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
+                    if (aCache.getAsObject(Const.Cache_Chart_12) == null) {
+                        aCache.put(Const.Cache_Chart_12, DataCalculator.getIntance(db).calChart12Data());
+                        aCache.put(Const.Cache_Chart_12_Date, DataCalculator.getIntance(db).getLastWeekDate());
+                    }
+                    sendBroadcast(intentChart);
                 }
-                aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
-                aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
-                if (aCache.getAsObject(Const.Cache_Chart_12) == null) {
-                    aCache.put(Const.Cache_Chart_12, DataCalculator.getIntance(db).calChart12Data());
-                    aCache.put(Const.Cache_Chart_12_Date, DataCalculator.getIntance(db).getLastWeekDate());
-                }
-                sendBroadcast(intentChart);
             }
             /***** DB Running Normally *****/
             if (DBCanRun) {
