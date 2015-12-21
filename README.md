@@ -1,4 +1,4 @@
-# PM2.5
+# PM2.5 (please star it after you clone it and like it.「^_^」)
 
 It is an android application for PM2.5 detection and reporting.
 
@@ -22,4 +22,4 @@ It is ok for personal learning and discussion.
 
 Please don't use the source code in any commercial projects.
 
-Any Questions or comments, please contact me liuhaodong0828@gmail.com
+Any questions or comments, please contact me liuhaodong0828@gmail.com
