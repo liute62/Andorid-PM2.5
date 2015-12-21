@@ -1,4 +1,4 @@
-# PM2.5 (please star it after you clone it and like it.「^_^」)
+# PM2.5 
 
 It is an android application for PM2.5 detection and reporting.
 
@@ -16,10 +16,12 @@ It contains features as below:
 
 6. Embedded Devices Connection --- the affiliated wristband and 803 PM2.5 indoor detection devices by using bluetooth and UDP protocal.
 
-Licence: All Rights Are Reserved. 
+## Licence: All Rights Are Reserved. 
 
 It is ok for personal learning and discussion.
 
 Please don't use the source code in any commercial projects.
 
 Any questions or comments, please contact me liuhaodong0828@gmail.com
+
+(please star it after you clone it and like it.「^_^」)
