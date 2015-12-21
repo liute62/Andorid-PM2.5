@@ -230,6 +230,9 @@ public class DBService extends Service {
                         isUpdate = true;
                     else isUpdate = false;
                 }else {
+                  isUpdate = true;
+                }
+                if(isUpdate){
                     intentText = new Intent(Const.Action_DB_MAIN_PMResult);
                     intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
                     intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
