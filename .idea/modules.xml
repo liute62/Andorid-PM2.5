@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PM2.5.iml" filepath="$PROJECT_DIR$/PM2.5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Andorid-PM2.5.iml" filepath="$PROJECT_DIR$/Andorid-PM2.5.iml" />
       <module fileurl="file://$PROJECT_DIR$/pM/pM.iml" filepath="$PROJECT_DIR$/pM/pM.iml" />
       <module fileurl="file://$PROJECT_DIR$/slidingmenu_library/slidingmenu_library.iml" filepath="$PROJECT_DIR$/slidingmenu_library/slidingmenu_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/umeng_share_library/umeng_share_library.iml" filepath="$PROJECT_DIR$/umeng_share_library/umeng_share_library.iml" />
     </modules>
   </component>
 </project>
+

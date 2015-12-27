@@ -276,7 +276,8 @@ public class DBService extends Service {
 
             } else {
 
-                Toast.makeText(getApplicationContext(), Const.Info_DB_Not_Running, Toast.LENGTH_SHORT).show();
+                //Todo using a more soft way to notify user.
+                //Toast.makeText(getApplicationContext(), Const.Info_DB_Not_Running, Toast.LENGTH_SHORT).show();
             }
 
             DBHandler.postDelayed(DBRunnable, Const.DB_Run_Time_INTERVAL);
@@ -410,15 +411,23 @@ public class DBService extends Service {
 
     private void GPSInitial() {
         boolean isGPSRun = false;
+        String provider = null;
+        String[] providers = {LocationManager.GPS_PROVIDER,LocationManager.PASSIVE_PROVIDER,LocationManager.NETWORK_PROVIDER};
         mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mLastLocation = mManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        for (int i = 0; i != providers.length; i++){
+            if(mManager.isProviderEnabled(providers[i])){
+                provider = providers[i];
+            }
+        }
+        if (provider != null)
+            mLastLocation = mManager.getLastKnownLocation(provider);
         if (mLastLocation == null) {
-            isGPSRun = false;
-            mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            for (int i = 0; i != providers.length; i++){
+                if(mManager.isProviderEnabled(providers[i])){
+                    mManager.requestLocationUpdates(providers[i], 0, 0, locationListener);
+                }
+            }
             Toast.makeText(getApplicationContext(), Const.Info_GPS_No_Cache, Toast.LENGTH_SHORT).show();
-//            longitude = Const.longitude_for_test;
-//            latitude = Const.latitude_for_test;
-//            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
         } else {
             isGPSRun = true;
             longitude = mLastLocation.getLongitude();
@@ -427,10 +436,6 @@ public class DBService extends Service {
         }
 
         mManager.addGpsStatusListener(gpsStatusListener);
-        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0, locationListener);
-//        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-//                Const.DB_Location_INTERVAL, 0, locationListener);
-
     }
 
     GpsStatus.Listener gpsStatusListener = new GpsStatus.Listener() {
@@ -439,15 +444,6 @@ public class DBService extends Service {
             if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
                 //Log.e("GPS_EVENT_FIRST_FIX","yes");
             } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
-//                //Log.e("GPS_EVENT_SATELLITE","yes");
-//                GpsStatus gpsStatus = mManager.getGpsStatus(null);
-//                int maxSatellites = gpsStatus.getMaxSatellites();
-//                Iterator<GpsSatellite> it = gpsStatus.getSatellites().iterator();
-//                int count = 0;
-//                while (it.hasNext() && count <= maxSatellites) {
-//                    count++;
-//                    GpsSatellite s = it.next();
-//                }
             } else if (event == GpsStatus.GPS_EVENT_STARTED) {
                 //Log.e("GPS_EVENT_STARTED","yes");
             } else if (event == GpsStatus.GPS_EVENT_STOPPED) {

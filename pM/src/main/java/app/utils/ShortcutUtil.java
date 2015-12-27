@@ -268,4 +268,18 @@ public class ShortcutUtil {
         }
         return min;
     }
+
+    public static int findMaxKeyDistance(Map<Integer,Float> map){
+        if (map.size() == 0) return 0;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for (Integer key:map.keySet()){
+            if(key < min){
+                min = key;
+            }if(key > max){
+                max = key;
+            }
+        }
+        return max - min;
+    }
 }

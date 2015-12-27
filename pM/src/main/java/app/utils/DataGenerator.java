@@ -499,26 +499,45 @@ public class DataGenerator {
 //    }
 
     public static LineChartData chart3DataGenerator(Map<Integer, Float> maps) {
+        for (Integer key: maps.keySet()){
+            Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
+        }
         ArrayList<Integer> tmpKey = new ArrayList<>();
         LineChartData data;
         int num = 0;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        int numPoints = maps.size();
-        for(Integer key: maps.keySet()){
-            tmpKey.add(key);
+        int numPoints = ShortcutUtil.findMaxKeyDistance(maps)+1;
+        int start = ShortcutUtil.getMinIndexFromMap(maps);
+        int end = ShortcutUtil.getMaxIndexFromMap(maps);
+        Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
+        for(int i = start; i <= end;i++){
+            tmpKey.add(start);
             axisValues.add(null);
         }
         Collections.sort(tmpKey);
-        for(Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][key]));
+        int index = 0;
+        for(Integer i = start; i <= end; i++) {
+            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][i]));
+            index++;
         }
         int maxNumberOfLines = 1;
         float[][] randomNumbersTab = new float[maxNumberOfLines][numPoints];
         //data generation
-        for (Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            randomNumbersTab[0][index] = maps.get(key).floatValue();
+        index = 0;
+        for (Integer i = start; i <=end; i++) {
+            if(maps.containsKey(i)){
+                //means value changed
+                randomNumbersTab[0][index] = maps.get(i).floatValue();
+            }else {
+                //means value not changed,we use the nearest value.
+                for(Integer j = i;j >= start; j--){
+                    if(maps.containsKey(j)){
+                        randomNumbersTab[0][index] = maps.get(j).floatValue();
+                        break;
+                    }
+                }
+            }
+            index++;
         }
 
         List<Line> lines = new ArrayList<Line>();
@@ -766,26 +785,45 @@ public class DataGenerator {
     }
 
     public static LineChartData chart10DataGenerator(Map<Integer, Float> maps) {
+        for (Integer key: maps.keySet()){
+            Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
+        }
         ArrayList<Integer> tmpKey = new ArrayList<>();
         LineChartData data;
         int num = 0;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        int numPoints = maps.size();
-        for(Integer key: maps.keySet()){
-            tmpKey.add(key);
+        int numPoints = ShortcutUtil.findMaxKeyDistance(maps)+1;
+        int start = ShortcutUtil.getMinIndexFromMap(maps);
+        int end = ShortcutUtil.getMaxIndexFromMap(maps);
+        Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
+        for(int i = start; i <= end;i++){
+            tmpKey.add(start);
             axisValues.add(null);
         }
         Collections.sort(tmpKey);
-        for(Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][key]));
+        int index = 0;
+        for(Integer i = start; i <= end; i++) {
+            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][i]));
+            index++;
         }
         int maxNumberOfLines = 1;
         float[][] randomNumbersTab = new float[maxNumberOfLines][numPoints];
         //data generation
-        for (Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            randomNumbersTab[0][index] = maps.get(key).floatValue();
+        index = 0;
+        for (Integer i = start; i <=end; i++) {
+            if(maps.containsKey(i)){
+                //means value changed
+                randomNumbersTab[0][index] = maps.get(i).floatValue();
+            }else {
+                //means value not changed,we use the nearest value.
+                for(Integer j = i;j >= start; j--){
+                    if(maps.containsKey(j)){
+                        randomNumbersTab[0][index] = maps.get(j).floatValue();
+                        break;
+                    }
+                }
+            }
+            index++;
         }
 
         List<Line> lines = new ArrayList<Line>();
