@@ -37,6 +37,7 @@ import com.example.pm.MainActivity;
 import com.example.pm.MyApplication;
 import com.example.pm.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -727,6 +728,7 @@ public class DBService extends Service {
             public void onResponse(JSONObject response) {
                 isUploadRun = false;
                 Log.e("response", response.toString());
+
                 State tmp;
                 tmp = state;
                 tmp.setUpload(1);
@@ -749,7 +751,52 @@ public class DBService extends Service {
      * Check DB if there are some data for uploading
      */
     public void checkPMDataForUpload() {
+        Log.d("upload","upload batch start");
+        final List<State> states = (List<State>) cupboard().withDatabase(db).query(State.class).withSelection("upload=?","0");
+        isUploadRun = true;
+        String url = HttpUtil.UploadBatch_url;
+        JSONArray array = new JSONArray();
+        for (State state:states) {
+            JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
+            array.put(tmp);
+        }
+        JSONObject batchData = null;
+        try {
+            batchData = new JSONObject();
+            batchData.put("data",array);
+        }  catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                isUploadRun = false;
+                Log.e("response", response.toString());
+                try {
+                    String value = response.getString("succeed_count");
+                    if (Integer.valueOf(value)==states.size()) {
+                        for (State state:states) {
+                            State tmp;
+                            tmp = state;
+                            tmp.setUpload(1);
+                            insertState(tmp);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                isUploadRun = false;
+                Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+        VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     /**
