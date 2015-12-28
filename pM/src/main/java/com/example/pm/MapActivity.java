@@ -1,12 +1,15 @@
 package com.example.pm;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -40,9 +43,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import app.model.PMModel;
 import app.model.Polution;
 import app.model.Position;
 import app.utils.Const;
+import app.utils.HttpUtil;
+import app.utils.VolleyQueue;
 
 
 public class MapActivity extends Activity {
@@ -75,7 +81,7 @@ public class MapActivity extends Activity {
     private Runnable monitorRunnable = new Runnable() {
         @Override
         public void run() {
-            initMonitorPoints();
+            //initMonitorPoints();
             monitorHandler.postDelayed(monitorRunnable,Monitor_TIME_INTERVAL);
         }
     };
@@ -177,12 +183,11 @@ public class MapActivity extends Activity {
 
     private void sendAllpositionsRequest() {
         RequestQueue mQueue = Volley.newRequestQueue(this);
-        String url = "http://ilab.tongji.edu.cn/pm25/web/restful/area-positions";
-        JsonObjectRequest position = new JsonObjectRequest(url,
-                null,
-                new Response.Listener<JSONObject>() {
+        String url = "http://ilab.tongji.edu.cn/pm25/web/restful/area-positions?area=上海";
+        JsonArrayRequest position = new JsonArrayRequest(url,
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(JSONArray response) {
                         Log.d("position", response.toString());
                         position_result = response.toString();
                     }
@@ -217,20 +222,49 @@ public class MapActivity extends Activity {
         mQueue.add(polution);
     }
 
+    private void searchPMRequest(final Position position) {
+        String url = HttpUtil.Search_PM_url;
+        url = url + "?longitude=" + position.getLongtitude() + "&latitude=" + position.getLatitude();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    PMModel pmModel = PMModel.parse(response);
+                    Double PM25Density = Double.valueOf(pmModel.getPm25());
+                    position.setDensity(PM25Density.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.e("searchPMRequest resp", response.toString());
+                Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+        VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
     private void getLocationDensity() {
-        Vector<Polution> polutions = getPolution(city, polution_result);
+        //Vector<Polution> polutions = getPolution(city, polution_result);
         HashMap<String,Vector<Position>> areas = getAllPositions(position_result);
         if (areas==null) {
             return;
         }
         Vector<Position> positions = areas.get(city);
-        for (Polution polution:polutions) {
-            for (Position position:positions) {
-                if (polution.getPosition_name().equals(position.getName())) {
-                    LatLng point = new LatLng(position.getLatitude(),position.getLongtitude());
-                    monitorPoints.put(point,new Double(polution.getPM2_5()));
-                }
+        for (Position position:positions) {
+            searchPMRequest(position);
+        }
+        for (Position position:positions) {
+            String density = position.getDensity();
+            if (density.equals("")) {
+                density = "0";
             }
+            Log.d("result",position.getName()+" "+position.getLatitude()+" "+position.getLongtitude()+" "+position.getDensity());
+            monitorPoints.put(new LatLng(position.getLatitude(), position.getLongtitude()), Double.valueOf(density));
         }
         for (LatLng point : monitorPoints.keySet()) {
             double distance = getMinimumDistance(point,monitorPoints.keySet());
@@ -241,26 +275,33 @@ public class MapActivity extends Activity {
 
     private HashMap<String,Vector<Position>> getAllPositions(String result) {
         HashMap<String,Vector<Position>> areas = new HashMap<String,Vector<Position>>();
-
-        JSONObject object;
+        Log.d("here","getAllPositions");
+        JSONArray arrays;
         try {
-            object = new JSONObject(result);
-            Iterator<String> keys = object.keys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                JSONArray array = object.getJSONArray(key);
-                Vector<Position> positions = new Vector<Position>();
-                for(int i=0 ; i < array.length();i++)
-                {
-                    JSONObject myjObject = array.getJSONObject(i);
-                    String position_name = myjObject.getString("position_name");
-                    double latitude = myjObject.getDouble("latitude");
-                    double longtitude = myjObject.getDouble("longtitude");
-                    String alias = myjObject.getString("alias");
-                    positions.add(new Position(position_name,latitude,longtitude,alias));
+            arrays = new JSONArray(result);
+            Log.d("count",arrays.length()+"");
+            for(int i=0 ; i < arrays.length();i++)
+            {
+                JSONObject myObject = arrays.getJSONObject(i);
+                Iterator<String> keys = myObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    if (key.equals(city)) {
+                        JSONArray array = myObject.getJSONArray(key);
+                        Vector<Position> positions = new Vector<Position>();
+                        for (int j = 0; j < array.length(); j++) {
+                            JSONObject myjObject = array.getJSONObject(j);
+                            String position_name = myjObject.getString("position_name");
+                            double latitude = myjObject.getDouble("latitude");
+                            double longtitude = myjObject.getDouble("longtitude");
+                            String alias = myjObject.getString("alias");
+                            positions.add(new Position(position_name, latitude, longtitude, alias));
+                        }
+                        areas.put(key, positions);
+                    }
                 }
-                areas.put(key, positions);
             }
+            Log.d("here","area");
             return areas;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -408,7 +449,7 @@ public class MapActivity extends Activity {
     private void plotText(LatLng startPoint,String text,int color) {
         //构建文字Option对象，用于在地图上添加文字
         OverlayOptions textOption = new TextOptions()
-                .fontSize(40)
+                .fontSize(30)
                 .fontColor(color)
                 .text(text)
                 .position(startPoint);
@@ -451,16 +492,16 @@ public class MapActivity extends Activity {
         polution_result = "";
         long start = System.currentTimeMillis()/1000;
         this.sendAllpositionsRequest();
-        this.sendPolutionRequest();
+        //this.sendPolutionRequest();
         long end = System.currentTimeMillis()/1000;
-        while (position_result==""||polution_result=="") {
+        while (position_result=="") {
             if (end-start>10) {
                 break;
             }
             end = System.currentTimeMillis()/1000/60;
         }
-        Log.d("result",polution_result+" "+position_result);
-        if (position_result!=""&& polution_result!="") {
+        Log.d("result", polution_result + " " + position_result);
+        if (position_result!="") {
             monitorPoints.clear();
             getLocationDensity();
         }
