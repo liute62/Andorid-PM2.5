@@ -38,7 +38,7 @@ public class ShareUtils {
         // 添加QQ、QZone平台
         addQQQZonePlatform();
         // 添加微信、微信朋友圈平台
-        addWXPlatform();
+        //addWXPlatform();
     }
 
     private void addCustomPlatforms() {
@@ -106,5 +106,6 @@ public class ShareUtils {
         UMWXHandler wxCircleHandler = new UMWXHandler(mActivity, appId, appSecret);
         wxCircleHandler.setToCircle(true);
         wxCircleHandler.addToSocialSDK();
+        setShareContent();
     }
 }

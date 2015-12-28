@@ -225,13 +225,15 @@ public class Const {
 
     public static final String Info_GPS_No_Cache = "无法获取上次定位信息";
 
-    public static final String Info_DB_Not_Running = "数据无法计算，请确保当前能获取到有关GPS信息";
+    public static final String Info_DB_Not_Running = "无GPS信息,数据无法计算,请退出登录后重试";
 
     public static final String Info_DB_Insert_Date_Conflict = "失败,插入数据库时间与当前时间不一致";
 
     public static final String Info_Bluetooth_ptc_Not_Support = "当前设备不支持蓝牙4.3协议";
 
     public static final String Info_Bluetooth_Not_Support = "当前设备不支持蓝牙";
+
+    public static final String Info_Away_Station_Range = "尊敬的用户，您目前所处位置，已经距最近的大气污染物监测台站超过60公里，您PM2.5吸入量的测算值的准确度有可能下降";
 
     public static String[] cityName =
             {

@@ -403,9 +403,12 @@ public class DataGenerator {
     }
 
     public static LineChartData chart2DataGenerator(Map<Integer, Float> map) {
+       int maxIndex = ShortcutUtil.getMaxIndexFromMap(map);
+//            int minIndex = ShortcutUtil.getMinIndexFromMap(map);
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
         int numberOfLines = 1;
-        int numberOfPoints = ChartsConst.Chart_X[2].length;
+       // int numberOfPoints = ChartsConst.Chart_X[2].length;
+            int numberOfPoints = maxIndex+1;
         for (int i = 0; i != numberOfPoints; i++) {
             axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[2][i]));
         }
@@ -434,6 +437,7 @@ public class DataGenerator {
             line.setFilled(false);
             line.setHasLines(true);
             line.setHasPoints(false);
+            line.setCubic(true);
             line.setHasLabelsOnlyForSelected(true);
             line.setStrokeWidth(2);
             lines.add(line);
@@ -448,27 +452,92 @@ public class DataGenerator {
         return data;
     }
 
+//    public static LineChartData chart2DataGenerator(Map<Integer, Float> map) {
+//        List<AxisValue> axisValues = new ArrayList<AxisValue>();
+//        int numberOfLines = 1;
+//        int numberOfPoints = ChartsConst.Chart_X[2].length;
+//        for (int i = 0; i != numberOfPoints; i++) {
+//            axisValues.add(i, new AxisValue(i).setLabel(ChartsConst.Chart_X[2][i]));
+//        }
+//        int maxNumberOfLines = 1;
+//        float[][] randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
+//        ValueShape shape = ValueShape.CIRCLE;
+//        LineChartData data;
+//        //data generation
+//        for (int j = 0; j < numberOfPoints; ++j) {
+//            if (map.containsKey(j)) {
+//                randomNumbersTab[0][j] = map.get(j).floatValue();
+//            } else {
+//                randomNumbersTab[0][j] = 0;
+//            }
+//        }
+//        List<Line> lines = new ArrayList<Line>();
+//        for (int i = 0; i < numberOfLines; ++i) {
+//            List<PointValue> values = new ArrayList<PointValue>();
+//            for (int j = 0; j < numberOfPoints; ++j) {
+//                values.add(new PointValue(j, randomNumbersTab[i][j]));
+//            }
+//
+//            Line line = new Line(values);
+//            line.setColor(ChartUtils.COLOR_BLUE);
+//            line.setShape(shape);
+//            line.setFilled(false);
+//            line.setHasLines(true);
+//            line.setHasPoints(false);
+//            line.setHasLabelsOnlyForSelected(true);
+//            line.setStrokeWidth(2);
+//            lines.add(line);
+//        }
+//
+//        data = new LineChartData(lines);
+//        Axis axisX = new Axis(axisValues);
+//        Axis axisY = new Axis().setHasLines(true);
+//        data.setAxisXBottom(axisX);
+//        data.setAxisYLeft(axisY);
+//        data.setBaseValue(Float.NEGATIVE_INFINITY);
+//        return data;
+//    }
+
     public static LineChartData chart3DataGenerator(Map<Integer, Float> maps) {
+        for (Integer key: maps.keySet()){
+            Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
+        }
         ArrayList<Integer> tmpKey = new ArrayList<>();
         LineChartData data;
         int num = 0;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        int numPoints = maps.size();
-        for(Integer key: maps.keySet()){
-            tmpKey.add(key);
+        int numPoints = ShortcutUtil.findMaxKeyDistance(maps)+1;
+        int start = ShortcutUtil.getMinIndexFromMap(maps);
+        int end = ShortcutUtil.getMaxIndexFromMap(maps);
+        Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
+        for(int i = start; i <= end;i++){
+            tmpKey.add(start);
             axisValues.add(null);
         }
         Collections.sort(tmpKey);
-        for(Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][key]));
+        int index = 0;
+        for(Integer i = start; i <= end; i++) {
+            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][i]));
+            index++;
         }
         int maxNumberOfLines = 1;
         float[][] randomNumbersTab = new float[maxNumberOfLines][numPoints];
         //data generation
-        for (Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            randomNumbersTab[0][index] = maps.get(key).floatValue();
+        index = 0;
+        for (Integer i = start; i <=end; i++) {
+            if(maps.containsKey(i)){
+                //means value changed
+                randomNumbersTab[0][index] = maps.get(i).floatValue();
+            }else {
+                //means value not changed,we use the nearest value.
+                for(Integer j = i;j >= start; j--){
+                    if(maps.containsKey(j)){
+                        randomNumbersTab[0][index] = maps.get(j).floatValue();
+                        break;
+                    }
+                }
+            }
+            index++;
         }
 
         List<Line> lines = new ArrayList<Line>();
@@ -482,7 +551,7 @@ public class DataGenerator {
             line.setColor(ChartUtils.COLOR_BLUE);
             line.setFilled(true);
             line.setHasLines(true);
-            //line.setHasPoints(true);
+            line.setHasPoints(false);
             line.setHasLabelsOnlyForSelected(true);
             line.setStrokeWidth(2);
             lines.add(line);
@@ -716,26 +785,45 @@ public class DataGenerator {
     }
 
     public static LineChartData chart10DataGenerator(Map<Integer, Float> maps) {
+        for (Integer key: maps.keySet()){
+            Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
+        }
         ArrayList<Integer> tmpKey = new ArrayList<>();
         LineChartData data;
         int num = 0;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        int numPoints = maps.size();
-        for(Integer key: maps.keySet()){
-            tmpKey.add(key);
+        int numPoints = ShortcutUtil.findMaxKeyDistance(maps)+1;
+        int start = ShortcutUtil.getMinIndexFromMap(maps);
+        int end = ShortcutUtil.getMaxIndexFromMap(maps);
+        Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
+        for(int i = start; i <= end;i++){
+            tmpKey.add(start);
             axisValues.add(null);
         }
         Collections.sort(tmpKey);
-        for(Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][key]));
+        int index = 0;
+        for(Integer i = start; i <= end; i++) {
+            axisValues.set(index, new AxisValue(index).setLabel(ChartsConst.Chart_X[1][i]));
+            index++;
         }
         int maxNumberOfLines = 1;
         float[][] randomNumbersTab = new float[maxNumberOfLines][numPoints];
         //data generation
-        for (Integer key: maps.keySet()) {
-            int index = Arrays.binarySearch(tmpKey.toArray(),key);
-            randomNumbersTab[0][index] = maps.get(key).floatValue();
+        index = 0;
+        for (Integer i = start; i <=end; i++) {
+            if(maps.containsKey(i)){
+                //means value changed
+                randomNumbersTab[0][index] = maps.get(i).floatValue();
+            }else {
+                //means value not changed,we use the nearest value.
+                for(Integer j = i;j >= start; j--){
+                    if(maps.containsKey(j)){
+                        randomNumbersTab[0][index] = maps.get(j).floatValue();
+                        break;
+                    }
+                }
+            }
+            index++;
         }
 
         List<Line> lines = new ArrayList<Line>();

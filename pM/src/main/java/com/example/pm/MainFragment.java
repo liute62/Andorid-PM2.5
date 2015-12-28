@@ -565,13 +565,17 @@ public class MainFragment extends Fragment implements OnClickListener {
                 String last_lati = aCache.getAsString(Const.Cache_Latitude);
                 String last_longi = aCache.getAsString(Const.Cache_Longitude);
                 if (last_lati == null || last_longi == null) {
+                    Log.e("MainFragment","lati or longi null");
                     aCache.put(Const.Cache_Latitude, lati);
                     aCache.put(Const.Cache_Longitude, longi);
                     searchCityRequest(lati, longi);
                 } else {
+                    Log.e("MainFragment",  String.valueOf(last_lati) + " " + String.valueOf(last_longi) + " " + String.valueOf(longi)+" "+String.valueOf(lati));
                     if (last_lati.equals(lati) && last_longi.equals(longi)) {
                         //no change
                     } else {
+                        aCache.put(Const.Cache_Latitude, lati);
+                        aCache.put(Const.Cache_Longitude, longi);
                         searchCityRequest(lati, longi);
                     }
                 }
