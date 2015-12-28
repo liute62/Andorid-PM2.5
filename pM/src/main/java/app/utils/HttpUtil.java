@@ -42,6 +42,8 @@ public class HttpUtil {
 
     public static final String MonitorLocation_url = base_url + "area-positions";
 
+    public static final String UploadBatch_url = base_url + "mobile-data/upload";
+
     private static HttpUtil instance;
 
     public static HttpUtil Instance() {
