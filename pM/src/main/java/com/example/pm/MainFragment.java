@@ -65,6 +65,8 @@ import lecho.lib.hellocharts.view.LineChartView;
  */
 public class MainFragment extends Fragment implements OnClickListener {
 
+    //Todo, a icon to alert that the data is discreet
+    //Todo, a icon to alert that user 60km away from station
     Activity mActivity;
     ImageView mProfile;
     ImageView mHotMap;
@@ -169,6 +171,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onPause() {
         mActivity.unregisterReceiver(dbReceiver);
         aCache.put(Const.Cache_Is_Background, "true");
+        aCache.put(Const.Cache_Pause_Time,String.valueOf(System.currentTimeMillis()));
         super.onPause();
     }
 
@@ -185,6 +188,8 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter.addAction(Const.Action_Chart_Result_3);
             intentFilter.addAction(Const.Action_DB_MAIN_Location);
             aCache.put(Const.Cache_Is_Background, "false");
+            String tmpTime = aCache.getAsString(Const.Cache_Pause_Time);
+            //Todo if longer than 30 min
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
         super.onResume();

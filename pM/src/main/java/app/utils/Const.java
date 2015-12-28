@@ -1,5 +1,6 @@
 package app.utils;
 
+import com.example.pm.FirstActivity;
 import com.example.pm.R;
 
 public class Const {
@@ -22,6 +23,8 @@ public class Const {
 
     public static boolean CURRENT_INDOOR = false;
 
+    public static boolean CURRENT_NEED_REFRESH = false;
+
     public static final double longitude_for_test = 116.304521;
 
     public static final double latitude_for_test = 39.972465;
@@ -30,6 +33,7 @@ public class Const {
      * Cache*
      */
     public static final String Cache_Is_Background = "Cache_Is_Background";
+    public static final String Cache_Pause_Time = "Cache_Pause_Time";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";

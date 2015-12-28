@@ -32,6 +32,7 @@ import app.utils.VolleyQueue;
  */
 public class LoginDialog extends Dialog implements OnClickListener {
 
+    //todo to fix the bug
     Activity mActivity;
     Button mSure;
     Button mBack;

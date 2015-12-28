@@ -231,7 +231,7 @@ public class MapActivity extends Activity {
                 try {
                     PMModel pmModel = PMModel.parse(response);
                     Double PM25Density = Double.valueOf(pmModel.getPm25());
-                    position.setDensity(PM25Density.toString());
+                    //position.setDensity(PM25Density.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -259,11 +259,11 @@ public class MapActivity extends Activity {
             searchPMRequest(position);
         }
         for (Position position:positions) {
-            String density = position.getDensity();
+            String density = "";//position.getDensity();
             if (density.equals("")) {
                 density = "0";
             }
-            Log.d("result",position.getName()+" "+position.getLatitude()+" "+position.getLongtitude()+" "+position.getDensity());
+            //Log.d("result",position.getName()+" "+position.getLatitude()+" "+position.getLongtitude()+" "+position.getDensity());
             monitorPoints.put(new LatLng(position.getLatitude(), position.getLongtitude()), Double.valueOf(density));
         }
         for (LatLng point : monitorPoints.keySet()) {

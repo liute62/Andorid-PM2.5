@@ -282,4 +282,8 @@ public class ShortcutUtil {
         }
         return max - min;
     }
+
+    public static boolean isLocationChangeEnough(double lati1,double lati2,double longi1,double longi2){
+        return true;
+    }
 }
