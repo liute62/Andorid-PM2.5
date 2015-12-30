@@ -87,43 +87,43 @@ public class DBService extends Service {
 
     public static final String ACTION = "app.services.DBService";
 
+    /** main **/
     private DBHelper dbHelper;
     private SQLiteDatabase db;
-
-    double longitude;  //the newest longitude
-    double latitude;  // the newest latitude
-    double last_long;  // the last time longitude
-    double last_lati;  // the last time latitude
-    double PM25Density;
-    double PM25Today;
-    Long IDToday;
-    double venVolToday;
-
+    private ACache aCache;
+    private Handler DBHandler = new Handler();
+    PMModel pmModel;
+    private final int State_Much_Index = 100;
+    private final int DB_Chart_Loop = 24;
+    private double longitude;  //the newest longitude
+    private double latitude;  // the newest latitude
+    private double last_long;  // the last time longitude
+    private double last_lati;  // the last time latitude
+    private double PM25Density;
+    private double PM25Today;
+    private Long IDToday;
+    private double venVolToday;
+    private int DBRunTime;
+    private boolean isPMSearchRun;
+    private boolean isPMSearchSuccess;
+    private boolean DBCanRun;
+    private boolean ChartTaskCanRun;
+    private boolean isLocationChanged;
+    private boolean isUploadTaskRun;
+    /** GPS **/
     private LocationManager mManager;
+    Location mLastLocation;
+    private final int GPS_Min_Frequency = 1000 * 60 * 59;
+    private final int GPS_Min_Distance = 100;
+    /** Sensor **/
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private SimpleStepDetector simpleStepDetector;
     private int numSteps;
     private long time1;
     private static Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC;
-    PMModel pmModel;
-    private Handler DBHandler = new Handler();
-    boolean isPMSearchRun;
-    boolean isPMSearchSuccess;
-    private boolean DBCanRun;
-    private boolean ChartTaskCanRun;
-    private boolean isLocationChanged;
-    private boolean isUploadTaskRun;
-    private int DBRunTime;
-    private int ChartRunTime;
-    ACache aCache;
-    private final int GPS_Min_Frequency = 1000 * 60 * 59;
-    private final int GPS_Min_Distance = 100;
     private final int Indoor_Outdoor_Frequency = 1;
     private final int upload_Frequency = 1;
-    private final int State_Much_Index = 100;
-    private final int DB_Chart_Loop = 24;
-    Location mLastLocation;
 
     private Runnable DBRunnable = new Runnable() {
         State state;
@@ -132,7 +132,7 @@ public class DBService extends Service {
 
         @Override
         public void run() {
-
+            /** notify user whether using the old PM2.5 density **/
             if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
                 Intent intent = new Intent(Const.Action_DB_Running_State);
                 intent.putExtra(Const.Intent_DB_Run_State,1);
@@ -142,6 +142,7 @@ public class DBService extends Service {
                 intent.putExtra(Const.Intent_DB_Run_State,0);
                 sendBroadcast(intent);
             }
+
             String isBackground = aCache.getAsString(Const.Cache_Is_Background);
             String userId = aCache.getAsString(Const.Cache_User_Id);
             if (isBackground == null) { //App first run
@@ -150,13 +151,14 @@ public class DBService extends Service {
                 if (userId == null) aCache.put(Const.Cache_User_Id, "0");
             }
             /**Time interval longer than 30 min, refresh the GUI **/
-            if(Const.CURRENT_NEED_REFRESH){
-                //Todo refresh the GUI and notify mainfragment to dismiss the progress bar, meanwhile we don't need DB run first time.
-                Const.CURRENT_NEED_REFRESH = false;
-                //update graph
-                //update textview
-                //Todo check if some data need to be upload.
-            }
+//            if(Const.CURRENT_NEED_REFRESH){
+//                //Todo refresh the GUI and notify mainfragment to dismiss the progress bar, meanwhile we don't need DB run first time.
+//                Const.CURRENT_NEED_REFRESH = false;
+//                //update graph
+//                //update textview
+//                //Todo check if some data need to be upload.
+//            }
+
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
@@ -286,6 +288,20 @@ public class DBService extends Service {
                         reset(DBRunTime);
                     }
                 }
+                //every 1 hour to check if some data need to be uploaded
+                String lastUploadTime = aCache.getAsString(Const.Cache_DB_Upload_Interval);
+                if(! ShortcutUtil.isStringOK(lastUploadTime))  aCache.put(Const.Cache_DB_Upload_Interval,String.valueOf(System.currentTimeMillis()));
+                else {
+                    Long curTime = System.currentTimeMillis();
+                    //every 1 hour to search the PM density from server
+                    if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
+                        aCache.put(Const.Cache_DB_Upload_Interval, String.valueOf(System.currentTimeMillis()));
+                        if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))){
+                            //means currently user has login
+                            checkPMDataForUpload();
+                        }
+                    }
+                }
                 DBRunTime++;
                 if(DBRunTime >= 500) DBRunTime = 1; //500 a cycle
                 if (DBRunTime % 5 == 0) {
@@ -323,14 +339,13 @@ public class DBService extends Service {
         last_long = -0.1;
         DBCanRun = false;
         DBRunTime = 0;
-        ChartRunTime = -1;
         isPMSearchRun = false;
         isUploadTaskRun = false;
         isLocationChanged = false;
+        aCache = ACache.get(getApplicationContext());
         isPMSearchSuccess = false;
         ChartTaskCanRun = true;
         //todo each time to run the data and
-        aCache = ACache.get(getApplicationContext());
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
         }
@@ -753,7 +768,7 @@ public class DBService extends Service {
                     aCache.put(Const.Cache_PM_Density, PM25Density);
                     sendBroadcast(intent);
                     DBCanRun = true;
-                    isPMSearchSuccess = false;
+                    isPMSearchSuccess = true;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -852,6 +867,10 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
+    /**
+     *
+     * @return
+     */
     private Location getLastLocation(){
         Location result = null;
         String provider = null;
@@ -877,6 +896,7 @@ public class DBService extends Service {
         }
         return result;
     }
+
     /**
      * Check if service running surpass a day
      * @param lasttime
@@ -895,14 +915,16 @@ public class DBService extends Service {
      * if Service running surpass a day, then reset data parmas
      */
     private void reset(int runtime) {
+        //todo test it !
         runtime = -1;
         longitude = 0.0;
         latitude = 0.0;
         last_lati = -0.1;
         last_long = -0.1;
+        IDToday = Long.valueOf(0);
+        venVolToday = Long.valueOf(0);
         DBCanRun = false;
         DBRunTime = 0;
-        ChartRunTime = -1;
         isPMSearchRun = false;
         isUploadTaskRun = false;
         isLocationChanged = false;

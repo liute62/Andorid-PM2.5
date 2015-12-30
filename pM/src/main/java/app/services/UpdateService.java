@@ -48,6 +48,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Step 5: upload the real state
  */
 public class UpdateService {
+
     private static UpdateService instance = null;
     boolean isRunning;
     private Context mContext;

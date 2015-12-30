@@ -572,7 +572,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(Const.Action_DB_Running_State)){
                 int state = intent.getIntExtra(Const.Intent_DB_Run_State,0);
-                //Log.e("state",String.valueOf(state));
+                Log.e("state",String.valueOf(state));
                 if(state == 1){
                     mDensityError.setVisibility(View.VISIBLE);
                     mDensityError.setOnClickListener(MainFragment.this);

@@ -17,6 +17,8 @@ public class Const {
 
     public static Long Min_Search_PM_Time = Long.valueOf(60 * 60 * 1000);
 
+    public static Long Min_Upload_Check_Time = Long.valueOf(60 * 60 * 1000);
+
     public static String CURRENT_ACCESS_TOKEN = "-1";
 
     public static String CURRENT_USER_NAME = "-1";
@@ -39,6 +41,7 @@ public class Const {
     public static final String Cache_Is_Background = "Cache_Is_Background";
     public static final String Cache_Pause_Time = "Cache_Pause_Time";
     public static final String Cache_DB_Run_Interval = "Cache_DB_Run_Interval";
+    public static final String Cache_DB_Upload_Interval = "Cache_DB_Upload_Interval";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";
@@ -46,6 +49,7 @@ public class Const {
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
     public static final String Cache_PM_Density = "Cache_PM_Density";
+    public static final String Cache_PM_Success = "Cache_PM_Success";
     public static final String Cache_PM_LastHour = "Cache_PM_LastHour";
     public static final String Cache_PM_LastDay = "Cache_PM_LastDay";
     public static final String Cache_PM_LastWeek = "Cache_PM_LastWeek";
