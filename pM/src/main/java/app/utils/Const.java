@@ -13,6 +13,10 @@ public class Const {
 
 //    public static String CURRENT_USER_ID = "0";
 
+    public static Long Min_Refresh_Time = Long.valueOf(30 * 60 * 1000);
+
+    public static Long Min_Search_PM_Time = Long.valueOf(60 * 60 * 1000);
+
     public static String CURRENT_ACCESS_TOKEN = "-1";
 
     public static String CURRENT_USER_NAME = "-1";
@@ -34,6 +38,7 @@ public class Const {
      */
     public static final String Cache_Is_Background = "Cache_Is_Background";
     public static final String Cache_Pause_Time = "Cache_Pause_Time";
+    public static final String Cache_DB_Run_Interval = "Cache_DB_Run_Interval";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";
@@ -123,6 +128,8 @@ public class Const {
     public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
 
     public static final String Action_DB_MAIN_Location = "Action_DB_MAIN_Location";
+
+    public static final String Action_DB_Running_State = "Action_DB_Running_State";
 
     public static final String Action_Chart_Cache = "Action_Chart_Cache";
 
@@ -229,7 +236,9 @@ public class Const {
 
     public static final String Info_GPS_No_Cache = "无法获取上次定位信息";
 
-    public static final String Info_DB_Not_Running = "无GPS信息,数据无法计算,请退出登录后重试";
+    public static final String Info_DB_Not_Running = "正使用缓存进行计算，请退出重试";
+
+    public static final String Info_Chart_Data_Lost = "当前图表显示的是非连续的信息，请保持程序长时间开启";
 
     public static final String Info_DB_Insert_Date_Conflict = "失败,插入数据库时间与当前时间不一致";
 

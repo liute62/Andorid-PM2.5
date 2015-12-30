@@ -225,37 +225,46 @@ public class DBService extends Service {
                         }
                         break;
                 }
-                boolean isUpdate = true;
                 //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
-                if(state != null && state.getId() > State_Much_Index){
+                int mul = 1;
+                if(state != null && state.getId() > State_Much_Index) {
+                    mul = 2;
+                }
                     //to much data here, we need to slow it down, every 1 min to check it
-                    if (DBRunTime % 12 == 0)
-                        isUpdate = true;
-                    else isUpdate = false;
-                }else {
-                  isUpdate = true;
-                }
-                if(isUpdate){
                     intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                    intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                    intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
-                    intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
-                }
-                if (isUpdate && isBackground.equals("false")) {
+                    if(DBRunTime % (5 * mul) == 0) {
+                        intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                    }if(DBRunTime % (2 * mul) == 0) {
+                        intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                    }if(DBRunTime % (10 * mul) == 0) {
+                        intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                    }
+
+                if (isBackground.equals("false")) {
                     sendBroadcast(intentText);
                 }
-                //TODO change to a more soft way by using system.currentime
-                if (DBRunTime == 12 * 60) {
-                    //means a hour
-                    Time t = new Time();
-                    t.setToNow();
-                    int currentHour = t.hour;
-                    searchPMRequest(String.valueOf(longitude),String.valueOf(latitude));
-                    DBRunTime = 1;
+                //change to a more soft way by using system.currentime
+                String lastTime = aCache.getAsString(Const.Cache_DB_Run_Interval);
+                if(! ShortcutUtil.isStringOK(lastTime))  aCache.put(Const.Cache_DB_Run_Interval,String.valueOf(System.currentTimeMillis()));
+                else {
+                    Long curTime = System.currentTimeMillis();
+                    //every 1 hour to search the PM density from server
+                    if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
+                        aCache.put(Const.Cache_DB_Run_Interval, String.valueOf(System.currentTimeMillis()));
+                        searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                    }
                 }
-                //TODO Every 10 min to open the GPS and if get the last location, close it.
+                //every 10 min to open the GPS and if get the last location, close it.
+                if(DBRunTime % 120 == 0){
+                    Location location = getLastLocation();
+                    if(location != null){
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                    }
+                    mManager = null;
+                }
+                //every 1 min to calculate the pm result
                 if (DBRunTime % 12 == 0) {
-                    //every 1 min to calculate
                     State last = state;
                     //state = calculatePM25(116.329,39.987);
                     state = calculatePM25(longitude, latitude);
@@ -268,6 +277,7 @@ public class DBService extends Service {
                     }
                 }
                 DBRunTime++;
+                if(DBRunTime >= 500) DBRunTime = 1; //500 a cycle
                 if (DBRunTime % 5 == 0) {
                     intentText = new Intent(Const.Action_DB_MAIN_Location);
                     intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
@@ -278,8 +288,9 @@ public class DBService extends Service {
                 }
 
             } else {
-
-                //Todo using a more soft way to notify user.
+                //using a more soft way to notify user.
+                Intent intent = new Intent(Const.Action_DB_Running_State);
+                sendBroadcast(intent);
             }
             DBHandler.postDelayed(DBRunnable, Const.DB_Run_Time_INTERVAL);
         }
@@ -354,8 +365,8 @@ public class DBService extends Service {
             IDToday = Long.valueOf(0);
         } else {
             State state = states.get(states.size() - 1);
-            Log.e("Today size", String.valueOf(states.size()));
-            Log.e("Today Last state", "begin");
+            //Log.e("Today size", String.valueOf(states.size()));
+            //Log.e("Today Last state", "begin");
             state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
@@ -677,9 +688,9 @@ public class DBService extends Service {
 //        //Log.e("insertState","now"+now+"insert"+insert);
 //        if(insert.equals(now)) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Log.e("state insert","-------insert ------state --------- begin");
-        state.print();
-        Log.e("state insert", "-------insert ------state --------- finish");
+        //Log.e("state insert","-------insert ------state --------- begin");
+        //state.print();
+        //Log.e("state insert", "-------insert ------state --------- finish");
         cupboard().withDatabase(db).put(state);
         //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
         IDToday++;
@@ -732,7 +743,7 @@ public class DBService extends Service {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.e("searchPMRequest resp", response.toString());
+                //Log.e("searchPMRequest resp", response.toString());
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
@@ -751,12 +762,12 @@ public class DBService extends Service {
         isUploadTaskRun = true;
         String url = HttpUtil.Upload_url;
         JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
-        Log.e("json", tmp.toString());
+        //Log.e("json", tmp.toString());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 isUploadTaskRun = false;
-                Log.e("response", response.toString());
+                //Log.e("response", response.toString());
                 State tmp;
                 tmp = state;
                 tmp.setUpload(1);
@@ -827,9 +838,33 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
+    private Location getLastLocation(){
+        Location result = null;
+        String provider = null;
+        String[] providers = {LocationManager.GPS_PROVIDER,LocationManager.PASSIVE_PROVIDER,LocationManager.NETWORK_PROVIDER};
+        mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        for (int i = 0; i != providers.length; i++){
+            if(mManager.isProviderEnabled(providers[i])){
+                provider = providers[i];
+            }
+        }
+        if (provider != null)
+            mLastLocation = mManager.getLastKnownLocation(provider);
+        if (mLastLocation == null) {
+            for (int i = 0; i != providers.length; i++){
+                if(mManager.isProviderEnabled(providers[i])){
+                    mManager.requestLocationUpdates(providers[i], 0, 0, locationListener);
+                }
+            }
+            Toast.makeText(getApplicationContext(), Const.Info_GPS_No_Cache, Toast.LENGTH_SHORT).show();
+        } else {
+            longitude = mLastLocation.getLongitude();
+            latitude = mLastLocation.getLatitude();
+        }
+        return result;
+    }
     /**
-     * Check if Service running surpass a day
-     *
+     * Check if service running surpass a day
      * @param lasttime
      * @return
      */
