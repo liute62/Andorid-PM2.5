@@ -40,7 +40,6 @@ public class DataCalculator {
         this.todayStates = calTodayStates();
         this.lastTwoHourStates = calLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok.
         this.lastWeekStates = calLastWeekStates(); //only manually invoke this function
-
     }
 
     public void updateLastDayState() {

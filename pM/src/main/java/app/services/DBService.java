@@ -109,6 +109,7 @@ public class DBService extends Service {
     PMModel pmModel;
     private Handler DBHandler = new Handler();
     boolean isPMSearchRun;
+    boolean isPMSearchSuccess;
     private boolean DBCanRun;
     private boolean ChartTaskCanRun;
     private boolean isLocationChanged;
@@ -132,6 +133,15 @@ public class DBService extends Service {
         @Override
         public void run() {
 
+            if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
+                Intent intent = new Intent(Const.Action_DB_Running_State);
+                intent.putExtra(Const.Intent_DB_Run_State,1);
+                sendBroadcast(intent);
+            }else {
+                Intent intent = new Intent(Const.Action_DB_Running_State);
+                intent.putExtra(Const.Intent_DB_Run_State,0);
+                sendBroadcast(intent);
+            }
             String isBackground = aCache.getAsString(Const.Cache_Is_Background);
             String userId = aCache.getAsString(Const.Cache_User_Id);
             if (isBackground == null) { //App first run
@@ -288,8 +298,9 @@ public class DBService extends Service {
                 }
 
             } else {
-                //using a more soft way to notify user.
+                //using a more soft way to notify user that DB is not running
                 Intent intent = new Intent(Const.Action_DB_Running_State);
+                intent.putExtra(Const.Intent_DB_Run_State,-1);
                 sendBroadcast(intent);
             }
             DBHandler.postDelayed(DBRunnable, Const.DB_Run_Time_INTERVAL);
@@ -316,6 +327,7 @@ public class DBService extends Service {
         isPMSearchRun = false;
         isUploadTaskRun = false;
         isLocationChanged = false;
+        isPMSearchSuccess = false;
         ChartTaskCanRun = true;
         //todo each time to run the data and
         aCache = ACache.get(getApplicationContext());
@@ -330,6 +342,7 @@ public class DBService extends Service {
             mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_Min_Frequency,GPS_Min_Distance, locationListener);
         }
         if((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0){
+            Log.e("DBCanRun","False");
             DBCanRun = false;
         }else {
             DBCanRun = true;
@@ -740,6 +753,7 @@ public class DBService extends Service {
                     aCache.put(Const.Cache_PM_Density, PM25Density);
                     sendBroadcast(intent);
                     DBCanRun = true;
+                    isPMSearchSuccess = false;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -749,8 +763,8 @@ public class DBService extends Service {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                DBCanRun = false;
                 isPMSearchRun = false;
+                isPMSearchSuccess = false;
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
             }
 

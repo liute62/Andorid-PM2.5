@@ -83,6 +83,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     ImageView mChart1Hint;
     ImageView mChart2Hint;
     ImageView mDensityError;
+    ImageView mRunError;
 
     Double PMDensity;
     Double PMBreatheHour;
@@ -268,6 +269,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mDayPM = (TextView) view.findViewById(R.id.main_day_pm);
         mWeekPM = (TextView) view.findViewById(R.id.main_week_pm);
         mDensityError = (ImageView)view.findViewById(R.id.main_density_error);
+        mRunError = (ImageView)view.findViewById(R.id.main_run_error);
         mChart1Hint = (ImageView)view.findViewById(R.id.main_chart_hint_1);
         mChart2Hint = (ImageView)view.findViewById(R.id.main_chart_hint_2);
         mChart1column = (ColumnChartView) view.findViewById(R.id.main_chart_1_column);
@@ -306,7 +308,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         String user_name = aCache.getAsString(Const.Cache_User_Name);
         String user_nickname = aCache.getAsString(Const.Cache_User_Nickname);
         String user_gender = aCache.getAsString(Const.Cache_User_Gender);
-
         String density = aCache.getAsString(Const.Cache_PM_Density);
         String pm_hour = aCache.getAsString(Const.Cache_PM_LastHour);
         String pm_day = aCache.getAsString(Const.Cache_PM_LastDay);
@@ -487,6 +488,9 @@ public class MainFragment extends Fragment implements OnClickListener {
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Chart_Data_Lost,Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_density_error:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Location,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_run_error:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -567,13 +571,25 @@ public class MainFragment extends Fragment implements OnClickListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(Const.Action_DB_Running_State)){
-                mDensityError.setVisibility(View.VISIBLE);
-                mDensityError.setOnClickListener(MainFragment.this);
+                int state = intent.getIntExtra(Const.Intent_DB_Run_State,0);
+                //Log.e("state",String.valueOf(state));
+                if(state == 1){
+                    mDensityError.setVisibility(View.VISIBLE);
+                    mDensityError.setOnClickListener(MainFragment.this);
+                }else if(state == -1){
+                    mRunError.setVisibility(View.VISIBLE);
+                    mRunError.setOnClickListener(MainFragment.this);
+                }else {
+                    if(mDensityError.getVisibility() == View.VISIBLE)
+                        mDensityError.setVisibility(View.GONE);
+                    if(mRunError.getVisibility() == View.VISIBLE)
+                        mRunError.setVisibility(View.GONE);
+                }
             }
             if (intent.getAction().equals(Const.Action_DB_MAIN_PMDensity)) {
                 //Update the density of PM
-                if(mDensityError.getVisibility() == View.VISIBLE)
-                    mDensityError.setVisibility(View.GONE);
+                if(mRunError.getVisibility() == View.VISIBLE)
+                    mRunError.setVisibility(View.GONE);
                 PMModel model = new PMModel();
                 model.setPm25(intent.getStringExtra(Const.Intent_PM_Density));
                 Message data = new Message();

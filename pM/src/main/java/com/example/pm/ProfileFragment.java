@@ -271,11 +271,14 @@ public class ProfileFragment extends Fragment implements
         aCache.remove(Const.Cache_Chart_10);
         aCache.remove(Const.Cache_Chart_12);
         aCache.remove(Const.Cache_Chart_12_Date);
+        aCache.remove(Const.Cache_PM_Density);
+        aCache.remove(Const.Cache_DB_Run_Interval);
+        aCache.remove(Const.Cache_City);
+        aCache.remove(Const.Cache_Pause_Time);
     }
 
     private void logOff() {
         clearLoginCache();
-        //turn off the running service
         Intent intent = new Intent(mActivity, DBService.class);
         mActivity.stopService(intent);
         getActivity().finish();

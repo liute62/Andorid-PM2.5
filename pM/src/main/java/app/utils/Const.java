@@ -96,6 +96,8 @@ public class Const {
 
     public static final String Intent_DB_PM_Longi = "Intent_DB_PM_Longi";
 
+    public static final String Intent_DB_Run_State = "Intent_DB_Run_State";
+
     public static final String Intent_chart1_data = "Intent_chart1_data";
 
     public static final String Intent_chart2_data = "Intent_chart2_data";
@@ -236,7 +238,9 @@ public class Const {
 
     public static final String Info_GPS_No_Cache = "无法获取上次定位信息";
 
-    public static final String Info_DB_Not_Running = "正使用缓存进行计算，请退出重试";
+    public static final String Info_DB_Not_Running = "后台并没有运行，请退出重试";
+
+    public static final String Info_DB_Not_Location = "当前正用上次获取的位置与浓度进行计算";
 
     public static final String Info_Chart_Data_Lost = "当前图表显示的是非连续的信息，请保持程序长时间开启";
 
