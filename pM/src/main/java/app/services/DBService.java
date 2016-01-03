@@ -2,6 +2,7 @@ package app.services;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -46,6 +47,7 @@ import app.movement.SimpleStepDetector;
 import app.movement.StepListener;
 import app.utils.ACache;
 import app.utils.Const;
+import app.utils.DBConstants;
 import app.utils.DBHelper;
 import app.utils.DataCalculator;
 import app.utils.HttpUtil;
@@ -110,6 +112,7 @@ public class DBService extends Service {
     private boolean ChartTaskCanRun;
     private boolean isLocationChanged;
     private boolean isUploadTaskRun;
+    private boolean isUploadRun;
     /** GPS **/
     private LocationManager mManager;
     Location mLastLocation;
@@ -224,7 +227,11 @@ public class DBService extends Service {
                         }
                         break;
                     case 1:
+                        checkPMDataForUpload();
+                        break;
                     case 3:
+                        UpdateService.run(getApplicationContext(),aCache,dbHelper);
+                        break;
                     case 7:
                         intentChart = new Intent(Const.Action_Chart_Result_1);
                         DataCalculator.getIntance(db).updateLastTwoHourState();
@@ -342,6 +349,7 @@ public class DBService extends Service {
         isPMSearchRun = false;
         isUploadTaskRun = false;
         isLocationChanged = false;
+        isUploadRun = false;
         aCache = ACache.get(getApplicationContext());
         isPMSearchSuccess = false;
         ChartTaskCanRun = true;
@@ -814,13 +822,20 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
+    private void updateStateUpLoad(State state,int upload) {
+        ContentValues values = new ContentValues();
+        values.put(DBConstants.DB_MetaData.STATE_HAS_UPLOAD, upload);
+        cupboard().withDatabase(db).update(State.class, values, "id = ?", state.getId() + "");
+    }
+
     /**
      * Check DB if there are some data for uploading
      */
     public void checkPMDataForUpload() {
-        Log.d("upload","upload batch start");
-        final List<State> states = (List<State>) cupboard().withDatabase(db).query(State.class).withSelection("upload=?","0");
-        isUploadTaskRun = true;
+        Log.d("upload", "upload batch start");
+        final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD+"=?","0").list();
+        Log.d("upload","upload size "+states.size());
+        isUploadRun = true;
         String url = HttpUtil.UploadBatch_url;
         JSONArray array = new JSONArray();
         for (State state:states) {
@@ -834,20 +849,17 @@ public class DBService extends Service {
         }  catch (JSONException e) {
             e.printStackTrace();
         }
-
+        Log.d("batchData",batchData.toString());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                isUploadTaskRun = false;
-                Log.d("response", response.toString());
+                isUploadRun = false;
+                Log.e("response", response.toString());
                 try {
                     String value = response.getString("succeed_count");
                     if (Integer.valueOf(value)==states.size()) {
-                        for (State state : states) {
-                            State tmp;
-                            tmp = state;
-                            tmp.setUpload(1);
-                            insertState(tmp);
+                        for (State state:states) {
+                            updateStateUpLoad(state,1);
                         }
                     }
                 } catch (JSONException e) {
@@ -858,7 +870,7 @@ public class DBService extends Service {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                isUploadTaskRun = false;
+                isUploadRun = false;
                 Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
             }
 
