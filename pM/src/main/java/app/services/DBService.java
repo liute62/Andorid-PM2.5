@@ -85,7 +85,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  */
 public class DBService extends Service {
 
-    public static final String ACTION = "app.services.DBService";
+    public static final String TAG = "app.services.DBService";
 
     /** main **/
     private DBHelper dbHelper;
@@ -357,7 +357,7 @@ public class DBService extends Service {
             mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_Min_Frequency,GPS_Min_Distance, locationListener);
         }
         if((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0){
-            Log.e("DBCanRun","False");
+            Log.e(TAG,"DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
             DBCanRun = false;
         }else {
             DBCanRun = true;
@@ -417,6 +417,7 @@ public class DBService extends Service {
     }
 
     private void sensorInitial() {
+        // TODO: 1/3/2016 change the detection algorithm, it may not work. 
         numSteps = 0;
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -424,6 +425,7 @@ public class DBService extends Service {
         simpleStepDetector.registerListener(new StepListener() {
             @Override
             public void step(long timeNs) {
+                Log.d(TAG,"Time: "+ShortcutUtil.refFormatNowDate(timeNs)+" Step: "+String.valueOf(numSteps));
                 numSteps++;
             }
         });
@@ -487,12 +489,9 @@ public class DBService extends Service {
 
         public void onGpsStatusChanged(int event) {
             if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
-                //Log.e("GPS_EVENT_FIRST_FIX","yes");
             } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
             } else if (event == GpsStatus.GPS_EVENT_STARTED) {
-                //Log.e("GPS_EVENT_STARTED","yes");
             } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
-              //  Log.e("GPS_EVENT_STOPPED", "yes");
             }
         }
     };
@@ -716,9 +715,9 @@ public class DBService extends Service {
 //        //Log.e("insertState","now"+now+"insert"+insert);
 //        if(insert.equals(now)) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        //Log.e("state insert","-------insert ------state --------- begin");
+        Log.d(TAG,"-------insert ------state --------- begin");
         //state.print();
-        //Log.e("state insert", "-------insert ------state --------- finish");
+        Log.d(TAG, "-------insert ------state --------- finish");
         cupboard().withDatabase(db).put(state);
         //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
         IDToday++;
@@ -772,7 +771,7 @@ public class DBService extends Service {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //Log.e("searchPMRequest resp", response.toString());
+                Log.d(TAG, "searchPMRequest resp:" + response.toString());
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
@@ -840,7 +839,7 @@ public class DBService extends Service {
             @Override
             public void onResponse(JSONObject response) {
                 isUploadTaskRun = false;
-                Log.e("response", response.toString());
+                Log.d("response", response.toString());
                 try {
                     String value = response.getString("succeed_count");
                     if (Integer.valueOf(value)==states.size()) {

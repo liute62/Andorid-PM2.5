@@ -84,6 +84,8 @@ public class MainFragment extends Fragment implements OnClickListener {
     ImageView mChart2Hint;
     ImageView mDensityError;
     ImageView mRunError;
+    ImageView mChart1Alert;
+    ImageView mChart2Alert;
 
     Double PMDensity;
     Double PMBreatheHour;
@@ -280,6 +282,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChangeChart2 = (TextView) view.findViewById(R.id.main_chart_2_change);
         mChart1Title = (TextView) view.findViewById(R.id.main_chart1_title);
         mChart2Title = (TextView) view.findViewById(R.id.main_chart2_title);
+        mChart1Alert = (ImageView) view.findViewById(R.id.main_chart_1_alert);
+        mChart2Alert = (ImageView) view.findViewById(R.id.main_chart_2_alert);
         setFonts(view);
         setListener();
         cacheInitial();
@@ -469,6 +473,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 } else {
                     current_chart1_index += 2;
                 }
+                boolean result1 = Const.Chart_Alert_Show[current_chart1_index];
+                if(result1 == true){
+                    mChart1Alert.setVisibility(View.VISIBLE);
+                    mChart1Alert.setOnClickListener(this);
+                }else mChart1Alert.setVisibility(View.GONE);
                 mChart1Title.setText(ChartsConst.Chart_title[current_chart1_index]);
                 chartInitial(current_chart1_index, current_chart2_index);
                 break;
@@ -478,6 +487,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 } else {
                     current_chart2_index += 2;
                 }
+                boolean result2 = Const.Chart_Alert_Show[current_chart2_index];
+                if(result2 == true){
+                    mChart2Alert.setVisibility(View.VISIBLE);
+                    mChart2Alert.setOnClickListener(this);
+                }else mChart2Alert.setVisibility(View.GONE);
                 mChart2Title.setText(ChartsConst.Chart_title[current_chart2_index]);
                 chartInitial(current_chart1_index, current_chart2_index);
                 break;
@@ -492,6 +506,12 @@ public class MainFragment extends Fragment implements OnClickListener {
                 break;
             case R.id.main_run_error:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_chart_1_alert:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_chart_2_alert:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;

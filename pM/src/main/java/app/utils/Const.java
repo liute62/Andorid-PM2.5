@@ -5,6 +5,8 @@ import com.example.pm.R;
 
 public class Const {
 
+    public static boolean[] Chart_Alert_Show = new boolean[]{false,false,false,false,false,false,false,false,false,false,false,false,false};
+
     public static String APP_KEY_UMENG = "566d299367e58e44cb005fe2";
 
     public static String APP_KEY_BAIDU = "In8U2gwdA6i5Q0lyDHne342u";
@@ -70,6 +72,7 @@ public class Const {
     public static final String Cache_Chart_10 = "Cache_Chart_10";
     public static final String Cache_Chart_12 = "Cache_Chart_12";
     public static final String Cache_Chart_12_Date = "Cache_Chart_12_Date";
+    public static final String Cache_Chart_Alert = "Cache_Chart_Alert";
 
 
     /**
@@ -255,6 +258,8 @@ public class Const {
     public static final String Info_Bluetooth_Not_Support = "当前设备不支持蓝牙";
 
     public static final String Info_Away_Station_Range = "尊敬的用户，您目前所处位置，已经距最近的大气污染物监测台站超过60公里，您PM2.5吸入量的测算值的准确度有可能下降";
+
+    public static final String Info_Data_Lost = "下图显示数据存在缺失情况，请保持APP长期且持续运行";
 
     public static String[] cityName =
             {

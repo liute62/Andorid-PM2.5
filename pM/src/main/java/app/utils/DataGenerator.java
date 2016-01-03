@@ -370,6 +370,9 @@ public class DataGenerator {
     }
 
     public static ColumnChartData chart1DataGenerator(Map<Integer, Float> maps) {
+        if(ShortcutUtil.isDataLost(maps))
+            Const.Chart_Alert_Show[1] = true;
+        else Const.Chart_Alert_Show[1] = false;
         ColumnChartData data;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
         int numColumns = ChartsConst.Chart_X[1].length;
@@ -403,6 +406,9 @@ public class DataGenerator {
     }
 
     public static LineChartData chart2DataGenerator(Map<Integer, Float> map) {
+        if(ShortcutUtil.isDataLost(map))
+            Const.Chart_Alert_Show[2] = true;
+        else Const.Chart_Alert_Show[2] = false;
        int maxIndex = ShortcutUtil.getMaxIndexFromMap(map);
 //            int minIndex = ShortcutUtil.getMinIndexFromMap(map);
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
@@ -679,6 +685,9 @@ public class DataGenerator {
     }
 
     public static ColumnChartData chart6DataGenerator(Map<Integer, Float> maps) {
+        if(ShortcutUtil.isDataLost(maps))
+            Const.Chart_Alert_Show[6] = true;
+        else Const.Chart_Alert_Show[6] = false;
         ColumnChartData data;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
         int numColumns = ChartsConst.Chart_X[6].length;
