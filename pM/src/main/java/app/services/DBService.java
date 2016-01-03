@@ -794,7 +794,6 @@ public class DBService extends Service {
     }
 
     public void uploadPMData(final State state) {
-        if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))) {
             isUploadRun = true;
             String url = HttpUtil.Upload_url;
             JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
@@ -817,7 +816,6 @@ public class DBService extends Service {
 
             });
             VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
-        }
     }
 
     private void updateStateUpLoad(State state,int upload) {

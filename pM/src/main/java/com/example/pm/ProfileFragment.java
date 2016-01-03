@@ -146,7 +146,7 @@ public class ProfileFragment extends Fragment implements
         mLogout.setOnClickListener(this);
         mTurnOffService.setOnClickListener(this);
         mTurnOffUpload.setOnClickListener(this);
-       // mClear.setOnClickListener(this);
+        mClear.setOnClickListener(this);
         mRegister.setOnClickListener(this);
         mBluetooth.setOnClickListener(this);
         mModifyPwd.setOnClickListener(this);
