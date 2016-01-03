@@ -39,7 +39,7 @@ public class DataCalculator {
         this.db = db;
         this.todayStates = calTodayStates();
         this.lastTwoHourStates = calLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok.
-        this.lastWeekStates = calLastWeekStates();
+        this.lastWeekStates = calLastWeekStates(); //only manually invoke this function
     }
 
     public void updateLastDayState() {
@@ -116,7 +116,8 @@ public class DataCalculator {
             } else {
                 day = day - i;
             }
-            lastWeekDate.add(i, String.valueOf(month + 1) + "." + String.valueOf(day));
+
+            lastWeekDate.add(i, String.valueOf((month + 1)>12?12:(month+1)) + "." + String.valueOf(day));
             calendar.set(year, month, day, 0, 0, 0);
             Long TodayNowTime = calendar.getTime().getTime();
             calendar.set(year, month, day, 23, 59, 59);

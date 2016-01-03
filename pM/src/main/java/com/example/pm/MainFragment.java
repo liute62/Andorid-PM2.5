@@ -65,6 +65,7 @@ import lecho.lib.hellocharts.view.LineChartView;
  */
 public class MainFragment extends Fragment implements OnClickListener {
 
+    //Todo, a icon to alert that user 60km away from station
     Activity mActivity;
     ImageView mProfile;
     ImageView mHotMap;
@@ -79,6 +80,12 @@ public class MainFragment extends Fragment implements OnClickListener {
     TextView mChangeChart2;
     TextView mChart1Title;
     TextView mChart2Title;
+    ImageView mChart1Hint;
+    ImageView mChart2Hint;
+    ImageView mDensityError;
+    ImageView mRunError;
+    ImageView mChart1Alert;
+    ImageView mChart2Alert;
 
     Double PMDensity;
     Double PMBreatheHour;
@@ -86,9 +93,9 @@ public class MainFragment extends Fragment implements OnClickListener {
     Double PMBreatheWeekAvg;
     int currentHour;
     int currentMin;
-    private String currentLatitude;
-    private String currentLongitude;
-    private String currentCity;
+    String currentLatitude;
+    String currentLongitude;
+    String currentCity;
     ClockTask clockTask;
     boolean isClockTaskRun = false;
 
@@ -144,18 +151,22 @@ public class MainFragment extends Fragment implements OnClickListener {
             if (msg.what == Const.Handler_PM_Density) {
                 PMModel data = (PMModel) msg.obj;
                 PMDensity = Double.valueOf(data.getPm25());
-                dataInitial();
+                //dataInitial();
+                text1Initial();
             }
             if (msg.what == Const.Handler_PM_Data) {
                 PMModel data = (PMModel) msg.obj;
-                PMBreatheHour = Double.valueOf(data.getPm_breath_hour());
-                PMBreatheDay = Double.valueOf(data.getPm_breath_today());
-                PMBreatheWeekAvg = Double.valueOf(data.getPm_breath_week());
-                //meanwhile update the cache
-                aCache.put(Const.Cache_PM_LastHour, PMBreatheHour);
-                aCache.put(Const.Cache_PM_LastDay, PMBreatheDay);
-                aCache.put(Const.Cache_PM_LastWeek, PMBreatheWeekAvg);
-                dataInitial();
+                if(ShortcutUtil.isStringOK(data.getPm_breath_hour())){
+                    PMBreatheHour = Double.valueOf(data.getPm_breath_hour());
+                    aCache.put(Const.Cache_PM_LastHour, PMBreatheHour);
+                }if(ShortcutUtil.isStringOK(data.getPm_breath_today())){
+                    PMBreatheDay = Double.valueOf(data.getPm_breath_today());
+                    aCache.put(Const.Cache_PM_LastDay, PMBreatheDay);
+                }if(ShortcutUtil.isStringOK(data.getPm_breath_week())) {
+                    PMBreatheWeekAvg = Double.valueOf(data.getPm_breath_week());
+                    aCache.put(Const.Cache_PM_LastWeek, PMBreatheWeekAvg);
+                }
+                text2Initial();
             }
             if(msg.what == Const.Handler_City_Name){
                 String name = (String)msg.obj;
@@ -169,6 +180,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onPause() {
         mActivity.unregisterReceiver(dbReceiver);
         aCache.put(Const.Cache_Is_Background, "true");
+        aCache.put(Const.Cache_Pause_Time,String.valueOf(System.currentTimeMillis()));
         super.onPause();
     }
 
@@ -177,6 +189,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (mActivity != null) {
             dbReceiver = new DBServiceReceiver();
             intentFilter = new IntentFilter();
+            intentFilter.addAction(Const.Action_DB_Running_State);
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
             intentFilter.addAction(Const.Action_Chart_Cache);
@@ -185,6 +198,13 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter.addAction(Const.Action_Chart_Result_3);
             intentFilter.addAction(Const.Action_DB_MAIN_Location);
             aCache.put(Const.Cache_Is_Background, "false");
+            String tmpTime = aCache.getAsString(Const.Cache_Pause_Time);
+            //Todo if longer than 30 min
+            long curTime = System.currentTimeMillis();
+            if(tmpTime != null && Long.valueOf(tmpTime) - curTime > 1){
+                Log.e("curTime",String.valueOf(curTime));
+                Const.CURRENT_NEED_REFRESH = true;
+            }
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
         super.onResume();
@@ -222,6 +242,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (!ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
             dbReceiver = new DBServiceReceiver();
             intentFilter = new IntentFilter();
+            intentFilter.addAction(Const.Action_DB_Running_State);
             intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
             intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
             intentFilter.addAction(Const.Action_Chart_Cache);
@@ -249,6 +270,10 @@ public class MainFragment extends Fragment implements OnClickListener {
         mHourPM = (TextView) view.findViewById(R.id.main_hour_pm);
         mDayPM = (TextView) view.findViewById(R.id.main_day_pm);
         mWeekPM = (TextView) view.findViewById(R.id.main_week_pm);
+        mDensityError = (ImageView)view.findViewById(R.id.main_density_error);
+        mRunError = (ImageView)view.findViewById(R.id.main_run_error);
+        mChart1Hint = (ImageView)view.findViewById(R.id.main_chart_hint_1);
+        mChart2Hint = (ImageView)view.findViewById(R.id.main_chart_hint_2);
         mChart1column = (ColumnChartView) view.findViewById(R.id.main_chart_1_column);
         mChart1line = (LineChartView) view.findViewById(R.id.main_chart_1_line);
         mChart2column = (ColumnChartView) view.findViewById(R.id.main_chart_2_column);
@@ -257,6 +282,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChangeChart2 = (TextView) view.findViewById(R.id.main_chart_2_change);
         mChart1Title = (TextView) view.findViewById(R.id.main_chart1_title);
         mChart2Title = (TextView) view.findViewById(R.id.main_chart2_title);
+        mChart1Alert = (ImageView) view.findViewById(R.id.main_chart_1_alert);
+        mChart2Alert = (ImageView) view.findViewById(R.id.main_chart_2_alert);
         setFonts(view);
         setListener();
         cacheInitial();
@@ -285,7 +312,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         String user_name = aCache.getAsString(Const.Cache_User_Name);
         String user_nickname = aCache.getAsString(Const.Cache_User_Nickname);
         String user_gender = aCache.getAsString(Const.Cache_User_Gender);
-
         String density = aCache.getAsString(Const.Cache_PM_Density);
         String pm_hour = aCache.getAsString(Const.Cache_PM_LastHour);
         String pm_day = aCache.getAsString(Const.Cache_PM_LastDay);
@@ -370,13 +396,23 @@ public class MainFragment extends Fragment implements OnClickListener {
             mTime.setText(String.valueOf(currentHour) + ": " + String.valueOf(currentMin));
         }
         mCity.setText(currentCity);
+        text1Initial();
+        text2Initial();
+     }
+
+    private void text1Initial(){
         mAirQuality.setText(DataGenerator.setAirQualityText(PMDensity));
         mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
         mHint.setTextColor(DataGenerator.setHeathHintColor(PMDensity));
+
+    }
+
+    private void text2Initial(){
         mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) + " 微克");
         mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " 微克");
         mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1)) + " 微克");
+
     }
 
     private void chartInitial(int chart1_index, int chart2_index) {
@@ -437,6 +473,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 } else {
                     current_chart1_index += 2;
                 }
+                boolean result1 = Const.Chart_Alert_Show[current_chart1_index];
+                if(result1 == true){
+                    mChart1Alert.setVisibility(View.VISIBLE);
+                    mChart1Alert.setOnClickListener(this);
+                }else mChart1Alert.setVisibility(View.GONE);
                 mChart1Title.setText(ChartsConst.Chart_title[current_chart1_index]);
                 chartInitial(current_chart1_index, current_chart2_index);
                 break;
@@ -446,8 +487,31 @@ public class MainFragment extends Fragment implements OnClickListener {
                 } else {
                     current_chart2_index += 2;
                 }
+                boolean result2 = Const.Chart_Alert_Show[current_chart2_index];
+                if(result2 == true){
+                    mChart2Alert.setVisibility(View.VISIBLE);
+                    mChart2Alert.setOnClickListener(this);
+                }else mChart2Alert.setVisibility(View.GONE);
                 mChart2Title.setText(ChartsConst.Chart_title[current_chart2_index]);
                 chartInitial(current_chart1_index, current_chart2_index);
+                break;
+            case R.id.main_chart_hint_1:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Chart_Data_Lost,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_chart_hint_2:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Chart_Data_Lost,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_density_error:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Location,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_run_error:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_chart_1_alert:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_chart_2_alert:
+                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -484,7 +548,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     private void searchCityRequest(String lati, final String Longi) {
         String url = HttpUtil.SearchCity_url;
         url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;
-        Log.e("url", url);
+        //Log.e("url", url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -496,7 +560,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                     JSONObject component = result.getJSONObject("addressComponent");
                     //Log.e("searchCityRequest comp",component.toString());
                     String cityName = component.getString("city");
-                    Log.e("searchCityRequest city",cityName);
+                   // Log.e("searchCityRequest city",cityName);
                     if (cityName != null && !cityName.trim().equals("")) {
                         Message msg = new Message();
                         msg.what = Const.Handler_City_Name;
@@ -526,8 +590,26 @@ public class MainFragment extends Fragment implements OnClickListener {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(Const.Action_DB_Running_State)){
+                int state = intent.getIntExtra(Const.Intent_DB_Run_State,0);
+                Log.e("state",String.valueOf(state));
+                if(state == 1){
+                    mDensityError.setVisibility(View.VISIBLE);
+                    mDensityError.setOnClickListener(MainFragment.this);
+                }else if(state == -1){
+                    mRunError.setVisibility(View.VISIBLE);
+                    mRunError.setOnClickListener(MainFragment.this);
+                }else {
+                    if(mDensityError.getVisibility() == View.VISIBLE)
+                        mDensityError.setVisibility(View.GONE);
+                    if(mRunError.getVisibility() == View.VISIBLE)
+                        mRunError.setVisibility(View.GONE);
+                }
+            }
             if (intent.getAction().equals(Const.Action_DB_MAIN_PMDensity)) {
                 //Update the density of PM
+                if(mRunError.getVisibility() == View.VISIBLE)
+                    mRunError.setVisibility(View.GONE);
                 PMModel model = new PMModel();
                 model.setPm25(intent.getStringExtra(Const.Intent_PM_Density));
                 Message data = new Message();
@@ -565,12 +647,12 @@ public class MainFragment extends Fragment implements OnClickListener {
                 String last_lati = aCache.getAsString(Const.Cache_Latitude);
                 String last_longi = aCache.getAsString(Const.Cache_Longitude);
                 if (last_lati == null || last_longi == null) {
-                    Log.e("MainFragment","lati or longi null");
+                    //Log.e("MainFragment","lati or longi null");
                     aCache.put(Const.Cache_Latitude, lati);
                     aCache.put(Const.Cache_Longitude, longi);
                     searchCityRequest(lati, longi);
                 } else {
-                    Log.e("MainFragment",  String.valueOf(last_lati) + " " + String.valueOf(last_longi) + " " + String.valueOf(longi)+" "+String.valueOf(lati));
+                    //Log.e("MainFragment",  String.valueOf(last_lati) + " " + String.valueOf(last_longi) + " " + String.valueOf(longi)+" "+String.valueOf(lati));
                     if (last_lati.equals(lati) && last_longi.equals(longi)) {
                         //no change
                     } else {

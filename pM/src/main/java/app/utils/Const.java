@@ -1,8 +1,11 @@
 package app.utils;
 
+import com.example.pm.FirstActivity;
 import com.example.pm.R;
 
 public class Const {
+
+    public static boolean[] Chart_Alert_Show = new boolean[]{false,false,false,false,false,false,false,false,false,false,false,false,false};
 
     public static String APP_KEY_UMENG = "566d299367e58e44cb005fe2";
 
@@ -11,6 +14,12 @@ public class Const {
     public static String Name_DB_Service = "app.services.DBService";
 
 //    public static String CURRENT_USER_ID = "0";
+
+    public static Long Min_Refresh_Time = Long.valueOf(30 * 60 * 1000);
+
+    public static Long Min_Search_PM_Time = Long.valueOf(60 * 60 * 1000);
+
+    public static Long Min_Upload_Check_Time = Long.valueOf(60 * 60 * 1000);
 
     public static String CURRENT_ACCESS_TOKEN = "-1";
 
@@ -22,6 +31,8 @@ public class Const {
 
     public static boolean CURRENT_INDOOR = false;
 
+    public static boolean CURRENT_NEED_REFRESH = false;
+
     public static final double longitude_for_test = 116.304521;
 
     public static final double latitude_for_test = 39.972465;
@@ -30,6 +41,9 @@ public class Const {
      * Cache*
      */
     public static final String Cache_Is_Background = "Cache_Is_Background";
+    public static final String Cache_Pause_Time = "Cache_Pause_Time";
+    public static final String Cache_DB_Run_Interval = "Cache_DB_Run_Interval";
+    public static final String Cache_DB_Upload_Interval = "Cache_DB_Upload_Interval";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";
@@ -37,6 +51,7 @@ public class Const {
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
     public static final String Cache_PM_Density = "Cache_PM_Density";
+    public static final String Cache_PM_Success = "Cache_PM_Success";
     public static final String Cache_PM_LastHour = "Cache_PM_LastHour";
     public static final String Cache_PM_LastDay = "Cache_PM_LastDay";
     public static final String Cache_PM_LastWeek = "Cache_PM_LastWeek";
@@ -57,6 +72,7 @@ public class Const {
     public static final String Cache_Chart_10 = "Cache_Chart_10";
     public static final String Cache_Chart_12 = "Cache_Chart_12";
     public static final String Cache_Chart_12_Date = "Cache_Chart_12_Date";
+    public static final String Cache_Chart_Alert = "Cache_Chart_Alert";
 
 
     /**
@@ -86,6 +102,8 @@ public class Const {
     public static final String Intent_DB_PM_Lati = "Intent_DB_PM_Lati";
 
     public static final String Intent_DB_PM_Longi = "Intent_DB_PM_Longi";
+
+    public static final String Intent_DB_Run_State = "Intent_DB_Run_State";
 
     public static final String Intent_chart1_data = "Intent_chart1_data";
 
@@ -119,6 +137,8 @@ public class Const {
     public static final String Action_DB_MAIN_PMDensity = "Action_DB_MAIN_PMDensity";
 
     public static final String Action_DB_MAIN_Location = "Action_DB_MAIN_Location";
+
+    public static final String Action_DB_Running_State = "Action_DB_Running_State";
 
     public static final String Action_Chart_Cache = "Action_Chart_Cache";
 
@@ -225,7 +245,11 @@ public class Const {
 
     public static final String Info_GPS_No_Cache = "无法获取上次定位信息";
 
-    public static final String Info_DB_Not_Running = "无GPS信息,数据无法计算,请退出登录后重试";
+    public static final String Info_DB_Not_Running = "后台并没有运行，请退出重试";
+
+    public static final String Info_DB_Not_Location = "当前正用上次获取的位置与浓度进行计算";
+
+    public static final String Info_Chart_Data_Lost = "当前图表显示的是非连续的信息，请保持程序长时间开启";
 
     public static final String Info_DB_Insert_Date_Conflict = "失败,插入数据库时间与当前时间不一致";
 
@@ -234,6 +258,8 @@ public class Const {
     public static final String Info_Bluetooth_Not_Support = "当前设备不支持蓝牙";
 
     public static final String Info_Away_Station_Range = "尊敬的用户，您目前所处位置，已经距最近的大气污染物监测台站超过60公里，您PM2.5吸入量的测算值的准确度有可能下降";
+
+    public static final String Info_Data_Lost = "下图显示数据存在缺失情况，请保持APP长期且持续运行";
 
     public static String[] cityName =
             {

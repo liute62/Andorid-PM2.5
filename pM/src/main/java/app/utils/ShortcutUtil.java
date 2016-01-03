@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -19,6 +20,8 @@ import java.util.Map;
  * Created by liuhaodong1 on 15/11/10.
  */
 public class ShortcutUtil {
+
+    public static final String TAG = "ShortcutUtil";
 
     public static int judgeInput(String user, String pass) {
 
@@ -281,5 +284,31 @@ public class ShortcutUtil {
             }
         }
         return max - min;
+    }
+
+    public static boolean isLocationChangeEnough(double lati1,double lati2,double longi1,double longi2){
+        return true;
+    }
+
+    public static boolean isDataLost(Map<Integer,Float> map){
+        if(map.size() <= 1) return false;
+        int total = findMaxKeyDistance(map) + 1;
+        Log.v(TAG,"total "+String.valueOf(total));
+        int num = 0;
+        for(Integer key : map.keySet()){
+            num++;
+            Log.v(TAG,"key "+String.valueOf(key));
+        }
+        if(total == num)
+            return false;
+        else return true;
+    }
+
+    public static void setDataLost(String keyForSave,Map<Integer,Float> map){
+        if(isDataLost(map)){
+            //Log.v("setDataLost", keyForSave + "true");
+        }else {
+            //Log.v("setDataLost",keyForSave+"false");
+        }
     }
 }

@@ -693,7 +693,7 @@ public class CustomViewAbove extends ViewGroup {
                     final int scrollX = getScrollX();
                     //				final int widthWithMargin = getWidth();
                     //				final float pageOffset = (float) (scrollX % widthWithMargin) / widthWithMargin;
-                    // TODO test this. should get better flinging behavior
+                    //test this. should get better flinging behavior
                     final float pageOffset = (float) (scrollX - getDestScrollX(mCurItem)) / getBehindWidth();
                     final int activePointerIndex = getPointerIndex(ev, mActivePointerId);
                     if (mActivePointerId != INVALID_POINTER) {
@@ -752,7 +752,7 @@ public class CustomViewAbove extends ViewGroup {
             mLastMotionX = x;
             mLastMotionY = y;
             setScrollingCacheEnabled(true);
-            // TODO add back in touch slop check
+            //add back in touch slop check
         } else if (xDiff > mTouchSlop) {
             mIsUnableToDrag = true;
         }

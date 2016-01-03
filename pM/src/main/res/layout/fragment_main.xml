@@ -173,6 +173,25 @@
                 android:id="@+id/main_week_pm"
                 android:layout_alignBaseline="@+id/textView8"
                 android:layout_alignLeft="@+id/main_hour_pm" />
+
+            <ImageView
+                android:layout_width="20dip"
+                android:layout_height="20dip"
+                android:id="@+id/main_density_error"
+                android:src="@android:drawable/presence_busy"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"
+                android:layout_marginEnd="30dip"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/main_run_error"
+                android:src="@android:drawable/btn_dialog"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"/>
         </RelativeLayout>
     </RelativeLayout>
 
@@ -229,6 +248,27 @@
                 android:paddingTop="8dp"
                 android:visibility="invisible" />
 
+            <ImageView
+                android:layout_width="20dip"
+                android:layout_height="20dip"
+                android:id="@+id/main_chart_hint_1"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="10dip"
+                android:layout_alignTop="@+id/main_chart1_title"
+                android:layout_toEndOf="@+id/main_chart1_title"
+                android:visibility="gone"/>
+
+
+            <ImageView
+                android:layout_width="20dip"
+                android:layout_height="20dip"
+                android:id="@+id/main_chart_1_alert"
+                android:layout_toEndOf="@+id/main_chart1_title"
+                android:src="@drawable/ic_error_outline_black_18dp"
+                android:layout_marginLeft="5dip"
+                android:visibility="gone"/>
+
             <!--<android.support.v4.view.ViewPager-->
             <!--android:id="@+id/main_chart_viewpager_1"-->
             <!--android:layout_width="match_parent"-->
@@ -263,6 +303,18 @@
                 android:textColor="@color/AccentBlue"
                 android:textSize="20sp" />
 
+
+            <ImageView
+                android:layout_width="20dip"
+                android:layout_height="20dip"
+                android:id="@+id/main_chart_hint_2"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="10dip"
+                android:layout_alignTop="@+id/main_chart2_title"
+                android:layout_toEndOf="@+id/main_chart2_title"
+                android:visibility="gone"/>
+
             <lecho.lib.hellocharts.view.ColumnChartView
                 android:id="@+id/main_chart_2_column"
                 android:layout_width="match_parent"
@@ -282,6 +334,15 @@
                 android:paddingRight="18dp"
                 android:paddingLeft="18dp"
                 android:visibility="invisible" />
+
+            <ImageView
+                android:layout_width="20dip"
+                android:layout_height="20dip"
+                android:id="@+id/main_chart_2_alert"
+                android:layout_toEndOf="@+id/main_chart2_title"
+                android:src="@drawable/ic_error_outline_black_18dp"
+                android:layout_marginLeft="5dip"
+                android:visibility="gone"/>
 
         </RelativeLayout>
     </LinearLayout>

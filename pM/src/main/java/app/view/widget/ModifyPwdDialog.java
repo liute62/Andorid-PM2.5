@@ -59,7 +59,6 @@ public class ModifyPwdDialog extends Dialog implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.widget_dialog_modify_pwd);
@@ -74,7 +73,6 @@ public class ModifyPwdDialog extends Dialog implements OnClickListener {
 
     @Override
     public void onClick(View arg0) {
-        // TODO Auto-generated method stub
         switch (arg0.getId()) {
             case R.id.dialog_modifypwd_sure:
                 username = mUser.getText().toString();

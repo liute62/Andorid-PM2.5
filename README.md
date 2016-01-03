@@ -10,13 +10,13 @@ It contains features as below:
 
 3. Calculate the data and plot graph for visualization.
 
-4. Personal state detections by using the mobile inner sensor to estimate entrained-air volume.
+4. Personal state detections by using the mobile built-in sensor to estimate entrained-air volume.
 
 5. Map function for better viewing polluted enviroment, but it is only available in China Mainland.
 
 6. Embedded Devices Connection --- the affiliated wristband and 803 PM2.5 indoor detection devices by using bluetooth and UDP protocal.
 
-## Licence: All Rights Are Reserved. 
+## Licence: All Rights Reserved. 
 
 It is ok for personal learning and discussion.
 

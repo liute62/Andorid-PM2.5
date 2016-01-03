@@ -25,6 +25,7 @@ import app.utils.VolleyQueue;
 
 public class RegisterActivity extends Activity implements View.OnClickListener {
 
+    //todo input check
     EditText mInviteCode;
     EditText mUsername;
     EditText mPassword;
