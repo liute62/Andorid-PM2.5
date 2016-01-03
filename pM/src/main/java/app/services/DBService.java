@@ -305,7 +305,7 @@ public class DBService extends Service {
                         aCache.put(Const.Cache_DB_Upload_Interval, String.valueOf(System.currentTimeMillis()));
                         if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))){
                             //means currently user has login
-                            checkPMDataForUpload();
+                           // checkPMDataForUpload();
                         }
                     }
                 }
@@ -794,28 +794,30 @@ public class DBService extends Service {
     }
 
     public void uploadPMData(final State state) {
-        isUploadRun = true;
-        String url = HttpUtil.Upload_url;
-        JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
-        Log.e("json", tmp.toString());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                isUploadRun = false;
-                Log.e("response", response.toString());
-                updateStateUpLoad(state,1);
-                Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                isUploadRun = false;
-                Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
-                insertState(state);
-            }
+        if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))) {
+            isUploadRun = true;
+            String url = HttpUtil.Upload_url;
+            JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
+            Log.e("json", tmp.toString());
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    isUploadRun = false;
+                    Log.e("response", response.toString());
+                    updateStateUpLoad(state, 1);
+                    Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    isUploadRun = false;
+                    Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+                    insertState(state);
+                }
 
-        });
-        VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+            });
+            VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        }
     }
 
     private void updateStateUpLoad(State state,int upload) {
@@ -828,50 +830,52 @@ public class DBService extends Service {
      * Check DB if there are some data for uploading
      */
     public void checkPMDataForUpload() {
-        Log.d("upload", "upload batch start");
-        final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD+"=?","0").list();
-        Log.d("upload","upload size "+states.size());
-        isUploadRun = true;
-        String url = HttpUtil.UploadBatch_url;
-        JSONArray array = new JSONArray();
-        for (State state:states) {
-            JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
-            array.put(tmp);
-        }
-        JSONObject batchData = null;
-        try {
-            batchData = new JSONObject();
-            batchData.put("data",array);
-        }  catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.d("batchData",batchData.toString());
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                isUploadRun = false;
-                Log.e("response", response.toString());
-                try {
-                    String value = response.getString("succeed_count");
-                    if (Integer.valueOf(value)==states.size()) {
-                        for (State state:states) {
-                            updateStateUpLoad(state,1);
+        if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))){
+            Log.d("upload", "upload batch start");
+            final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD + "=?", "0").list();
+            Log.d("upload", "upload size " + states.size());
+            isUploadRun = true;
+            String url = HttpUtil.UploadBatch_url;
+            JSONArray array = new JSONArray();
+            for (State state : states) {
+                JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
+                array.put(tmp);
+            }
+            JSONObject batchData = null;
+            try {
+                batchData = new JSONObject();
+                batchData.put("data", array);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.d("batchData", batchData.toString());
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    isUploadRun = false;
+                    Log.e("response", response.toString());
+                    try {
+                        String value = response.getString("succeed_count");
+                        if (Integer.valueOf(value) == states.size()) {
+                            for (State state : states) {
+                                updateStateUpLoad(state, 1);
+                            }
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                isUploadRun = false;
-                Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
-            }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    isUploadRun = false;
+                    Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+                }
 
-        });
-        VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+            });
+            VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        }
     }
 
     /**

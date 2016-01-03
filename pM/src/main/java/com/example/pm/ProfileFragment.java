@@ -146,7 +146,7 @@ public class ProfileFragment extends Fragment implements
         mLogout.setOnClickListener(this);
         mTurnOffService.setOnClickListener(this);
         mTurnOffUpload.setOnClickListener(this);
-        mClear.setOnClickListener(this);
+       // mClear.setOnClickListener(this);
         mRegister.setOnClickListener(this);
         mBluetooth.setOnClickListener(this);
         mModifyPwd.setOnClickListener(this);
@@ -202,11 +202,11 @@ public class ProfileFragment extends Fragment implements
                 break;
             case R.id.profile_clear_data:
                 clearCache();
-                getActivity().finish();
                 if (ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
                     intent = new Intent(mActivity, DBService.class);
                     mActivity.stopService(intent);
                 }
+                getActivity().finish();
                 break;
             case R.id.profile_rigister:
                 intent = new Intent(mActivity, RegisterActivity.class);
