@@ -445,7 +445,6 @@ public class DBService extends Service {
                     simpleStepDetector.updateAccel(
                             event.timestamp, event.values[0], event.values[1], event.values[2]);
                 }
-
                 long time2 = System.currentTimeMillis();
                 if (time2 - time1 > 5000) {
                     if (numSteps > 70)
@@ -795,25 +794,22 @@ public class DBService extends Service {
     }
 
     public void uploadPMData(final State state) {
-        isUploadTaskRun = true;
+        isUploadRun = true;
         String url = HttpUtil.Upload_url;
         JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
-        //Log.e("json", tmp.toString());
+        Log.e("json", tmp.toString());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                isUploadTaskRun = false;
-                //Log.e("response", response.toString());
-                State tmp;
-                tmp = state;
-                tmp.setUpload(1);
-                insertState(tmp);
+                isUploadRun = false;
+                Log.e("response", response.toString());
+                updateStateUpLoad(state,1);
                 Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                isUploadTaskRun = false;
+                isUploadRun = false;
                 Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
                 insertState(state);
             }
