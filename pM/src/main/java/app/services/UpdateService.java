@@ -17,8 +17,10 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +36,7 @@ import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.DBHelper;
 import app.utils.HttpUtil;
+import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import nl.qbusict.cupboard.QueryResultIterable;
 
@@ -59,9 +62,7 @@ public class UpdateService {
         if(instance == null){
             instance = new UpdateService(context,aCache,dbHelper);
         }
-        if(instance.isRunning == false){
-            instance.runInner();
-        }
+        instance.runInner();
     }
 
     private UpdateService(Context context,ACache aCache,DBHelper dbHelper){
@@ -73,7 +74,6 @@ public class UpdateService {
 
     //main process
     private void runInner() {
-        isRunning = true;
         boolean isConnected = isNetworkAvailable(mContext);
         if (!isConnected) {
             Log.d("connection","update is not start cause no network");
@@ -83,6 +83,7 @@ public class UpdateService {
         if (isConnected) {
             synchronized (this) {
                 List<State> states = this.getAllNotConnection();
+                Log.d("connection","not connection is "+states.size());
                 if (states != null) {
                     while (states.size() > 0 && isConnected) {
                         State s = states.remove(0);
@@ -98,23 +99,8 @@ public class UpdateService {
     get all not uploaded
      */
     private List<State> getAllNotConnection() {
-        Cursor c = cupboard().withDatabase(db).query(State.class).getCursor();
-        QueryResultIterable<State> itr = cupboard().withCursor(c).iterate(State.class);
-        try{
-            List<State> siList = new ArrayList<State>();
-            Log.d("connection","not connection "+siList.size());
-            for (State state:itr) {
-                if (state.getConnection()==0) {
-                    siList.add(state);
-                }
-            }
-            return siList;
-        } catch(Exception e) {
-            Log.e("error","get connection is failed");
-        }finally{
-            c.close();
-        }
-        return null;
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0").list();
+        return states;
     }
 
     private void updateStateDensity(State state,String density) {
@@ -160,12 +146,14 @@ public class UpdateService {
      */
     public void UpdateDensity(final State state) {
         String url = HttpUtil.Search_PM_url + "?longitude=" + state.getLongtitude() + "&latitude=" + state.getLatitude()
-                + "&time_point=" + state.getTime_point();
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+                + "&time_point=" + ShortcutUtil.refFormatNowDate(Long.valueOf(state.getTime_point())).substring(0, 19);
+        Log.d("url",url);
+        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(Request.Method.GET, url, new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(JSONArray response) {
                 try {
-                    String mDensity = String.valueOf(response.getDouble("PM25"));
+                    Log.d("connection","connection is ok now");
+                    String mDensity = String.valueOf(response.getJSONObject(0).getDouble("PM25"));
                     //update density
                     updateStateDensity(state, mDensity);
                     //update connection
@@ -182,6 +170,7 @@ public class UpdateService {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Log.d("error",error.toString());
                 Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
             }
         });
