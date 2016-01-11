@@ -10,9 +10,12 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 
 import app.services.UpdateService;
+import app.utils.ACache;
+import app.utils.Const;
 
 public class MainActivity extends SlidingActivity {
 
+    ACache aCache;
     Fragment newFragment;
 
     @Override

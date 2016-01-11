@@ -21,13 +21,14 @@
     <string name="main_fig_4_title">平均单位时间吸入的空气量(L/min)</string>
     <string name="main_fig_5_title"></string>
     <string name="main_fig_6_title">累积吸入的空气量(L)</string>
-    <string name="first_app_name">健康空气(Bio3Air)</string>
-    <string name="first_title">手机APP用户须知</string>
+    <string name="first_app_name">自由呼吸(Bio3Air)</string>
+    <string name="first_title">自由呼吸(Bio3Air)手机APP用户须知</string>
     <string name="first_para_1">1.凡以任何方式使用本APP，或直接、间接使用本APP资料者，均被视为已经仔细阅读本条款并完全同意。并且均被视为自愿接受本APP相关声明和用户服务协议的约束。</string>
-    <string name="first_para_2">2.健康空气(Bio3Air)手机APP用于测量、记录和显示用户个人大气污染物(例如PM2.5)。</string>
-    <string name="first_para_3">3.健康空气(Bio3Air)手机APP为您提供的大气污染物浓度和暴露量数据、以及健康提示，不应用于医学诊断、治疗相关等目的。</string>
-    <string name="first_para_4">4.使用健康空气(Bio3Air)手机APP，会产生一定的数据流量，并导致相关费用。</string>
-    <string name="first_para_5">5.本公司对相关声明版权及其修改权、更新权和最终解释权均属NNNN公司所有。</string>
+    <string name="first_para_2">2.严正声明：北京圣马山环保科技有限公司获专利授权，发布自由呼吸系列产品。自由呼吸系列产品(测量方法，软件系统，硬件设备等) 被专利保护，仿冒必将受到法律的查处。</string>
+    <string name="first_para_3">3.健康空气(Bio3Air)手机APP用于测量、记录和显示用户个人大气污染物(例如PM2.5)。</string>
+    <string name="first_para_4">4.健康空气(Bio3Air)手机APP为您提供的大气污染物浓度和暴露量数据、以及健康提示，不应用于医学诊断、治疗相关等目的。</string>
+    <string name="first_para_5">5.使用健康空气(Bio3Air)手机APP，会产生一定的数据流量，并导致相关费用。</string>
+    <string name="first_para_6">6.北京圣马山环保科技有限公司获专利授权，发布自由呼吸系列产品。本声明版权及其修改权、更新权和最终解释权均属北京圣马山环保科技有限公司所有。</string>
     <string name="register_title">用户注册</string>
     <!--For Bluetooth -->
     <string name="ble_not_supported">该设备不支持蓝牙4.3协议</string>

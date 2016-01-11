@@ -41,6 +41,8 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
     ImageView mProfile;
     ImageView mBack;
     ImageView mScan;
+
+
     ImageView mRefresh;
     ImageView mStop;
     ListView mDevicesList;

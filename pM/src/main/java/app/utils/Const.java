@@ -73,6 +73,7 @@ public class Const {
     public static final String Cache_Chart_12 = "Cache_Chart_12";
     public static final String Cache_Chart_12_Date = "Cache_Chart_12_Date";
     public static final String Cache_Chart_Alert = "Cache_Chart_Alert";
+    public static final String Cache_User_Weight = "Cache_User_Weight";
 
 
     /**
@@ -87,6 +88,8 @@ public class Const {
     public static final int Handler_Modify_Pwd_Success = 100004;
 
     public static final int Handler_City_Name = 100005;
+
+    public static final int Handler_Input_Weight = 100006;
 
     /**
      * Intent Tag Code*
@@ -128,6 +131,8 @@ public class Const {
     public static final String Intent_chart12_data = "Intent_chart12_data";
 
     public static final String Intent_chart_12_data_date = "Intent_chart_12_data_date";
+
+    public static final String Intent_User_Weight = "Intent_User_Weight";
 
     /**
      * Service & Activity Code*
@@ -260,6 +265,8 @@ public class Const {
     public static final String Info_Away_Station_Range = "尊敬的用户，您目前所处位置，已经距最近的大气污染物监测台站超过60公里，您PM2.5吸入量的测算值的准确度有可能下降";
 
     public static final String Info_Data_Lost = "下图显示数据存在缺失情况，请保持APP长期且持续运行";
+
+    public static final String Info_Input_Weight_Error = "体重输入有误，请重新输入.";
 
     public static String[] cityName =
             {
