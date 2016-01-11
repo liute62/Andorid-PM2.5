@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.SyncStateContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,8 +20,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.umeng.socialize.controller.UMServiceFactory;
-import com.umeng.socialize.controller.UMSocialService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +30,8 @@ import app.utils.HttpUtil;
 import app.utils.ShareUtils;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
+import app.view.widget.DialogNotification;
+import app.view.widget.DialogPersonalState;
 import app.view.widget.InfoDialog;
 import app.view.widget.LoginDialog;
 import app.view.widget.ModifyPwdDialog;
@@ -57,6 +56,8 @@ public class ProfileFragment extends Fragment implements
     Button mModifyPwd;
     Button mShare;
     TextView mResetPwd;
+    TextView mNotification;
+    TextView mModifyAndView;
     ACache aCache;
     InfoDialog infoDialog;
     boolean infoDialogShow;
@@ -73,11 +74,20 @@ public class ProfileFragment extends Fragment implements
         }
     };
 
-    Handler modifyPwdHandler = new Handler() {
+    Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-
+            if (msg.what == Const.Handler_Gender_Updated){
+                String gender = aCache.getAsString(Const.Cache_User_Gender);
+                if(gender != null){
+                    if(Integer.valueOf(gender) == 1){
+                        mGender.setText(mActivity.getResources().getString(R.string.profile_gender_female));
+                    }else if(Integer.valueOf(gender) == 0){
+                        mGender.setText(mActivity.getResources().getString(R.string.profile_gender_male));
+                    }
+                }
+            }
         }
     };
 
@@ -108,6 +118,8 @@ public class ProfileFragment extends Fragment implements
         mModifyPwd = (Button) view.findViewById(R.id.profile_modify_password);
         mResetPwd = (TextView) view.findViewById(R.id.profile_reset_pwd);
         mShare = (Button)view.findViewById(R.id.profile_share);
+        mNotification = (TextView)view.findViewById(R.id.profile_view_notification);
+        mModifyAndView = (TextView)view.findViewById(R.id.profile_modify_personal_state);
         checkCache();
         setListener();
         return view;
@@ -151,6 +163,8 @@ public class ProfileFragment extends Fragment implements
         mBluetooth.setOnClickListener(this);
         mModifyPwd.setOnClickListener(this);
         mShare.setOnClickListener(this);
+        mNotification.setOnClickListener(this);
+        mModifyAndView.setOnClickListener(this);
     }
 
     @Override
@@ -162,6 +176,12 @@ public class ProfileFragment extends Fragment implements
     public void onClick(View v) {
         Intent intent = null;
         switch (v.getId()) {
+            case R.id.profile_modify_personal_state:
+                DialogPersonalState.getInstance(mActivity, mHandler).show();
+                break;
+            case R.id.profile_view_notification:
+                DialogNotification.getInstance(mActivity).show();
+                break;
             case R.id.profile_login:
                 LoginDialog loginDialog = new LoginDialog(getActivity(), loginHandler);
                 loginDialog.show();
@@ -217,7 +237,7 @@ public class ProfileFragment extends Fragment implements
                 break;
             case R.id.profile_modify_password:
                 if (!Const.CURRENT_ACCESS_TOKEN.equals("-1")) {
-                    ModifyPwdDialog modifyPwdDialog = new ModifyPwdDialog(mActivity, modifyPwdHandler);
+                    ModifyPwdDialog modifyPwdDialog = new ModifyPwdDialog(mActivity, mHandler);
                     modifyPwdDialog.show();
                 } else {
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_First, Toast.LENGTH_SHORT).show();

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.pm.R;
 
 import app.utils.Const;
+import app.utils.ShortcutUtil;
 
 /**
  * Created by Administrator on 1/11/2016.
@@ -53,7 +54,7 @@ public class DialogInputWeight extends Dialog implements View.OnClickListener{
                 break;
             case R.id.input_weight_confirm:
                 String content = mContent.getText().toString();
-                if(validate(content)){
+                if(ShortcutUtil.isWeightInputCorrect(content)){
                     Message message = new Message();
                     message.what = Const.Handler_Input_Weight;
                     message.obj = content;
@@ -63,20 +64,5 @@ public class DialogInputWeight extends Dialog implements View.OnClickListener{
                 }
                 break;
         }
-    }
-
-    private boolean validate(String content){
-        if(content == null) return false;
-        if(content.trim().equals("")) return false;
-        Integer weight = 0;
-        try{
-            weight = Integer.valueOf(content);
-        }catch (Exception e){
-            return false;
-        }
-        if(weight <= 0 || weight >= 200){
-            return false;
-        }
-        return true;
     }
 }

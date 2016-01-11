@@ -47,7 +47,7 @@ public class Const {
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";
-    public static final String Cache_User_Gender = "Cache_User_Gender";
+    public static final String Cache_User_Gender = "Cache_User_Gender"; // 0 male, 1 female, -1 undefined
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
     public static final String Cache_PM_Density = "Cache_PM_Density";
@@ -90,6 +90,8 @@ public class Const {
     public static final int Handler_City_Name = 100005;
 
     public static final int Handler_Input_Weight = 100006;
+
+    public static final int Handler_Gender_Updated = 100007;
 
     /**
      * Intent Tag Code*
@@ -267,6 +269,8 @@ public class Const {
     public static final String Info_Data_Lost = "下图显示数据存在缺失情况，请保持APP长期且持续运行";
 
     public static final String Info_Input_Weight_Error = "体重输入有误，请重新输入.";
+
+    public static final String Info_Input_Weight_Saved = "体重数据已保存";
 
     public static String[] cityName =
             {

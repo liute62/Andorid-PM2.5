@@ -92,6 +92,26 @@
                         android:textColor="@color/AccentBlue"
                         android:visibility="invisible" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="用户须知"
+                        android:id="@+id/profile_view_notification"
+                        android:textColor="@color/AccentBlue"
+                        android:layout_marginStart="30dp"
+                        android:layout_below="@+id/profile_reset_pwd"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:layout_width="34dp"
+                        android:layout_height="wrap_content"
+                        android:text="查看修改"
+                        android:id="@+id/profile_modify_personal_state"
+                        android:textColor="@color/AccentBlue"
+                        android:layout_marginLeft="6dp"
+                        android:layout_alignTop="@+id/profile_username"
+                        android:layout_toEndOf="@+id/profile_username" />
+
 
                 </RelativeLayout>
 
