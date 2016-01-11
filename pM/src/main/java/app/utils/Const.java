@@ -330,4 +330,11 @@ public class Const {
             "0", "50", "100", "150", "200", "300","浓度"
     };
 
+    /**
+     * DayMaxOfTheMonth[1] = 31 January : number of days = 31
+     */
+    public static int[] DayMaxOfTheMonth = {
+       0,31,29,31,30,31,30,31,31,30,31,30,31
+    };
+
 }

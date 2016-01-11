@@ -105,14 +105,13 @@ public class DataCalculator {
             int month = monthOrigin;
             int year = yearOrigin;
             if (day - i < 1) {
-                //this time I don't take the different number day of a month into consideration
-                //Ex. 11.1: 1 - 7 = -6, actually date should be 10.(30+1-7)
+                //TODO for Febarury.
                 month = month - 1;
-                day = 30 + day - i;
                 if (month < 1) {
                     year = year - 1;
                     month = 12;
                 }
+                day = Const.DayMaxOfTheMonth[month] + day - i;
             } else {
                 day = day - i;
             }
