@@ -230,7 +230,7 @@ public class DBService extends Service {
                         checkPMDataForUpload();
                         break;
                     case 3:
-                        UpdateService.run(getApplicationContext(),aCache,dbHelper);
+                        //UpdateService.run(getApplicationContext(),aCache,dbHelper);
                         break;
                     case 7:
                         intentChart = new Intent(Const.Action_Chart_Result_1);
@@ -356,6 +356,7 @@ public class DBService extends Service {
         //todo each time to run the data and
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
+            Log.d(TAG,"PM25 Density "+String.valueOf(PM25Density));
         }
         GPSInitial();
         DBInitial();
@@ -407,7 +408,7 @@ public class DBService extends Service {
             state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
-            IDToday = Long.valueOf(state.getId());
+            IDToday = Long.valueOf(state.getId()) + 1;
         }
     }
 
@@ -732,12 +733,12 @@ public class DBService extends Service {
 //        //Log.e("insertState","now"+now+"insert"+insert);
 //        if(insert.equals(now)) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Log.d(TAG,"-------insert ------state --------- begin");
-        //state.print();
+        Log.d(TAG, "-------insert ------state --------- begin");
+        state.print();
         Log.d(TAG, "-------insert ------state --------- finish");
         cupboard().withDatabase(db).put(state);
-        //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
         IDToday++;
+        //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
 //        }else {
 //            Toast.makeText(getApplicationContext(),Const.Info_DB_Insert_Date_Conflict,Toast.LENGTH_SHORT);
 //        }
@@ -781,6 +782,7 @@ public class DBService extends Service {
                     intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
                     //set current pm density for calculation
                     PM25Density = Double.valueOf(pmModel.getPm25());
+                    Log.d(TAG,"searchPMRequest PM2.5 Density "+String.valueOf(PM25Density));
                     aCache.put(Const.Cache_PM_Density, PM25Density);
                     sendBroadcast(intent);
                     DBCanRun = true;
@@ -804,15 +806,17 @@ public class DBService extends Service {
     }
 
     public void uploadPMData(final State state) {
+            Log.d(TAG,"uploadPMData State density: "+state.getDensity());
             isUploadRun = true;
             String url = HttpUtil.Upload_url;
             JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
-            Log.e("json", tmp.toString());
+            Log.d("json", tmp.toString());
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     isUploadRun = false;
                     Log.v("response", response.toString());
+                    insertState(state);
                     updateStateUpLoad(state, 1);
                     Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
                 }
@@ -861,7 +865,7 @@ public class DBService extends Service {
                 @Override
                 public void onResponse(JSONObject response) {
                     isUploadRun = false;
-                    Log.e("response", response.toString());
+                    Log.d("response", response.toString());
                     try {
                         String value = response.getString("succeed_count");
                         if (Integer.valueOf(value) == states.size()) {

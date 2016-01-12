@@ -308,11 +308,11 @@ public class ShortcutUtil {
     public static boolean isDataLost(Map<Integer,Float> map){
         if(map.size() <= 1) return false;
         int total = findMaxKeyDistance(map) + 1;
-        Log.v(TAG,"total "+String.valueOf(total));
+        ///Log.v(TAG,"total "+String.valueOf(total));
         int num = 0;
         for(Integer key : map.keySet()){
             num++;
-            Log.v(TAG,"key "+String.valueOf(key));
+            //Log.v(TAG,"key "+String.valueOf(key));
         }
         if(total == num)
             return false;

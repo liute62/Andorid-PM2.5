@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  */
 public class DataResultActivity extends Activity {
 
+    public static final String TAG = "DataResultActivity";
     ListView mListView;
     List<State> todayStates;
     StateAdapter mAdapter;
@@ -46,6 +48,9 @@ public class DataResultActivity extends Activity {
         db = dbHelper.getReadableDatabase();
         todayStates = getTodayState();
         mListView = (ListView)findViewById(R.id.data_result_listview);
+//        for(int i = 0; i != todayStates.size(); i++){
+//            Log.d(TAG,String.valueOf(i)+" "+todayStates.get(i).getDensity());
+//        }
         mAdapter = new StateAdapter(this,todayStates);
         mListView.setAdapter(mAdapter);
     }
@@ -129,11 +134,11 @@ public class DataResultActivity extends Activity {
                 viewHolder.mStatus.setText(mdata.get(position).getStatus());
                 viewHolder.mOutdoor.setText(mdata.get(position).getOutdoor());
                 viewHolder.mAir.setText(mdata.get(position).getVentilation_volume().length() < 8?
-                mdata.get(position).getVentilation_volume():mdata.get(position).getVentilation_volume().substring(0, 7));
-                viewHolder.mPMDensity.setText(mdata.get(position).getDensity().length()<8?
-                        mdata.get(position).getDensity():mdata.get(position).getDensity().substring(0,7));
+                        mdata.get(position).getVentilation_volume() : mdata.get(position).getVentilation_volume().substring(0, 7));
+                viewHolder.mPMDensity.setText(mdata.get(position).getDensity().length() < 8?
+                        mdata.get(position).getDensity() : mdata.get(position).getDensity().substring(0,7));
                 viewHolder.mPMResult.setText(mdata.get(position).getPm25().length() < 8?
-                        mdata.get(position).getPm25():mdata.get(position).getPm25().substring(0,7));
+                        mdata.get(position).getPm25() : mdata.get(position).getPm25().substring(0,7));
                 viewHolder.mSource.setText(mdata.get(position).getSource());
                 viewHolder.mUpload.setText(mdata.get(position).getUpload() == 0? "Not":"Yes");
             return convertView;

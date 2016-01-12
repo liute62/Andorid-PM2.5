@@ -103,6 +103,7 @@ public class State {
             object.put("steps", state.getSteps());
             object.put("avg_rate", state.getAvg_rate());
             object.put("ventilation_volume", state.getVentilation_volume());
+            object.put("density",state.getDensity());
             object.put("pm25", state.getPm25());
             object.put("source", state.getSource());
         } catch (JSONException e) {

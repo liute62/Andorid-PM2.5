@@ -506,7 +506,7 @@ public class DataGenerator {
 
     public static LineChartData chart3DataGenerator(Map<Integer, Float> maps) {
         for (Integer key: maps.keySet()){
-            Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
+            //Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
         }
         ArrayList<Integer> tmpKey = new ArrayList<>();
         LineChartData data;
@@ -515,7 +515,7 @@ public class DataGenerator {
         int numPoints = ShortcutUtil.findMaxKeyDistance(maps)+1;
         int start = ShortcutUtil.getMinIndexFromMap(maps);
         int end = ShortcutUtil.getMaxIndexFromMap(maps);
-        Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
+        //Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
         for(int i = start; i <= end;i++){
             tmpKey.add(start);
             axisValues.add(null);
@@ -795,7 +795,7 @@ public class DataGenerator {
 
     public static LineChartData chart10DataGenerator(Map<Integer, Float> maps) {
         for (Integer key: maps.keySet()){
-            Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
+           // Log.e(String.valueOf(key),String.valueOf(maps.get(key)));
         }
         ArrayList<Integer> tmpKey = new ArrayList<>();
         LineChartData data;
@@ -804,7 +804,7 @@ public class DataGenerator {
         int numPoints = ShortcutUtil.findMaxKeyDistance(maps)+1;
         int start = ShortcutUtil.getMinIndexFromMap(maps);
         int end = ShortcutUtil.getMaxIndexFromMap(maps);
-        Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
+        //Log.e("num start end",String.valueOf(numPoints)+" "+String.valueOf(start)+" "+String.valueOf(end));
         for(int i = start; i <= end;i++){
             tmpKey.add(start);
             axisValues.add(null);

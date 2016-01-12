@@ -65,6 +65,7 @@ import lecho.lib.hellocharts.view.LineChartView;
  */
 public class MainFragment extends Fragment implements OnClickListener {
 
+    public static final String TAG = "MainFragment";
     //Todo, a icon to alert that user 60km away from station
     Activity mActivity;
     ImageView mProfile;
@@ -202,7 +203,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             //Todo if longer than 30 min
             long curTime = System.currentTimeMillis();
             if(tmpTime != null && Long.valueOf(tmpTime) - curTime > 1){
-                Log.e("curTime",String.valueOf(curTime));
+                Log.d(TAG,"CurrentTime "+ShortcutUtil.refFormatNowDate(curTime));
                 Const.CURRENT_NEED_REFRESH = true;
             }
             mActivity.registerReceiver(dbReceiver, intentFilter);
@@ -592,7 +593,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(Const.Action_DB_Running_State)){
                 int state = intent.getIntExtra(Const.Intent_DB_Run_State,0);
-                Log.e("state",String.valueOf(state));
+               // Log.e("state",String.valueOf(state));
                 if(state == 1){
                     mDensityError.setVisibility(View.VISIBLE);
                     mDensityError.setOnClickListener(MainFragment.this);
