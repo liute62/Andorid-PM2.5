@@ -124,9 +124,21 @@
             android:layout_height="wrap_content"
             android:text="返回"
             android:layout_marginTop="8dp"
-            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="30dp"
             android:layout_centerHorizontal="true"
             android:id="@+id/personal_state_btn"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/personal_state_today"
+            android:text="查看今日纪录"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="20dp"
+            android:layout_toStartOf="@+id/personal_state_btn" />
     </RelativeLayout>
 
     <RelativeLayout

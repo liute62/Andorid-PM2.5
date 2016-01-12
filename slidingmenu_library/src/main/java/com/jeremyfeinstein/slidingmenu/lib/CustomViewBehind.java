@@ -19,28 +19,21 @@ public class CustomViewBehind extends ViewGroup {
 
     private static final String TAG = "CustomViewBehind";
 
-    //±ßÔµ»¬¶¯µÄÁÙ½çÖµ
     private static final int MARGIN_THRESHOLD = 48; // dips
 
-    //³õÊ¼»¯´¥ÃşµÄÄ£Ê½
     private int mTouchMode = SlidingMenu.TOUCHMODE_MARGIN;
 
-    //¶¨ÒåÉÏ·½ÊÓÍ¼
     private CustomViewAbove mViewAbove;
 
-    //¶¨ÒåÄÚÈİÊÓÍ¼
     private View mContent;
     private View mSecondaryContent;
 
-    //¶¨Òå»¬¶¯±ßÔµµÄÁÙ½çÖµ
     private int mMarginThreshold;
 
-    //¿í¶ÈµÄÆ«ÒÆÁ¿
     private int mWidthOffset;
 
     private CanvasTransformer mTransformer;
 
-    //ÊÇ·ñÄÜ¹»Ê¹ÓÃ×ÓÊÓÍ¼
     private boolean mChildrenEnabled;
 
     public CustomViewBehind(Context context) {
@@ -62,7 +55,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÉèÖÃ¿í¶ÈµÄÆ«ÒÆÁ¿
+     * ï¿½ï¿½ï¿½Ã¿ï¿½Èµï¿½Æ«ï¿½ï¿½ï¿½ï¿½
      */
     public void setWidthOffset(int i) {
         mWidthOffset = i;
@@ -70,28 +63,28 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÉèÖÃ±ßÔµ»¬¶¯µÄÁÙ½çÖµ
+     * ï¿½ï¿½ï¿½Ã±ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù½ï¿½Öµ
      */
     public void setMarginThreshold(int marginThreshold) {
         mMarginThreshold = marginThreshold;
     }
 
     /**
-     * µÃµ½±ßÔµ»¬¶¯µÄÁÙ½çÖµ
+     * ï¿½Ãµï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù½ï¿½Öµ
      */
     public int getMarginThreshold() {
         return mMarginThreshold;
     }
 
     /**
-     * µÃµ½ÊÓÍ¼µÄ¿í¶È
+     * ï¿½Ãµï¿½ï¿½ï¿½Í¼ï¿½Ä¿ï¿½ï¿½
      */
     public int getBehindWidth() {
         return mContent.getWidth();
     }
 
     /**
-     * ÉèÖÃÊÓÍ¼µÄÄÚÈİ
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     public void setContent(View v) {
         if (mContent != null)
@@ -101,14 +94,14 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * µÃµ½ÊÓÍ¼µÄÄÚÈİ
+     * ï¿½Ãµï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     public View getContent() {
         return mContent;
     }
 
     /**
-     * ÉèÖÃÓÒ±ß»¬¶¯²Ëµ¥µÄÄÚÈİ£¬µ±Ä£Ê½ÉèÖÃÎªLEFT_RIGHTÄ£Ê½Ê±
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ò±ß»ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ£ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ÎªLEFT_RIGHTÄ£Ê½Ê±
      */
     public void setSecondaryContent(View v) {
         if (mSecondaryContent != null)
@@ -118,14 +111,14 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * µÃµ½ÓÒ±ß»¬¶¯²Ëµ¥µÄÄÚÈİ
+     * ï¿½Ãµï¿½ï¿½Ò±ß»ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     public View getSecondaryContent() {
         return mSecondaryContent;
     }
 
     /**
-     * ÉèÖÃÊÇ·ñÄÜ¹»Ê¹ÓÃ×ÓÊÓÍ¼
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ü¹ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
      */
     public void setChildrenEnabled(boolean enabled) {
         mChildrenEnabled = enabled;
@@ -180,32 +173,32 @@ public class CustomViewBehind extends ViewGroup {
             mSecondaryContent.measure(contentWidth, contentHeight);
     }
 
-    //¶¨ÒåÄ£Ê½µÄÖµ
+    //ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½Öµ
     private int mMode;
 
-    //ÊÇ·ñÄÜ¹»Ê¹ÓÃ½¥Èë½¥³öĞ§¹û
+    //ï¿½Ç·ï¿½ï¿½Ü¹ï¿½Ê¹ï¿½Ã½ï¿½ï¿½ë½¥ï¿½ï¿½Ğ§ï¿½ï¿½
     private boolean mFadeEnabled;
 
-    //¶¨Òå½¥Èë½¥³öµÄÖµ
+    //ï¿½ï¿½ï¿½å½¥ï¿½ë½¥ï¿½ï¿½ï¿½ï¿½Öµ
     private float mFadeDegree;
 
-    //¶¨Òå½¥Èë½¥³öĞ§¹û»­±Ê
+    //ï¿½ï¿½ï¿½å½¥ï¿½ë½¥ï¿½ï¿½Ğ§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     private final Paint mFadePaint = new Paint();
 
-    //¶¨Òå»¬¶¯Ëõ·ÅµÄÖµ
+    //ï¿½ï¿½ï¿½å»¬ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½Öµ
     private float mScrollScale;
 
-    //¶¨Òå»¬¶¯²Ëµ¥µÄÒõÓ°
+    //ï¿½ï¿½ï¿½å»¬ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ó°
     private Drawable mShadowDrawable;
 
-    //¶¨ÒåÓÒ±ß»¬¶¯²Ëµ¥µÄÒõÓ°Í¼Æ¬
+    //ï¿½ï¿½ï¿½ï¿½ï¿½Ò±ß»ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ó°Í¼Æ¬
     private Drawable mSecondaryShadowDrawable;
 
-    //¶¨ÒåÒõÓ°µÄ¿í¶È
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½Ä¿ï¿½ï¿½
     private int mShadowWidth;
 
     /**
-     * ÉèÖÃÄ£Ê½µÄÖµ
+     * ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½Öµ
      */
     public void setMode(int mode) {
         if (mode == SlidingMenu.LEFT || mode == SlidingMenu.RIGHT) {
@@ -218,28 +211,28 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * µÃµ½Ä£Ê½µÄÖµ
+     * ï¿½Ãµï¿½Ä£Ê½ï¿½ï¿½Öµ
      */
     public int getMode() {
         return mMode;
     }
 
     /**
-     * ÉèÖÃ»¬¶¯Ëõ·ÅµÄÖµ
+     * ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½Öµ
      */
     public void setScrollScale(float scrollScale) {
         mScrollScale = scrollScale;
     }
 
     /**
-     * µÃµ½»¬¶¯Ëõ·ÅµÄÖµ
+     * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åµï¿½Öµ
      */
     public float getScrollScale() {
         return mScrollScale;
     }
 
     /**
-     * ÉèÖÃ»¬¶¯²Ëµ¥µÄÒõÓ°
+     * ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ó°
      */
     public void setShadowDrawable(Drawable shadow) {
         mShadowDrawable = shadow;
@@ -247,7 +240,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÉèÖÃÓÒ±ß»¬¶¯²Ëµ¥µÄÒõÓ°
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ò±ß»ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ó°
      */
     public void setSecondaryShadowDrawable(Drawable shadow) {
         mSecondaryShadowDrawable = shadow;
@@ -255,7 +248,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÉèÖÃÒõÓ°µÄ¿í¶È
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½Ä¿ï¿½ï¿½
      */
     public void setShadowWidth(int width) {
         mShadowWidth = width;
@@ -263,14 +256,14 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÉèÖÃÄÜ·ñÊ¹ÓÃ½¥Èë½¥³öĞ§¹û
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ü·ï¿½Ê¹ï¿½Ã½ï¿½ï¿½ë½¥ï¿½ï¿½Ğ§ï¿½ï¿½
      */
     public void setFadeEnabled(boolean b) {
         mFadeEnabled = b;
     }
 
     /**
-     * ÉèÖÃ½¥Èë½¥³öµÄÖµ
+     * ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ë½¥ï¿½ï¿½ï¿½ï¿½Öµ
      */
     public void setFadeDegree(float degree) {
         if (degree > 1.0f || degree < 0.0f)
@@ -279,7 +272,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * µÃµ½²Ëµ¥Ò³Ãæ
+     * ï¿½Ãµï¿½ï¿½Ëµï¿½Ò³ï¿½ï¿½
      */
     public int getMenuPage(int page) {
         page = (page > 1) ? 2 : ((page < 1) ? 0 : page);
@@ -293,7 +286,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * »¬¶¯ÏÂ·½ÊÓÍ¼µ½´ïµÄÎ»ÖÃ
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
      */
     public void scrollBehindTo(View content, int x, int y) {
         int vis = View.VISIBLE;
@@ -321,7 +314,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * µÃµ½×ó±ß²Ëµ¥µÄÊÓÍ¼
+     * ï¿½Ãµï¿½ï¿½ï¿½ß²Ëµï¿½ï¿½ï¿½ï¿½ï¿½Í¼
      */
     public int getMenuLeft(View content, int page) {
         if (mMode == SlidingMenu.LEFT) {
@@ -350,7 +343,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * µÃµ½×ó±ß¿òÊÓÍ¼
+     * ï¿½Ãµï¿½ï¿½ï¿½ß¿ï¿½ï¿½ï¿½Í¼
      */
     public int getAbsLeftBound(View content) {
         if (mMode == SlidingMenu.LEFT || mMode == SlidingMenu.LEFT_RIGHT) {
@@ -362,7 +355,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * µÃµ½ÓÒ±ß¿òÊÓÍ¼
+     * ï¿½Ãµï¿½ï¿½Ò±ß¿ï¿½ï¿½ï¿½Í¼
      */
     public int getAbsRightBound(View content) {
         if (mMode == SlidingMenu.LEFT) {
@@ -374,7 +367,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÊÇ·ñÔÊĞí´¥ÃşÆÁÄ»µÄ±ßÔµ
+     * ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ä±ï¿½Ôµ
      */
     public boolean marginTouchAllowed(View content, int x) {
         int left = content.getLeft();
@@ -391,14 +384,14 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÉèÖÃ´¥ÃşÄ£Ê½µÄÖµ
+     * ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½Öµ
      */
     public void setTouchMode(int i) {
         mTouchMode = i;
     }
 
     /**
-     * ÊÇ·ñÔÊĞíÍ¨¹ı´¥Ãş´ò¿ª»¬¶¯²Ëµ¥
+     * ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ò¿ª»ï¿½ï¿½ï¿½ï¿½Ëµï¿½
      */
     public boolean menuOpenTouchAllowed(View content, int currPage, float x) {
         switch (mTouchMode) {
@@ -411,7 +404,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * »¬¶¯²Ëµ¥¿ìËÙ·µ»Ø
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ù·ï¿½ï¿½ï¿½
      */
     public boolean menuTouchInQuickReturn(View content, int currPage, float x) {
         if (mMode == SlidingMenu.LEFT || (mMode == SlidingMenu.LEFT_RIGHT && currPage == 0)) {
@@ -423,7 +416,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÊÇ·ñÔÊĞí¹Ø±Õ»¬¶¯²Ëµ¥
+     * ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ø±Õ»ï¿½ï¿½ï¿½ï¿½Ëµï¿½
      */
     public boolean menuClosedSlideAllowed(float dx) {
         if (mMode == SlidingMenu.LEFT) {
@@ -437,7 +430,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * ÊÇ·ñÔÊĞí´ò¿ª»¬¶¯²Ëµ¥
+     * ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ò¿ª»ï¿½ï¿½ï¿½ï¿½Ëµï¿½
      */
     public boolean menuOpenSlideAllowed(float dx) {
         if (mMode == SlidingMenu.LEFT) {
@@ -451,7 +444,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * »­»¬¶¯²Ëµ¥µÄÒõÓ°
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ó°
      */
     public void drawShadow(View content, Canvas canvas) {
         if (mShadowDrawable == null || mShadowWidth <= 0) return;
@@ -473,7 +466,7 @@ public class CustomViewBehind extends ViewGroup {
     }
 
     /**
-     * »­³ö½¥Èë½¥³öĞ§¹û
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë½¥ï¿½ï¿½Ğ§ï¿½ï¿½
      */
     public void drawFade(View content, Canvas canvas, float openPercent) {
         if (!mFadeEnabled) return;

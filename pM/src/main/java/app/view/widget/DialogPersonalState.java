@@ -2,9 +2,11 @@ package app.view.widget;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -14,6 +16,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.pm.DataResultActivity;
 import com.example.pm.R;
 
 import app.utils.ACache;
@@ -50,6 +53,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     Button mBack;
     RadioButton mMale;
     RadioButton mFemale;
+    Button mDataResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,8 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         mFemale.setOnClickListener(this);
         mBack = (Button)findViewById(R.id.personal_state_btn);
         mBack.setOnClickListener(this);
+        mDataResult = (Button)findViewById(R.id.personal_state_today);
+        mDataResult.setOnClickListener(this);
         loadData();
     }
 
@@ -98,6 +104,10 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.personal_state_today:
+                Intent intent = new Intent(mContext, DataResultActivity.class);
+                mContext.startActivity(intent);
+                break;
             case R.id.personal_state_weight_save:
                 String content = mWeight.getText().toString();
                 if(ShortcutUtil.isWeightInputCorrect(content)){

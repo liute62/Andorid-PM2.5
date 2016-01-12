@@ -51,6 +51,7 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".MapActivity"></activity>
         <activity android:name="app.bluetooth.DeviceControlActivity"></activity>
+        <activity android:name=".DataResultActivity"></activity>
 
 
 

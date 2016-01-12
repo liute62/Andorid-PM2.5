@@ -357,11 +357,12 @@ public class DBService extends Service {
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
         }
+        GPSInitial();
         DBInitial();
         serviceStateInitial();
         sensorInitial();
-        GPSInitial();
         if (mLastLocation != null){
+            Log.d(TAG,"Change the Location Updates speed to "+String.valueOf(GPS_Min_Frequency)+" "+String.valueOf(GPS_Min_Distance));
             mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_Min_Frequency,GPS_Min_Distance, locationListener);
         }
         if((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0){
@@ -477,8 +478,10 @@ public class DBService extends Service {
         if (provider != null)
             mLastLocation = mManager.getLastKnownLocation(provider);
         if (mLastLocation == null) {
+            Log.d(TAG,"provider: "+provider+" LastKnownLocation == null");
             for (int i = 0; i != providers.length; i++){
                 if(mManager.isProviderEnabled(providers[i])){
+                    Log.d(TAG,"Request: "+providers[i]+" Update");
                     mManager.requestLocationUpdates(providers[i], 0, 0, locationListener);
                 }
             }
@@ -487,6 +490,9 @@ public class DBService extends Service {
             isGPSRun = true;
             longitude = mLastLocation.getLongitude();
             latitude = mLastLocation.getLatitude();
+            Log.d(TAG,"Location Service is running"+String.valueOf(latitude)+" "+String.valueOf(longitude));
+            aCache.put(Const.Cache_Latitude, latitude);
+            aCache.put(Const.Cache_Longitude,longitude);
             searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
         }
         mManager.addGpsStatusListener(gpsStatusListener);
@@ -513,14 +519,18 @@ public class DBService extends Service {
                 latitude = location.getLatitude();
                 if (last_long == longitude && last_lati == latitude) {
                     //means no changes
+                    Log.d(TAG,"onLocationChanged Current Location == Lastime Location");
                 } else {
                     //location has been changed, check if changes big enough
                     if (ShortcutUtil.isLocationChangeEnough(last_lati,latitude,last_long,longitude)) {
+                        Log.d(TAG,"onLocationChanged Current Location Changed enough and get the density from server");
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
                     last_lati = latitude;
                     last_long = longitude;
                 }
+            }else {
+                Log.d(TAG,"onLocationChanged Location == null");
             }
         }
 
@@ -778,7 +788,7 @@ public class DBService extends Service {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "searchPMRequest resp:" + response.toString());
+                Log.v(TAG, "searchPMRequest resp:" + response.toString());
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
@@ -802,7 +812,7 @@ public class DBService extends Service {
                 @Override
                 public void onResponse(JSONObject response) {
                     isUploadRun = false;
-                    Log.e("response", response.toString());
+                    Log.v("response", response.toString());
                     updateStateUpLoad(state, 1);
                     Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
                 }
