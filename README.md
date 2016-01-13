@@ -4,17 +4,24 @@ It is an android application for PM2.5 detection and reporting.
 
 It contains features as below:
 
-1. Basical Http Restful services like Login, Register, Change pwd, Email, ect.
+1.	Basic Http Restful services like Login, Register, Change password, email, ect.
 
-2. Pull and push PM 2.5 density and other enviromental related information from and to our server.
+2.	Pull and push PM 2.5 density and other environmental related information from and to our server.
 
-3. Calculate the data and plot graph for visualization.
+3.	An algorithm for calculating the number of PM2.5 breathed in and plot 12 different graphs for visualization.
 
-4. Personal state detections by using the mobile built-in sensor to estimate entrained-air volume.
+4.	Intelligent health reminder based on your environmental information and your health state.
 
-5. Map function for better viewing polluted enviroment, but it is only available in China Mainland.
+5.	Personal state detections by using the mobile built-in sensor, such as estimating entrained-air volume when you are walking, running and playing sports.
 
-6. Embedded Devices Connection --- the affiliated wristband and 803 PM2.5 indoor detection devices by using bluetooth and UDP protocal.
+6.	Map function for better viewing polluted environment, but it is only available in China Mainland.
+
+7.	Embedded Devices Connection --- the affiliated wristband and 803 PM2.5 indoor detection device by using Bluetooth and UDP protocal.
+
+8.	Cache mechanism for reducing redundant calculation and too many accesses to the database.
+
+9.	A Thread pool for network operations by using Volley Framework.
+
 
 ## Licence: All Rights Reserved. 
 
