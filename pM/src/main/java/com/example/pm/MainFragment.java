@@ -303,9 +303,15 @@ public class MainFragment extends Fragment implements OnClickListener {
     }
 
     private void setFonts(View view) {
-        Typeface typeFace = Typeface.createFromAsset(mActivity.getAssets(), "SourceHanSansCNLight.ttf");
+//        Typeface typeFace = Typeface.createFromAsset(mActivity.getAssets(), "SourceHanSansCNLight.ttf");
+        Typeface typeFace = Typeface.createFromAsset(mActivity.getAssets(), "kaiti.TTF");
         TextView textView1 = (TextView) view.findViewById(R.id.textView1);
         textView1.setTypeface(typeFace);
+        mHint.setTypeface(typeFace);
+        mAirQuality.setTypeface(typeFace);
+        mCity.setTypeface(typeFace);
+        mChangeChart1.setTypeface(typeFace);
+        mChangeChart2.setTypeface(typeFace);
     }
 
     private void cacheInitial() {

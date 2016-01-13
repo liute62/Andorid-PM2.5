@@ -309,8 +309,12 @@ public class Const {
                     "澳门"
             };
 
+//    public static String[] airQuality = {
+//            "空气质量优", "空气质量良", "轻度污染", "中度污染", "重度污染", "严重污染"
+//    };
+
     public static String[] airQuality = {
-            "空气质量优", "空气质量良", "轻度污染", "中度污染", "重度污染", "严重污染"
+            "优", "良", "轻度污染", "中度污染", "重度污染", "严重污染"
     };
 
     public static String[] heathHint = {
