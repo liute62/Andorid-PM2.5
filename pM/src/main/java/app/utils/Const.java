@@ -1,6 +1,5 @@
 package app.utils;
 
-import com.example.pm.FirstActivity;
 import com.example.pm.R;
 
 public class Const {
@@ -171,12 +170,12 @@ public class Const {
 
     public static final String ERROR_REGISTER_WRONG = "无法注册,请检查当前网络状态";
     //breath according to state
-    public static final double boy_breath = 6.6; // L/min
-    public static final double girl_breath = 6.0; // L/min
-    public static double static_breath = boy_breath;
-    public static final double walk_breath = 2.1 * static_breath;
-    public static final double bicycle_breath = 2.1 * static_breath;
-    public static final double run_breath = 6 * static_breath;
+    public static double Global_boy_breath = 6.6; // L/min
+    public static double girl_breath = 6.0; // L/min
+    public static double Global_static_breath = Global_boy_breath;
+    public static final double walk_breath = 2.1 * Global_static_breath;
+    public static final double bicycle_breath = 2.1 * Global_static_breath;
+    public static final double run_breath = 6 * Global_static_breath;
 
     /**
      * Movement*

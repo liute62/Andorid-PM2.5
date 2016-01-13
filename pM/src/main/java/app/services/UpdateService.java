@@ -1,15 +1,10 @@
 package app.services;
 
-import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,11 +19,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import app.Entity.State;
 import app.utils.ACache;
@@ -38,7 +31,6 @@ import app.utils.DBHelper;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
-import nl.qbusict.cupboard.QueryResultIterable;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
@@ -189,7 +181,7 @@ public class UpdateService {
         Const.MotionStatus mMotionStatus = state.getStatus().equals("1")? Const.MotionStatus.STATIC:state.getStatus().equals("2")? Const.MotionStatus.WALK: Const.MotionStatus.RUN;
 
         if (mMotionStatus == Const.MotionStatus.STATIC) {
-            breath = Const.static_breath;
+            breath = Const.Global_static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {
             breath = Const.walk_breath;
         } else if (mMotionStatus == Const.MotionStatus.RUN) {

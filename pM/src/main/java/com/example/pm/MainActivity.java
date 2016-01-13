@@ -12,6 +12,7 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 import app.services.UpdateService;
 import app.utils.ACache;
 import app.utils.Const;
+import app.utils.ShortcutUtil;
 
 public class MainActivity extends SlidingActivity {
 

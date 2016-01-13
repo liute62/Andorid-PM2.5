@@ -71,6 +71,7 @@ public class State {
         this.pm25 = pm25;
         this.source = source;
         this.upload = upload;
+        this.connection = connection;
     }
 
     public void print() {

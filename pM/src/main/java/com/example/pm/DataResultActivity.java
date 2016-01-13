@@ -131,8 +131,14 @@ public class DataResultActivity extends Activity {
                 viewHolder.mLongi.setText(mdata.get(position).getLongtitude());
                 viewHolder.mStep.setText(mdata.get(position).getSteps());
                 viewHolder.mAvgRate.setText(mdata.get(position).getAvg_rate());
-                viewHolder.mStatus.setText(mdata.get(position).getStatus());
-                viewHolder.mOutdoor.setText(mdata.get(position).getOutdoor());
+                int status = Integer.valueOf(mdata.get(position).getStatus());
+                if(status == 1)
+                    viewHolder.mStatus.setText("St");
+                else if(status == 2)
+                    viewHolder.mStatus.setText("Wa");
+                else if(status == 3)
+                    viewHolder.mStatus.setText("Run");
+                viewHolder.mOutdoor.setText(Integer.valueOf(mdata.get(position).getOutdoor())== 1? "in":"out");
                 viewHolder.mAir.setText(mdata.get(position).getVentilation_volume().length() < 8?
                         mdata.get(position).getVentilation_volume() : mdata.get(position).getVentilation_volume().substring(0, 7));
                 viewHolder.mPMDensity.setText(mdata.get(position).getDensity().length() < 8?
@@ -140,7 +146,7 @@ public class DataResultActivity extends Activity {
                 viewHolder.mPMResult.setText(mdata.get(position).getPm25().length() < 8?
                         mdata.get(position).getPm25() : mdata.get(position).getPm25().substring(0,7));
                 viewHolder.mSource.setText(mdata.get(position).getSource());
-                viewHolder.mUpload.setText(mdata.get(position).getUpload() == 0? "Not":"Yes");
+                viewHolder.mUpload.setText(mdata.get(position).getUpload() == 0? "N":"Y");
             return convertView;
         }
 

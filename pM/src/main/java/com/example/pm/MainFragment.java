@@ -239,6 +239,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         pmModel = new PMModel();
         loadingDialog = new LoadingDialog(getActivity());
         aCache = ACache.get(mActivity);
+        ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
         //GPS Task
         if (!ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
             dbReceiver = new DBServiceReceiver();
@@ -656,6 +657,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                     //Log.e("MainFragment",  String.valueOf(last_lati) + " " + String.valueOf(last_longi) + " " + String.valueOf(longi)+" "+String.valueOf(lati));
                     if (last_lati.equals(lati) && last_longi.equals(longi)) {
                         //no change
+                        //for safe, if current city == null. search City anyway
+                        String city = mCity.getText().toString();
+                        if(city == null || city.equals("null")){
+                            searchCityRequest(lati,longi);
+                        }
                     } else {
                         aCache.put(Const.Cache_Latitude, lati);
                         aCache.put(Const.Cache_Longitude, longi);

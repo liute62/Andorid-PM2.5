@@ -16,24 +16,19 @@
 
 package app.movement;
 
+import android.hardware.SensorManager;
+import android.util.Log;
+
 /**
  * Receives sensor updates and alerts a StepListener when a step has been detected.
  */
 public class SimpleStepDetector {
 
-    private static final int ACCEL_RING_SIZE = 100;
-    private static final int VEL_RING_SIZE = 50;
-    private static final float STEP_THRESHOLD = 10f;
-    private static final int STEP_DELAY_NS = 270000000;
+    public static String TAG = "SimpleStepDetector";
 
-    private int accelRingCounter = 0;
-    private float[] accelRingX = new float[ACCEL_RING_SIZE];
-    private float[] accelRingY = new float[ACCEL_RING_SIZE];
-    private float[] accelRingZ = new float[ACCEL_RING_SIZE];
-    private int velRingCounter = 0;
-    private float[] velRing = new float[VEL_RING_SIZE];
-    private long lastStepTimeNs = 0;
-    private float oldVelocityEstimate = 0;
+    public static final float thred = 1.5f;
+
+    public static int stepNum;
 
     private StepListener listener;
 
@@ -50,36 +45,15 @@ public class SimpleStepDetector {
         currentAccel[1] = y;
         currentAccel[2] = z;
 
+        currentAccel[0] = -currentAccel[0]/SensorManager.GRAVITY_EARTH;
+        currentAccel[1] = -currentAccel[1]/ SensorManager.GRAVITY_EARTH;
+        currentAccel[2] = currentAccel[2]/SensorManager.GRAVITY_EARTH;
+        float result = (float) Math.sqrt(currentAccel[0]*currentAccel[0] + currentAccel[1]*currentAccel[1] + currentAccel[2]*currentAccel[2]);
+
         // First step is to update our guess of where the global z vector is.
-        accelRingCounter++;
-        accelRingX[accelRingCounter % ACCEL_RING_SIZE] = currentAccel[0];
-        accelRingY[accelRingCounter % ACCEL_RING_SIZE] = currentAccel[1];
-        accelRingZ[accelRingCounter % ACCEL_RING_SIZE] = currentAccel[2];
-
-        float[] worldZ = new float[3];
-        worldZ[0] = SensorFusionMath.sum(accelRingX) / Math.min(accelRingCounter, ACCEL_RING_SIZE);
-        worldZ[1] = SensorFusionMath.sum(accelRingY) / Math.min(accelRingCounter, ACCEL_RING_SIZE);
-        worldZ[2] = SensorFusionMath.sum(accelRingZ) / Math.min(accelRingCounter, ACCEL_RING_SIZE);
-
-        float normalization_factor = SensorFusionMath.norm(worldZ);
-
-        worldZ[0] = worldZ[0] / normalization_factor;
-        worldZ[1] = worldZ[1] / normalization_factor;
-        worldZ[2] = worldZ[2] / normalization_factor;
-
-        // Next step is to figure out the component of the current acceleration
-        // in the direction of world_z and subtract gravity's contribution
-        float currentZ = SensorFusionMath.dot(worldZ, currentAccel) - normalization_factor;
-        velRingCounter++;
-        velRing[velRingCounter % VEL_RING_SIZE] = currentZ;
-
-        float velocityEstimate = SensorFusionMath.sum(velRing);
-
-        if (velocityEstimate > STEP_THRESHOLD && oldVelocityEstimate <= STEP_THRESHOLD
-                && (timeNs - lastStepTimeNs > STEP_DELAY_NS)) {
-            listener.step(timeNs);
-            lastStepTimeNs = timeNs;
+       // Log.d(TAG,String.valueOf(result));
+        if(result > thred){
+            listener.step(System.currentTimeMillis());
         }
-        oldVelocityEstimate = velocityEstimate;
     }
 }

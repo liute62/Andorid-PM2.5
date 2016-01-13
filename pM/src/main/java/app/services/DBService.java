@@ -24,23 +24,19 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.pm.MainActivity;
 import com.example.pm.R;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
 import app.Entity.State;
 import app.model.PMModel;
 import app.movement.SimpleStepDetector;
@@ -123,10 +119,14 @@ public class DBService extends Service {
     private Sensor mAccelerometer;
     private SimpleStepDetector simpleStepDetector;
     private int numSteps;
+    private int numStepsTmp; //to insert the step value to state
     private long time1;
     private static Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC;
     private final int Indoor_Outdoor_Frequency = 1;
     private final int upload_Frequency = 1;
+    private final int Motion_Detection_Interval = 60 * 1000; //1min
+    private final int Motion_Run_Thred = 100; //100 step / min
+    private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
 
     private Runnable DBRunnable = new Runnable() {
         State state;
@@ -353,6 +353,10 @@ public class DBService extends Service {
         aCache = ACache.get(getApplicationContext());
         isPMSearchSuccess = false;
         ChartTaskCanRun = true;
+        //calculate the static breath by weight
+        String weightStr = aCache.getAsString(Const.Cache_User_Weight);
+        if(weightStr != null)
+            ShortcutUtil.calStaticBreath(Integer.valueOf(weightStr));
         //todo each time to run the data and
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
@@ -427,7 +431,6 @@ public class DBService extends Service {
     }
 
     private void sensorInitial() {
-        // TODO: 1/3/2016 change the detection algorithm, it may not work. 
         numSteps = 0;
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -437,6 +440,7 @@ public class DBService extends Service {
             public void step(long timeNs) {
                 Log.d(TAG,"Time: "+ShortcutUtil.refFormatNowDate(timeNs)+" Step: "+String.valueOf(numSteps));
                 numSteps++;
+                numStepsTmp++;
             }
         });
         time1 = System.currentTimeMillis();
@@ -448,15 +452,16 @@ public class DBService extends Service {
                             event.timestamp, event.values[0], event.values[1], event.values[2]);
                 }
                 long time2 = System.currentTimeMillis();
-                if (time2 - time1 > 5000) {
-                    if (numSteps > 70)
+                if (time2 - time1 > Motion_Detection_Interval) {
+                    if (numSteps > Motion_Run_Thred)
                         mMotionStatus = Const.MotionStatus.RUN;
-                    else if (numSteps <= 70 && numSteps >= 30)
+                    else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
                         mMotionStatus = Const.MotionStatus.WALK;
                     else
                         mMotionStatus = Const.MotionStatus.STATIC;
                     numSteps = 0;
                     time1 = time2;
+                    Log.v(TAG, "Motion Status: " + String.valueOf(mMotionStatus));
                 }
             }
             @Override
@@ -587,9 +592,9 @@ public class DBService extends Service {
                 density /= 3;
             }
         }
-
+        Log.d(TAG,"Static Breath "+String.valueOf(Const.Global_static_breath));
         if (mMotionStatus == Const.MotionStatus.STATIC) {
-            breath = Const.static_breath;
+            breath = Const.Global_static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {
             breath = Const.walk_breath;
         } else if (mMotionStatus == Const.MotionStatus.RUN) {
@@ -604,7 +609,8 @@ public class DBService extends Service {
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR ? "1" : "0",
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numSteps), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1", 0, isConnected ? 1 : 0);
+                Integer.toString(numStepsTmp), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1", 0, isConnected ? 1 : 0);
+        numStepsTmp = 0;
         return state;
     }
 

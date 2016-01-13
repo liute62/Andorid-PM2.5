@@ -182,7 +182,7 @@
             <Button
                 android:id="@+id/profile_logout"
                 style="@style/main_left_button_style"
-                android:text="退出登录" />
+                android:text="安全退出" />
 
         </LinearLayout>
     </app.view.widget.PullScrollView>

@@ -112,7 +112,8 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
                 String content = mWeight.getText().toString();
                 if(ShortcutUtil.isWeightInputCorrect(content)){
                     Toast.makeText(mContext.getApplicationContext(),Const.Info_Input_Weight_Saved,Toast.LENGTH_SHORT).show();
-                    aCache.put(Const.Cache_User_Weight,content);
+                    aCache.put(Const.Cache_User_Weight, content);
+                    ShortcutUtil.calStaticBreath(Integer.valueOf(content));
                 }else {
                     Toast.makeText(mContext.getApplicationContext(),Const.Info_Input_Weight_Error,Toast.LENGTH_SHORT).show();
                 }
