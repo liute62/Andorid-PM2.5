@@ -20,6 +20,8 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by Haodong Liu on 11/20/2015.
  */
 public class DataCalculator {
+
+    public static final String TAG = "DataCalculator";
     SQLiteDatabase db;
     private List<State> todayStates;
     private List<State> lastTwoHourStates;
@@ -378,8 +380,10 @@ public class DataCalculator {
         }
         //now calculate the sum of value
         for (int i = 0; i != 48; i++) {
+//            Log.d(TAG,"cal Chart 6 "+String.valueOf(i)+" "+String.valueOf(tmpMap.get(i)));
             if (tmpMap.containsKey(i)) {
-                map.put(i, ShortcutUtil.avgOfArrayNum(tmpMap.values().toArray()));
+                map.put(i,tmpMap.get(i));
+                //map.put(i, ShortcutUtil.avgOfArrayNum(tmpMap.values().toArray()));
             }
         }
         return map;
