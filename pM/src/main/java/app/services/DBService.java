@@ -592,13 +592,18 @@ public class DBService extends Service {
                 density /= 3;
             }
         }
-        Log.d(TAG,"Static Breath "+String.valueOf(Const.Global_static_breath));
+        double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
+        if(static_breath == 0.0){
+            Toast.makeText(getApplicationContext(),Const.Info_Weight_Null,Toast.LENGTH_SHORT).show();
+            static_breath = 6.6; // using the default one
+        }
+        Log.d(TAG,"Static Breath "+String.valueOf(static_breath));
         if (mMotionStatus == Const.MotionStatus.STATIC) {
-            breath = Const.Global_static_breath;
+            breath = static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {
-            breath = Const.walk_breath;
+            breath = static_breath * 2.1;
         } else if (mMotionStatus == Const.MotionStatus.RUN) {
-            breath = Const.run_breath;
+            breath = static_breath * 6;
         }
         venVolToday += breath;
         breath = breath / 1000; //change L/min to m3/min

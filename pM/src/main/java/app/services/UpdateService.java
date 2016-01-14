@@ -179,13 +179,13 @@ public class UpdateService {
         Double density = new Double(Double.valueOf(mDensity)-Double.valueOf(state.getDensity()));
         Boolean mIndoor =  state.getOutdoor().equals("0")?true:false;
         Const.MotionStatus mMotionStatus = state.getStatus().equals("1")? Const.MotionStatus.STATIC:state.getStatus().equals("2")? Const.MotionStatus.WALK: Const.MotionStatus.RUN;
-
+        double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
         if (mMotionStatus == Const.MotionStatus.STATIC) {
-            breath = Const.Global_static_breath;
+            breath = static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {
-            breath = Const.walk_breath;
+            breath = static_breath * 2.1;
         } else if (mMotionStatus == Const.MotionStatus.RUN) {
-            breath = Const.run_breath;
+            breath = static_breath * 6;
         }
 
         double PM25 = density*breath/60/1000;

@@ -327,22 +327,22 @@ public class ShortcutUtil {
         }
     }
 
-    public static void calStaticBreath(int weight){
+    public static double calStaticBreath(int weight){
         float a = 7.8f;
         int num = 13;
         double result = weight * a * num / 1000;
         String resultStr = String.valueOf(result);
         if(resultStr.length() > 5)
             resultStr = resultStr.substring(0,4);
-        Const.Global_boy_breath = Double.valueOf(resultStr);
+        return Double.valueOf(resultStr);
     }
 
-    public static void calStaticBreath(String weightStr){
+    public static double calStaticBreath(String weightStr){
         int weight = 0;
         try {
             weight = Integer.valueOf(weightStr);
         }catch (Exception e){
-            return;
+            return 0.0f;
         }
         float a = 7.8f;
         int num = 13;
@@ -350,7 +350,6 @@ public class ShortcutUtil {
         String resultStr = String.valueOf(result);
         if(resultStr.length() > 5)
             resultStr = resultStr.substring(0,4);
-        Log.d(TAG,"global static breath should be"+Double.valueOf(resultStr));
-        Const.Global_static_breath = Double.valueOf(resultStr);
+        return Double.valueOf(resultStr);
     }
 }
