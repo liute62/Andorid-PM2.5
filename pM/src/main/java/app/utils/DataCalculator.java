@@ -32,7 +32,7 @@ public class DataCalculator {
 
     public static DataCalculator getIntance(SQLiteDatabase db) {
         if (instance == null) {
-            return new DataCalculator(db);
+            instance = new DataCalculator(db);
         }
         return instance;
     }
@@ -101,7 +101,7 @@ public class DataCalculator {
         int monthOrigin = calendar.get(Calendar.MONTH);
         int dayOrigin = calendar.get(Calendar.DAY_OF_MONTH);
         lastWeekDate = new ArrayList<>();
-        Log.d(TAG,"begin");
+        //Log.d(TAG,"begin");
 //        Log.e("yearOrigin",String.valueOf(yearOrigin));
         for (int i = 0; i != 7; i++) {
             int day = dayOrigin;
@@ -131,7 +131,7 @@ public class DataCalculator {
             //Log.d(TAG,String.valueOf(i)+" "+lastWeekDate.get(i)+" "+String.valueOf(states.size()));
             mData.add(i, states);
         }
-        Log.d(TAG,"end");
+        //Log.d(TAG,"end");
         return mData;
     }
 
@@ -525,7 +525,7 @@ public class DataCalculator {
         List<List<State>> datas = getLastWeekStates();
         if (datas.isEmpty()) return map;
         for (int i = 0; i != datas.size(); i++) {
-            Log.d(TAG,"calChart12Data: "+String.valueOf(i)+" "+String.valueOf(datas.get(i).size()));
+            //Log.d(TAG,"calChart12Data: "+String.valueOf(i)+" "+String.valueOf(datas.get(i).size()));
             List<State> state = datas.get(i);
             if (state.isEmpty())
                 map.put(i, 0.0f);

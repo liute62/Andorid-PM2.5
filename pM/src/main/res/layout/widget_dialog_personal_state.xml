@@ -33,8 +33,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="当前经度"
+            android:layout_below="@+id/textView13"
             android:textColor="@android:color/black"
-            android:layout_marginLeft="130dp"
             android:id="@+id/textView14" />
 
         <TextView
@@ -43,8 +43,8 @@
             android:text="0"
             android:textColor="@android:color/black"
             android:id="@+id/personal_state_longi"
+            android:layout_below="@+id/personal_state_lati"
             android:layout_marginStart="2dp"
-            android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/textView14" />
     </RelativeLayout>
 

@@ -377,7 +377,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             currentCity = city;
             mAddCity.setVisibility(View.GONE);
         }else {
-            currentCity = "无";
+            currentCity = "null";
             mAddCity.setVisibility(View.VISIBLE);
         }
 
