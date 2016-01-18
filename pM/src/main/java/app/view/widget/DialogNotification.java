@@ -19,16 +19,8 @@ import java.util.jar.Attributes;
 public class DialogNotification extends Dialog {
 
     Button mBack;
-    private static DialogNotification instance = null;
 
-    public static DialogNotification getInstance(Context context){
-        if(instance == null){
-            instance = new DialogNotification(context);
-        }
-        return instance;
-    }
-
-    private DialogNotification(Context context) {
+    public DialogNotification(Context context) {
         super(context);
     }
 

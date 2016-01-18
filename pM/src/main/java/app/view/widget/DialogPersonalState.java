@@ -28,16 +28,7 @@ import app.utils.ShortcutUtil;
  */
 public class DialogPersonalState extends Dialog implements View.OnClickListener{
 
-    private static DialogPersonalState instance = null;
-
-    public static DialogPersonalState getInstance(Context context,Handler parent){
-        if(instance == null){
-            instance = new DialogPersonalState(context,parent);
-        }
-        return instance;
-    }
-
-    private DialogPersonalState(Context context,Handler parent) {
+    public DialogPersonalState(Context context,Handler parent) {
         super(context);
         mContext = context;
         this.mHandler = parent;

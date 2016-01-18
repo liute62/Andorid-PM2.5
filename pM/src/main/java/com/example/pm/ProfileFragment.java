@@ -177,10 +177,12 @@ public class ProfileFragment extends Fragment implements
         Intent intent = null;
         switch (v.getId()) {
             case R.id.profile_modify_personal_state:
-                DialogPersonalState.getInstance(mActivity, mHandler).show();
+                DialogPersonalState dialogPersonalState = new DialogPersonalState(mActivity, mHandler);
+                dialogPersonalState.show();
                 break;
             case R.id.profile_view_notification:
-                DialogNotification.getInstance(mActivity).show();
+                DialogNotification dialogNotification = new DialogNotification(mActivity);
+                dialogNotification.show();
                 break;
             case R.id.profile_login:
                 LoginDialog loginDialog = new LoginDialog(getActivity(), loginHandler);

@@ -33,6 +33,8 @@ import com.example.pm.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.sql.Struct;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -135,6 +137,7 @@ public class DBService extends Service {
 
         @Override
         public void run() {
+            Log.d(TAG,"DB Runtime = "+String.valueOf(DBRunTime));
             /** notify user whether using the old PM2.5 density **/
             if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
                 Intent intent = new Intent(Const.Action_DB_Running_State);
@@ -679,13 +682,14 @@ public class DBService extends Service {
         }
         for (int i = 0; i != datas.size(); i++) {
             List<State> states = datas.get(i);
+            num++;
             if (states.isEmpty()) {
-                break;
+               tmp = Double.valueOf(0);
             } else {
-                num++;
                 tmp = Double.valueOf(states.get(states.size() - 1).getPm25());
-                result += tmp;
             }
+            Log.d(TAG,"calLastWeekAvgPM tmp = "+ String.valueOf(tmp));
+            result += tmp;
         }
         return String.valueOf(result / num);
     }
@@ -749,6 +753,7 @@ public class DBService extends Service {
         Log.d(TAG, "-------insert ------state --------- finish");
         cupboard().withDatabase(db).put(state);
         IDToday++;
+        aCache.put(Const.Cache_Lastime_Timepoint,state.getTime_point());
         //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
 //        }else {
 //            Toast.makeText(getApplicationContext(),Const.Info_DB_Insert_Date_Conflict,Toast.LENGTH_SHORT);

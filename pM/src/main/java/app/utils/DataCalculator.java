@@ -101,6 +101,7 @@ public class DataCalculator {
         int monthOrigin = calendar.get(Calendar.MONTH);
         int dayOrigin = calendar.get(Calendar.DAY_OF_MONTH);
         lastWeekDate = new ArrayList<>();
+        Log.d(TAG,"begin");
 //        Log.e("yearOrigin",String.valueOf(yearOrigin));
         for (int i = 0; i != 7; i++) {
             int day = dayOrigin;
@@ -127,8 +128,10 @@ public class DataCalculator {
             if (states == null || states.isEmpty()) {
                 states = new ArrayList<>();
             }
+            //Log.d(TAG,String.valueOf(i)+" "+lastWeekDate.get(i)+" "+String.valueOf(states.size()));
             mData.add(i, states);
         }
+        Log.d(TAG,"end");
         return mData;
     }
 

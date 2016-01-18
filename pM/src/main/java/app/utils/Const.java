@@ -73,6 +73,7 @@ public class Const {
     public static final String Cache_Chart_12_Date = "Cache_Chart_12_Date";
     public static final String Cache_Chart_Alert = "Cache_Chart_Alert";
     public static final String Cache_User_Weight = "Cache_User_Weight";
+    public static final String Cache_Lastime_Timepoint = "Cache_Lastime_Timepoint";
 
 
     /**
