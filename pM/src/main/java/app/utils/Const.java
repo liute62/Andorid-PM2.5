@@ -41,8 +41,8 @@ public class Const {
      */
     public static final String Cache_Is_Background = "Cache_Is_Background";
     public static final String Cache_Pause_Time = "Cache_Pause_Time";
-    public static final String Cache_DB_Run_Interval = "Cache_DB_Run_Interval";
-    public static final String Cache_DB_Upload_Interval = "Cache_DB_Upload_Interval";
+    public static final String Cache_DB_Lastime_searchDensity = "Cache_DB_Lastime_searchDensity";
+    public static final String Cache_DB_Lastime_Upload = "Cache_DB_Lastime_Upload";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";

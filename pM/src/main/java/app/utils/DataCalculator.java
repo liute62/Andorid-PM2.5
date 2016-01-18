@@ -403,10 +403,9 @@ public class DataCalculator {
         if (datas.isEmpty()) return map;
         for (int i = 0; i != datas.size(); i++) {
             List<State> state = datas.get(i);
-            if (state.isEmpty()) {
+            if (state.isEmpty())
                 map.put(i, 0.0f);
-                break;
-            }
+            else
             map.put(i, Float.valueOf(state.get(state.size() - 1).getPm25()));
         }
         return map;
@@ -528,11 +527,10 @@ public class DataCalculator {
         for (int i = 0; i != datas.size(); i++) {
             Log.d(TAG,"calChart12Data: "+String.valueOf(i)+" "+String.valueOf(datas.get(i).size()));
             List<State> state = datas.get(i);
-            if (state.isEmpty()) {
+            if (state.isEmpty())
                 map.put(i, 0.0f);
-                break;
-            }
-            map.put(i, Float.valueOf(state.get(state.size() - 1).getVentilation_volume()));
+            else
+                map.put(i, Float.valueOf(state.get(state.size() - 1).getVentilation_volume()));
         }
         return map;
     }

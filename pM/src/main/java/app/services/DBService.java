@@ -34,7 +34,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Struct;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -156,15 +155,6 @@ public class DBService extends Service {
                 aCache.put(Const.Cache_Is_Background, isBackground);
                 if (userId == null) aCache.put(Const.Cache_User_Id, "0");
             }
-            /**Time interval longer than 30 min, refresh the GUI **/
-//            if(Const.CURRENT_NEED_REFRESH){
-//                //Todo refresh the GUI and notify mainfragment to dismiss the progress bar, meanwhile we don't need DB run first time.
-//                Const.CURRENT_NEED_REFRESH = false;
-//                //update graph
-//                //update textview
-//                //Todo check if some data need to be upload.
-//            }
-
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
@@ -202,7 +192,6 @@ public class DBService extends Service {
                     }
                 }
                 Bundle mBundle = new Bundle();
-                //todo slow down the DB based on the size
                 switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                     case 5:
                         intentChart = new Intent(Const.Action_Chart_Result_2);
@@ -261,18 +250,17 @@ public class DBService extends Service {
                     }if(DBRunTime % (10 * mul) == 0) {
                         intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                     }
-
                 if (isBackground.equals("false")) {
                     sendBroadcast(intentText);
                 }
                 //change to a more soft way by using system.currentime
-                String lastTime = aCache.getAsString(Const.Cache_DB_Run_Interval);
-                if(! ShortcutUtil.isStringOK(lastTime))  aCache.put(Const.Cache_DB_Run_Interval,String.valueOf(System.currentTimeMillis()));
+                String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
+                if(! ShortcutUtil.isStringOK(lastTime))  aCache.put(Const.Cache_DB_Lastime_searchDensity,String.valueOf(System.currentTimeMillis()));
                 else {
                     Long curTime = System.currentTimeMillis();
                     //every 1 hour to search the PM density from server
                     if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
-                        aCache.put(Const.Cache_DB_Run_Interval, String.valueOf(System.currentTimeMillis()));
+                        aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
                 }
@@ -288,7 +276,6 @@ public class DBService extends Service {
                 //every 1 min to calculate the pm result
                 if (DBRunTime % 12 == 0) {
                     State last = state;
-                    //state = calculatePM25(116.329,39.987);
                     state = calculatePM25(longitude, latitude);
                     State now = state;
                     if (!isSurpass(last, now)) {
@@ -299,13 +286,13 @@ public class DBService extends Service {
                     }
                 }
                 //every 1 hour to check if some data need to be uploaded
-                String lastUploadTime = aCache.getAsString(Const.Cache_DB_Upload_Interval);
-                if(! ShortcutUtil.isStringOK(lastUploadTime))  aCache.put(Const.Cache_DB_Upload_Interval,String.valueOf(System.currentTimeMillis()));
+                String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
+                if(! ShortcutUtil.isStringOK(lastUploadTime))  aCache.put(Const.Cache_DB_Lastime_Upload,String.valueOf(System.currentTimeMillis()));
                 else {
                     Long curTime = System.currentTimeMillis();
                     //every 1 hour to search the PM density from server
                     if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
-                        aCache.put(Const.Cache_DB_Upload_Interval, String.valueOf(System.currentTimeMillis()));
+                        aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
                         if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))){
                             //means currently user has login
                            // checkPMDataForUpload();
@@ -322,7 +309,6 @@ public class DBService extends Service {
                         sendBroadcast(intentText);
                     }
                 }
-
             } else {
                 //using a more soft way to notify user that DB is not running
                 Intent intent = new Intent(Const.Action_DB_Running_State);
@@ -674,7 +660,7 @@ public class DBService extends Service {
 
     private String calLastWeekAvgPM() {
         Double result = 0.0;
-        Double tmp;
+        Double tmp = 0.0;
         int num = 0;
         List<List<State>> datas = DataCalculator.getIntance(db).getLastWeekStates();
         if (datas.isEmpty()) {
@@ -682,11 +668,11 @@ public class DBService extends Service {
         }
         for (int i = 0; i != datas.size(); i++) {
             List<State> states = datas.get(i);
-            num++;
-            if (states.isEmpty()) {
-               tmp = Double.valueOf(0);
-            } else {
+            if (!states.isEmpty()) {
+                num++;
                 tmp = Double.valueOf(states.get(states.size() - 1).getPm25());
+            }else {
+                tmp = 0.0;
             }
             Log.d(TAG,"calLastWeekAvgPM tmp = "+ String.valueOf(tmp));
             result += tmp;
@@ -858,7 +844,8 @@ public class DBService extends Service {
      * Check DB if there are some data for uploading
      */
     public void checkPMDataForUpload() {
-        if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))){
+        String idStr = aCache.getAsString(Const.Cache_User_Id);
+        if(ShortcutUtil.isStringOK(idStr) && !idStr.equals("0")){
             Log.d("upload", "upload batch start");
             final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD + "=?", "0").list();
             Log.d("upload", "upload size " + states.size());
