@@ -8,8 +8,10 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,7 +33,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 /**
  * Created by Administrator on 1/11/2016.
  */
-public class DataResultActivity extends Activity {
+public class DataResultActivity extends Activity implements OnClickListener{
 
     public static final String TAG = "DataResultActivity";
     ListView mListView;
@@ -39,6 +41,13 @@ public class DataResultActivity extends Activity {
     StateAdapter mAdapter;
     DBHelper dbHelper;
     private SQLiteDatabase db;
+    Button mNext;
+    Button mLast;
+    TextView mTitle;
+    Long currentTime = Long.valueOf(0);
+    int year;
+    int month;
+    int day;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,24 +57,27 @@ public class DataResultActivity extends Activity {
         db = dbHelper.getReadableDatabase();
         todayStates = getTodayState();
         mListView = (ListView)findViewById(R.id.data_result_listview);
-//        for(int i = 0; i != todayStates.size(); i++){
-//            Log.d(TAG,String.valueOf(i)+" "+todayStates.get(i).getDensity());
-//        }
+        mNext = (Button)findViewById(R.id.data_result_center_next);
+        mNext.setOnClickListener(this);
+        mLast = (Button)findViewById(R.id.data_result_center_last);
+        mLast.setOnClickListener(this);
+        mTitle = (TextView)findViewById(R.id.data_result_center_title);
         mAdapter = new StateAdapter(this,todayStates);
         mListView.setAdapter(mAdapter);
+        setTile(currentTime);
     }
 
     private List<State> getTodayState(){
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
         calendar.set(year, month, day, 0, 0, 0);
 
         Long nowTime = calendar.getTime().getTime();
         calendar.set(year, month, day, 23, 59, 59);
         Long nextTime = calendar.getTime().getTime();
-
+        currentTime = nextTime;
         /**Get states of today **/
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
         if(states != null)
@@ -73,16 +85,76 @@ public class DataResultActivity extends Activity {
         else return new ArrayList<>();
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.data_result_center_last:
+                last();
+                break;
+            case R.id.data_result_center_next:
+                next();
+                break;
+        }
+    }
+
+    private void next(){
+        Calendar calendar = Calendar.getInstance();
+        day++;
+        // TODO: 1/18/2016 some cases of the calendar
+        calendar.set(year, month, day, 0, 0, 0);
+
+        Long nowTime = calendar.getTime().getTime();
+        calendar.set(year, month, day, 23, 59, 59);
+        Long nextTime = calendar.getTime().getTime();
+        currentTime = nextTime;
+        /**Get states of today **/
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
+        if(states == null) states = new ArrayList<>();
+        mAdapter.setData(states);
+        mListView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+        setTile(currentTime);
+
+    }
+
+    private void last(){
+        Calendar calendar = Calendar.getInstance();
+        day--;
+        // TODO: 1/18/2016 some cases of the calendar
+        calendar.set(year, month, day, 0, 0, 0);
+
+        Long nowTime = calendar.getTime().getTime();
+        calendar.set(year, month, day, 23, 59, 59);
+        Long nextTime = calendar.getTime().getTime();
+        currentTime = nextTime;
+        /**Get states of today **/
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
+        if(states == null) states = new ArrayList<>();
+        mAdapter.setData(states);
+        mListView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+        setTile(currentTime);
+    }
+
+    private void setTile(Long time){
+        String str = ShortcutUtil.refFormatNowDate(time);
+        mTitle.setText(str);
+    }
 
     private class StateAdapter extends BaseAdapter{
 
         Context mContext;
         LayoutInflater mInflater;
         List<State> mdata;
+
         public StateAdapter(Context context,List<State> data){
             mContext = context;
             mdata = data;
             mInflater = LayoutInflater.from(mContext);
+        }
+
+        public void setData(List<State> data){
+            mdata = data;
         }
 
         @Override

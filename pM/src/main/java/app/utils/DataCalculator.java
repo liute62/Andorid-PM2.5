@@ -526,6 +526,7 @@ public class DataCalculator {
         List<List<State>> datas = getLastWeekStates();
         if (datas.isEmpty()) return map;
         for (int i = 0; i != datas.size(); i++) {
+            Log.d(TAG,"calChart12Data: "+String.valueOf(i)+" "+String.valueOf(datas.get(i).size()));
             List<State> state = datas.get(i);
             if (state.isEmpty()) {
                 map.put(i, 0.0f);
