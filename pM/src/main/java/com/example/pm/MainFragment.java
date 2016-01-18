@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +44,7 @@ import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.LoadingDialog;
+import app.view.widget.LocalizationDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.view.ColumnChartView;
@@ -87,6 +87,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     ImageView mRunError;
     ImageView mChart1Alert;
     ImageView mChart2Alert;
+    ImageView mAddCity;
 
     Double PMDensity;
     Double PMBreatheHour;
@@ -149,31 +150,44 @@ public class MainFragment extends Fragment implements OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == Const.Handler_PM_Density) {
-                PMModel data = (PMModel) msg.obj;
-                PMDensity = Double.valueOf(data.getPm25());
-                //dataInitial();
-                text1Initial();
+            switch (msg.what){
+                case Const.Handler_PM_Density:
+                    PMModel data1 = (PMModel) msg.obj;
+                    PMDensity = Double.valueOf(data1.getPm25());
+                    //dataInitial();
+                    text1Initial();
+                    break;
+                case Const.Handler_PM_Data:
+                    PMModel data = (PMModel) msg.obj;
+                    if (ShortcutUtil.isStringOK(data.getPm_breath_hour())) {
+                        PMBreatheHour = Double.valueOf(data.getPm_breath_hour());
+                        aCache.put(Const.Cache_PM_LastHour, PMBreatheHour);
+                    }
+                    if (ShortcutUtil.isStringOK(data.getPm_breath_today())) {
+                        PMBreatheDay = Double.valueOf(data.getPm_breath_today());
+                        aCache.put(Const.Cache_PM_LastDay, PMBreatheDay);
+                    }
+                    if (ShortcutUtil.isStringOK(data.getPm_breath_week())) {
+                        PMBreatheWeekAvg = Double.valueOf(data.getPm_breath_week());
+                        aCache.put(Const.Cache_PM_LastWeek, PMBreatheWeekAvg);
+                    }
+                    text2Initial();
+                    break;
+                case Const.Handler_City_Name:
+                    String name = (String)msg.obj;
+                    currentCity = name;
+                    mAddCity.setVisibility(View.GONE);
+                    mCity.setText(currentCity);
+                    aCache.put(Const.Cache_City,currentCity);
+                    break;
+                case Const.Handler_Add_City:
+                    String name2 = (String)msg.obj;
+                    currentCity = name2;
+                    mAddCity.setVisibility(View.GONE);
+                    mCity.setText(currentCity);
+                    break;
             }
-            if (msg.what == Const.Handler_PM_Data) {
-                PMModel data = (PMModel) msg.obj;
-                if(ShortcutUtil.isStringOK(data.getPm_breath_hour())){
-                    PMBreatheHour = Double.valueOf(data.getPm_breath_hour());
-                    aCache.put(Const.Cache_PM_LastHour, PMBreatheHour);
-                }if(ShortcutUtil.isStringOK(data.getPm_breath_today())){
-                    PMBreatheDay = Double.valueOf(data.getPm_breath_today());
-                    aCache.put(Const.Cache_PM_LastDay, PMBreatheDay);
-                }if(ShortcutUtil.isStringOK(data.getPm_breath_week())) {
-                    PMBreatheWeekAvg = Double.valueOf(data.getPm_breath_week());
-                    aCache.put(Const.Cache_PM_LastWeek, PMBreatheWeekAvg);
-                }
-                text2Initial();
-            }
-            if(msg.what == Const.Handler_City_Name){
-                String name = (String)msg.obj;
-                currentCity = name;
-                mCity.setText(currentCity);
-            }
+
         }
     };
 
@@ -286,6 +300,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChart2Title = (TextView) view.findViewById(R.id.main_chart2_title);
         mChart1Alert = (ImageView) view.findViewById(R.id.main_chart_1_alert);
         mChart2Alert = (ImageView) view.findViewById(R.id.main_chart_2_alert);
+        mAddCity = (ImageView)view.findViewById(R.id.main_add_city);
         setFonts(view);
         setListener();
         cacheInitial();
@@ -300,6 +315,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mHotMap.setOnClickListener(this);
         mChangeChart1.setOnClickListener(this);
         mChangeChart2.setOnClickListener(this);
+        mAddCity.setOnClickListener(this);
     }
 
     private void setFonts(View view) {
@@ -339,7 +355,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (ShortcutUtil.isStringOK(user_gender)) {
             Const.CURRENT_USER_GENDER = user_gender;
         }
-
         if (ShortcutUtil.isStringOK(density)) {
             PMDensity = Double.valueOf(density);
         }
@@ -360,8 +375,10 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
         if (ShortcutUtil.isStringOK(city)) {
             currentCity = city;
+            mAddCity.setVisibility(View.GONE);
         }else {
             currentCity = "无";
+            mAddCity.setVisibility(View.VISIBLE);
         }
 
         /*********Chart Data Initial**********/
@@ -466,6 +483,10 @@ public class MainFragment extends Fragment implements OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.main_add_city:
+                LocalizationDialog dialog = new LocalizationDialog(mActivity,mDataHandler);
+                dialog.show();
+                break;
             case R.id.main_profile:
                 mProfile.setSelected(true);
                 MainActivity mainActivity = (MainActivity) getActivity();

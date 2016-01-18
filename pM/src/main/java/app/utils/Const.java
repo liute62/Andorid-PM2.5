@@ -93,6 +93,8 @@ public class Const {
 
     public static final int Handler_Gender_Updated = 100007;
 
+    public static final int Handler_Add_City = 100008;
+
     /**
      * Intent Tag Code*
      */

@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -351,5 +353,19 @@ public class ShortcutUtil {
         if(resultStr.length() > 5)
             resultStr = resultStr.substring(0,4);
         return Double.valueOf(resultStr);
+    }
+
+    public static String subStrLocation(String location){
+        String locationStr = location;
+        if(location.length() >= 8)
+            locationStr.substring(0,7);
+        return locationStr;
+    }
+
+    public static String subStrLocation(String location,int cut){
+        String locationStr = location;
+        if(location.length() >= cut)
+            locationStr.substring(0,cut - 1);
+        return locationStr;
     }
 }
