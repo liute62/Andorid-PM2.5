@@ -762,6 +762,9 @@ public class DataGenerator {
     }
 
     public static ColumnChartData chart8DataGenerator(Map<Integer, Float> maps) {
+//        for (Integer key : maps.keySet()){
+//            //Log.e("chart8DataGenerator",String.valueOf(key)+" "+maps.get(key));
+//        }
         ColumnChartData data;
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
         int numColumns = ChartsConst.Chart_X[8].length;

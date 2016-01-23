@@ -174,6 +174,7 @@ public class DBService extends Service {
                         aCache.put(Const.Cache_Chart_7_Date, DataCalculator.getIntance(db).getLastWeekDate());
                     }
                     aCache.put(Const.Cache_Chart_8, DataCalculator.getIntance(db).calChart8Data());
+                    aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
                     aCache.put(Const.Cache_Chart_10, DataCalculator.getIntance(db).calChart10Data());
                     if (aCache.getAsObject(Const.Cache_Chart_12) == null) {
                         aCache.put(Const.Cache_Chart_12, DataCalculator.getIntance(db).calChart12Data());

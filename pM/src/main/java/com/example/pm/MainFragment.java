@@ -43,6 +43,7 @@ import app.utils.DataGenerator;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
+import app.view.widget.DialogConfirm;
 import app.view.widget.LoadingDialog;
 import app.view.widget.LocalizationDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -88,6 +89,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     ImageView mChart1Alert;
     ImageView mChart2Alert;
     ImageView mAddCity;
+    TextView mViewMore2;
 
     Double PMDensity;
     Double PMBreatheHour;
@@ -126,6 +128,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     HashMap<Integer, Float> chartData7; //data for chart 7
     List<String> chart7Date;           //date(mm.dd) for chart 7
     HashMap<Integer, Float> chartData8; //data for chart 8
+    List<String> chart8Time;
     HashMap<Integer, Float> chartData10; //data for chart 10
     HashMap<Integer, Float> chartData12; //data for chart 12
     List<String> chart12Date;           //date(mm.dd) for chart 12
@@ -261,6 +264,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         chartData6 = new HashMap<>();
         chartData7 = new HashMap<>();
         chartData8 = new HashMap<>();
+        chart8Time = new ArrayList<>();
         chartData10 = new HashMap<>();
         chartData12 = new HashMap<>();
         pmModel = new PMModel();
@@ -316,6 +320,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChart1Alert = (ImageView) view.findViewById(R.id.main_chart_1_alert);
         mChart2Alert = (ImageView) view.findViewById(R.id.main_chart_2_alert);
         mAddCity = (ImageView)view.findViewById(R.id.main_add_city);
+        mViewMore2 = (TextView)view.findViewById(R.id.main_view_more_2);
         setFonts(view);
         setListener();
         cacheInitial();
@@ -331,6 +336,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChangeChart1.setOnClickListener(this);
         mChangeChart2.setOnClickListener(this);
         mAddCity.setOnClickListener(this);
+        mViewMore2.setOnClickListener(this);
     }
 
     private void setFonts(View view) {
@@ -531,6 +537,8 @@ public class MainFragment extends Fragment implements OnClickListener {
                 } else {
                     current_chart2_index += 2;
                 }
+                if(current_chart2_index == 8) mViewMore2.setVisibility(View.VISIBLE);
+                else mViewMore2.setVisibility(View.GONE);
                 boolean result2 = Const.Chart_Alert_Show[current_chart2_index];
                 if(result2 == true){
                     mChart2Alert.setVisibility(View.VISIBLE);
@@ -556,6 +564,17 @@ public class MainFragment extends Fragment implements OnClickListener {
                 break;
             case R.id.main_chart_2_alert:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.main_view_more_2:
+                String start = "无";
+                String end = "无";
+                if(chart8Time.size() >= 2){
+                    start  = chart8Time.get(0);
+                    end = chart8Time.get(chart8Time.size() - 1);
+                }
+                DialogConfirm confirm = new DialogConfirm(mActivity,"最近两小时","从: "+start+"到: "+end);
+                confirm.show();
+                confirm.setAllDismissListener();
                 break;
             default:
                 break;
@@ -695,9 +714,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 chartData7 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_7);
                 chart7Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_7_Date);
                 chartData8 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_8);
+                chart8Time = (ArrayList) aCache.getAsObject(Const.Cache_Chart_8_Time);
                 chartData10 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_10);
                 chartData12 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_12);
                 chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
+
                 chartInitial(current_chart1_index, current_chart2_index);
             } else if (intent.getAction().equals(Const.Action_DB_MAIN_Location)) {
                 String lati = intent.getStringExtra(Const.Intent_DB_PM_Lati);

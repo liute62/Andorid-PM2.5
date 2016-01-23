@@ -2,137 +2,18 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_renren_1.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="0ca209d760b28d73bbe444888cdd0c20eeaacbc3">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_renren_1-91b3674eabe965d119598b145642eeaf7b864362.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_scrshot.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="4dc6f6adcfa03644f08ffa15890b40a650aa62ba">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_scrshot-bcd8f66f9b01390a9eb7fe4c5f4611b9b9518ea9.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.0\support-annotations-23.1.0.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="92e3fc113ec3ee36b64603a38857b95700025633">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\support-annotations-23.1.0-a27c3f024e51ace21f3d1dd13012f4f9d527fafe.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="b1346c2623d568b77b06b09d9033860d51ebb475">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-0ab69b5791bc5b973e5b5dd589a2f4d552f74a2f.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_facebook_2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="00f01ae2985f8e128050ec4ff1beeeaf3979d2cf">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_facebook_2-a2a0c29cbe1b1677b1294f19cf1a469ee2d3277e.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_evernote.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="0666f34c3bf01b02b13f219226cf6cf17fc9be8f">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_evernote-488f2c544f6c1dee992f3f5e59367f99e6f35efe.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_QQZone_2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="4a69b33758dcba3ef519cbd4b6c8af5f41603c4f">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_QQZone_2-8e8e61b37ef44773b1ef063c1fed8db670725569.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_instagram.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="25a71316e20a8c82f3287c3f67ff9b49afb2bf67">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_instagram-269c00e59ed3dc2cc996a744d8624b3dc02b334b.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_Sina.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="a6eee0ece63ba5e74411057d09eda1a5a01ca940">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_Sina-feb77ee96f96048469260825209f44dd971e38d5.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_ynote.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="45b9934972e608b88f3501f16c36c30cf72ade02">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_ynote-c961622dc18690992ead41c75a049dc64b0478b3.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_WeiXin_1.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="47f4993168154fa73377d7470b9f6887d48a8023">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_WeiXin_1-b0227fefdf68a91d62b8a6af110fe4d2d4859408.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\src\main\jniLibs\locSDK_6.03.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="f97b00e2e5a384be96ab4d668fa3e2ff62cdbbb7">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\locSDK_6.03-0a8c7e494a94ce6da676fc90674bd1290a377b0c.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\internal_impl-23.1.0-1153071d64fccb854954c38d79b8427134b98872.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_QQZone_1.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="c184c69f43b1fe46390f7123717c65bd844bccb6">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_QQZone_1-23d5522b5668c6d468ece24ba466def142e21cbe.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_laiwang_1.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="5778375ae0d0aa13d1e8f810116bce0672ad7973">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_laiwang_1-20bfa7ad8af5359e128917c6eac98f1fe3a11996.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\com.mcxiaoke.volley\library\1.0.18\38da306aafee11459cd935a01d2c92a98dc670a4\library-1.0.18.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\library-1.0.18-b1a2008231d51f8c72918a90038fc32a12e31c85.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\umeng_social_sdk.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="4688dc44ccef22b7f057301ee6abbe187a8d35ea">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\umeng_social_sdk-46b75a570bfd2244582e829c9485615be7502a9e.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_comment.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="1913fe82fed9f3cd0f9fcc311c23e07292644de5">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_comment-a947e255cca7859d76642f0a92984a56049cf06b.jar" />
-    </item>
-    <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_email.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="a3035cf2249ebc09a5b5204362a8cc0a653f9589">
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_email-1a1e31fa510bbcf574884d24146d189049e87db6.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tumblr.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="44d6a4be1e7d4a61a5a7e59ce4ed759d870875ce">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tumblr-dea3c96c02ea6b160e152703282251b84b600b2f.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_whatsapp.jar"
@@ -142,11 +23,39 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_whatsapp-eef3a16f2263a4b90e321218ee4ed8043c4b0d32.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_yixin_1.jar"
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\slidingmenu_library\unspecified\jars\classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="8fa68a3bb5ae6231cd4ccaf355d80c6f3725d0ca">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_yixin_1-e73f4890dfe7a46c3ba1903331cda2fd72530d6c.jar" />
+        sha1="c68f95726ada11e8bd33af0b5922d9c0bac29b2d">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-e3e1594469c752eb5629390eec4a4f50fd978322.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_WeiXin_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="b651be701cb256e3972e7c5a07119f26bb7b44a4">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_WeiXin_2-97262b5a29b3382db5590a449916e73f2741f3cb.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tencentWB_3.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ffa8f4a76d210b0e34c255891e4d7478faf7b918">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tencentWB_3-3bb41d865f54278b174d78ecd2369d8369c21278.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_facebook_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="41a79614adcfc72743618ceff4fb4181f0e34ea0">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_facebook_1-064ecf066d15783be1e1ddce3039ac3045b1a61c.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_foursquare.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="9a78b719deb17d9f165f94b21c1c85c841771dc8">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_foursquare-5c1e79013dacb669b35f10de4f177cd9b7adaba6.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\httpmime-4.1.3.jar"
@@ -163,144 +72,11 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_pocket-4c8694861b06ec865a6ac77a6501f7b4eb0096ff.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_foursquare.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="9a78b719deb17d9f165f94b21c1c85c841771dc8">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_foursquare-5c1e79013dacb669b35f10de4f177cd9b7adaba6.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\slidingmenu_library\unspecified\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="f50b48629585c00a94494f6bcae718589824bc78">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-e3e1594469c752eb5629390eec4a4f50fd978322.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_facebook_1.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="41a79614adcfc72743618ceff4fb4181f0e34ea0">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_facebook_1-064ecf066d15783be1e1ddce3039ac3045b1a61c.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tumblr.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="44d6a4be1e7d4a61a5a7e59ce4ed759d870875ce">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tumblr-dea3c96c02ea6b160e152703282251b84b600b2f.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="57ae0d750ff83f0c738d21720224ac7ea866a094">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-9030eff457ba25afd2e123a6c3b09c10d6b97085.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\src\main\jniLibs\BaiduLBS_Android.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="bb71d6cfe5166741a0a99e85471a8b90e97f5228">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\BaiduLBS_Android-e8e5ee7f8612dc15fffdd4171a6a10d70a9a4cb7.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tencentWB_1.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="328c5351cae13f2ab29450d22b6c02d0ac88a855">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tencentWB_1-bc93fd7972300f7820a116e625bc8a81cba2be7d.jar" />
-    </item>
-    <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\bolts-android-1.1.4.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="129874135e6081269ace2312092031558865de12">
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\bolts-android-1.1.4-08b07c40d2738c416c46d1ce72ebac4ccdd09c76.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_actionbarview.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="7394ff91726de69882400a0a3a5bf0e8ee51f6d9">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_actionbarview-04ace7a157eebdc7fb1c4ffd078c9b649fec6aff.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_laiwang_2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="23472dc1bfab9ee666f21183f17e46b08f87531f">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_laiwang_2-9b2df3b867cd1f0f3a27d09448587e531551d6c3.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_yixin_2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="0b76e0baa9d33735bb65952ac97e8f522458ba0c">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_yixin_2-75ce120230f8fb021adec7eca8acb53ae8dad4ba.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_WeiXin_2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="b651be701cb256e3972e7c5a07119f26bb7b44a4">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_WeiXin_2-97262b5a29b3382db5590a449916e73f2741f3cb.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_AtFriends.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="801adcdfad1a73f352ab0fbfadaf315e88b26823">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_AtFriends-d26f8e55643ca0b69b532c317389485198885690.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_sms.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="ae93280308ce10442ffb9c8c716977940471dc7a">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_sms-5c038558438d5e972376a26dcdfab8f84a8c5a44.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-a57e3065a26a679feafc6268193326422e57ba35.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_QQZone_3.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="931ab461b91c2a2fd5c697e7f622cdca8c2b3ac5">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_QQZone_3-1b30015b947098c8c798c69e9e2c2ecd82267edd.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\nl.qbusict\cupboard\2.1.2\aa2654568535e3a29af7a3b86453b8ff85af6d12\cupboard-2.1.2.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\cupboard-2.1.2-efbe7a181d0b668fd2c95e0dc8f538b5e868ca9d.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_pinterest.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="d09e8c77b1214463aa6461f3b7cf1fa114c69498">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_pinterest-65f8164a24b8cc486a09456ca9d6d452423f90a6.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_line.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="c2559b2d77e45b2a8ce585f80c090b4d55092692">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_line-05282175e0e467256ea9a8ffc6a9ccadeb5245bf.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_flickr.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="6adc43a02c60734693cd0e62fc466eaddd934c84">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_flickr-e075a614b135324e3b6acd8c975f8d0e20bc543e.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_kakao.jar"
@@ -310,11 +86,32 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_kakao-6403cc6af585f4409f45877b3489ce71627cb767.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.github.lecho\hellocharts-library\1.5.8\jars\classes.jar"
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_pinterest.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="56c6a22c42588628903e9dda5d8f3aa1c1b4372f">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-dec244dde1571b06a43fb5a7271094cf37428e07.jar" />
+        sha1="d09e8c77b1214463aa6461f3b7cf1fa114c69498">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_pinterest-65f8164a24b8cc486a09456ca9d6d452423f90a6.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\libs\internal_impl-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\internal_impl-23.1.0-1153071d64fccb854954c38d79b8427134b98872.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_linkedin.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="a5f28aafb5b50fc114a296e2c88b1003f02973f6">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_linkedin-98e76c3ce453de98e967e4a075560356de63ff15.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_yixin_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8fa68a3bb5ae6231cd4ccaf355d80c6f3725d0ca">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_yixin_1-e73f4890dfe7a46c3ba1903331cda2fd72530d6c.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_shake.jar"
@@ -324,11 +121,179 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_shake-7436e5029085cdd63ebc5d0ba2e5745480b48a59.jar" />
     </item>
     <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tencentWB_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="6f744074067eb201171c9c8ff1ca45ed821a76a8">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tencentWB_2-f010a4a4914680d9e862b406075b62834d879b69.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_laiwang_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="5778375ae0d0aa13d1e8f810116bce0672ad7973">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_laiwang_1-20bfa7ad8af5359e128917c6eac98f1fe3a11996.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_ynote.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="45b9934972e608b88f3501f16c36c30cf72ade02">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_ynote-c961622dc18690992ead41c75a049dc64b0478b3.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\src\main\jniLibs\locSDK_6.03.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="f97b00e2e5a384be96ab4d668fa3e2ff62cdbbb7">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\locSDK_6.03-0a8c7e494a94ce6da676fc90674bd1290a377b0c.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_yixin_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="0b76e0baa9d33735bb65952ac97e8f522458ba0c">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_yixin_2-75ce120230f8fb021adec7eca8acb53ae8dad4ba.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_QQZone_3.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="931ab461b91c2a2fd5c697e7f622cdca8c2b3ac5">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_QQZone_3-1b30015b947098c8c798c69e9e2c2ecd82267edd.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_Sina.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="a6eee0ece63ba5e74411057d09eda1a5a01ca940">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_Sina-feb77ee96f96048469260825209f44dd971e38d5.jar" />
+    </item>
+    <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_like.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="18c87f83fb936fb724ea6adb76795584511318e8">
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_like-1e893ba99891338557e54372a0f99cebf00eedaf.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_sms.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ae93280308ce10442ffb9c8c716977940471dc7a">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_sms-5c038558438d5e972376a26dcdfab8f84a8c5a44.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_line.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="c2559b2d77e45b2a8ce585f80c090b4d55092692">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_line-05282175e0e467256ea9a8ffc6a9ccadeb5245bf.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="3f9ade2764ddf31976e70b76e8eedf33b1585e5b">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-0ab69b5791bc5b973e5b5dd589a2f4d552f74a2f.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tencentWB_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="328c5351cae13f2ab29450d22b6c02d0ac88a855">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tencentWB_1-bc93fd7972300f7820a116e625bc8a81cba2be7d.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_facebook_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="00f01ae2985f8e128050ec4ff1beeeaf3979d2cf">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_facebook_2-a2a0c29cbe1b1677b1294f19cf1a469ee2d3277e.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_evernote.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="0666f34c3bf01b02b13f219226cf6cf17fc9be8f">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_evernote-488f2c544f6c1dee992f3f5e59367f99e6f35efe.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_laiwang_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="23472dc1bfab9ee666f21183f17e46b08f87531f">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_laiwang_2-9b2df3b867cd1f0f3a27d09448587e531551d6c3.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-a57e3065a26a679feafc6268193326422e57ba35.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_actionbarview.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="7394ff91726de69882400a0a3a5bf0e8ee51f6d9">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_actionbarview-04ace7a157eebdc7fb1c4ffd078c9b649fec6aff.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_renren_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="0ca209d760b28d73bbe444888cdd0c20eeaacbc3">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_renren_1-91b3674eabe965d119598b145642eeaf7b864362.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_comment.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="1913fe82fed9f3cd0f9fcc311c23e07292644de5">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_comment-a947e255cca7859d76642f0a92984a56049cf06b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.0\support-annotations-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="92e3fc113ec3ee36b64603a38857b95700025633">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\support-annotations-23.1.0-a27c3f024e51ace21f3d1dd13012f4f9d527fafe.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_QQZone_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="4a69b33758dcba3ef519cbd4b6c8af5f41603c4f">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_QQZone_2-8e8e61b37ef44773b1ef063c1fed8db670725569.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.github.lecho\hellocharts-library\1.5.8\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="56c6a22c42588628903e9dda5d8f3aa1c1b4372f">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-dec244dde1571b06a43fb5a7271094cf37428e07.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_flickr.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="6adc43a02c60734693cd0e62fc466eaddd934c84">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_flickr-e075a614b135324e3b6acd8c975f8d0e20bc543e.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\umeng_social_sdk.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="4688dc44ccef22b7f057301ee6abbe187a8d35ea">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\umeng_social_sdk-46b75a570bfd2244582e829c9485615be7502a9e.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_scrshot.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="4dc6f6adcfa03644f08ffa15890b40a650aa62ba">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_scrshot-bcd8f66f9b01390a9eb7fe4c5f4611b9b9518ea9.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_UserCenter.jar"
@@ -338,18 +303,11 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_UserCenter-c39d3f1007c8331f009b2ed6d1f9227a82fbb6f7.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tencentWB_2.jar"
+        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\com.mcxiaoke.volley\library\1.0.18\38da306aafee11459cd935a01d2c92a98dc670a4\library-1.0.18.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="6f744074067eb201171c9c8ff1ca45ed821a76a8">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tencentWB_2-f010a4a4914680d9e862b406075b62834d879b69.jar" />
-    </item>
-    <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_tencentWB_3.jar"
-        jumboMode="false"
-        revision="23.0.1"
-        sha1="ffa8f4a76d210b0e34c255891e4d7478faf7b918">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_tencentWB_3-3bb41d865f54278b174d78ecd2369d8369c21278.jar" />
+        sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\library-1.0.18-b1a2008231d51f8c72918a90038fc32a12e31c85.jar" />
     </item>
     <item
         jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_renren_2.jar"
@@ -359,11 +317,53 @@
         <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_renren_2-66ba422ccf4331e59bcf07a6333d921f756c1781.jar" />
     </item>
     <item
-        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_linkedin.jar"
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_AtFriends.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="a5f28aafb5b50fc114a296e2c88b1003f02973f6">
-        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_linkedin-98e76c3ce453de98e967e4a075560356de63ff15.jar" />
+        sha1="801adcdfad1a73f352ab0fbfadaf315e88b26823">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_AtFriends-d26f8e55643ca0b69b532c317389485198885690.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_WeiXin_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="47f4993168154fa73377d7470b9f6887d48a8023">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_WeiXin_1-b0227fefdf68a91d62b8a6af110fe4d2d4859408.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\.gradle\caches\modules-2\files-2.1\nl.qbusict\cupboard\2.1.2\aa2654568535e3a29af7a3b86453b8ff85af6d12\cupboard-2.1.2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\cupboard-2.1.2-efbe7a181d0b668fd2c95e0dc8f538b5e868ca9d.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_QQZone_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="c184c69f43b1fe46390f7123717c65bd844bccb6">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_QQZone_1-23d5522b5668c6d468ece24ba466def142e21cbe.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="57ae0d750ff83f0c738d21720224ac7ea866a094">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\classes-9030eff457ba25afd2e123a6c3b09c10d6b97085.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\exploded-aar\Andorid-PM2.5\umeng_share_library\unspecified\jars\libs\SocialSDK_instagram.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="25a71316e20a8c82f3287c3f67ff9b49afb2bf67">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\SocialSDK_instagram-269c00e59ed3dc2cc996a744d8624b3dc02b334b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\src\main\jniLibs\BaiduLBS_Android.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="bb71d6cfe5166741a0a99e85471a8b90e97f5228">
+        <dex dex="C:\Users\Administrator\Documents\GitHub\Andorid-PM2.5\pM\build\intermediates\pre-dexed\debug\BaiduLBS_Android-e8e5ee7f8612dc15fffdd4171a6a10d70a9a4cb7.jar" />
     </item>
 
 </items>

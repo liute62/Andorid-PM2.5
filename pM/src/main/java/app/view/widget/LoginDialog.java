@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -32,6 +33,7 @@ import app.utils.VolleyQueue;
  */
 public class LoginDialog extends Dialog implements OnClickListener {
 
+    public static final String TAG = "LoginDialog";
     //todo to fix the bug
     Activity mActivity;
     Button mSure;
@@ -64,13 +66,34 @@ public class LoginDialog extends Dialog implements OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.widget_dialog_login);
         mLoadingDialog = new LoadingDialog(mActivity);
         mSure = (Button) findViewById(R.id.activitytitle_sure);
         mBack = (Button) findViewById(R.id.activitytitle_cancel);
         mUser = (EditText) findViewById(R.id.activitytitle_title);
+        try {
+            mUser.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    Log.e(TAG,"username focus == "+String.valueOf(hasFocus));
+                }
+            });
+        }catch (Exception e){
+            Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG).show();
+        }
         mPass = (EditText) findViewById(R.id.login_password);
+        try {
+            mPass.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    Log.e(TAG,"password focus == "+String.valueOf(hasFocus));
+                }
+            });
+        }catch (Exception e){
+            Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG).show();
+        }
+
         mSure.setOnClickListener(this);
         mBack.setOnClickListener(this);
     }

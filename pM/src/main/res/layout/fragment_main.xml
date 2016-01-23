@@ -298,6 +298,17 @@
                 android:layout_marginLeft="5dip"
                 android:visibility="gone"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="查看"
+                android:visibility="gone"
+                android:textColor="@color/AccentBlue"
+                android:id="@+id/main_view_more_1"
+                android:layout_alignBaseline="@+id/main_chart_1_column"
+                android:layout_toEndOf="@+id/main_chart1_title" />
+
             <!--<android.support.v4.view.ViewPager-->
             <!--android:id="@+id/main_chart_viewpager_1"-->
             <!--android:layout_width="match_parent"-->
@@ -373,6 +384,17 @@
                 android:src="@drawable/ic_error_outline_black_18dp"
                 android:layout_marginLeft="5dip"
                 android:visibility="gone"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="查看"
+                android:visibility="gone"
+                android:textColor="@color/AccentBlue"
+                android:id="@+id/main_view_more_2"
+                android:layout_alignBaseline="@+id/main_chart_2_column"
+                android:layout_toEndOf="@+id/main_chart2_title" />
 
         </RelativeLayout>
     </LinearLayout>

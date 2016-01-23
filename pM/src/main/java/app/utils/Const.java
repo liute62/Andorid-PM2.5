@@ -58,6 +58,7 @@ public class Const {
     public static final String Cache_Longitude = "Cache_Longitude";
     public static final String Cache_Latitude = "Cache_Latitude";
     public static final String Cache_City = "Cache_City";
+    public static final String Cache_Indoor_Outdoor = "Cache_Indoor_Outdoor";
 
     public static final String Cache_Chart_1 = "Cache_Chart_1";
     public static final String Cache_Chart_2 = "Cache_Chart_2";
@@ -68,6 +69,7 @@ public class Const {
     public static final String Cache_Chart_7 = "Cache_Chart_7";
     public static final String Cache_Chart_7_Date = "Cache_Chart_7_Date";
     public static final String Cache_Chart_8 = "Cache_Chart_8";
+    public static final String Cache_Chart_8_Time = "Cache_Chart_8_Time";
     public static final String Cache_Chart_10 = "Cache_Chart_10";
     public static final String Cache_Chart_12 = "Cache_Chart_12";
     public static final String Cache_Chart_12_Date = "Cache_Chart_12_Date";

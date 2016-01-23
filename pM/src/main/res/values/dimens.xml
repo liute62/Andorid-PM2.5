@@ -23,8 +23,8 @@
 
     <!-- login dialog dimen -->
     <dimen name="login_dialog_left">10dip</dimen>
-    <dimen name="login_dialog_left2">10dip</dimen>
+    <dimen name="login_dialog_left2">18dip</dimen>
     <dimen name="login_dialog_right">30dip</dimen>
-    <dimen name="login_dialog_top">10dip</dimen>
+    <dimen name="login_dialog_top">18dip</dimen>
     <dimen name="login_dialog_bottom">10dip</dimen>
 </resources>

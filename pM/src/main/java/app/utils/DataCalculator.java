@@ -27,6 +27,7 @@ public class DataCalculator {
     private List<State> lastTwoHourStates;
     private List<List<State>> lastWeekStates;
     private ArrayList<String> lastWeekDate;
+    private ArrayList<String> lastTwoHourTime;
 
     private static DataCalculator instance = null;
 
@@ -38,6 +39,7 @@ public class DataCalculator {
     }
 
     private DataCalculator(SQLiteDatabase db) {
+        lastTwoHourTime = new ArrayList<>();
         this.db = db;
         this.todayStates = calTodayStates();
         this.lastTwoHourStates = calLastTwoHourStates(); //Actually the time is set here before function be invoked. But it's ok.
@@ -91,6 +93,10 @@ public class DataCalculator {
         calendar.set(year, month, day, currentHour, currentMin, 59);
         Long nowTime = calendar.getTime().getTime();
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", lastTime.toString(), nowTime.toString()).list();
+        lastTwoHourTime = new ArrayList<>();
+        for(int i = 0; i != states.size(); i++){
+            lastTwoHourTime.add(ShortcutUtil.refFormatNowDate(Long.valueOf(states.get(i).getTime_point())));
+        }
         return states;
     }
 
@@ -161,6 +167,10 @@ public class DataCalculator {
 
     public List<State> getLastTwoHourStates() {
         return lastTwoHourStates;
+    }
+
+    public ArrayList<String> getLastTwoHourTime() {
+        return lastTwoHourTime;
     }
 
     public List<List<State>> getLastWeekStates() {
@@ -423,6 +433,9 @@ public class DataCalculator {
         }
         //Log.e("calChart8Data firsttime",ShortcutUtil.refFormatNowDate(Long.valueOf(states.get(0).getTime_point())));
         //Log.e("calChart8Data lasttime",ShortcutUtil.refFormatNowDate(Long.valueOf(states.get(states.size() - 1).getTime_point())));
+//        for(int i = 0; i != states.size(); i++){
+//            Log.e("calChart8Data",String.valueOf(i)+" "+ShortcutUtil.refFormatNowDate(Long.valueOf(states.get(i).getTime_point()))+" "+states.get(i).getVentilation_volume());
+//        }
         HashMap<Integer, Float> tmpMap = new HashMap<>();
         if (states.size() == 1) {
             tmpMap.put(0, Float.valueOf(states.get(0).getVentilation_volume()));

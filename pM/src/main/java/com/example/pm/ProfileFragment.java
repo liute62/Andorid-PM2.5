@@ -196,7 +196,7 @@ public class ProfileFragment extends Fragment implements
                 dialogNotification.show();
                 break;
             case R.id.profile_login:
-                LoginDialog loginDialog = new LoginDialog(getActivity(), loginHandler);
+                LoginDialog loginDialog = new LoginDialog(mActivity, loginHandler);
                 loginDialog.show();
                 break;
             case R.id.profile_share:

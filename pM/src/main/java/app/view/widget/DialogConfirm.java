@@ -85,4 +85,21 @@ public class DialogConfirm extends Dialog {
         cancelListener = listener;
         if(mCancel != null && listener != null) mCancel.setOnClickListener(listener);
     }
+
+    public void setAllDismissListener(){
+            cancelListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DialogConfirm.this.dismiss();
+                }
+            };
+            confirmListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DialogConfirm.this.dismiss();
+                }
+            };
+        if(mConfirm != null) mConfirm.setOnClickListener(confirmListener);
+        if(mCancel != null) mCancel.setOnClickListener(cancelListener);
+    }
 }
