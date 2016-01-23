@@ -10,6 +10,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import app.Entity.State;
 import app.model.PMModel;
@@ -496,9 +498,47 @@ public class DBService extends Service {
     GpsStatus.Listener gpsStatusListener = new GpsStatus.Listener() {
 
         public void onGpsStatusChanged(int event) {
+            Log.d(TAG,"onGpsStatusChanged event == "+String.valueOf(event));
+            GpsStatus status = mManager.getGpsStatus(null);
             if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
+                int time = status.getTimeToFirstFix();
+                Log.d(TAG,"onGpsStatusChanged time "+String.valueOf(time));
             } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
+                Iterable<GpsSatellite> allgps = status.getSatellites();
+                Iterator<GpsSatellite> items = allgps.iterator();
+                int i = 0;
+                int ii = 0;
+                while (items.hasNext())
+                {
+                    GpsSatellite tmp = (GpsSatellite) items.next();
+                    if (tmp.usedInFix())
+                        ii++;
+                    i++;
+                }
+                if(ii > 4){
+                    Const.CURRENT_INDOOR = false;
+                }else {
+                    Const.CURRENT_INDOOR = true;
+                }
+               Log.d(TAG,"onGpsStatusChanged i "+String.valueOf(i)+" ii"+String.valueOf(ii));
             } else if (event == GpsStatus.GPS_EVENT_STARTED) {
+                Iterable<GpsSatellite> allgps = status.getSatellites();
+                Iterator<GpsSatellite> items = allgps.iterator();
+                int i = 0;
+                int ii = 0;
+                while (items.hasNext())
+                {
+                    GpsSatellite tmp = (GpsSatellite) items.next();
+                    if (tmp.usedInFix())
+                        ii++;
+                    i++;
+                }
+                if(ii > 4){
+                    Const.CURRENT_INDOOR = false;
+                }else {
+                    Const.CURRENT_INDOOR = true;
+                }
+                Log.d(TAG,"onGpsStatusChanged started i "+String.valueOf(i)+" ii"+String.valueOf(ii));
             } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
             }
         }
@@ -557,7 +597,6 @@ public class DBService extends Service {
      * density: (ug/m3)
      * breath:  (L/min)
      * Calculate today the number of pm2.5 breathed until now
-     *
      * @param longi
      * @param lati
      * @return
@@ -897,7 +936,7 @@ public class DBService extends Service {
     }
 
     /**
-     *
+     * Get the last known location from providers
      * @return
      */
     private Location getLastLocation(){

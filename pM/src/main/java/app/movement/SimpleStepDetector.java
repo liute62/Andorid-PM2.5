@@ -26,7 +26,7 @@ public class SimpleStepDetector {
 
     public static String TAG = "SimpleStepDetector";
 
-    public static final float thred = 1.5f;
+    public static final float thred = 1.25f;
 
     public static int stepNum;
 

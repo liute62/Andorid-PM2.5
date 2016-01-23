@@ -1,7 +1,13 @@
 package app.utils;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 
+import com.example.pm.R;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.controller.UMServiceFactory;
 import com.umeng.socialize.controller.UMSocialService;
@@ -11,6 +17,10 @@ import com.umeng.socialize.sso.SinaSsoHandler;
 import com.umeng.socialize.sso.UMQQSsoHandler;
 import com.umeng.socialize.weixin.controller.UMWXHandler;
 import com.umeng.socialize.weixin.media.CircleShareContent;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by Administrator on 12/10/2015.
@@ -43,12 +53,47 @@ public class ShareUtils {
 
     private void addCustomPlatforms() {
        // 添加微信平台
-        addWXPlatform();
+        //addWXPlatform();
+
     }
 
     public void share(){
         mController.getConfig().removePlatform( SHARE_MEDIA.RENREN, SHARE_MEDIA.DOUBAN);
         mController.openShare(mActivity,false);
+        //estForSendingWechat(2);
+    }
+
+    private void testForSendingWechat(int type){
+        Intent intent = new Intent();
+        //ComponentName cmp = new ComponentName("com.tencent.mm","com.tencent.mm.ui.LauncherUI");
+        ComponentName cmp = null;
+        switch (type){
+            case 1:
+                cmp = new ComponentName("com.tencent.mm","com.tencent.mm.ui.tools.ShareImgUI");
+                break;
+            case 2:
+                cmp = new ComponentName("com.tencent.mm",
+                        "com.tencent.mm.ui.tools.ShareToTimeLineUI");
+                break;
+        }
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("image/*");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.putExtra("kdescription", "test for intent of wechat");
+        Bitmap bitmap = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.card_avatar_bar);
+        File f = new File("/sdcard/namecard/", "test");
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Uri uri = Uri.fromFile(f);
+        intent.putExtra(Intent.EXTRA_STREAM,uri);
+        intent.setComponent(cmp);
+        mActivity.startActivityForResult(intent, 0);
     }
 
     private void setShareContent() {
