@@ -2303,6 +2303,7 @@ containing a value of this type.
         public static final int custom=0x7f0c004b;
         public static final int customPanel=0x7f0c004a;
         public static final int data_result_air=0x7f0c00ea;
+        public static final int data_result_airtitle=0x7f0c0072;
         public static final int data_result_avg_rate=0x7f0c00e9;
         public static final int data_result_center_last=0x7f0c0065;
         public static final int data_result_center_next=0x7f0c0066;
@@ -2546,7 +2547,6 @@ containing a value of this type.
         public static final int textView26=0x7f0c0070;
         public static final int textView27=0x7f0c006e;
         public static final int textView28=0x7f0c006f;
-        public static final int textView29=0x7f0c0072;
         public static final int textView3=0x7f0c007d;
         public static final int textView30=0x7f0c0073;
         public static final int textView31=0x7f0c0074;

@@ -2,9 +2,12 @@ package com.example.pm;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
@@ -19,12 +22,37 @@ public class MainActivity extends SlidingActivity {
     public static final String TAG = "MainActivity";
     ACache aCache;
     Fragment newFragment;
+    int offset = 20;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Display d = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int width = d.getWidth();
+        int height = d.getHeight();
+        offset = getOffsetByResolution(width);
         MyInitial();
+        Log.e(TAG,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height));
+    }
+
+    /**
+     * for 720 X 1280 case 720
+     * for 1440 X 2560 case 1440
+     * @param width
+     * @return
+     */
+    private int getOffsetByResolution(int width){
+        int result = 20;
+        switch(width){
+            case 720:
+                result = 100;
+                break;
+            case 1440:
+                result = 220;
+                break;
+        }
+        return result;
     }
 
     private void MyInitial() {
@@ -45,7 +73,7 @@ public class MainActivity extends SlidingActivity {
         sm.setShadowWidth(40);
         sm.setShadowDrawable(R.drawable.shadow);
         //setBehindOffset()为设置SlidingMenu打开后，右边留下的宽度。可以把这个值写在dimens里面去:60dp
-        sm.setBehindOffset(220);
+        sm.setBehindOffset(offset);
         sm.setFadeDegree(0.35f);
         //sm.setAboveOffset(20);
         //设置slding menu的几种手势模式

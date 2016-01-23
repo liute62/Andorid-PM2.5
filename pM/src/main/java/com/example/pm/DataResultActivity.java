@@ -6,10 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -43,16 +45,19 @@ public class DataResultActivity extends Activity implements OnClickListener{
     private SQLiteDatabase db;
     Button mNext;
     Button mLast;
+    TextView mAirTitle;
     TextView mTitle;
     Long currentTime = Long.valueOf(0);
     int year;
     int month;
     int day;
+    private int resolution_type  = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_result);
+        setResolutionParams();
         dbHelper = new DBHelper(getApplicationContext());
         db = dbHelper.getReadableDatabase();
         todayStates = getTodayState();
@@ -63,8 +68,25 @@ public class DataResultActivity extends Activity implements OnClickListener{
         mLast.setOnClickListener(this);
         mTitle = (TextView)findViewById(R.id.data_result_center_title);
         mAdapter = new StateAdapter(this,todayStates);
+        mAirTitle = (TextView)findViewById(R.id.data_result_airtitle);
+        if(resolution_type == 1) mAirTitle.setText("air");
+        else mAirTitle.setText("vol_volume");
         mListView.setAdapter(mAdapter);
         setTile(currentTime);
+    }
+
+    private void setResolutionParams(){
+        Display d = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int width = d.getWidth();
+        int height = d.getHeight();
+        switch(width){
+            case 720:
+                resolution_type = 1;
+                break;
+            case 1440:
+                resolution_type = 2;
+                break;
+        }
     }
 
     private List<State> getTodayState(){
@@ -199,8 +221,8 @@ public class DataResultActivity extends Activity implements OnClickListener{
                 viewHolder.mId.setText(mdata.get(position).getId() == null?"null":String.valueOf(mdata.get(position).getId()));
                 viewHolder.mUserId.setText(mdata.get(position).getUserid() == null? "null":mdata.get(position).getUserid());
                 viewHolder.mDate.setText(ShortcutUtil.refFormatNowDate(Long.valueOf(mdata.get(position).getTime_point())));
-                viewHolder.mLati.setText(mdata.get(position).getLatitude());
-                viewHolder.mLongi.setText(mdata.get(position).getLongtitude());
+                viewHolder.mLati.setText(cutStringByType(mdata.get(position).getLatitude()));
+                viewHolder.mLongi.setText(cutStringByType(mdata.get(position).getLongtitude()));
                 viewHolder.mStep.setText(mdata.get(position).getSteps());
                 viewHolder.mAvgRate.setText(mdata.get(position).getAvg_rate());
                 int status = Integer.valueOf(mdata.get(position).getStatus());
@@ -237,6 +259,16 @@ public class DataResultActivity extends Activity implements OnClickListener{
             TextView mPMResult;
             TextView mSource;
             TextView mUpload;
+        }
+
+        private String cutStringByType(String str){
+            if(resolution_type == 1){
+                int length = str.length();
+                if(length > 6){
+                    str = str.substring(0,6);
+                }
+            }
+            return str;
         }
     }
 
