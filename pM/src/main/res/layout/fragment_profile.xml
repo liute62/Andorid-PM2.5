@@ -196,7 +196,7 @@
             <Button
                 android:id="@+id/profile_exit"
                 style="@style/main_left_button_style"
-                android:text="安全退出" />
+                android:text="退出服务" />
 
         </LinearLayout>
     </app.view.widget.PullScrollView>

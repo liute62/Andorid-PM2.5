@@ -50,4 +50,8 @@
     <string name="menu_disconnect">Disconnect</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
+    <string name="menu_exit_confirm_title">确认退出APP?</string>
+    <string name="menu_exit_confirm_content">确认退出，后台服务将会停止，导致数据丢失。如果想保持后台运行，直接按返回键回到桌面即可。</string>
+    <string name="menu_exit_confirm_confirm">确认</string>
+    <string name="menu_exit_confirm_cancel">取消</string>
 </resources>

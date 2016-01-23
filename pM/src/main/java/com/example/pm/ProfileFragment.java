@@ -30,6 +30,7 @@ import app.utils.HttpUtil;
 import app.utils.ShareUtils;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
+import app.view.widget.DialogConfirm;
 import app.view.widget.DialogNotification;
 import app.view.widget.DialogPersonalState;
 import app.view.widget.InfoDialog;
@@ -136,13 +137,6 @@ public class ProfileFragment extends Fragment implements
             mLogOff.setOnClickListener(this);
             mResetPwd.setVisibility(View.VISIBLE);
             mResetPwd.setOnClickListener(this);
-            if (Const.CURRENT_USER_GENDER.equals("1")) {
-                mGender.setText("男");
-            } else if (Const.CURRENT_USER_GENDER.equals("2")) {
-                mGender.setText("女");
-            } else {
-                mGender.setText("Gender");
-            }
             mUsername.setText(Const.CURRENT_USER_NAME);
             mName.setText(Const.CURRENT_USER_NICKNAME);
         } else {
@@ -155,6 +149,16 @@ public class ProfileFragment extends Fragment implements
             mGender.setText("Gender");
             mUsername.setText("Username");
             mName.setText("Name");
+        }
+        String gender = aCache.getAsString(Const.Cache_User_Gender);
+        if(ShortcutUtil.isStringOK(gender)){
+            if (gender.equals("0")) {
+                mGender.setText("男");
+            } else if (gender.equals("1")) {
+                mGender.setText("女");
+            } else {
+                mGender.setText("Gender");
+            }
         }
     }
 
@@ -310,9 +314,27 @@ public class ProfileFragment extends Fragment implements
     }
 
     private void exit() {
-        Intent intent = new Intent(mActivity, DBService.class);
-        mActivity.stopService(intent);
-        getActivity().finish();
+        final DialogConfirm confirm = new DialogConfirm(mActivity,
+                mActivity.getResources().getString(R.string.menu_exit_confirm_title),
+                mActivity.getResources().getString(R.string.menu_exit_confirm_content));
+        confirm.setCancelText(mActivity.getResources().getString(R.string.menu_exit_confirm_cancel));
+        confirm.setConfirmText(mActivity.getResources().getString(R.string.menu_exit_confirm_confirm));
+        confirm.setCancelable(false);
+        confirm.setCancelListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirm.dismiss();
+            }
+        });
+        confirm.setConfirmListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mActivity, DBService.class);
+                mActivity.stopService(intent);
+                getActivity().finish();
+            }
+        });
+        confirm.show();
     }
 
     private void logOff(){
