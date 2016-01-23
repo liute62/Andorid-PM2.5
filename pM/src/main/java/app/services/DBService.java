@@ -825,8 +825,11 @@ public class DBService extends Service {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Log.d(TAG,"uploadPMData onError Response");
                     isUploadRun = false;
-                    Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+                    String id = aCache.getAsString(Const.Cache_User_Id);
+                    if(ShortcutUtil.isStringOK(id) && !id.equals("0"))
+                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
                     insertState(state);
                 }
 

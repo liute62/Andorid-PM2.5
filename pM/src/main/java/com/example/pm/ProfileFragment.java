@@ -46,8 +46,9 @@ public class ProfileFragment extends Fragment implements
     TextView mName;
     TextView mUsername;
     TextView mGender;
+    TextView mLogOff;
     Button mLogin;
-    Button mLogout;
+    Button mExit;
     Button mTurnOffUpload;
     Button mClear;
     Button mRegister;
@@ -109,7 +110,7 @@ public class ProfileFragment extends Fragment implements
         mUsername = (TextView) view.findViewById(R.id.profile_username);
         mGender = (TextView) view.findViewById(R.id.profile_gender);
         mLogin = (Button) view.findViewById(R.id.profile_login);
-        mLogout = (Button) view.findViewById(R.id.profile_logout);
+        mExit = (Button) view.findViewById(R.id.profile_exit);
         mTurnOffUpload = (Button) view.findViewById(R.id.profile_turnoff_upload);
         mTurnOffService = (Button) view.findViewById(R.id.profile_turnoff_service);
         mClear = (Button) view.findViewById(R.id.profile_clear_data);
@@ -120,6 +121,7 @@ public class ProfileFragment extends Fragment implements
         mShare = (Button)view.findViewById(R.id.profile_share);
         mNotification = (TextView)view.findViewById(R.id.profile_view_notification);
         mModifyAndView = (TextView)view.findViewById(R.id.profile_modify_personal_state);
+        mLogOff = (TextView)view.findViewById(R.id.profile_logoff);
         checkCache();
         setListener();
         return view;
@@ -130,6 +132,8 @@ public class ProfileFragment extends Fragment implements
         if (ShortcutUtil.isStringOK(userId)) {
             mLogin.setVisibility(View.INVISIBLE);
             mLogin.setOnClickListener(null);
+            mLogOff.setVisibility(View.VISIBLE);
+            mLogOff.setOnClickListener(this);
             mResetPwd.setVisibility(View.VISIBLE);
             mResetPwd.setOnClickListener(this);
             if (Const.CURRENT_USER_GENDER.equals("1")) {
@@ -146,6 +150,8 @@ public class ProfileFragment extends Fragment implements
             mLogin.setOnClickListener(this);
             mResetPwd.setVisibility(View.INVISIBLE);
             mResetPwd.setOnClickListener(null);
+            mLogOff.setVisibility(View.INVISIBLE);
+            mLogOff.setOnClickListener(null);
             mGender.setText("Gender");
             mUsername.setText("Username");
             mName.setText("Name");
@@ -155,7 +161,7 @@ public class ProfileFragment extends Fragment implements
     private void setListener() {
         mScrollView.setOnTurnListener(this);
         mLogin.setOnClickListener(this);
-        mLogout.setOnClickListener(this);
+        mExit.setOnClickListener(this);
         mTurnOffService.setOnClickListener(this);
         mTurnOffUpload.setOnClickListener(this);
         mClear.setOnClickListener(this);
@@ -165,6 +171,7 @@ public class ProfileFragment extends Fragment implements
         mShare.setOnClickListener(this);
         mNotification.setOnClickListener(this);
         mModifyAndView.setOnClickListener(this);
+        mLogOff.setOnClickListener(this);
     }
 
     @Override
@@ -191,7 +198,10 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_share:
                 shareProcess();
                 break;
-            case R.id.profile_logout:
+            case R.id.profile_exit:
+                exit();
+                break;
+            case R.id.profile_logoff:
                 logOff();
                 break;
             case R.id.profile_turnoff_service:
@@ -299,7 +309,13 @@ public class ProfileFragment extends Fragment implements
         aCache.remove(Const.Cache_Pause_Time);
     }
 
-    private void logOff() {
+    private void exit() {
+        Intent intent = new Intent(mActivity, DBService.class);
+        mActivity.stopService(intent);
+        getActivity().finish();
+    }
+
+    private void logOff(){
         clearLoginCache();
         Intent intent = new Intent(mActivity, DBService.class);
         mActivity.stopService(intent);

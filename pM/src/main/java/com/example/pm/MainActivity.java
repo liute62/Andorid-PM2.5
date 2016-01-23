@@ -16,6 +16,7 @@ import app.utils.ShortcutUtil;
 
 public class MainActivity extends SlidingActivity {
 
+    public static final String TAG = "MainActivity";
     ACache aCache;
     Fragment newFragment;
 
@@ -41,11 +42,12 @@ public class MainActivity extends SlidingActivity {
 
         // customize the SlidingMenu
         SlidingMenu sm = getSlidingMenu();
-        sm.setShadowWidth(50);
+        sm.setShadowWidth(40);
         sm.setShadowDrawable(R.drawable.shadow);
         //setBehindOffset()为设置SlidingMenu打开后，右边留下的宽度。可以把这个值写在dimens里面去:60dp
-        sm.setBehindOffset(60);
+        sm.setBehindOffset(220);
         sm.setFadeDegree(0.35f);
+        //sm.setAboveOffset(20);
         //设置slding menu的几种手势模式
         //TOUCHMODE_FULLSCREEN 全屏模式，在content页面中，滑动，可以打开sliding menu
         //TOUCHMODE_MARGIN 边缘模式，在content页面中，如果想打开slding ,你需要在屏幕边缘滑动才可以打开slding menu
@@ -77,12 +79,13 @@ public class MainActivity extends SlidingActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("resume", "resume");
+        Log.d(TAG, "onResume");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy");
     }
 
     @Override

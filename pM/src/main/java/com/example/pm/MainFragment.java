@@ -193,6 +193,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 
     @Override
     public void onPause() {
+        Log.d(TAG,"onPause");
         mActivity.unregisterReceiver(dbReceiver);
         aCache.put(Const.Cache_Is_Background, "true");
         aCache.put(Const.Cache_Pause_Time,String.valueOf(System.currentTimeMillis()));
@@ -222,7 +223,19 @@ public class MainFragment extends Fragment implements OnClickListener {
             }
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
+        Time t = new Time();
+        t.setToNow();
+        currentMin = t.minute;
+        currentHour = t.hour;
+        mClockHandler.sendEmptyMessage(1);
         super.onResume();
+        Log.d(TAG, "onResume");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
     }
 
     @Override
@@ -266,10 +279,12 @@ public class MainFragment extends Fragment implements OnClickListener {
             intentFilter.addAction(Const.Action_Chart_Result_2);
             intentFilter.addAction(Const.Action_Chart_Result_3);
             intentFilter.addAction(Const.Action_DB_MAIN_Location);
-            mActivity.registerReceiver(dbReceiver, intentFilter);
-            intentFilter = new IntentFilter();
-            Intent mIntent = new Intent(mActivity, DBService.class);
-            mActivity.startService(mIntent);
+            if(mActivity != null) {
+                mActivity.registerReceiver(dbReceiver, intentFilter);
+                intentFilter = new IntentFilter();
+                Intent mIntent = new Intent(mActivity, DBService.class);
+                mActivity.startService(mIntent);
+            }
         }
     }
 
@@ -564,6 +579,20 @@ public class MainFragment extends Fragment implements OnClickListener {
                     mClockHandler.sendEmptyMessage(1);
                 }
             }
+        }
+
+        @Override
+        protected void onCancelled() {
+            Log.d(TAG,"clock task onCancelled");
+            isClockTaskRun = false;
+            super.onCancelled();
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            Log.d(TAG,"clock task onPostExecute");
+            isClockTaskRun = false;
+            super.onPostExecute(integer);
         }
     }
 

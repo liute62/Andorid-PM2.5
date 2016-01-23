@@ -69,9 +69,9 @@ public class DataGenerator {
         if (pm < 50) {
             return Color.GREEN;
         } else if (pm > 50 && pm < 100) {
-            return Color.YELLOW;
-        } else if (pm > 100 && pm < 150) {
             return Color.argb(255, 255, 165, 0); //Orange #FFA500
+        } else if (pm > 100 && pm < 150) {
+            return Color.MAGENTA; //MAGENTA
         } else if (pm > 150 && pm < 200) {
             return Color.RED;
         } else if (pm > 200 && pm < 300) {
@@ -103,11 +103,13 @@ public class DataGenerator {
         if (pm < 50) {
             return Color.GREEN;
         } else if (pm > 50 && pm < 100) {
-            return Color.YELLOW;
-        } else if (pm > 100 && pm < 150) {
             return Color.argb(255, 255, 165, 0); //Orange
-        }
-        return Color.argb(255, 139, 35, 35); //Brown
+        } else if (pm > 100 && pm < 150) {
+            return Color.MAGENTA;
+        } else if (pm > 150 && pm < 200) {
+            return Color.RED;
+        }else
+            return Color.argb(255, 139, 35, 35); //Brown
     }
 
     public static int setHeathHintColor(double pm) {
