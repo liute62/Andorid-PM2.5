@@ -304,6 +304,7 @@ public class ShortcutUtil {
     }
 
     public static boolean isLocationChangeEnough(double lati1,double lati2,double longi1,double longi2){
+        // TODO: 1/24/2016 set a threshod to see if location changed enough
         return true;
     }
 

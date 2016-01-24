@@ -92,14 +92,16 @@ public class DBService extends Service {
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
-    private Handler DBHandler = new Handler();
+    Handler DBHandler = new Handler();
     PMModel pmModel;
-    private final int State_Much_Index = 100;
-    private final int DB_Chart_Loop = 24;
+    final int State_Much_Index = 500;
+    int DB_Chart_Loop = 12;
     private double longitude;  //the newest longitude
     private double latitude;  // the newest latitude
     private double last_long;  // the last time longitude
     private double last_lati;  // the last time latitude
+    private double enough_lati; // lati value to see if location changed enough
+    private double enough_longi; //longi value to see if location changed enough
     private double PM25Density;
     private double PM25Today;
     private Long IDToday;
@@ -116,7 +118,7 @@ public class DBService extends Service {
     private LocationManager mManager;
     Location mLastLocation;
     private final int GPS_Min_Frequency = 1000 * 60 * 59;
-    private final int GPS_Min_Distance = 100;
+    private final int GPS_Min_Distance = 10;
     /** Sensor **/
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -138,25 +140,6 @@ public class DBService extends Service {
 
         @Override
         public void run() {
-            Log.d(TAG,"DB Runtime = "+String.valueOf(DBRunTime));
-            /** notify user whether using the old PM2.5 density **/
-            if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
-                Intent intent = new Intent(Const.Action_DB_Running_State);
-                intent.putExtra(Const.Intent_DB_Run_State,1);
-                sendBroadcast(intent);
-            }else {
-                Intent intent = new Intent(Const.Action_DB_Running_State);
-                intent.putExtra(Const.Intent_DB_Run_State,0);
-                sendBroadcast(intent);
-            }
-
-            String isBackground = aCache.getAsString(Const.Cache_Is_Background);
-            String userId = aCache.getAsString(Const.Cache_User_Id);
-            if (isBackground == null) { //App first run
-                isBackground = "false";
-                aCache.put(Const.Cache_Is_Background, isBackground);
-                if (userId == null) aCache.put(Const.Cache_User_Id, "0");
-            }
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
@@ -183,6 +166,26 @@ public class DBService extends Service {
                     sendBroadcast(intentChart);
                 }
             }
+
+            Log.d(TAG,"DB Runtime = "+String.valueOf(DBRunTime));
+            /** notify user whether using the old PM2.5 density **/
+            if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
+                Intent intent = new Intent(Const.Action_DB_Running_State);
+                intent.putExtra(Const.Intent_DB_Run_State,1);
+                sendBroadcast(intent);
+            }else {
+                Intent intent = new Intent(Const.Action_DB_Running_State);
+                intent.putExtra(Const.Intent_DB_Run_State,0);
+                sendBroadcast(intent);
+            }
+
+            String isBackground = aCache.getAsString(Const.Cache_Is_Background);
+            String userId = aCache.getAsString(Const.Cache_User_Id);
+            if (isBackground == null) { //App first run
+                isBackground = "false";
+                aCache.put(Const.Cache_Is_Background, isBackground);
+                if (userId == null) aCache.put(Const.Cache_User_Id, "0");
+            }
             /***** DB Running Normally *****/
             if (DBCanRun) {
                 if (DBRunTime == 0) { //Initialize the state when DB start
@@ -194,9 +197,28 @@ public class DBService extends Service {
                         DBRunTime = 1;
                     }
                 }
+                if(state.getId() > State_Much_Index) DB_Chart_Loop = 24;
+                else DB_Chart_Loop = 12;
                 Bundle mBundle = new Bundle();
                 switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
+                    case 1:
+                        checkPMDataForUpload();
+                        break;
+                    case 3:
+                        UpdateService.run(getApplicationContext(),aCache,dbHelper);
+                        break;
                     case 5:
+                        intentChart = new Intent(Const.Action_Chart_Result_1);
+                        DataCalculator.getIntance(db).updateLastTwoHourState();
+                        mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                        mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                        mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                        if (isBackground.equals("false")) {
+                            intentChart.putExtras(mBundle);
+                            sendBroadcast(intentChart);
+                        }
+                        break;
+                    case 7:
                         intentChart = new Intent(Const.Action_Chart_Result_2);
                         DataCalculator.getIntance(db).updateLastDayState();
                         mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
@@ -221,23 +243,6 @@ public class DBService extends Service {
                             sendBroadcast(intentChart);
                         }
                         break;
-                    case 1:
-                        checkPMDataForUpload();
-                        break;
-                    case 3:
-                        //UpdateService.run(getApplicationContext(),aCache,dbHelper);
-                        break;
-                    case 7:
-                        intentChart = new Intent(Const.Action_Chart_Result_1);
-                        DataCalculator.getIntance(db).updateLastTwoHourState();
-                        mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
-                        mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
-                        mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
-                        if (isBackground.equals("false")) {
-                            intentChart.putExtras(mBundle);
-                            sendBroadcast(intentChart);
-                        }
-                        break;
                 }
                 //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
                 int mul = 1;
@@ -246,20 +251,23 @@ public class DBService extends Service {
                 }
                     //to much data here, we need to slow it down, every 1 min to check it
                     intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                    if(DBRunTime % (5 * mul) == 0) {
+                     if(DBRunTime % (2 * mul) == 0) {
+                         intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                     }
+                     if(DBRunTime % (5 * mul) == 0) {
                         intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                    }if(DBRunTime % (2 * mul) == 0) {
-                        intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
-                    }if(DBRunTime % (10 * mul) == 0) {
+                     }if(DBRunTime % (10 * mul) == 0) {
                         intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
-                    }
+                     }
                 if (isBackground.equals("false")) {
                     sendBroadcast(intentText);
                 }
                 //change to a more soft way by using system.currentime
                 String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
-                if(! ShortcutUtil.isStringOK(lastTime))  aCache.put(Const.Cache_DB_Lastime_searchDensity,String.valueOf(System.currentTimeMillis()));
-                else {
+                if(! ShortcutUtil.isStringOK(lastTime))  {
+                    aCache.put(Const.Cache_DB_Lastime_searchDensity,String.valueOf(System.currentTimeMillis()));
+                    searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                }else {
                     Long curTime = System.currentTimeMillis();
                     //every 1 hour to search the PM density from server
                     if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
@@ -336,19 +344,17 @@ public class DBService extends Service {
         latitude = 0.0;
         last_lati = -0.1;
         last_long = -0.1;
+        enough_lati = -0.1;
+        enough_longi = -0.1;
         DBCanRun = false;
         DBRunTime = 0;
         isPMSearchRun = false;
         isUploadTaskRun = false;
         isLocationChanged = false;
         isUploadRun = false;
-        aCache = ACache.get(getApplicationContext());
         isPMSearchSuccess = false;
         ChartTaskCanRun = true;
-        //calculate the static breath by weight
-        String weightStr = aCache.getAsString(Const.Cache_User_Weight);
-        if(weightStr != null)
-            ShortcutUtil.calStaticBreath(Integer.valueOf(weightStr));
+        aCache = ACache.get(getApplicationContext());
         //todo each time to run the data and
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
@@ -471,15 +477,15 @@ public class DBService extends Service {
         for (int i = 0; i != providers.length; i++){
             if(mManager.isProviderEnabled(providers[i])){
                 provider = providers[i];
+                mLastLocation = mManager.getLastKnownLocation(provider);
+                if(mLastLocation != null) break;
             }
         }
-        if (provider != null)
-            mLastLocation = mManager.getLastKnownLocation(provider);
         if (mLastLocation == null) {
-            Log.d(TAG,"provider: "+provider+" LastKnownLocation == null");
+            Log.e(TAG, "provider: "+provider+" LastKnownLocation == null");
             for (int i = 0; i != providers.length; i++){
-                if(mManager.isProviderEnabled(providers[i])){
-                    Log.d(TAG,"Request: "+providers[i]+" Update");
+                if(mManager.isProviderEnabled(providers[i])) {
+                    Log.e(TAG, "No lastimeLocation, Request: "+providers[i]+" Update");
                     mManager.requestLocationUpdates(providers[i], 0, 0, locationListener);
                 }
             }
@@ -558,8 +564,10 @@ public class DBService extends Service {
                     Log.d(TAG,"onLocationChanged Current Location == Lastime Location");
                 } else {
                     //location has been changed, check if changes big enough
-                    if (ShortcutUtil.isLocationChangeEnough(last_lati,latitude,last_long,longitude)) {
+                    if (ShortcutUtil.isLocationChangeEnough(enough_lati,latitude,enough_longi,longitude)) {
                         Log.d(TAG,"onLocationChanged Current Location Changed enough and get the density from server");
+                        enough_longi = longitude;
+                        enough_lati = latitude;
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
                     last_lati = latitude;
