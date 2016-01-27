@@ -100,6 +100,13 @@ public class ShortcutUtil {
         return retStrFormatNowDate;
     }
 
+    public static String refFormatDateAndTime(long currentTimeMillis) {
+        Date nowTime = new Date(currentTimeMillis);
+        SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String retStrFormatNowDate = sdFormatter.format(nowTime);
+        return retStrFormatNowDate;
+    }
+
     public static String refFormatOnlyDate(long currentTimeMillis) {
         Date nowTime = new Date(currentTimeMillis);
         SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd");

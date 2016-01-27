@@ -44,19 +44,19 @@
             android:text="39.9776624"
             android:id="@+id/data_result_lati" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
         <TextView
             android:layout_marginLeft="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
             android:id="@+id/data_result_outdoor" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_marginLeft="10dp"
@@ -113,6 +113,14 @@
             android:layout_height="wrap_content"
             android:text="0"
             android:id="@+id/data_result_upload" />
+
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/data_result_connection" />
+
     </LinearLayout>
 
 </LinearLayout>

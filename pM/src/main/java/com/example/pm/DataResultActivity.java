@@ -214,13 +214,14 @@ public class DataResultActivity extends Activity implements OnClickListener{
                 viewHolder.mPMResult = (TextView)convertView.findViewById(R.id.data_result_pm);
                 viewHolder.mSource = (TextView)convertView.findViewById(R.id.data_result_source);
                 viewHolder.mUpload = (TextView)convertView.findViewById(R.id.data_result_upload);
+                viewHolder.mConnection = (TextView)convertView.findViewById(R.id.data_result_connection);
                 convertView.setTag(viewHolder);
             }else {
                 viewHolder = (ViewHolder)convertView.getTag();
             }
                 viewHolder.mId.setText(mdata.get(position).getId() == null?"null":String.valueOf(mdata.get(position).getId()));
                 viewHolder.mUserId.setText(mdata.get(position).getUserid() == null? "null":mdata.get(position).getUserid());
-                viewHolder.mDate.setText(ShortcutUtil.refFormatNowDate(Long.valueOf(mdata.get(position).getTime_point())));
+                viewHolder.mDate.setText(ShortcutUtil.refFormatDateAndTime(Long.valueOf(mdata.get(position).getTime_point())));
                 viewHolder.mLati.setText(cutStringByType(mdata.get(position).getLatitude()));
                 viewHolder.mLongi.setText(cutStringByType(mdata.get(position).getLongtitude()));
                 viewHolder.mStep.setText(mdata.get(position).getSteps());
@@ -233,14 +234,15 @@ public class DataResultActivity extends Activity implements OnClickListener{
                 else if(status == 3)
                     viewHolder.mStatus.setText("Run");
                 viewHolder.mOutdoor.setText(Integer.valueOf(mdata.get(position).getOutdoor())== 1? "in":"out");
-                viewHolder.mAir.setText(mdata.get(position).getVentilation_volume().length() < 8?
-                        mdata.get(position).getVentilation_volume() : mdata.get(position).getVentilation_volume().substring(0, 7));
-                viewHolder.mPMDensity.setText(mdata.get(position).getDensity().length() < 8?
-                        mdata.get(position).getDensity() : mdata.get(position).getDensity().substring(0,7));
+                viewHolder.mAir.setText(mdata.get(position).getVentilation_volume().length() < 5?
+                        mdata.get(position).getVentilation_volume() : mdata.get(position).getVentilation_volume().substring(0, 4));
+                viewHolder.mPMDensity.setText(mdata.get(position).getDensity().length() < 5?
+                        mdata.get(position).getDensity() : mdata.get(position).getDensity().substring(0,4));
                 viewHolder.mPMResult.setText(mdata.get(position).getPm25().length() < 8?
                         mdata.get(position).getPm25() : mdata.get(position).getPm25().substring(0,7));
                 viewHolder.mSource.setText(mdata.get(position).getSource());
                 viewHolder.mUpload.setText(mdata.get(position).getUpload() == 0? "N":"Y");
+                viewHolder.mConnection.setText(mdata.get(position).getConnection() == 0? "N":"Y");
             return convertView;
         }
 
@@ -259,6 +261,7 @@ public class DataResultActivity extends Activity implements OnClickListener{
             TextView mPMResult;
             TextView mSource;
             TextView mUpload;
+            TextView mConnection;
         }
 
         private String cutStringByType(String str){
