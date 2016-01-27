@@ -89,6 +89,14 @@ public class UpdateService {
     }
 
     /*
+    get all after state
+     */
+    private List<State> getAllAfterState(State state) {
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_TIME_POINT_COL + ">=?", state.getTime_point()).list();
+        return states;
+    }
+
+    /*
     get all not uploaded
      */
     private List<State> getAllNotConnection() {
@@ -111,6 +119,12 @@ public class UpdateService {
     private void updateStateHasUpload(State state,int hasUpload) {
         ContentValues values = new ContentValues();
         values.put(DBConstants.DB_MetaData.STATE_HAS_UPLOAD, hasUpload);
+        cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
+    }
+
+    private void updateStatePM25(State state,double pm25) {
+        ContentValues values = new ContentValues();
+        values.put(DBConstants.DB_MetaData.STATE_PM25_COL, pm25);
         cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
     }
 
@@ -187,8 +201,11 @@ public class UpdateService {
         } else if (mMotionStatus == Const.MotionStatus.RUN) {
             breath = static_breath * 6;
         }
-
         double PM25 = density*breath/60/1000;
+        List<State> states = this.getAllAfterState(state);
+        for (State s : states) {
+            this.updateStatePM25(s,Double.valueOf(s.getPm25())+PM25);
+        }
     }
 
     /*
