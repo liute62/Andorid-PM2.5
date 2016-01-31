@@ -16,6 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="当前纬度"
+            android:layout_toRightOf="@+id/personal_state_get_location"
             android:textColor="@android:color/black"
             android:id="@+id/textView13" />
 
@@ -33,7 +34,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="当前经度"
+            android:layout_alignLeft="@+id/textView13"
             android:layout_below="@+id/textView13"
+            android:layout_marginTop="5dp"
             android:textColor="@android:color/black"
             android:id="@+id/textView14" />
 
@@ -41,11 +44,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
+            android:layout_marginTop="5dp"
             android:textColor="@android:color/black"
             android:id="@+id/personal_state_longi"
             android:layout_below="@+id/personal_state_lati"
             android:layout_marginStart="2dp"
             android:layout_toEndOf="@+id/textView14" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="重新定位"
+            android:id="@+id/personal_state_get_location" />
     </RelativeLayout>
 
     <RelativeLayout

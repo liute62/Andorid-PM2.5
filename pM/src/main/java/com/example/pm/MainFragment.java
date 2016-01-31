@@ -44,10 +44,10 @@ import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.DialogConfirm;
+import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
 import app.view.widget.DialogRefresh;
 import app.view.widget.LoadingDialog;
-import app.view.widget.LocalizationDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.view.ColumnChartView;
@@ -508,11 +508,11 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.main_current_city:
-                LocalizationDialog dialog2 = new LocalizationDialog(mActivity,mDataHandler);
+                DialogGetCity dialog2 = new DialogGetCity(mActivity,mDataHandler);
                 dialog2.show();
                 break;
             case R.id.main_add_city:
-                LocalizationDialog dialog = new LocalizationDialog(mActivity,mDataHandler);
+                DialogGetCity dialog = new DialogGetCity(mActivity,mDataHandler);
                 dialog.show();
                 break;
             case R.id.main_profile:

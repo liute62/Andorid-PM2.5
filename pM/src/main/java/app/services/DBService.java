@@ -2,6 +2,7 @@ package app.services;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -972,6 +973,14 @@ public class DBService extends Service {
             latitude = mLastLocation.getLatitude();
         }
         return result;
+    }
+
+    class BluetoothReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+        }
     }
 
     /**

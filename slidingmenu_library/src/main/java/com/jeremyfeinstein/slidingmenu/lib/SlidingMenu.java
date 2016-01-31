@@ -38,78 +38,64 @@ public class SlidingMenu extends RelativeLayout {
     private boolean mActionbarOverlay = false;
 
     /**
-     * ÎªsetTouchModeAbove()·½·¨ÉèÖÃÒ»¸ö³£Á¿Öµ£¬ÔÊĞí»¬¶¯²Ëµ¥Í¨¹ı»¬¶¯ÆÁÄ»µÄ±ßÔµ±»´ò¿ª
      */
     public static final int TOUCHMODE_MARGIN = 0;
 
     /**
-     * ÎªsetTouchModeAbove()·½·¨ÉèÖÃÒ»¸ö³£Á¿Öµ£¬ÔÊĞí»¬¶¯²Ëµ¥Í¨¹ı»¬¶¯ÆÁÄ»µÄÈÎºÎµØ·½±»´ò¿ª
      */
     public static final int TOUCHMODE_FULLSCREEN = 1;
 
     /**
-     * ÎªsetTouchModeAbove()·½·¨ÉèÖÃÒ»¸ö³£Á¿Öµ£¬²»ÔÊĞí»¬¶¯²Ëµ¥Í¨¹ı»¬¶¯ÆÁÄ»±»´ò¿ª
      */
     public static final int TOUCHMODE_NONE = 2;
 
     /**
-     * ÎªsetMode()·½·¨ÉèÖÃÒ»¸ö³£Á¿Öµ£¬°Ñ»¬¶¯²Ëµ¥·ÅÔÚ×ó±ß
      */
     public static final int LEFT = 0;
 
     /**
-     * ÎªsetMode()·½·¨ÉèÖÃÒ»¸ö³£Á¿Öµ£¬°Ñ»¬¶¯²Ëµ¥·ÅÔÚÓÒ±ß
      */
     public static final int RIGHT = 1;
 
     /**
-     * ÎªsetMode()·½·¨ÉèÖÃÒ»¸ö³£Á¿Öµ£¬°Ñ»¬¶¯²Ëµ¥·ÅÔÚ×óÓÒÁ½±ß
      */
     public static final int LEFT_RIGHT = 2;
 
     /**
-     * ¶¨ÒåÉÏ·½ÊÓÍ¼¶ÔÏó
      */
     private CustomViewAbove mViewAbove;
 
     /**
-     * ¶¨ÒåÏÂ·½ÊÓÍ¼¶ÔÏó
      */
     private CustomViewBehind mViewBehind;
 
     /**
-     * ¶¨Òå»¬¶¯²Ëµ¥´ò¿ªµÄ¼àÌı¶ÔÏó
      */
     private OnOpenListener mOpenListener;
 
     /**
-     * ¶¨Òå»¬¶¯²Ëµ¥¹Ø±ÕµÄ¼àÌı¶ÔÏó
      */
     private OnCloseListener mCloseListener;
 
     /**
-     * »¬¶¯²Ëµ¥´ò¿ªÊ±µÄ¼àÌıÊÂ¼ş
      */
     public interface OnOpenListener {
         public void onOpen();
     }
 
     /**
-     * ¼à²â»¬¶¯²Ëµ¥ÊÇ·ñÒÑ¾­´ò¿ªµÄ¼àÌıÊÂ¼ş
      */
     public interface OnOpenedListener {
         public void onOpened();
     }
 
     /**
-     * »¬¶¯²Ëµ¥¹Ø±ÕÊ±µÄ¼àÌıÊÂ¼ş
      */
     public interface OnCloseListener {
         public void onClose();
     }
 
     /**
-     * ¼à²â»¬¶¯²Ëµ¥ÊÇ·ñÒÑ¾­¹Ø±ÕµÄ¼àÌıÊÂ¼ş
      */
     public interface OnClosedListener {
         public void onClosed();
@@ -130,7 +116,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ³õÊ¼»¯»¬¶¯²Ëµ¥
      *
      * @param context the associated Context
      */
@@ -139,7 +124,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ³õÊ¼»¯»¬¶¯²Ëµ¥
      *
      * @param activity   the activity to attach slidingmenu
      * @param slideStyle the slidingmenu style
@@ -150,7 +134,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ³õÊ¼»¯»¬¶¯²Ëµ¥
      *
      * @param context the associated Context
      * @param attrs   the attrs
@@ -160,7 +143,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ³õÊ¼»¯»¬¶¯²Ëµ¥
      *
      * @param context  the associated Context
      * @param attrs    the attrs
@@ -248,7 +230,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * °Ñ»¬¶¯²Ëµ¥Ìí¼Ó½øËùÓĞµÄActivityÖĞ
      *
      * @param activity   the Activity
      * @param slideStyle either SLIDING_CONTENT or SLIDING_WINDOW
@@ -258,7 +239,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * °Ñ»¬¶¯²Ëµ¥Ìí¼Ó½øËùÓĞµÄActivityÖĞ
      *
      * @param activity         the Activity
      * @param slideStyle       either SLIDING_CONTENT or SLIDING_WINDOW
@@ -303,14 +283,12 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ´Ó²¼¾Ö×ÊÔ´ÎÄ¼şÖĞÉèÖÃÉÏ·½µÄÊÓÍ¼ÄÚÈİ£¬Õâ¸ö²¼¾Ö»á±»Ìî³äÌí¼Óµ½ËùÓĞÍ¼²ãµÄ×îÉÏ·½
      */
     public void setContent(int res) {
         setContent(LayoutInflater.from(getContext()).inflate(res, null));
     }
 
     /**
-     * Í¨¹ıViewÀ´ÉèÖÃÉÏ·½µÄÊÓÍ¼ÄÚÈİ
      */
     public void setContent(View view) {
         mViewAbove.setContent(view);
@@ -318,14 +296,12 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * µÃµ½ÉÏ·½µÄÊÓÍ¼ÄÚÈİ
      */
     public View getContent() {
         return mViewAbove.getContent();
     }
 
     /**
-     * ´Ó²¼¾Ö×ÊÔ´ÎÄ¼şÖĞÉèÖÃÏÂ·½£¨»¬¶¯²Ëµ¥£©µÄÊÓÍ¼ÄÚÈİ£¬Õâ¸ö²¼¾Ö»á±»Ìî³äÌí¼Óµ½ËùÓĞÍ¼²ãµÄ×îÏÂ·½
      *
      * @param res the new content
      */
@@ -334,7 +310,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * µÃµ½ÏÂ·½£¨»¬¶¯²Ëµ¥£©µÄÊÓÍ¼ÄÚÈİ
      *
      * @param view The desired content to display.
      */
@@ -343,49 +318,42 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * µÃµ½ÏÂ·½£¨»¬¶¯²Ëµ¥£©µÄÊÓÍ¼ÄÚÈİ
      */
     public View getMenu() {
         return mViewBehind.getContent();
     }
 
     /**
-     * ´Ó²¼¾Ö×ÊÔ´ÎÄ¼şÖĞÉèÖÃÏÂ·½£¨ÓÒ±ß»¬¶¯²Ëµ¥£©µÄÊÓÍ¼ÄÚÈİ£¬Õâ¸ö²¼¾Ö»á±»Ìî³äÌí¼Óµ½ËùÓĞÍ¼²ãµÄ×îÏÂ·½
      */
     public void setSecondaryMenu(int res) {
         setSecondaryMenu(LayoutInflater.from(getContext()).inflate(res, null));
     }
 
     /**
-     * ÉèÖÃÏÂ·½£¨ÓÒ±ß»¬¶¯²Ëµ¥£©µÄÊÓÍ¼ÄÚÈİ
      */
     public void setSecondaryMenu(View v) {
         mViewBehind.setSecondaryContent(v);
     }
 
     /**
-     * µÃµ½ÏÂ·½£¨ÓÒ±ß»¬¶¯²Ëµ¥£©µÄÊÓÍ¼ÄÚÈİ
      */
     public View getSecondaryMenu() {
         return mViewBehind.getSecondaryContent();
     }
 
     /**
-     * ÉèÖÃÉÏ·½ÊÓÍ¼ÊÇ·ñÄÜ¹»»¬¶¯
      */
     public void setSlidingEnabled(boolean b) {
         mViewAbove.setSlidingEnabled(b);
     }
 
     /**
-     * ¼ì²âÉÏ·½ÊÓÍ¼ÊÇ·ñÄÜ¹»»¬¶¯
      */
     public boolean isSlidingEnabled() {
         return mViewAbove.isSlidingEnabled();
     }
 
     /**
-     * ÉèÖÃ»¬¶¯²Ëµ¥³öÏÖÔÚÊÓÍ¼ÖĞµÄÎ»ÖÃ
      *
      * @param mode must be either SlidingMenu.LEFT or SlidingMenu.RIGHT
      */
@@ -397,7 +365,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * µÃµ½»¬¶¯²Ëµ¥ÔÚÊÓÍ¼ÖĞµÄÎ»ÖÃ
      *
      * @return the current mode, either SlidingMenu.LEFT or SlidingMenu.RIGHT
      */
@@ -406,7 +373,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ÉèÖÃ»¬¶¯²Ëµ¥ÊÇ·ñÊÇ¾²Ì¬Ä£Ê½(²»ÄÜ¹»Ê¹ÓÃ»¬¶¯²Ëµ¥)
      */
     public void setStatic(boolean b) {
         if (b) {
@@ -423,56 +389,48 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ´ò¿ª»¬¶¯²Ëµ¥²¢ÏÔÊ¾²Ëµ¥µÄÊÓÍ¼
      */
     public void showMenu() {
         showMenu(true);
     }
 
     /**
-     * ÊÇ·ñÊ¹ÓÃ¶¯»­Ğ§¹û´ò¿ª»¬¶¯²Ëµ¥²¢ÏÔÊ¾²Ëµ¥µÄÊÓÍ¼
      */
     public void showMenu(boolean animate) {
         mViewAbove.setCurrentItem(0, animate);
     }
 
     /**
-     * ´ò¿ªÓÒ±ßµÄ»¬¶¯²Ëµ¥²¢ÏÔÊ¾²Ëµ¥µÄÊÓÍ¼
      */
     public void showSecondaryMenu() {
         showSecondaryMenu(true);
     }
 
     /**
-     * ÊÇ·ñÊ¹ÓÃ¶¯»­Ğ§¹û´ò¿ªÓÒ±ßµÄ»¬¶¯²Ëµ¥²¢ÏÔÊ¾²Ëµ¥µÄÊÓÍ¼
      */
     public void showSecondaryMenu(boolean animate) {
         mViewAbove.setCurrentItem(2, animate);
     }
 
     /**
-     * ¹Ø±Õ²Ëµ¥²¢ÏÔÊ¾ÉÏ·½µÄÊÓÍ¼
      */
     public void showContent() {
         showContent(true);
     }
 
     /**
-     * ÊÇ·ñÊ¹ÓÃ¶¯»­Ğ§¹û¹Ø±Õ²Ëµ¥²¢ÏÔÊ¾ÉÏ·½µÄÊÓÍ¼
      */
     public void showContent(boolean animate) {
         mViewAbove.setCurrentItem(1, animate);
     }
 
     /**
-     * »¬¶¯²Ëµ¥µÄ¿ª¹Ø
      */
     public void toggle() {
         toggle(true);
     }
 
     /**
-     * ÊÇ·ñÊ¹ÓÃ¶¯»­Ğ§¹û´ò¿ª»ò¹Ø±Õ»¬¶¯²Ëµ¥
      */
     public void toggle(boolean animate) {
         if (isMenuShowing()) {
@@ -483,28 +441,24 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¼ì²â»¬¶¯²Ëµ¥ÊÇ·ñÕıÔÚ±»ÏÔÊ¾
      */
     public boolean isMenuShowing() {
         return mViewAbove.getCurrentItem() == 0 || mViewAbove.getCurrentItem() == 2;
     }
 
     /**
-     * ¼ì²âÓÒ±ß»¬¶¯²Ëµ¥ÊÇ·ñÕıÔÚ±»ÏÔÊ¾
      */
     public boolean isSecondaryMenuShowing() {
         return mViewAbove.getCurrentItem() == 2;
     }
 
     /**
-     * µÃµ½ÏÂ·½ÊÓÍ¼µÄÆ«ÒÆÁ¿
      */
     public int getBehindOffset() {
         return ((RelativeLayout.LayoutParams) mViewBehind.getLayoutParams()).rightMargin;
     }
 
     /**
-     * ¸ù¾İÏñËØµÄÖµÀ´ÉèÖÃÏÂ·½ÊÓÍ¼µÄÆ«ÒÆÁ¿
      *
      * @param i The margin, in pixels, on the right of the screen that the behind view scrolls to.
      */
@@ -513,7 +467,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İdimension×ÊÔ´ÎÄ¼şµÄIDÀ´ÉèÖÃÏÂ·½ÊÓÍ¼µÄÆ«ÒÆÁ¿
      *
      * @param resID The dimension resource id to be set as the behind offset.
      *              The menu, when open, will leave this width margin on the right of the screen.
@@ -524,7 +477,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İÏñËØµÄÖµÀ´ÉèÖÃÉÏ·½ÊÓÍ¼µÄÆ«ÒÆÁ¿
      *
      * @param i the new above offset, in pixels
      */
@@ -533,7 +485,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İdimension×ÊÔ´ÎÄ¼şµÄIDÀ´ÉèÖÃÉÏ·½ÊÓÍ¼µÄÆ«ÒÆÁ¿
      *
      * @param resID The dimension resource id to be set as the above offset.
      */
@@ -542,8 +493,7 @@ public class SlidingMenu extends RelativeLayout {
         setAboveOffset(i);
     }
 
-    /**
-     * ¸ù¾İÏñËØµÄÖµÀ´ÉèÖÃÏÂ·½ÊÓÍ¼µÄ¿í¶È
+   /**
      *
      * @param i The width the Sliding Menu will open to, in pixels
      */
@@ -565,7 +515,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İdimension×ÊÔ´ÎÄ¼şµÄIDÀ´ÉèÖÃÏÂ·½ÊÓÍ¼µÄ¿í¶È
      *
      * @param res The dimension resource id to be set as the behind width offset.
      *            The menu, when open, will open this wide.
@@ -576,7 +525,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * µÃµ½ÏÂ·½ÊÓÍ¼µÄÔÚ¹ö¶¯Ê±µÄËõ·Å±ÈÀı
      *
      * @return The scale of the parallax scroll
      */
@@ -585,7 +533,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ÉèÖÃÏÂ·½ÊÓÍ¼µÄÔÚ¹ö¶¯Ê±µÄËõ·Å±ÈÀı
      *
      * @param f The scale of the parallax scroll (i.e. 1.0f scrolls 1 pixel for every
      *          1 pixel that the above view scrolls and 0.0f scrolls 0 pixels)
@@ -597,14 +544,12 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * µÃµ½±ßÔµ´¥ÃşµÄÁÙ½çÖµ
      */
     public int getTouchmodeMarginThreshold() {
         return mViewBehind.getMarginThreshold();
     }
 
     /**
-     * µ±´¥ÃşµÄµÄÄ£Ê½Îª±ßÔµ´¥ÃşÊ±£¬ÉèÖÃ±ßÔµ´¥ÃşµÄÁÙ½çÖµ
      */
     public void setTouchmodeMarginThreshold(int touchmodeMarginThreshold) {
         mViewBehind.setMarginThreshold(touchmodeMarginThreshold);
@@ -620,7 +565,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * µÃµ½ÉÏ·½ÊÓÍ¼µÄ´¥ÃşÄ£Ê½µÄÖµ
      */
     public int getTouchModeAbove() {
         return mViewAbove.getTouchMode();
@@ -628,7 +572,6 @@ public class SlidingMenu extends RelativeLayout {
 
 
     /**
-     * ÉèÖÃÉÏ·½ÊÓÍ¼µÄ´¥ÃşÄ£Ê½µÄÖµ
      */
     public void setTouchModeAbove(int i) {
         if (i != TOUCHMODE_FULLSCREEN && i != TOUCHMODE_MARGIN
@@ -640,7 +583,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ÉèÖÃÏÂ·½ÊÓÍ¼µÄ´¥ÃşÄ£Ê½µÄÖµ
      */
     public void setTouchModeBehind(int i) {
         if (i != TOUCHMODE_FULLSCREEN && i != TOUCHMODE_MARGIN
@@ -652,7 +594,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İ×ÊÔ´ÎÄ¼şIDÀ´ÉèÖÃ»¬¶¯²Ëµ¥µÄÒõÓ°Ğ§¹û
      *
      * @param resId the resource ID of the new shadow drawable
      */
@@ -661,7 +602,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İDrawableÀ´ÉèÖÃ»¬¶¯²Ëµ¥µÄÒõÓ°Ğ§¹û
      *
      * @param d the new shadow drawable
      */
@@ -670,7 +610,7 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İ×ÊÔ´ÎÄ¼şIDÀ´ÉèÖÃÓÒ±ß»¬¶¯²Ëµ¥µÄÒõÓ°Ğ§¹û
+     *
      *
      * @param resId the resource ID of the new shadow drawable
      */
@@ -679,7 +619,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İDrawableÀ´ÉèÖÃ»¬¶¯²Ëµ¥µÄÒõÓ°Ğ§¹û
      *
      * @param d the new shadow drawable
      */
@@ -688,7 +627,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İdimension×ÊÔ´ÎÄ¼şµÄIDÀ´ÉèÖÃÒõÓ°µÄ¿í¶È
      *
      * @param resId The dimension resource id to be set as the shadow width.
      */
@@ -697,7 +635,6 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ¸ù¾İÏñËØµÄÖµÀ´ÉèÖÃÒõÓ°µÄ¿í¶È
      *
      * @param pixels the new shadow width, in pixels
      */
@@ -706,14 +643,13 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ÉèÖÃÊÇ·ñÄÜ¹»Ê¹ÓÃ»¬¶¯²Ëµ¥½¥Èë½¥³öµÄĞ§¹û
      */
     public void setFadeEnabled(boolean b) {
         mViewBehind.setFadeEnabled(b);
     }
 
     /**
-     * ÉèÖÃ½¥Èë½¥³öĞ§¹ûµÄÖµ
+     * ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ë½¥ï¿½ï¿½Ğ§ï¿½ï¿½ï¿½Öµ
      *
      * @param f the new fade degree, between 0.0f and 1.0f
      */
@@ -758,35 +694,30 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * Ìí¼Ó±»ºöÂÔµÄÊÓÍ¼
      */
     public void addIgnoredView(View v) {
         mViewAbove.addIgnoredView(v);
     }
 
     /**
-     * ÒÆ³ı±»ºöÂÔµÄÊÓÍ¼
      */
     public void removeIgnoredView(View v) {
         mViewAbove.removeIgnoredView(v);
     }
 
     /**
-     * µ±Ä£Ê½ÎªFullscreenÄ£Ê½Ê±£¬´¥ÃşÆÁÄ»Çå³ıËùÓĞ±»ºöÂÔµÄÊÓÍ¼
      */
     public void clearIgnoredViews() {
         mViewAbove.clearIgnoredViews();
     }
 
     /**
-     * ÉèÖÃ´ò¿ª¼àÌıÊÂ¼ş£¬µ±»¬¶¯²Ëµ¥±»´ò¿ªÊ±µ÷ÓÃ
      */
     public void setOnOpenListener(OnOpenListener listener) {
         mOpenListener = listener;
     }
 
     /**
-     * ÉèÖÃ¹Ø±Õ¼àÌıÊÂ¼ş£¬µ±»¬¶¯²Ëµ¥±»¹Ø±ÕÊ±µ÷ÓÃ
      */
     public void setOnCloseListener(OnCloseListener listener) {
         //mViewAbove.setOnCloseListener(listener);
@@ -794,21 +725,18 @@ public class SlidingMenu extends RelativeLayout {
     }
 
     /**
-     * ÉèÖÃ´ò¿ª¼àÌıÊÂ¼ş£¬µ±»¬¶¯²Ëµ¥±»´ò¿ª¹ıÖ®ºóµ÷ÓÃ
      */
     public void setOnOpenedListener(OnOpenedListener listener) {
         mViewAbove.setOnOpenedListener(listener);
     }
 
     /**
-     * ÉèÖÃ¹Ø±Õ¼àÌıÊÂ¼ş£¬µ±»¬¶¯²Ëµ¥±»¹Ø±Õ¹ıÖ®ºóµ÷ÓÃ
      */
     public void setOnClosedListener(OnClosedListener listener) {
         mViewAbove.setOnClosedListener(listener);
     }
 
     /**
-     * ¹¦ÄÜÃèÊö£º±£´æ×´Ì¬µÄÀà£¬¼Ì³Ğ×ÔBaseSavedState
      */
     public static class SavedState extends BaseSavedState {
         private final int mItem;

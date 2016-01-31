@@ -88,6 +88,7 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
         mSearch = (Button)findViewById(R.id.get_density_confirm);
         mLati = (TextView)findViewById(R.id.get_density_lati);
         mLongi = (TextView)findViewById(R.id.get_density_longi);
+        mDensity = (TextView)findViewById(R.id.get_density_density);
         mLoading = (TextView)findViewById(R.id.get_density_loading);
         mCancel.setOnClickListener(this);
         mSearch.setOnClickListener(this);
@@ -138,6 +139,8 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
                     //set current pm density for calculation
                     PM25Density = Double.valueOf(pmModel.getPm25());
                     Log.e(TAG, "searchPMRequest PM2.5 Density " + String.valueOf(PM25Density));
+                    mDensity.setText(String.valueOf(PM25Density));
+                    aCache.put(Const.Cache_PM_Density,PM25Density);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -149,6 +152,10 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
             public void onErrorResponse(VolleyError error) {
                 if(error != null){
                     Log.e(TAG,error.getMessage());
+                    if(error.getMessage().trim().equals("org.json.JSONException: End of input at character 0 of")){
+                        mDensity.setText(Const.Info_No_PMDensity);
+                        //Toast.makeText(mContext.getApplicationContext(),Const.Info_No_PMDensity,Toast.LENGTH_SHORT).show();
+                    }
                 }
                 isRunning = false;
                 mSearch.setEnabled(true);

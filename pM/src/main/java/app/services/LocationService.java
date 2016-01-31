@@ -30,7 +30,15 @@ public class LocationService implements LocationListener
 {
 
     public static final String TAG = "LocationService";
+
+    public static final int TAG_BAIDU = 0;
+
+    public static final int TAG_GPS = 1;
+
+    public static final int TAG_NETWORK = 2;
+
     public static LocationService instance;
+
     Location mLastLocation = null;
     Context mContext;
     String provider = null;
@@ -38,12 +46,60 @@ public class LocationService implements LocationListener
     LocationManager mLocationManager;
     LocationQueue locationQueue;
     Long timeInterval;
+    int localization_type;
 
     /**
      * Baidu Map
      */
     LocationClient locationClient;
     BDLocationListener bdLocationListener = new MyLocationListener();
+
+    public static LocationService getInstance(Context context){
+        if(instance == null)
+            instance = new LocationService(context);
+        return instance;
+    }
+
+    private LocationService(Context context) {
+        mContext = context;
+        locationQueue = new LocationQueue();
+        setDefaultTag();
+        initMethodByType(localization_type);
+    }
+
+    private void setDefaultTag(){
+        localization_type = TAG_BAIDU;
+    }
+
+    private void initMethodByType(int type){
+        switch (type){
+            case TAG_BAIDU:
+                 baiduInit();
+                break;
+            case TAG_GPS:
+                break;
+        }
+    }
+
+    private void runMethodByType(int type){
+        switch (type){
+            case TAG_BAIDU:
+                baiduRun();
+                break;
+        }
+    }
+
+    /**
+     * For Baidu Method
+     */
+    private void baiduInit(){
+        onCreate();
+        initLocation();
+    }
+
+    private void baiduRun(){
+        locationClient.start();
+    }
 
     private void onCreate(){
         locationClient = new LocationClient(mContext.getApplicationContext());
@@ -133,16 +189,7 @@ public class LocationService implements LocationListener
         }
     }
 
-    public static LocationService getInstance(Context context){
-        if(instance == null)
-            instance = new LocationService(context);
-        return instance;
-    }
 
-    private LocationService(Context context) {
-        mContext = context;
-        locationQueue = new LocationQueue();
-    }
 
     public Location getLastKnownLocation() {
         init();
@@ -187,8 +234,7 @@ public class LocationService implements LocationListener
         //init();
         //timeInterval = minTime;
         //mRun.run();
-        onCreate();
-        initLocation();
+        runMethodByType(localization_type);
     }
 
     public void stop(){

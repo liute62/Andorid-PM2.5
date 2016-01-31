@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -29,7 +28,7 @@ import app.utils.VolleyQueue;
 /**
  * Created by Administrator on 1/18/2016.
  */
-public class LocalizationDialog extends Dialog implements View.OnClickListener{
+public class DialogGetCity extends Dialog implements View.OnClickListener{
 
     public static final String loadingText = "正在搜索";
     public static final String successText = "搜索成功";
@@ -87,7 +86,7 @@ public class LocalizationDialog extends Dialog implements View.OnClickListener{
         }
     };
 
-    public LocalizationDialog(Context context,Handler parent) {
+    public DialogGetCity(Context context, Handler parent) {
         super(context);
         mContext = context;
         mHandler = parent;
@@ -101,7 +100,7 @@ public class LocalizationDialog extends Dialog implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         setCancelable(false);
-        setContentView(R.layout.widget_dialog_localization);
+        setContentView(R.layout.widget_dialog_get_city);
         mLoading = (TextView)findViewById(R.id.localization_loading);
         mConfirm = (Button)findViewById(R.id.localization_confirm);
         mConfirm.setOnClickListener(this);
