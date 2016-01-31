@@ -42,6 +42,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     TextView mLongitude;
     TextView mLatitude;
     Button mBack;
+    Button mLocalization;
     RadioButton mMale;
     RadioButton mFemale;
     Button mDataResult;
@@ -65,6 +66,8 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         mBack.setOnClickListener(this);
         mDataResult = (Button)findViewById(R.id.personal_state_today);
         mDataResult.setOnClickListener(this);
+        mLocalization = (Button)findViewById(R.id.personal_state_get_location);
+        mLocalization.setOnClickListener(this);
         loadData();
     }
 
@@ -121,6 +124,11 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
                 mMale.setChecked(false);
                 mFemale.setChecked(true);
                 aCache.put(Const.Cache_User_Gender,"1");
+                break;
+            case R.id.personal_state_get_location:
+                DialogGetLocation getLocation = new DialogGetLocation(mContext);
+                getLocation.show();
+                DialogPersonalState.this.dismiss();
                 break;
         }
     }

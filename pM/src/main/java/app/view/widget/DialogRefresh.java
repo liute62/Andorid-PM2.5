@@ -87,10 +87,10 @@ public class DialogRefresh extends Dialog implements View.OnClickListener
         }
     }
 
-    private void getLocation(){
+    private void getLocation() {
         setRunning();
         isRunning = true;
-        locationService.run(Long.valueOf(10000));
+        locationService.run();
     }
 
     private void setRunning(){

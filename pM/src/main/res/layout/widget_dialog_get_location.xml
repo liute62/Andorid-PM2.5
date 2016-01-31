@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="350dp"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <RelativeLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前纬度"
+            android:textColor="@android:color/black"
+            android:id="@+id/textView13" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/get_location_lati"
+            android:layout_marginStart="2dp"
+            android:layout_alignParentTop="true"
+            android:textColor="@android:color/black"
+            android:layout_toEndOf="@+id/textView13" />
+
+        <TextView
+            android:layout_marginTop="3dp"
+            android:layout_below="@+id/textView13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前经度"
+            android:textColor="@android:color/black"
+            android:id="@+id/textView14" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@android:color/black"
+            android:id="@+id/get_location_longi"
+            android:layout_marginStart="2dp"
+            android:layout_alignBaseline="@+id/textView14"
+            android:layout_toEndOf="@+id/textView14" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="百度地图"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/get_location_baidu"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GPS"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@+id/get_location_baidu"
+            android:id="@+id/get_location_gps"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="网络"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@+id/get_location_gps"
+            android:id="@+id/get_location_network"
+            android:checked="false" />
+
+        <TextView
+            android:layout_below="@+id/get_location_baidu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新的纬度"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/textView21" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="3dp"
+            android:layout_toEndOf="@+id/textView21"
+            android:id="@+id/get_location_new_lati"
+            android:layout_alignBaseline="@+id/textView21"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新的经度"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/textView20"
+            android:layout_below="@+id/textView21"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="3dp"
+            android:layout_toEndOf="@+id/textView20"
+            android:id="@+id/get_location_new_longi"
+            android:layout_alignBaseline="@+id/textView20"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="返回"
+            android:layout_marginTop="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="30dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/get_location_back"/>
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/get_location_search"
+            android:text="开始"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="20dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保存"
+            android:id="@+id/get_location_save"
+            android:layout_marginTop="8dp"
+            android:layout_toStartOf="@+id/get_location_back"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp">
+    </RelativeLayout>
+</LinearLayout>

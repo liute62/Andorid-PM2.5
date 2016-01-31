@@ -35,7 +35,8 @@
         android:layout_toRightOf="@+id/textView2"
         android:layout_marginLeft="30dip"
         android:layout_alignBaseline="@+id/textView2"
-        android:layout_below="@id/register_top_layout" />
+        android:layout_below="@id/register_top_layout"
+        android:numeric="integer" />
 
     <TextView
         android:layout_width="wrap_content"

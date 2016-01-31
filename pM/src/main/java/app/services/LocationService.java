@@ -39,6 +39,8 @@ public class LocationService implements LocationListener
 
     public static LocationService instance;
 
+    GetTheLocation getTheLocation;
+
     Location mLastLocation = null;
     Context mContext;
     String provider = null;
@@ -230,11 +232,18 @@ public class LocationService implements LocationListener
 
     Handler mHandler = new Handler();
 
-    public void run(Long minTime){
+    public void run(){
         //init();
         //timeInterval = minTime;
         //mRun.run();
         runMethodByType(localization_type);
+        getTheLocation = new GetTheLocation() {
+            @Override
+            public void onGetLocation(Location location) {
+
+            }
+        };
+        getTheLocation.onGetLocation(new Location("test"));
     }
 
     public void stop(){
@@ -266,7 +275,7 @@ public class LocationService implements LocationListener
 
     }
 
-    public interface getTheLocation{
+    public interface GetTheLocation{
 
         void onGetLocation(Location location);
     }
