@@ -52,7 +52,7 @@
             android:id="@+id/textView17" />
 
         <TextView
-            android:layout_marginLeft="100dp"
+            android:layout_marginLeft="50dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="user_id"
@@ -60,26 +60,35 @@
             android:layout_alignParentLeft="true"/>
 
         <TextView
-            android:layout_centerHorizontal="true"
+            android:id="@+id/textView2"
+            android:layout_marginLeft="120dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="time"/>
 
         <TextView
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="100dp"
+            android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="longitude"
+            android:layout_toEndOf="@+id/textView2"
             android:id="@+id/textView23"/>
 
         <TextView
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="latitude"
+            android:layout_marginLeft="20dp"
+            android:layout_toEndOf="@+id/textView23"
             android:id="@+id/textView24"/>
+
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="odr"
+            android:id="@+id/textView27"
+            android:layout_toEndOf="@+id/textView24"/>
 
     </RelativeLayout>
 
@@ -90,13 +99,6 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_marginLeft="3dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="odr"
-            android:id="@+id/textView27" />
 
         <TextView
             android:layout_marginLeft="3dp"
@@ -130,29 +132,36 @@
             android:layout_marginLeft="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="density"
+            android:text="dnsty"
             android:id="@+id/textView30" />
 
         <TextView
             android:layout_marginLeft="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="pm25"
+            android:text="pm"
             android:id="@+id/textView31" />
 
         <TextView
             android:layout_marginLeft="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="source"
+            android:text="src"
             android:id="@+id/textView32" />
 
         <TextView
             android:layout_marginLeft="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="upload"
+            android:text="upld"
             android:id="@+id/textView33" />
+
+        <TextView
+            android:layout_marginLeft="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="conn"
+            android:id="@+id/textView19" />
 
     </LinearLayout>
 

@@ -458,6 +458,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     }
 
     private void text2Initial(){
+        Log.e(TAG,"hour: "+String.valueOf(PMBreatheHour)+" "+ShortcutUtil.ugScale(PMBreatheHour, 2));
         mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) + " 微克");
         mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " 微克");
         mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1)) + " 微克");
@@ -577,8 +578,8 @@ public class MainFragment extends Fragment implements OnClickListener {
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_view_more_2:
-                String start = "无";
-                String end = "无";
+                String start = "暂无数据";
+                String end = "暂无数据";
                 if(chart8Time.size() >= 2){
                     start  = chart8Time.get(0);
                     end = chart8Time.get(chart8Time.size() - 1);

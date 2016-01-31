@@ -151,10 +151,12 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
             @Override
             public void onErrorResponse(VolleyError error) {
                 if(error != null){
-                    Log.e(TAG,error.getMessage());
-                    if(error.getMessage().trim().equals("org.json.JSONException: End of input at character 0 of")){
-                        mDensity.setText(Const.Info_No_PMDensity);
-                        //Toast.makeText(mContext.getApplicationContext(),Const.Info_No_PMDensity,Toast.LENGTH_SHORT).show();
+                    if(error.getMessage() != null) {
+                        Log.e(TAG, error.getMessage());
+                        if (error.getMessage().trim().equals("org.json.JSONException: End of input at character 0 of")) {
+                            mDensity.setText(Const.Info_No_PMDensity);
+                            //Toast.makeText(mContext.getApplicationContext(),Const.Info_No_PMDensity,Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
                 isRunning = false;

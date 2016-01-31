@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,6 +51,7 @@ import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.DBHelper;
 import app.utils.DataCalculator;
+import app.utils.FileUtil;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
@@ -278,11 +280,18 @@ public class DBService extends Service {
                 }
                 //every 10 min to open the GPS and if get the last location, close it.
                 if(DBRunTime % 120 == 0){
+                    mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+                    mManager.addGpsStatusListener(gpsStatusListener);
+                    mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0.0f,locationListener);
                     Location location = getLastLocation();
                     if(location != null){
                         latitude = location.getLatitude();
                         longitude = location.getLongitude();
                     }
+                    mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0.0f,locationListener);
+                }if(DBRunTime % 150 == 0){
+                    mManager.removeGpsStatusListener(gpsStatusListener);
+                    mManager.removeUpdates(locationListener);
                     mManager = null;
                 }
                 //every 1 min to calculate the pm result
@@ -368,6 +377,7 @@ public class DBService extends Service {
         if (mLastLocation != null){
             Log.d(TAG,"Change the Location Updates speed to "+String.valueOf(GPS_Min_Frequency)+" "+String.valueOf(GPS_Min_Distance));
             mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_Min_Frequency,GPS_Min_Distance, locationListener);
+            mManager.removeGpsStatusListener(gpsStatusListener);
         }
         if((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0){
             Log.e(TAG,"DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
@@ -506,11 +516,15 @@ public class DBService extends Service {
     GpsStatus.Listener gpsStatusListener = new GpsStatus.Listener() {
 
         public void onGpsStatusChanged(int event) {
-            Log.d(TAG,"onGpsStatusChanged event == "+String.valueOf(event));
+            //Log.d(TAG,"onGpsStatusChanged event == "+String.valueOf(event));
+            if(mManager == null) mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
             GpsStatus status = mManager.getGpsStatus(null);
+            mManager = null;
+            FileUtil.appendStrToFile(DBRunTime,"onGpsStatusChanged event "+event);
             if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
                 int time = status.getTimeToFirstFix();
                 Log.d(TAG,"onGpsStatusChanged time "+String.valueOf(time));
+                FileUtil.appendStrToFile(DBRunTime,"onGpsStatusChanged");
             } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
                 Iterable<GpsSatellite> allgps = status.getSatellites();
                 Iterator<GpsSatellite> items = allgps.iterator();
@@ -523,6 +537,7 @@ public class DBService extends Service {
                         ii++;
                     i++;
                 }
+                FileUtil.appendStrToFile(DBRunTime,"GPS_EVENT_SATELLITE_STATUS ii "+ii);
                 if(ii > 4){
                     Const.CURRENT_INDOOR = false;
                 }else {
@@ -541,6 +556,7 @@ public class DBService extends Service {
                         ii++;
                     i++;
                 }
+                FileUtil.appendStrToFile(DBRunTime,"GPS_EVENT_STARTED ii "+ii);
                 if(ii > 4){
                     Const.CURRENT_INDOOR = false;
                 }else {
@@ -548,6 +564,7 @@ public class DBService extends Service {
                 }
                 Log.d(TAG,"onGpsStatusChanged started i "+String.valueOf(i)+" ii"+String.valueOf(ii));
             } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
+                FileUtil.appendStrToFile(DBRunTime,"GPS_EVENT_STOPPED");
             }
         }
     };
@@ -567,6 +584,7 @@ public class DBService extends Service {
                     //location has been changed, check if changes big enough
                     if (ShortcutUtil.isLocationChangeEnough(enough_lati,latitude,enough_longi,longitude)) {
                         Log.d(TAG,"onLocationChanged Current Location Changed enough and get the density from server");
+                        FileUtil.appendStrToFile(DBRunTime,"onLocationChanged enough lati: "+latitude+" longi: "+longitude);
                         enough_longi = longitude;
                         enough_lati = latitude;
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
@@ -576,6 +594,7 @@ public class DBService extends Service {
                 }
             }else {
                 Log.d(TAG,"onLocationChanged Location == null");
+                FileUtil.appendStrToFile(DBRunTime,"onLocationChanged Location == null");
             }
         }
 
@@ -765,6 +784,7 @@ public class DBService extends Service {
                 result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
             }
         }
+        Log.e(TAG,"lastTwoHour: "+result);
         return String.valueOf(result);
     }
 
@@ -838,6 +858,7 @@ public class DBService extends Service {
                     sendBroadcast(intent);
                     DBCanRun = true;
                     isPMSearchSuccess = true;
+                    FileUtil.appendStrToFile(DBRunTime," search pm density success，density: "+PM25Density);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -849,6 +870,7 @@ public class DBService extends Service {
             public void onErrorResponse(VolleyError error) {
                 isPMSearchRun = false;
                 isPMSearchSuccess = false;
+                FileUtil.appendStrToFile(DBRunTime,"search pm density failed");
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
             }
 
@@ -866,6 +888,7 @@ public class DBService extends Service {
                 @Override
                 public void onResponse(JSONObject response) {
                     isUploadRun = false;
+                    FileUtil.appendStrToFile(DBRunTime,"upload data success");
                     Log.v("response", response.toString());
                     insertState(state);
                     updateStateUpLoad(state, 1);
@@ -875,6 +898,7 @@ public class DBService extends Service {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG,"uploadPMData onError Response");
+                    FileUtil.appendStrToFile(DBRunTime,"upload data failed");
                     isUploadRun = false;
                     String id = aCache.getAsString(Const.Cache_User_Id);
                     if(ShortcutUtil.isStringOK(id) && !id.equals("0"))
@@ -979,7 +1003,9 @@ public class DBService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(Const.Action_Bluetooth_Hearth)){
 
+            }
         }
     }
 

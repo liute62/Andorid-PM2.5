@@ -159,6 +159,8 @@ public class Const {
 
     public static final String Action_Chart_Result_3 = "Action_Chart_Result_3";
 
+    public static final String Action_Bluetooth_Hearth = "Action_Bluetooth_Hearth";
+
     public static final int Action_Profile_Register = 200001;
 
     /**
