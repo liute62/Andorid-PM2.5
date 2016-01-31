@@ -44,6 +44,8 @@ import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 import app.view.widget.DialogConfirm;
+import app.view.widget.DialogGetDensity;
+import app.view.widget.DialogRefresh;
 import app.view.widget.LoadingDialog;
 import app.view.widget.LocalizationDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -337,6 +339,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChangeChart2.setOnClickListener(this);
         mAddCity.setOnClickListener(this);
         mViewMore2.setOnClickListener(this);
+        mCity.setOnClickListener(this);
     }
 
     private void setFonts(View view) {
@@ -504,6 +507,10 @@ public class MainFragment extends Fragment implements OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.main_current_city:
+                LocalizationDialog dialog2 = new LocalizationDialog(mActivity,mDataHandler);
+                dialog2.show();
+                break;
             case R.id.main_add_city:
                 LocalizationDialog dialog = new LocalizationDialog(mActivity,mDataHandler);
                 dialog.show();
@@ -555,9 +562,13 @@ public class MainFragment extends Fragment implements OnClickListener {
                 break;
             case R.id.main_density_error:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Location,Toast.LENGTH_SHORT).show();
+                DialogGetDensity dialogGetDensity = new DialogGetDensity(mActivity);
+                dialogGetDensity.show();
                 break;
             case R.id.main_run_error:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
+                DialogRefresh refresh = new DialogRefresh(mActivity);
+                refresh.show();
                 break;
             case R.id.main_chart_1_alert:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();

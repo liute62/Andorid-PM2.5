@@ -10,6 +10,8 @@ public class UserModel extends BaseModel {
 
     public static final String ID = "id";
 
+    public static final String CODE = "code";
+
     public static final String NAME = "name";
 
     public static final String PASSWORD = "password";
@@ -25,6 +27,8 @@ public class UserModel extends BaseModel {
     public static final String PHONE = "phone";
 
     private String id;
+
+    private String code;
 
     private String name;
 
@@ -56,6 +60,8 @@ public class UserModel extends BaseModel {
         UserModel bean = new UserModel();
         if (object.has(ID)) {
             bean.setId(object.getString(ID));
+        }if(object.has(CODE)){
+            bean.setCode(object.getString(CODE));
         }
         if (object.has(NAME)) {
             bean.setName(object.getString(NAME));
@@ -84,6 +90,9 @@ public class UserModel extends BaseModel {
     public JSONObject toJsonObject() throws JSONException {
         JSONObject object = new JSONObject();
         object.put(ID, getId());
+        if(code != null){
+            object.put(CODE,getCode());
+        }
         if (name != null) {
             object.put(NAME, getName());
         }
@@ -114,6 +123,14 @@ public class UserModel extends BaseModel {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {

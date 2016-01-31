@@ -90,6 +90,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 //if input meet the requirement
                 boolean inputSuccess = true;
                 int gender = 0;
+                String code = mInviteCode.getText().toString();
                 String username = mUsername.getText().toString();
                 String password = mPassword.getText().toString();
                 String pwdconfirm = mConfirmPwd.getText().toString();
@@ -97,6 +98,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 String firstname = mFirstname.getText().toString();
                 String mail = mEmail.getText().toString();
                 String phone = mPhone.getText().toString();
+                if(code == null || code.trim().equals("")) inputSuccess = false;
                 if (username == null || username.trim().equals("")) inputSuccess = false;
                 if (password == null || password.trim().equals("")) inputSuccess = false;
                 if (pwdconfirm == null || pwdconfirm.trim().equals("")) inputSuccess = false;
@@ -115,6 +117,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                         Toast.makeText(RegisterActivity.this, Const.Info_Register_pwdError, Toast.LENGTH_SHORT).show();
                     else {
                         UserModel userModel = new UserModel();
+                        userModel.setCode(code);
                         userModel.setName(username);
                         userModel.setFirstname(firstname);
                         userModel.setLastname(lastname);

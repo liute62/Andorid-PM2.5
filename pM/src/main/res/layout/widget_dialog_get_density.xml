@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
-            android:id="@+id/localization_lati"
+            android:id="@+id/get_density_lati"
             android:layout_marginStart="2dp"
             android:layout_alignParentTop="true"
             android:textColor="@android:color/black"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="0"
             android:textColor="@android:color/black"
-            android:id="@+id/localization_longi"
+            android:id="@+id/get_density_longi"
             android:layout_marginStart="2dp"
             android:layout_alignBaseline="@+id/textView14"
             android:layout_toEndOf="@+id/textView14" />
@@ -56,20 +56,20 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="正在搜索"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="20dp"
-            android:id="@+id/localization_loading" />
+            android:textColor="@color/AccentBlue"
+            android:id="@+id/get_density_loading" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="当前城市"
+            android:text="浓度为"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="20dp"
             android:id="@+id/textView20"
-            android:layout_below="@+id/localization_loading"/>
+            android:layout_below="@+id/get_density_loading"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -79,8 +79,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="20dp"
             android:layout_toEndOf="@+id/textView20"
-            android:id="@+id/localization_city_name"
-            android:layout_below="@+id/localization_loading"/>
+            android:id="@+id/get_density_density"
+            android:layout_below="@+id/get_density_loading"/>
 
     </RelativeLayout>
 
@@ -95,18 +95,17 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="30dp"
             android:layout_centerHorizontal="true"
-            android:id="@+id/localization_back"/>
+            android:id="@+id/get_density_back"/>
 
         <Button
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:id="@+id/localization_confirm"
-            android:text="确认"
+            android:id="@+id/get_density_confirm"
+            android:text="搜索"
             android:layout_centerHorizontal="true"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="8dp"
-            android:layout_marginStart="20dp"
-            android:layout_toStartOf="@+id/personal_state_btn" />
+            android:layout_marginStart="20dp"/>
     </RelativeLayout>
 
     <RelativeLayout
