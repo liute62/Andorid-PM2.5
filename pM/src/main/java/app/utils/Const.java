@@ -163,6 +163,8 @@ public class Const {
 
     public static final String Action_Search_Density_ToService = "Action_Search_Density_ToService";
 
+    public static final String Action_Get_Location_ToService = "Action_Get_Location_ToService";
+
     public static final int Action_Profile_Register = 200001;
 
     /**
@@ -283,6 +285,8 @@ public class Const {
     public static final String Info_Weight_Null = "当前体重数据为零，请输入相关体重数据";
 
     public static final String Info_No_PMDensity = "当前地区无法获得有关PM浓度信息";
+
+    public static final String Info_Location_Saved = "地理位置信息保存成功";
 
     public static String[] cityName =
             {

@@ -292,12 +292,14 @@ public class DBService extends Service {
                 }
                 //every 10 min to open the GPS and if get the last location, close it.
                 if(DBRunTime % 120 == 0){
+                    FileUtil.appendStrToFile(DBRunTime,"Add status listener and request location Updates");
                     mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                     mManager.addGpsStatusListener(gpsStatusListener);
                     mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0.0f,locationListener);
                     getLastLocation();
                     mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0.0f,locationListener);
                 }if(DBRunTime % 150 == 0){
+                    FileUtil.appendStrToFile(DBRunTime,"remove status listener, remove request location Updates");
                     mManager.removeGpsStatusListener(gpsStatusListener);
                     mManager.removeUpdates(locationListener);
                     mManager = null;
@@ -516,6 +518,7 @@ public class DBService extends Service {
             for (int i = 0; i != providers.length; i++){
                 if(mManager.isProviderEnabled(providers[i])) {
                     Log.e(TAG, "No lastimeLocation, Request: "+providers[i]+" Update");
+                    FileUtil.appendStrToFile(DBRunTime,"Loc Init provider = "+providers[i]);
                     mManager.requestLocationUpdates(providers[i], 0, 0, locationListener);
                 }
             }
@@ -821,13 +824,20 @@ public class DBService extends Service {
 //        String now =  ShortcutUtil.refFormatOnlyDate(t.toMillis(true));
 //        //Log.e("insertState","now"+now+"insert"+insert);
 //        if(insert.equals(now)) {
+        String str = "";
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        if(db == null)
+            str = "db = null ";
+        else str = "db != null ";
         Log.d(TAG, "-------insert ------state --------- begin");
         state.print();
         Log.d(TAG, "-------insert ------state --------- finish");
-        cupboard().withDatabase(db).put(state);
+        long r = cupboard().withDatabase(db).put(state);
+        str += "entity Id "+String.valueOf(r);
         IDToday++;
+        str += " idToday = "+IDToday;
         aCache.put(Const.Cache_Lastime_Timepoint,state.getTime_point());
+        FileUtil.appendStrToFile(DBRunTime,"insert state "+str);
         //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
 //        }else {
 //            Toast.makeText(getApplicationContext(),Const.Info_DB_Insert_Date_Conflict,Toast.LENGTH_SHORT);
@@ -1042,6 +1052,14 @@ public class DBService extends Service {
                 intent.putExtra(Const.Intent_DB_Run_State,1);
                 sendBroadcast(intentTmp);
                 PM25Density = intent.getDoubleExtra(Const.Intent_PM_Density,0.0);
+            }else if(intent.getAction().equals(Const.Action_Get_Location_ToService)){
+                Log.e(TAG,"Action_Get_Location_ToService");
+                double lati = intent.getDoubleExtra(Const.Intent_DB_PM_Lati,0.0);
+                double longi = intent.getDoubleExtra(Const.Intent_DB_PM_Longi,0.0);
+                if(lati != 0.0 && longi != 0.0){
+                    latitude = lati;
+                    longitude = longi;
+                }
             }
         }
     }

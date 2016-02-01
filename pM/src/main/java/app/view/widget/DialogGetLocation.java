@@ -1,7 +1,9 @@
 package app.view.widget;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pm.R;
 
@@ -127,15 +130,27 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
             case R.id.get_location_save:
                 String lati = mNewLati.getText().toString();
                 String longi = mNewLongi.getText().toString();
-                if(ShortcutUtil.isStringOK(lati) && !lati.equals("0")) aCache.put(Const.Cache_Latitude,lati);
-                if(ShortcutUtil.isStringOK(longi) && !longi.equals("0")) aCache.put(Const.Cache_Longitude,longi);
+                if(ShortcutUtil.isStringOK(lati) && !lati.equals("0") && ShortcutUtil.isStringOK(longi) && !longi.equals("0")) {
+                    aCache.put(Const.Cache_Latitude,lati);
+                    aCache.put(Const.Cache_Longitude, longi);
+                    Toast.makeText(mContext.getApplicationContext(),Const.Info_Location_Saved,Toast.LENGTH_SHORT).show();
+                    notifyService(Double.valueOf(lati),Double.valueOf(longi));
+                }
                 DialogGetLocation.this.dismiss();
                 break;
         }
     }
 
+    private void notifyService(double lati,double longi){
+        Intent intent = new Intent(Const.Action_Get_Location_ToService);
+        intent.putExtra(Const.Intent_DB_PM_Lati,lati);
+        intent.putExtra(Const.Intent_DB_PM_Longi,longi);
+        mContext.sendBroadcast(intent);
+    }
+
     private void begin(){
         runnable.run();
+        locationService.setGetTheLocationListener(this);
         onSearch();
         isSearching = true;
         int tag = LocationService.TAG_GPS;
@@ -146,12 +161,13 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     }
 
     private void onSearch(){
+        mSearch.setText(mContext.getString(R.string.dialog_base_searching));
         mSearch.setClickable(false);
         mSearch.setEnabled(false);
     }
 
     private void afterSearch(){
-        mSearch.setText(mContext.getString(R.string.dialog_base_searching));
+        mSearch.setText(mContext.getString(R.string.dialog_base_begin));
         mSearch.setEnabled(true);
         mSearch.setClickable(true);
     }
@@ -195,10 +211,25 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         mNetwork.setChecked(true);
     }
 
+
     @Override
     public void onGetLocation(Location location) {
+        if(location != null)
+            mNewLati.setText(String.valueOf(location.getLatitude()));
+            mNewLongi.setText(String.valueOf(location.getLongitude()));
+    }
+
+    @Override
+    public void onSearchStop(Location location) {
         isSearching = false;
         isRunnable = false;
         afterSearch();
+        if(location != null) {
+            mNewLati.setText(String.valueOf(location.getLatitude()));
+            mNewLongi.setText(String.valueOf(location.getLongitude()));
+        }else {
+            mNewLati.setText("0");
+            mNewLongi.setText("0");
+        }
     }
 }
