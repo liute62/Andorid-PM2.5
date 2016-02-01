@@ -23,24 +23,25 @@ public class FileUtil {
 
     public static final String log_path = base_path+"/Bio3Air";
 
-    public static final String log_file_name = log_path +"/bio3AirLog.txt";
+    public static final String log_file_name = log_path +"/bio3AirLog";
 
     public static void appendStrToFile(int runTime,String content){
-       long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         String timeStr = ShortcutUtil.refFormatDateAndTime(time);
+        String path = log_file_name + timeStr.substring(0,10)+".txt";
         String txt = timeStr+" DBRuntime = "+runTime+" "+content;
         //Log.e(TAG,"path = "+log_path);
         File dir = new File(log_path);
         PrintWriter printWriter = null;
         if(!dir.exists())
             dir.mkdirs();
-        File file = new File(log_file_name);
+        File file = new File(path);
         if(!file.exists())
             try {
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e(TAG,"file = "+log_file_name+" create failed");
+                Log.e(TAG,"file = "+path+" create failed");
             }
         try {
             OutputStream outputStream = new FileOutputStream(file,true);
@@ -48,7 +49,7 @@ public class FileUtil {
             printWriter.println(txt);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Log.e(TAG,"file = "+log_file_name+" not found");
+            Log.e(TAG,"file = "+path+" not found");
         }finally {
             if(printWriter != null)
                 printWriter.close();

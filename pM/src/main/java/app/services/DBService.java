@@ -171,6 +171,7 @@ public class DBService extends Service {
             }
 
             Log.d(TAG,"DB Runtime = "+String.valueOf(DBRunTime));
+            FileUtil.appendStrToFile(DBRunTime,"cycle");
             /** notify user whether using the old PM2.5 density **/
             if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
                 Intent intent = new Intent(Const.Action_DB_Running_State);
@@ -283,11 +284,7 @@ public class DBService extends Service {
                     mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                     mManager.addGpsStatusListener(gpsStatusListener);
                     mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0.0f,locationListener);
-                    Location location = getLastLocation();
-                    if(location != null){
-                        latitude = location.getLatitude();
-                        longitude = location.getLongitude();
-                    }
+                    getLastLocation();
                     mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0.0f,locationListener);
                 }if(DBRunTime % 150 == 0){
                     mManager.removeGpsStatusListener(gpsStatusListener);
@@ -519,7 +516,7 @@ public class DBService extends Service {
             //Log.d(TAG,"onGpsStatusChanged event == "+String.valueOf(event));
             if(mManager == null) mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
             GpsStatus status = mManager.getGpsStatus(null);
-            mManager = null;
+            //mManager = null;
             FileUtil.appendStrToFile(DBRunTime,"onGpsStatusChanged event "+event);
             if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
                 int time = status.getTimeToFirstFix();
@@ -853,12 +850,12 @@ public class DBService extends Service {
                     intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
                     //set current pm density for calculation
                     PM25Density = Double.valueOf(pmModel.getPm25());
-                    Log.d(TAG,"searchPMRequest PM2.5 Density "+String.valueOf(PM25Density));
+                    Log.e(TAG,"searchPMRequest PM2.5 Density "+String.valueOf(PM25Density));
                     aCache.put(Const.Cache_PM_Density, PM25Density);
                     sendBroadcast(intent);
                     DBCanRun = true;
                     isPMSearchSuccess = true;
-                    FileUtil.appendStrToFile(DBRunTime," search pm density success，density: "+PM25Density);
+                    FileUtil.appendStrToFile(DBRunTime," search pm density success, density: "+PM25Density);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -973,7 +970,7 @@ public class DBService extends Service {
      * Get the last known location from providers
      * @return
      */
-    private Location getLastLocation(){
+    private void getLastLocation(){
         Location result = null;
         String provider = null;
         String[] providers = {LocationManager.GPS_PROVIDER,LocationManager.PASSIVE_PROVIDER,LocationManager.NETWORK_PROVIDER};
@@ -981,6 +978,10 @@ public class DBService extends Service {
         for (int i = 0; i != providers.length; i++){
             if(mManager.isProviderEnabled(providers[i])){
                 provider = providers[i];
+                if (provider != null)
+                    mLastLocation = mManager.getLastKnownLocation(provider);
+                if(mLastLocation != null)
+                    break;
             }
         }
         if (provider != null)
@@ -996,7 +997,6 @@ public class DBService extends Service {
             longitude = mLastLocation.getLongitude();
             latitude = mLastLocation.getLatitude();
         }
-        return result;
     }
 
     class BluetoothReceiver extends BroadcastReceiver{

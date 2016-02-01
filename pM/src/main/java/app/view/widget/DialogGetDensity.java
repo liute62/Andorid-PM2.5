@@ -99,8 +99,10 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
         aCache = ACache.get(mContext);
         String longiStr = aCache.getAsString(Const.Cache_Longitude);
         String latiStr = aCache.getAsString(Const.Cache_Latitude);
+        String density = aCache.getAsString(Const.Cache_PM_Density);
         if(ShortcutUtil.isStringOK(latiStr)) mLati.setText(latiStr);
         if(ShortcutUtil.isStringOK(longiStr)) mLongi.setText(longiStr);
+        if(ShortcutUtil.isStringOK(density)) mDensity.setText(density);
     }
 
     private void setStop(){

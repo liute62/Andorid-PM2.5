@@ -340,6 +340,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAddCity.setOnClickListener(this);
         mViewMore2.setOnClickListener(this);
         mCity.setOnClickListener(this);
+        mAirQuality.setOnClickListener(this);
     }
 
     private void setFonts(View view) {
@@ -508,6 +509,10 @@ public class MainFragment extends Fragment implements OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.main_air_quality:
+                DialogGetDensity getDensity = new DialogGetDensity(mActivity);
+                getDensity.show();
+                break;
             case R.id.main_current_city:
                 DialogGetCity dialog2 = new DialogGetCity(mActivity,mDataHandler);
                 dialog2.show();

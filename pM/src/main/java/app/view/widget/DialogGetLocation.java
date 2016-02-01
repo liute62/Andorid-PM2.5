@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.example.pm.R;
 
+import java.security.cert.LDAPCertStoreParameters;
+
 import app.services.LocationService;
 import app.utils.ACache;
 import app.utils.Const;
@@ -136,7 +138,11 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         runnable.run();
         onSearch();
         isSearching = true;
-        locationService.run();
+        int tag = LocationService.TAG_GPS;
+        if(mGPS.isChecked())tag = LocationService.TAG_GPS;
+        if(mNetwork.isChecked()) tag = LocationService.TAG_NETWORK;
+        Log.e(TAG,"begin tag = "+tag);
+        locationService.run(tag);
     }
 
     private void onSearch(){

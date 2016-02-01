@@ -63,14 +63,43 @@ public class LocationService implements LocationListener
     }
 
     private LocationService(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         locationQueue = new LocationQueue();
         setDefaultTag();
-        initMethodByType(localization_type);
+        //initMethodByType(localization_type);
     }
 
     private void setDefaultTag(){
-        localization_type = TAG_BAIDU;
+        localization_type = TAG_GPS;
+    }
+
+    public void run(){
+        initMethodByType(localization_type);
+        runMethodByType(localization_type);
+        getTheLocation = new GetTheLocation() {
+            @Override
+            public void onGetLocation(Location location) {
+
+            }
+        };
+        getTheLocation.onGetLocation(new Location("test"));
+    }
+
+    public void run(int type){
+        if(type == TAG_BAIDU || type == TAG_GPS|| type == TAG_NETWORK)
+            localization_type = type;
+        runMethodByType(localization_type);
+        getTheLocation = new GetTheLocation() {
+            @Override
+            public void onGetLocation(Location location) {
+
+            }
+        };
+        getTheLocation.onGetLocation(new Location("test"));
+    }
+
+    public void stop(){
+        stopMethodByType(localization_type);
     }
 
     private void initMethodByType(int type){
@@ -79,6 +108,10 @@ public class LocationService implements LocationListener
                  baiduInit();
                 break;
             case TAG_GPS:
+                deviceInit(TAG_GPS);
+                break;
+            case TAG_NETWORK:
+                deviceInit(TAG_NETWORK);
                 break;
         }
     }
@@ -88,6 +121,22 @@ public class LocationService implements LocationListener
             case TAG_BAIDU:
                 baiduRun();
                 break;
+            case TAG_GPS:
+            case TAG_NETWORK:
+                deviceRun();
+                break;
+        }
+    }
+
+    private void stopMethodByType(int type){
+        switch (type){
+            case TAG_BAIDU:
+                baiduStop();
+                break;
+            case TAG_GPS:
+            case TAG_NETWORK:
+                deviceStop();
+                break;
         }
     }
 
@@ -95,20 +144,24 @@ public class LocationService implements LocationListener
      * For Baidu Method
      */
     private void baiduInit(){
-        onCreate();
-        initLocation();
+        baiduCreate();
+        baiduInitLoc();
     }
 
     private void baiduRun(){
         locationClient.start();
     }
 
-    private void onCreate(){
+    private void baiduStop(){
+        locationClient.stop();
+    }
+
+    private void baiduCreate(){
         locationClient = new LocationClient(mContext.getApplicationContext());
         locationClient.registerLocationListener(bdLocationListener);
     }
 
-    private void initLocation(){
+    private void baiduInitLoc(){
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationMode.Hight_Accuracy);
         option.setCoorType("bd09ll");
@@ -192,20 +245,24 @@ public class LocationService implements LocationListener
     }
 
 
-
+    /**
+     * For GPS / NETWORK Method
+     * @return
+     */
     public Location getLastKnownLocation() {
-        init();
+        initGPS();
         mLastLocation = mLocationManager.getLastKnownLocation(provider);
         return mLastLocation;
     }
 
-    private void init(){
+    private void initGPS(){
         mLocationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
-        if(provider == null) setDefaultProvider();
-        if(provider != null) {
-            Log.e(TAG,"Using provider "+provider);
-            mLocationManager.requestLocationUpdates(provider, 0, 0, this);
-        }
+        provider = providers[0];
+    }
+
+    private void initNetwork(){
+        mLocationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+        provider = providers[2];
     }
 
     private void setDefaultProvider(){
@@ -214,6 +271,22 @@ public class LocationService implements LocationListener
                 provider = providers[i];
             }
         }
+    }
+
+    private void deviceInit(int type){
+        if(type == TAG_GPS) initGPS();
+        if(type == TAG_NETWORK) initNetwork();
+    }
+
+    private void deviceRun(){
+        if(provider != null) {
+            Log.e(TAG,"Using provider "+provider);
+            mLocationManager.requestLocationUpdates(provider, 0, 0, this);
+        }
+    }
+
+    private void deviceStop(){
+        mLocationManager.removeUpdates(this);
     }
 
     Runnable mRun = new Runnable() {
@@ -232,31 +305,18 @@ public class LocationService implements LocationListener
 
     Handler mHandler = new Handler();
 
-    public void run(){
-        //init();
-        //timeInterval = minTime;
-        //mRun.run();
-        runMethodByType(localization_type);
-        getTheLocation = new GetTheLocation() {
-            @Override
-            public void onGetLocation(Location location) {
-
-            }
-        };
-        getTheLocation.onGetLocation(new Location("test"));
-    }
-
-    public void stop(){
-        mLocationManager.removeUpdates(this);
-        //mHandler.removeCallbacks(mRun);
-    }
-
     @Override
     public void onLocationChanged(Location location) {
         if(location != null){
             Log.e(TAG,location.getLatitude()+" "+location.getLongitude()+" "+location.getSpeed()+" "
             +location.getAltitude()+" "+location.getProvider());
             locationQueue.add(location);
+            if(locationQueue.isFull()){
+                stop();
+                Log.e(TAG,locationQueue.toString());
+            }
+        }else {
+            Log.e(TAG,"onLocationChanged provider = "+provider+" null");
         }
     }
 
@@ -282,9 +342,6 @@ public class LocationService implements LocationListener
 
     /**
      * A queue to collect the location and to
-     *
-     *
-     *
      */
     private class LocationQueue extends ArrayList{
 
@@ -314,6 +371,24 @@ public class LocationService implements LocationListener
                 return false;
             }
             return super.add(object);
+        }
+
+        public boolean isFull(){
+            return size()>threshed;
+        }
+
+        @Override
+        public Location get(int index) {
+            return (Location)super.get(index);
+        }
+
+        @Override
+        public String toString() {
+            String str = "";
+            for (int i = 0; i != size(); i++){
+               str += i+" "+String.valueOf(get(i).getLongitude())+" "+String.valueOf(get(i).getLatitude());
+            }
+            return str;
         }
 
         public void getCommonLocation(){

@@ -239,7 +239,7 @@ public class DataResultActivity extends Activity implements OnClickListener{
                 viewHolder.mPMDensity.setText(mdata.get(position).getDensity().length() < 5?
                         mdata.get(position).getDensity() : mdata.get(position).getDensity().substring(0,4));
                 viewHolder.mPMResult.setText(mdata.get(position).getPm25().length() < 5?
-                        mdata.get(position).getPm25() : mdata.get(position).getPm25().substring(0,7));
+                        mdata.get(position).getPm25() : mdata.get(position).getPm25().substring(0,4));
                 viewHolder.mSource.setText(mdata.get(position).getSource());
                 viewHolder.mUpload.setText(mdata.get(position).getUpload() == 0? "N":"Y");
                 viewHolder.mConnection.setText(mdata.get(position).getConnection() == 0? "N":"Y");
