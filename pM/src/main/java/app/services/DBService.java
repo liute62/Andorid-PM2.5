@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -22,6 +23,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
@@ -31,6 +33,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.pm.MainActivity;
+import com.example.pm.MainFragment;
 import com.example.pm.R;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -95,7 +98,6 @@ public class DBService extends Service {
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
-    Handler DBHandler = new Handler();
     PMModel pmModel;
     final int State_Much_Index = 500;
     int DB_Chart_Loop = 12;
@@ -105,6 +107,7 @@ public class DBService extends Service {
     private double last_lati;  // the last time latitude
     private double enough_lati; // lati value to see if location changed enough
     private double enough_longi; //longi value to see if location changed enough
+    private int PM25Source; //1 or 2
     private double PM25Density;
     private double PM25Today;
     private Long IDToday;
@@ -135,6 +138,14 @@ public class DBService extends Service {
     private final int Motion_Detection_Interval = 60 * 1000; //1min
     private final int Motion_Run_Thred = 100; //100 step / min
     private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
+
+    Handler DBHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            DBRunnable.run();
+        }
+    };
 
     private Runnable DBRunnable = new Runnable() {
         State state;
@@ -297,7 +308,8 @@ public class DBService extends Service {
                     state = calculatePM25(longitude, latitude);
                     State now = state;
                     if (!isSurpass(last, now)) {
-                        uploadPMData(state);
+                        //uploadPMData(state); //no upload action
+                        insertState(state);
                     } else {
                         //TODO Check if Runtime logic success
                         reset(DBRunTime);
@@ -346,6 +358,7 @@ public class DBService extends Service {
     public void onCreate() {
         super.onCreate();
         mLastLocation = null;
+        PM25Source = 0;
         PM25Density = 0.0;
         longitude = 0.0;
         latitude = 0.0;
@@ -367,6 +380,7 @@ public class DBService extends Service {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
             Log.d(TAG,"PM25 Density "+String.valueOf(PM25Density));
         }
+        registerAReceiver();
         GPSInitial();
         DBInitial();
         serviceStateInitial();
@@ -382,7 +396,15 @@ public class DBService extends Service {
         }else {
             DBCanRun = true;
         }
-        DBRunnable.run();
+        DBHandler.sendEmptyMessageDelayed(0,10000);
+    }
+
+    private void registerAReceiver(){
+        Receiver receiver = new Receiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Const.Action_Search_Density_ToService);
+        filter.addAction(Const.Action_Bluetooth_Hearth);
+        this.registerReceiver(receiver,filter);
     }
 
     @Override
@@ -668,7 +690,7 @@ public class DBService extends Service {
                 String.valueOf(lati),
                 Const.CURRENT_INDOOR ? "1" : "0",
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numStepsTmp), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), "1", 0, isConnected ? 1 : 0);
+                Integer.toString(numStepsTmp), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
         numStepsTmp = 0;
         return state;
     }
@@ -845,17 +867,26 @@ public class DBService extends Service {
             public void onResponse(JSONObject response) {
                 isPMSearchRun = false;
                 try {
-                    pmModel = PMModel.parse(response);
-                    Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
-                    intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
-                    //set current pm density for calculation
-                    PM25Density = Double.valueOf(pmModel.getPm25());
-                    Log.e(TAG,"searchPMRequest PM2.5 Density "+String.valueOf(PM25Density));
-                    aCache.put(Const.Cache_PM_Density, PM25Density);
-                    sendBroadcast(intent);
-                    DBCanRun = true;
-                    isPMSearchSuccess = true;
-                    FileUtil.appendStrToFile(DBRunTime," search pm density success, density: "+PM25Density);
+                    int status = response.getInt("status");
+                    if(status == 1){
+                        pmModel = PMModel.parse(response.getJSONObject("data"));
+                        Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
+                        intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
+                        //set current pm density for calculation
+                        PM25Density = Double.valueOf(pmModel.getPm25());
+                        PM25Source = pmModel.getSource();
+                        Log.e(TAG,"searchPMRequest PM2.5 Density "+String.valueOf(PM25Density));
+                        aCache.put(Const.Cache_PM_Density, PM25Density);
+                        sendBroadcast(intent);
+                        DBCanRun = true;
+                        isPMSearchSuccess = true;
+                        FileUtil.appendStrToFile(DBRunTime," search pm density success, density: "+PM25Density);
+                    }else {
+                        isPMSearchRun = false;
+                        isPMSearchSuccess = false;
+                        FileUtil.appendStrToFile(DBRunTime,"search pm density failed");
+                        Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -999,12 +1030,18 @@ public class DBService extends Service {
         }
     }
 
-    class BluetoothReceiver extends BroadcastReceiver{
+    class Receiver extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(Const.Action_Bluetooth_Hearth)){
 
+            }else if(intent.getAction().equals(Const.Action_Search_Density_ToService)){
+                Log.e(TAG,"Action_Search_Density_ToService");
+                Intent intentTmp = new Intent(Const.Action_DB_Running_State);
+                intent.putExtra(Const.Intent_DB_Run_State,1);
+                sendBroadcast(intentTmp);
+                PM25Density = intent.getDoubleExtra(Const.Intent_PM_Density,0.0);
             }
         }
     }

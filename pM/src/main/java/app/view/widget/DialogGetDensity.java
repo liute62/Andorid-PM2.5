@@ -114,6 +114,12 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
         isStop = false;
     }
 
+    private void notifyService(Double value){
+        Intent intent = new Intent(Const.Action_Search_Density_ToService);
+        intent.putExtra(Const.Intent_PM_Density,value);
+        mContext.sendBroadcast(intent);
+    }
+
     /**
      * Get and Update Current PM info.
      *
@@ -135,19 +141,27 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
                 mSearch.setClickable(true);
                 setStop();
                 try {
-                    pmModel = PMModel.parse(response);
-                    Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
-                    intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
-                    //set current pm density for calculation
-                    PM25Density = Double.valueOf(pmModel.getPm25());
-                    Log.e(TAG, "searchPMRequest PM2.5 Density " + String.valueOf(PM25Density));
-                    mDensity.setText(String.valueOf(PM25Density));
-                    aCache.put(Const.Cache_PM_Density,PM25Density);
+                    int status = response.getInt("status");
+                    if(status == 1) {
+                        pmModel = PMModel.parse(response.getJSONObject("data"));
+                        Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
+                        intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
+                        //set current pm density for calculation
+                        PM25Density = Double.valueOf(pmModel.getPm25());
+                        Log.e(TAG, "searchPMRequest PM2.5 Density " + String.valueOf(PM25Density));
+                        mDensity.setText(String.valueOf(PM25Density));
+                        aCache.put(Const.Cache_PM_Density, PM25Density);
+                        notifyService(PM25Density);
+                        Toast.makeText(mContext.getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
+                    }else {
+                        String str = response.getString("message");
+                        mDensity.setText(str);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    mDensity.setText("server error");
                 }
                 Log.e(TAG, "searchPMRequest resp:" + response.toString());
-                Toast.makeText(mContext.getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override

@@ -36,6 +36,8 @@ public class PMModel {
 
     public static final String WIND = "Wind";
 
+    public static final String Source = "source";
+
     private String pm25;
 
     private String pm10;
@@ -69,6 +71,8 @@ public class PMModel {
     private String pm_breath_today;
 
     private String pm_breath_week;
+
+    private int source;
 
     public PMModel() {
         pm25 = "0";
@@ -271,5 +275,13 @@ public class PMModel {
 
     public void setPm_breath_week(String pm_breath_week) {
         this.pm_breath_week = pm_breath_week;
+    }
+
+    public int getSource() {
+        return source;
+    }
+
+    public void setSource(int source) {
+        this.source = source;
     }
 }
