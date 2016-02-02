@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
@@ -138,6 +139,8 @@ public class DBService extends Service {
     private final int Motion_Detection_Interval = 60 * 1000; //1min
     private final int Motion_Run_Thred = 100; //100 step / min
     private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
+    private PowerManager powerManager;
+    PowerManager.WakeLock wakeLock;
 
     Handler DBHandler = new Handler(){
         @Override
@@ -182,7 +185,7 @@ public class DBService extends Service {
             }
 
             Log.d(TAG,"DB Runtime = "+String.valueOf(DBRunTime));
-            FileUtil.appendStrToFile(DBRunTime,"cycle");
+            //FileUtil.appendStrToFile(DBRunTime,"cycle");
             /** notify user whether using the old PM2.5 density **/
             if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
                 Intent intent = new Intent(Const.Action_DB_Running_State);
@@ -377,6 +380,9 @@ public class DBService extends Service {
         isPMSearchSuccess = false;
         ChartTaskCanRun = true;
         aCache = ACache.get(getApplicationContext());
+        powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+        wakeLock.acquire();
         //todo each time to run the data and
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
@@ -411,6 +417,7 @@ public class DBService extends Service {
 
     @Override
     public void onDestroy() {
+        if(wakeLock != null) wakeLock.release();
         super.onDestroy();
         DBRunnable = null;
     }

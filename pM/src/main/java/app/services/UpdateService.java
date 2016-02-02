@@ -178,7 +178,7 @@ public class UpdateService {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("error",error.toString());
-                Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
             }
         });
 
