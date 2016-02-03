@@ -407,6 +407,7 @@ public class ProfileFragment extends Fragment implements
     }
 
     private void bluetoothProcess(){
+        
         Fragment bluetooth = new BluetoothFragment();
         mActivity.getFragmentManager()
                 .beginTransaction()

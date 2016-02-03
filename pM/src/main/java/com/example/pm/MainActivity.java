@@ -44,6 +44,7 @@ public class MainActivity extends SlidingActivity {
     }
 
     /**
+     * for 540 X 960 case 540
      * for 720 X 1280 case 720
      * for 1440 X 2560 case 1440
      * @param width
@@ -52,6 +53,9 @@ public class MainActivity extends SlidingActivity {
     private int getOffsetByResolution(int width){
         int result = 20;
         switch(width){
+            case 540:
+                result = 80;
+                break;
             case 720:
                 result = 100;
                 break;

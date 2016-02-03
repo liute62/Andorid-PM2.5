@@ -80,6 +80,9 @@ public class DataResultActivity extends Activity implements OnClickListener{
         int width = d.getWidth();
         int height = d.getHeight();
         switch(width){
+            case 540:
+                resolution_type = 1;
+                break;
             case 720:
                 resolution_type = 1;
                 break;
@@ -228,11 +231,11 @@ public class DataResultActivity extends Activity implements OnClickListener{
                 viewHolder.mAvgRate.setText(mdata.get(position).getAvg_rate());
                 int status = Integer.valueOf(mdata.get(position).getStatus());
                 if(status == 1)
-                    viewHolder.mStatus.setText("St");
+                    viewHolder.mStatus.setText("S");
                 else if(status == 2)
-                    viewHolder.mStatus.setText("Wa");
+                    viewHolder.mStatus.setText("W");
                 else if(status == 3)
-                    viewHolder.mStatus.setText("Run");
+                    viewHolder.mStatus.setText("R");
                 viewHolder.mOutdoor.setText(Integer.valueOf(mdata.get(position).getOutdoor())== 1? "out":"in");
                 viewHolder.mAir.setText(mdata.get(position).getVentilation_volume().length() < 5?
                         mdata.get(position).getVentilation_volume() : mdata.get(position).getVentilation_volume().substring(0, 4));

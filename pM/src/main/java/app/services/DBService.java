@@ -38,7 +38,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import app.Entity.State;
-import app.bluetooth.BluetoothService;
 import app.model.PMModel;
 import app.movement.SimpleStepDetector;
 import app.movement.StepListener;
@@ -56,7 +55,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by liuhaodong1 on 15/11/10.
- *
+ * //need update ....
  * DBService Sequences
  * -----Oncreate-----
  * 1.params Initial.
@@ -87,37 +86,35 @@ public class DBService extends Service {
 
     public static final String TAG = "app.services.DBService";
 
-    /** main **/
+    /** data **/
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
     PMModel pmModel;
-    final int State_Much_Index = 500;
-    int DB_Chart_Loop = 12;
+
+    /** PM State **/
     private double longitude;  //the newest longitude
     private double latitude;  // the newest latitude
-    private double last_long;  // the last time longitude
-    private double last_lati;  // the last time latitude
-    private double enough_lati; // lati value to see if location changed enough
-    private double enough_longi; //longi value to see if location changed enough
     private int PM25Source; //1 or 2
     private double PM25Density;
     private double PM25Today;
     private Long IDToday;
     private double venVolToday;
+    private String avg_rate;
+    /****/
     private int DBRunTime;
-    private boolean isPMSearchRun;
+    final int State_Much_Index = 500;
+    int DB_Chart_Loop = 12;
+    private boolean isPMSearchRunning;
     private boolean isPMSearchSuccess;
     private boolean DBCanRun;
-    private boolean ChartTaskCanRun;
     private boolean isLocationChanged;
-    private boolean isUploadTaskRun;
-    private boolean isUploadRun;
-    /** GPS **/
+    private boolean isUploadRunning;
+
+    /** Location**/
+    LocationService locationService;
     Location mLastLocation;
     private boolean isGPSRun = false;
-    private final int GPS_Min_Frequency = 1000 * 60 * 59;
-    private final int GPS_Min_Distance = 10;
     /** Sensor **/
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -126,15 +123,12 @@ public class DBService extends Service {
     private int numStepsTmp; //to insert the step value to state
     private long time1;
     private static Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC;
-    private final int Indoor_Outdoor_Frequency = 1;
-    private final int upload_Frequency = 1;
     private final int Motion_Detection_Interval = 60 * 1000; //1min
     private final int Motion_Run_Thred = 100; //100 step / min
     private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
+    /** Wake the thread **/
     private PowerManager powerManager;
     PowerManager.WakeLock wakeLock;
-    LocationService locationService;
-    private String avg_rate;
 
     Handler DBHandler = new Handler(){
         @Override
@@ -146,8 +140,10 @@ public class DBService extends Service {
             }else {
                 DBCanRun = true;
             }
-            if(DBRunnable != null)
+            if(DBRunnable != null) {
+                wakeLock.acquire();
                 DBRunnable.run();
+            }
         }
     };
 
@@ -269,18 +265,17 @@ public class DBService extends Service {
                 }
                     //to much data here, we need to slow it down, every 1 min to check it
                     intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                     if(DBRunTime % (2 * mul) == 0) {
+                     if(DBRunTime % (3 * mul) == 0) { //15s 30s
                          intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                      }
-                     if(DBRunTime % (5 * mul) == 0) {
+                     if(DBRunTime % (6 * mul) == 0) {//30s 1min
                         intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                     }if(DBRunTime % (10 * mul) == 0) {
+                     }if(DBRunTime % (12 * mul) == 0) {//1min 2min
                         intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                      }
                 if (isBackground.equals("false")) {
                     sendBroadcast(intentText);
                 }
-                //change to a more soft way by using system.currentime
                 String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
                 if(! ShortcutUtil.isStringOK(lastTime))  {
                     aCache.put(Const.Cache_DB_Lastime_searchDensity,String.valueOf(System.currentTimeMillis()));
@@ -289,17 +284,18 @@ public class DBService extends Service {
                     Long curTime = System.currentTimeMillis();
                     //every 1 hour to search the PM density from server
                     if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
+                        FileUtil.appendStrToFile(DBRunTime,"every 1 hour to search the PM density from server");
                         aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
                 }
                 //every 10 min to open the GPS and if get the last location, close it.
-                if(DBRunTime == 120){
+                if(DBRunTime % 120 == 0){ //120 * 5s = 10min
                     FileUtil.appendStrToFile(DBRunTime,"Add status listener and request location Updates");
                     if(locationService.isGpsAvailable)
                          locationService.run(LocationService.TYPE_GPS);
                     else locationService.run(LocationService.TYPE_NETWORK);
-                }if(DBRunTime == 150){
+                }if(DBRunTime == 160){ //160 * 5s = 15min
                     FileUtil.appendStrToFile(DBRunTime,"remove status listener, remove request location Updates");
                     locationService.stop();
                 }
@@ -313,7 +309,7 @@ public class DBService extends Service {
                         insertState(state);
                     } else {
                         //TODO Check if Runtime logic success
-                        reset(DBRunTime);
+                        reset();
                     }
                 }
                 //every 1 hour to check if some data need to be uploaded
@@ -321,17 +317,18 @@ public class DBService extends Service {
                 if(! ShortcutUtil.isStringOK(lastUploadTime))  aCache.put(Const.Cache_DB_Lastime_Upload,String.valueOf(System.currentTimeMillis()));
                 else {
                     Long curTime = System.currentTimeMillis();
-                    //every 1 hour to search the PM density from server
+                    //every 1 hour to check pm data for upload
                     if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
                         aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
+                        FileUtil.appendStrToFile(DBRunTime,"every 1 hour to check pm data for upload");
                         if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))){
                             //means currently user has login
-                           // checkPMDataForUpload();
+                            checkPMDataForUpload();
                         }
                     }
                 }
                 DBRunTime++;
-                if(DBRunTime >= 720) DBRunTime = 1; //1/5s, 12/min 720/h 720 a cycle
+                if(DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle
                 if (DBRunTime % 5 == 0) {
                     intentText = new Intent(Const.Action_DB_MAIN_Location);
                     intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
@@ -363,19 +360,13 @@ public class DBService extends Service {
         PM25Density = 0.0;
         longitude = 0.0;
         latitude = 0.0;
-        last_lati = -0.1;
-        last_long = -0.1;
-        enough_lati = -0.1;
-        enough_longi = -0.1;
         DBCanRun = false;
         DBRunTime = 0;
         avg_rate = "12";
-        isPMSearchRun = false;
-        isUploadTaskRun = false;
+        isPMSearchRunning = false;
         isLocationChanged = false;
-        isUploadRun = false;
+        isUploadRunning = false;
         isPMSearchSuccess = false;
-        ChartTaskCanRun = true;
         aCache = ACache.get(getApplicationContext());
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
@@ -386,7 +377,7 @@ public class DBService extends Service {
         //todo each time to run the data and
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
-            Log.d(TAG,"PM25 Density "+String.valueOf(PM25Density));
+            Log.e(TAG,"onCreate PM25 Density "+String.valueOf(PM25Density));
         }
         registerAReceiver();
         locationInitial();
@@ -395,6 +386,10 @@ public class DBService extends Service {
         sensorInitial();
         if (mLastLocation != null){
             locationService.stop();
+            Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
+            intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
+            intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
+            sendBroadcast(intentText);
         }
         DBHandler.sendEmptyMessageDelayed(0,10000);
     }
@@ -436,8 +431,6 @@ public class DBService extends Service {
             IDToday = Long.valueOf(0);
         } else {
             State state = states.get(states.size() - 1);
-            //Log.e("Today size", String.valueOf(states.size()));
-            //Log.e("Today Last state", "begin");
             state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
@@ -448,7 +441,6 @@ public class DBService extends Service {
     private void serviceStateInitial() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
@@ -526,6 +518,7 @@ public class DBService extends Service {
             }
         }
     }
+
 
       LocationService.GetTheLocation getTheLocation = new LocationService.GetTheLocation() {
           @Override
@@ -650,7 +643,6 @@ public class DBService extends Service {
             }else {
                 tmp = 0.0;
             }
-            Log.d(TAG,"calLastWeekAvgPM tmp = "+ String.valueOf(tmp));
             result += tmp;
         }
         return String.valueOf(result / num);
@@ -684,7 +676,6 @@ public class DBService extends Service {
             return states.get(states.size() - 1).getPm25();
         } else {
             State state1 = states.get(states.size() - 1); // the last one
-            //Log.e("state1",state1.getPm25());
             if (firstHour) {
                 result = Double.valueOf(state1.getPm25()) - 0;
             } else {
@@ -692,24 +683,17 @@ public class DBService extends Service {
                 result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
             }
         }
-        //Log.e(TAG,"lastTwoHour: "+result);
         return String.valueOf(result);
     }
 
     /**
-     * DB Operations
+     * DB Operations, insert a calculated pm state model to DB
      *
      * @param state
      */
     private void insertState(State state) {
-//        //check a conflict,
-//        //ex. 12.2 23.59 - 12.3 0.01 check if current day == insert day, if yes, insert it, else not insert it
-//        String insert = ShortcutUtil.refFormatOnlyDate(Long.valueOf(state.getTime_point()));
-//        Time t = new Time();
-//        t.setToNow();
-//        String now =  ShortcutUtil.refFormatOnlyDate(t.toMillis(true));
-//        //Log.e("insertState","now"+now+"insert"+insert);
-//        if(insert.equals(now)) {
+        //check a conflict,
+        //ex. 12.2 23.59 - 12.3 0.01 check if current day == insert day, if yes, insert it, else not insert it
         String str = "";
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if(db == null)
@@ -724,44 +708,21 @@ public class DBService extends Service {
         str += " idToday = "+IDToday;
         aCache.put(Const.Cache_Lastime_Timepoint,state.getTime_point());
         FileUtil.appendStrToFile(DBRunTime,"insert state "+str);
-        //Log.e("State,Inserted upload", String.valueOf(state.getUpload()));
-//        }else {
-//            Toast.makeText(getApplicationContext(),Const.Info_DB_Insert_Date_Conflict,Toast.LENGTH_SHORT);
-//        }
-    }
-
-    private void searchState() {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 0, 0, 0);
-
-        Long nowTime = calendar.getTime().getTime();
-        calendar.set(year, month, day, 23, 59, 59);
-        Long nextTime = calendar.getTime().getTime();
-        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
-        if (!states.isEmpty()) {
-            for (int i = 0; i != states.size(); i++) {
-                states.get(i).print();
-            }
-        }
     }
 
     /**
      * Get and Update Current PM info.
-     *
      * @param longitude
      * @param latitude
      */
     private void searchPMRequest(String longitude, String latitude) {
-        isPMSearchRun = true;
+        isPMSearchRunning = true;
         String url = HttpUtil.Search_PM_url;
         url = url + "?longitude=" + longitude + "&latitude=" + latitude;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                isPMSearchRun = false;
+                isPMSearchRunning = false;
                 try {
                     int status = response.getInt("status");
                     if(status == 1){
@@ -778,7 +739,7 @@ public class DBService extends Service {
                         isPMSearchSuccess = true;
                         FileUtil.appendStrToFile(DBRunTime," search pm density success, density: "+PM25Density);
                     }else {
-                        isPMSearchRun = false;
+                        isPMSearchRunning = false;
                         isPMSearchSuccess = false;
                         FileUtil.appendStrToFile(DBRunTime,"search pm density failed");
                         Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
@@ -792,7 +753,7 @@ public class DBService extends Service {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                isPMSearchRun = false;
+                isPMSearchRunning = false;
                 isPMSearchSuccess = false;
                 FileUtil.appendStrToFile(DBRunTime,"search pm density failed");
                 Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
@@ -802,16 +763,17 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
+    @Deprecated
     public void uploadPMData(final State state) {
             Log.d(TAG,"uploadPMData State density: "+state.getDensity());
-            isUploadRun = true;
+            isUploadRunning = true;
             String url = HttpUtil.Upload_url;
             JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
             Log.d("json", tmp.toString());
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, tmp, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    isUploadRun = false;
+                    isUploadRunning = false;
                     FileUtil.appendStrToFile(DBRunTime,"upload data success");
                     Log.v("response", response.toString());
                     insertState(state);
@@ -823,7 +785,7 @@ public class DBService extends Service {
                 public void onErrorResponse(VolleyError error) {
                     Log.d(TAG,"uploadPMData onError Response");
                     FileUtil.appendStrToFile(DBRunTime,"upload data failed");
-                    isUploadRun = false;
+                    isUploadRunning = false;
                     String id = aCache.getAsString(Const.Cache_User_Id);
                     if(ShortcutUtil.isStringOK(id) && !id.equals("0"))
                         Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
@@ -849,7 +811,8 @@ public class DBService extends Service {
             Log.d("upload", "upload batch start");
             final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD + "=?", "0").list();
             Log.d("upload", "upload size " + states.size());
-            isUploadRun = true;
+            FileUtil.appendStrToFile(DBRunTime,"checkPMDataForUpload upload batch start size = "+states.size());
+            isUploadRunning = true;
             String url = HttpUtil.UploadBatch_url;
             JSONArray array = new JSONArray();
             for (State state : states) {
@@ -867,10 +830,11 @@ public class DBService extends Service {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    isUploadRun = false;
+                    isUploadRunning = false;
                     Log.d("response", response.toString());
                     try {
                         String value = response.getString("succeed_count");
+                        FileUtil.appendStrToFile(DBRunTime,"checkPMDataForUpload upload success value = "+value);
                         if (Integer.valueOf(value) == states.size()) {
                             for (State state : states) {
                                 updateStateUpLoad(state, 1);
@@ -884,7 +848,7 @@ public class DBService extends Service {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    isUploadRun = false;
+                    isUploadRunning = false;
                     Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
                 }
 
@@ -944,24 +908,23 @@ public class DBService extends Service {
     /**
      * if Service running surpass a day, then reset data parmas
      */
-    private void reset(int runtime) {
+    private void reset() {
         //todo test it !
-        runtime = -1;
         longitude = 0.0;
         latitude = 0.0;
-        last_lati = -0.1;
-        last_long = -0.1;
         IDToday = Long.valueOf(0);
         venVolToday = Long.valueOf(0);
-        DBCanRun = false;
+        PM25Today = 0;
+        PM25Source = 0;
+        PM25Density = 0.0;
+        DBCanRun = true;
         DBRunTime = 0;
-        isPMSearchRun = false;
-        isUploadTaskRun = false;
+        isPMSearchRunning = false;
         isLocationChanged = false;
-        ChartTaskCanRun = true;
+        isUploadRunning = false;
+        isPMSearchSuccess = false;
+        locationInitial();
         DBInitial();
         sensorInitial();
-        locationInitial();
-        //GPSInitial();
     }
 }

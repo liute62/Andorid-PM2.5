@@ -340,8 +340,13 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         if(provider != null) {
             Log.e(TAG,"deviceRun: Using provider "+provider);
             runBeginTime = System.currentTimeMillis();
-            mLocationManager.requestLocationUpdates(provider, 0, 0, this);
-            mLocationManager.addGpsStatusListener(this);
+            if(mLocationManager.isProviderEnabled(provider)) {
+                mLocationManager.requestLocationUpdates(provider, 0, 0, this);
+                mLocationManager.addGpsStatusListener(this);
+            }else {
+                Log.e(TAG,"provider = "+provider+" is not enabled");
+                stop();
+            }
         }
     }
 
