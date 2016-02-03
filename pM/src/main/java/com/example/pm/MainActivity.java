@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -15,6 +16,7 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 import app.services.UpdateService;
 import app.utils.ACache;
 import app.utils.Const;
+import app.utils.FileUtil;
 import app.utils.ShortcutUtil;
 
 public class MainActivity extends SlidingActivity {
@@ -31,8 +33,13 @@ public class MainActivity extends SlidingActivity {
         Display d = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int width = d.getWidth();
         int height = d.getHeight();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        float density = displayMetrics.density;
+        int densityDPI = displayMetrics.densityDpi;
         offset = getOffsetByResolution(width);
         MyInitial();
+        FileUtil.appendStrToFile(-1,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height)
+        +" "+"density: "+String.valueOf(density)+" densityDPI"+String.valueOf(densityDPI));
         Log.e(TAG,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height));
     }
 

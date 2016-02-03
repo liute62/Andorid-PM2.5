@@ -1,7 +1,6 @@
 package app.view.widget;
 
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -13,13 +12,10 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pm.R;
-
-import java.security.cert.LDAPCertStoreParameters;
 
 import app.services.LocationService;
 import app.utils.ACache;
@@ -33,7 +29,6 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         CompoundButton.OnCheckedChangeListener,LocationService.GetTheLocation
 {
 
-    // TODO: 1/18/2016 enable user to get GPS by network and GPS provider manually
     public static final String TAG = "DialogGetLocation";
     ACache aCache;
     Context mContext;
@@ -60,17 +55,18 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
                 if (num == 0) {
                     mSearch.setText(mContext.getString(R.string.dialog_base_searching));
                 } else if (num == 1) {
-                    mSearch.setText(mContext.getString(R.string.dialog_base_searching)+".");
+                    mSearch.setText(mContext.getString(R.string.dialog_base_searching) + ".");
                 } else if (num == 2) {
-                    mSearch.setText(mContext.getString(R.string.dialog_base_searching)+"..");
-                } else if(num == 3){
-                    mSearch.setText(mContext.getString(R.string.dialog_base_searching)+"...");
-                }else {
+                    mSearch.setText(mContext.getString(R.string.dialog_base_searching) + "..");
+                } else if (num == 3) {
+                    mSearch.setText(mContext.getString(R.string.dialog_base_searching) + "...");
+                } else {
                     num = 0;
                 }
                 num++;
+
+                handler.postDelayed(runnable, 300);
             }
-            handler.postDelayed(runnable,300);
         }
     };
 
@@ -149,15 +145,25 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     }
 
     private void begin(){
-        runnable.run();
+        beforeSearch();
         locationService.setGetTheLocationListener(this);
-        onSearch();
         isSearching = true;
-        int tag = LocationService.TAG_GPS;
-        if(mGPS.isChecked())tag = LocationService.TAG_GPS;
-        if(mNetwork.isChecked()) tag = LocationService.TAG_NETWORK;
+        int tag = LocationService.TYPE_GPS;
+        if(mGPS.isChecked())tag = LocationService.TYPE_GPS;
+        if(mNetwork.isChecked()) tag = LocationService.TYPE_NETWORK;
         Log.e(TAG,"begin tag = "+tag);
         locationService.run(tag);
+        runnable.run();
+        onSearch();
+    }
+
+    private void beforeSearch(){
+        isRunnable = true;
+        mNewLati.setText("0");
+        mNewLongi.setText("0");
+        mSearch.setText(mContext.getString(R.string.dialog_base_begin));
+        mSearch.setEnabled(true);
+        mSearch.setClickable(true);
     }
 
     private void onSearch(){
@@ -211,6 +217,12 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         mNetwork.setChecked(true);
     }
 
+    @Override
+    protected void onStop() {
+        if(locationService != null)
+            locationService.stop();
+        super.onStop();
+    }
 
     @Override
     public void onGetLocation(Location location) {

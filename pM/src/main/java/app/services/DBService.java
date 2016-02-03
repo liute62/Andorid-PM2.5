@@ -12,14 +12,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.GpsSatellite;
-import android.location.GpsStatus;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,18 +27,16 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.pm.MainActivity;
-import com.example.pm.MainFragment;
 import com.example.pm.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
+
 import app.Entity.State;
 import app.model.PMModel;
 import app.movement.SimpleStepDetector;
@@ -122,8 +113,8 @@ public class DBService extends Service {
     private boolean isUploadTaskRun;
     private boolean isUploadRun;
     /** GPS **/
-    private LocationManager mManager;
     Location mLastLocation;
+    private boolean isGPSRun = false;
     private final int GPS_Min_Frequency = 1000 * 60 * 59;
     private final int GPS_Min_Distance = 10;
     /** Sensor **/
@@ -141,12 +132,20 @@ public class DBService extends Service {
     private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
     private PowerManager powerManager;
     PowerManager.WakeLock wakeLock;
+    LocationService locationService;
 
     Handler DBHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            DBRunnable.run();
+            if((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0){
+                Log.e(TAG,"DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
+                DBCanRun = false;
+            }else {
+                DBCanRun = true;
+            }
+            if(DBRunnable != null)
+                DBRunnable.run();
         }
     };
 
@@ -185,7 +184,6 @@ public class DBService extends Service {
             }
 
             Log.d(TAG,"DB Runtime = "+String.valueOf(DBRunTime));
-            //FileUtil.appendStrToFile(DBRunTime,"cycle");
             /** notify user whether using the old PM2.5 density **/
             if((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess){
                 Intent intent = new Intent(Const.Action_DB_Running_State);
@@ -294,18 +292,14 @@ public class DBService extends Service {
                     }
                 }
                 //every 10 min to open the GPS and if get the last location, close it.
-                if(DBRunTime % 120 == 0){
+                if(DBRunTime == 120){
                     FileUtil.appendStrToFile(DBRunTime,"Add status listener and request location Updates");
-                    mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-                    mManager.addGpsStatusListener(gpsStatusListener);
-                    mManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0.0f,locationListener);
-                    getLastLocation();
-                    mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0.0f,locationListener);
-                }if(DBRunTime % 150 == 0){
+                    if(locationService.isGpsAvailable)
+                         locationService.run(LocationService.TYPE_GPS);
+                    else locationService.run(LocationService.TYPE_NETWORK);
+                }if(DBRunTime == 150){
                     FileUtil.appendStrToFile(DBRunTime,"remove status listener, remove request location Updates");
-                    mManager.removeGpsStatusListener(gpsStatusListener);
-                    mManager.removeUpdates(locationListener);
-                    mManager = null;
+                    locationService.stop();
                 }
                 //every 1 min to calculate the pm result
                 if (DBRunTime % 12 == 0) {
@@ -335,7 +329,7 @@ public class DBService extends Service {
                     }
                 }
                 DBRunTime++;
-                if(DBRunTime >= 500) DBRunTime = 1; //500 a cycle
+                if(DBRunTime >= 720) DBRunTime = 1; //1/5s, 12/min 720/h 720 a cycle
                 if (DBRunTime % 5 == 0) {
                     intentText = new Intent(Const.Action_DB_MAIN_Location);
                     intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
@@ -380,6 +374,9 @@ public class DBService extends Service {
         isPMSearchSuccess = false;
         ChartTaskCanRun = true;
         aCache = ACache.get(getApplicationContext());
+        locationService = LocationService.getInstance(this);
+        locationService.setGetTheLocationListener(getTheLocation);
+        locationService.getIndoorOutdoor();
         powerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
         wakeLock.acquire();
@@ -389,20 +386,12 @@ public class DBService extends Service {
             Log.d(TAG,"PM25 Density "+String.valueOf(PM25Density));
         }
         registerAReceiver();
-        GPSInitial();
+        locationInitial();
         DBInitial();
         serviceStateInitial();
         sensorInitial();
         if (mLastLocation != null){
-            Log.d(TAG,"Change the Location Updates speed to "+String.valueOf(GPS_Min_Frequency)+" "+String.valueOf(GPS_Min_Distance));
-            mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_Min_Frequency,GPS_Min_Distance, locationListener);
-            mManager.removeGpsStatusListener(gpsStatusListener);
-        }
-        if((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0){
-            Log.e(TAG,"DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
-            DBCanRun = false;
-        }else {
-            DBCanRun = true;
+            locationService.stop();
         }
         DBHandler.sendEmptyMessageDelayed(0,10000);
     }
@@ -508,148 +497,53 @@ public class DBService extends Service {
         }, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private void GPSInitial() {
-        boolean isGPSRun = false;
-        String provider = null;
-        String[] providers = {LocationManager.GPS_PROVIDER,LocationManager.PASSIVE_PROVIDER,LocationManager.NETWORK_PROVIDER};
-        mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        for (int i = 0; i != providers.length; i++){
-            if(mManager.isProviderEnabled(providers[i])){
-                provider = providers[i];
-                mLastLocation = mManager.getLastKnownLocation(provider);
-                if(mLastLocation != null) break;
-            }
-        }
-        if (mLastLocation == null) {
-            Log.e(TAG, "provider: "+provider+" LastKnownLocation == null");
-            for (int i = 0; i != providers.length; i++){
-                if(mManager.isProviderEnabled(providers[i])) {
-                    Log.e(TAG, "No lastimeLocation, Request: "+providers[i]+" Update");
-                    FileUtil.appendStrToFile(DBRunTime,"Loc Init provider = "+providers[i]);
-                    mManager.requestLocationUpdates(providers[i], 0, 0, locationListener);
-                }
-            }
-            Toast.makeText(getApplicationContext(), Const.Info_GPS_No_Cache, Toast.LENGTH_SHORT).show();
-        } else {
+    private void locationInitial(){
+        mLastLocation = locationService.getLastKnownLocation();
+        if(mLastLocation != null){
             isGPSRun = true;
             longitude = mLastLocation.getLongitude();
             latitude = mLastLocation.getLatitude();
             Log.d(TAG,"Location Service is running"+String.valueOf(latitude)+" "+String.valueOf(longitude));
+            FileUtil.appendStrToFile(DBRunTime,"locationInitial getLastKnownLocation "+String.valueOf(latitude)+" "+String.valueOf(longitude));
             aCache.put(Const.Cache_Latitude, latitude);
             aCache.put(Const.Cache_Longitude,longitude);
             searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+        }else {
+            //new a thread to get the location
+            String lati = aCache.getAsString(Const.Cache_Latitude);
+            String longi = aCache.getAsString(Const.Cache_Longitude);
+            if(ShortcutUtil.isStringOK(lati) && ShortcutUtil.isStringOK(longi)){
+                FileUtil.appendStrToFile(DBRunTime, "Using the cache location as default location"+lati+" "+longi);
+                longitude = Double.valueOf(longi);
+                latitude = Double.valueOf(lati);
+                searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+            }else {
+                FileUtil.appendStrToFile(DBRunTime, "locationInitial new a thread to get the location");
+                locationService.run(LocationService.TYPE_NETWORK);
+            }
         }
-        mManager.addGpsStatusListener(gpsStatusListener);
     }
 
-    GpsStatus.Listener gpsStatusListener = new GpsStatus.Listener() {
+      LocationService.GetTheLocation getTheLocation = new LocationService.GetTheLocation() {
+          @Override
+          public void onGetLocation(Location location) {
 
-        public void onGpsStatusChanged(int event) {
-            //Log.d(TAG,"onGpsStatusChanged event == "+String.valueOf(event));
-            if(mManager == null) mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-            GpsStatus status = mManager.getGpsStatus(null);
-            //mManager = null;
-            FileUtil.appendStrToFile(DBRunTime,"onGpsStatusChanged event "+event);
-            if (event == GpsStatus.GPS_EVENT_FIRST_FIX) {
-                int time = status.getTimeToFirstFix();
-                Log.d(TAG,"onGpsStatusChanged time "+String.valueOf(time));
-                FileUtil.appendStrToFile(DBRunTime,"onGpsStatusChanged");
-            } else if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
-                Iterable<GpsSatellite> allgps = status.getSatellites();
-                Iterator<GpsSatellite> items = allgps.iterator();
-                int i = 0;
-                int ii = 0;
-                while (items.hasNext())
-                {
-                    GpsSatellite tmp = (GpsSatellite) items.next();
-                    if (tmp.usedInFix())
-                        ii++;
-                    i++;
-                }
-                FileUtil.appendStrToFile(DBRunTime,"GPS_EVENT_SATELLITE_STATUS ii "+ii);
-                if(ii > 4){
-                    Const.CURRENT_INDOOR = false;
-                }else {
-                    Const.CURRENT_INDOOR = true;
-                }
-               Log.d(TAG,"onGpsStatusChanged i "+String.valueOf(i)+" ii"+String.valueOf(ii));
-            } else if (event == GpsStatus.GPS_EVENT_STARTED) {
-                Iterable<GpsSatellite> allgps = status.getSatellites();
-                Iterator<GpsSatellite> items = allgps.iterator();
-                int i = 0;
-                int ii = 0;
-                while (items.hasNext())
-                {
-                    GpsSatellite tmp = (GpsSatellite) items.next();
-                    if (tmp.usedInFix())
-                        ii++;
-                    i++;
-                }
-                FileUtil.appendStrToFile(DBRunTime,"GPS_EVENT_STARTED ii "+ii);
-                if(ii > 4){
-                    Const.CURRENT_INDOOR = false;
-                }else {
-                    Const.CURRENT_INDOOR = true;
-                }
-                Log.d(TAG,"onGpsStatusChanged started i "+String.valueOf(i)+" ii"+String.valueOf(ii));
-            } else if (event == GpsStatus.GPS_EVENT_STOPPED) {
-                FileUtil.appendStrToFile(DBRunTime,"GPS_EVENT_STOPPED");
-            }
-        }
-    };
+          }
 
-    LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            if (location != null) {
-                isLocationChanged = true;
-                mLastLocation = location;
-                longitude = location.getLongitude();
-                latitude = location.getLatitude();
-                if (last_long == longitude && last_lati == latitude) {
-                    //means no changes
-                    Log.d(TAG,"onLocationChanged Current Location == Lastime Location");
-                } else {
-                    //location has been changed, check if changes big enough
-                    if (ShortcutUtil.isLocationChangeEnough(enough_lati,latitude,enough_longi,longitude)) {
-                        Log.d(TAG,"onLocationChanged Current Location Changed enough and get the density from server");
-                        FileUtil.appendStrToFile(DBRunTime,"onLocationChanged enough lati: "+latitude+" longi: "+longitude);
-                        enough_longi = longitude;
-                        enough_lati = latitude;
-                        searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
-                    }
-                    last_lati = latitude;
-                    last_long = longitude;
-                }
-            }else {
-                Log.d(TAG,"onLocationChanged Location == null");
-                FileUtil.appendStrToFile(DBRunTime,"onLocationChanged Location == null");
-            }
-        }
-
-        @Override
-        public void onStatusChanged(String s, int status, Bundle bundle) {
-            if (status == LocationProvider.AVAILABLE) {
-                Toast.makeText(getApplicationContext(), Const.Info_GPS_Available, Toast.LENGTH_SHORT).show();
-            } else if (status == LocationProvider.OUT_OF_SERVICE) {
-                Toast.makeText(getApplicationContext(), Const.Info_GPS_OutOFService, Toast.LENGTH_SHORT).show();
-            } else if (status == LocationProvider.TEMPORARILY_UNAVAILABLE) {
-                Toast.makeText(getApplicationContext(), Const.Info_GPS_Pause, Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-            Toast.makeText(getApplicationContext(), Const.Info_GPS_Open,
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-            Toast.makeText(getApplicationContext(), Const.Info_GPS_Turnoff,
-                    Toast.LENGTH_SHORT).show();
-        }
-    };
+          @Override
+          public void onSearchStop(Location location) {
+              if(location != null){
+                  isLocationChanged = true;
+                  mLastLocation = location;
+                  longitude = mLastLocation.getLongitude();
+                  latitude = mLastLocation.getLatitude();
+                  aCache.put(Const.Cache_Longitude,longitude);
+                  aCache.put(Const.Cache_Latitude,latitude);
+                  FileUtil.appendStrToFile(DBRunTime,"onSearchStop lati: "+latitude+" longi: "+longitude);
+                  searchPMRequest(String.valueOf(longitude),String.valueOf(latitude));
+              }
+          }
+      };
 
     /**
      * density: (ug/m3)
@@ -663,18 +557,18 @@ public class DBService extends Service {
         Double breath = 0.0;
         Double density = PM25Density;
 
-        boolean isConnected = isNetworkAvailable(this);
+        boolean isConnected = ShortcutUtil.isNetworkAvailable(this);
         double ratio = 1;
         if (!isConnected) {
             ratio = this.getLastSevenDaysInOutRatio();
             density = ratio * density + (1-ratio)*density/3;
             if (ratio>0.5) {
-                Const.CURRENT_INDOOR = true;
+                Const.CURRENT_OUTDOOR = 0;
             } else {
-                Const.CURRENT_INDOOR = false;
+                Const.CURRENT_OUTDOOR = 1;
             }
         } else {
-            if (Const.CURRENT_INDOOR) {
+            if (Const.CURRENT_OUTDOOR == 0) {
                 density /= 3;
             }
         }
@@ -694,36 +588,18 @@ public class DBService extends Service {
         venVolToday += breath;
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
-
+        Const.CURRENT_OUTDOOR = locationService.getIndoorOutdoor();
         State state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
-                Const.CURRENT_INDOOR ? "1" : "0",
+                String.valueOf(Const.CURRENT_OUTDOOR),
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
                 Integer.toString(numStepsTmp), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
         numStepsTmp = 0;
         return state;
     }
 
-    /*
-    check the availabilty of the network
-     */
-    private boolean isNetworkAvailable(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) {
-        } else {
-            NetworkInfo[] info = cm.getAllNetworkInfo();
-            if (info != null) {
-                for (int i = 0; i < info.length; i++) {
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
+
 
     private double getLastSevenDaysInOutRatio() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -813,7 +689,7 @@ public class DBService extends Service {
                 result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
             }
         }
-        Log.e(TAG,"lastTwoHour: "+result);
+        //Log.e(TAG,"lastTwoHour: "+result);
         return String.valueOf(result);
     }
 
@@ -1014,39 +890,6 @@ public class DBService extends Service {
         }
     }
 
-    /**
-     * Get the last known location from providers
-     * @return
-     */
-    private void getLastLocation(){
-        Location result = null;
-        String provider = null;
-        String[] providers = {LocationManager.GPS_PROVIDER,LocationManager.PASSIVE_PROVIDER,LocationManager.NETWORK_PROVIDER};
-        mManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        for (int i = 0; i != providers.length; i++){
-            if(mManager.isProviderEnabled(providers[i])){
-                provider = providers[i];
-                if (provider != null)
-                    mLastLocation = mManager.getLastKnownLocation(provider);
-                if(mLastLocation != null)
-                    break;
-            }
-        }
-        if (provider != null)
-            mLastLocation = mManager.getLastKnownLocation(provider);
-        if (mLastLocation == null) {
-            for (int i = 0; i != providers.length; i++){
-                if(mManager.isProviderEnabled(providers[i])){
-                    mManager.requestLocationUpdates(providers[i], 0, 0, locationListener);
-                }
-            }
-            Toast.makeText(getApplicationContext(), Const.Info_GPS_No_Cache, Toast.LENGTH_SHORT).show();
-        } else {
-            longitude = mLastLocation.getLongitude();
-            latitude = mLastLocation.getLatitude();
-        }
-    }
-
     class Receiver extends BroadcastReceiver{
 
         @Override
@@ -1058,6 +901,7 @@ public class DBService extends Service {
                 Intent intentTmp = new Intent(Const.Action_DB_Running_State);
                 intent.putExtra(Const.Intent_DB_Run_State,1);
                 sendBroadcast(intentTmp);
+                isPMSearchSuccess = true;
                 PM25Density = intent.getDoubleExtra(Const.Intent_PM_Density,0.0);
             }else if(intent.getAction().equals(Const.Action_Get_Location_ToService)){
                 Log.e(TAG,"Action_Get_Location_ToService");
@@ -1105,6 +949,7 @@ public class DBService extends Service {
         ChartTaskCanRun = true;
         DBInitial();
         sensorInitial();
-        GPSInitial();
+        locationInitial();
+        //GPSInitial();
     }
 }

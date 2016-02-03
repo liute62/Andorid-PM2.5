@@ -1,14 +1,15 @@
 package app.services;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.ArrayMap;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
@@ -20,22 +21,29 @@ import com.baidu.location.Poi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import app.utils.FileUtil;
 
 /**
  * @author haodong
  */
-public class LocationService implements LocationListener
+public class LocationService implements LocationListener,GpsStatus.Listener
 {
 
     public static final String TAG = "LocationService";
 
-    public static final int TAG_BAIDU = 0;
+    public static final int TYPE_BAIDU = 0;
 
-    public static final int TAG_GPS = 1;
+    public static final int TYPE_GPS = 1;
 
-    public static final int TAG_NETWORK = 2;
+    public static final int TYPE_NETWORK = 2;
+
+    public static final int Outdoor = 1;
+
+    public static final int Indoor = 0;
 
     public static LocationService instance;
 
@@ -50,11 +58,23 @@ public class LocationService implements LocationListener
     Long timeInterval;
     int localization_type;
 
+    long runBeginTime;
+
+    long runMiddleTime;
+
+    private long runTimePeriod = 1000 * 10;
+
+    boolean isRunning;
+
     /**
      * Baidu Map
      */
     LocationClient locationClient;
     BDLocationListener bdLocationListener = new MyLocationListener();
+
+    boolean isGpsAvailable;
+
+    boolean isWifiAvailable;
 
     public static LocationService getInstance(Context context){
         if(instance == null)
@@ -63,6 +83,9 @@ public class LocationService implements LocationListener
     }
 
     private LocationService(Context context) {
+        isGpsAvailable = false;
+        isWifiAvailable = false;
+        isRunning = false;
         mContext = context.getApplicationContext();
         locationQueue = new LocationQueue();
         setDefaultTag();
@@ -74,7 +97,7 @@ public class LocationService implements LocationListener
     }
 
     private void setDefaultTag(){
-        localization_type = TAG_GPS;
+        localization_type = TYPE_GPS;
     }
 
     public void run(){
@@ -83,37 +106,40 @@ public class LocationService implements LocationListener
     }
 
     public void run(int type){
-        if(type == TAG_BAIDU || type == TAG_GPS|| type == TAG_NETWORK)
+        isRunning = true;
+        if(type == TYPE_BAIDU || type == TYPE_GPS || type == TYPE_NETWORK)
             localization_type = type;
         initMethodByType(localization_type);
         runMethodByType(localization_type);
     }
 
     public void stop(){
-        stopMethodByType(localization_type);
+        if(isRunning)
+          stopMethodByType(localization_type);
+        isRunning = false;
     }
 
     private void initMethodByType(int type){
         switch (type){
-            case TAG_BAIDU:
+            case TYPE_BAIDU:
                  baiduInit();
                 break;
-            case TAG_GPS:
-                deviceInit(TAG_GPS);
+            case TYPE_GPS:
+                deviceInit(TYPE_GPS);
                 break;
-            case TAG_NETWORK:
-                deviceInit(TAG_NETWORK);
+            case TYPE_NETWORK:
+                deviceInit(TYPE_NETWORK);
                 break;
         }
     }
 
     private void runMethodByType(int type){
         switch (type){
-            case TAG_BAIDU:
+            case TYPE_BAIDU:
                 baiduRun();
                 break;
-            case TAG_GPS:
-            case TAG_NETWORK:
+            case TYPE_GPS:
+            case TYPE_NETWORK:
                 deviceRun();
                 break;
         }
@@ -121,11 +147,11 @@ public class LocationService implements LocationListener
 
     private void stopMethodByType(int type){
         switch (type){
-            case TAG_BAIDU:
+            case TYPE_BAIDU:
                 baiduStop();
                 break;
-            case TAG_GPS:
-            case TAG_NETWORK:
+            case TYPE_GPS:
+            case TYPE_NETWORK:
                 deviceStop();
                 break;
         }
@@ -167,6 +193,11 @@ public class LocationService implements LocationListener
         option.SetIgnoreCacheException(false);
         option.setEnableSimulateGps(false);
         locationClient.setLocOption(option);
+    }
+
+    @Override
+    public void onGpsStatusChanged(int i) {
+
     }
 
     public class MyLocationListener implements BDLocationListener {
@@ -243,7 +274,43 @@ public class LocationService implements LocationListener
     public Location getLastKnownLocation() {
         initGPS();
         mLastLocation = mLocationManager.getLastKnownLocation(provider);
+        if(mLastLocation != null){
+            Log.e(TAG,"getLastKnownLocation gps == NULL");
+            return mLastLocation;
+        }
+        initNetwork();
+        mLastLocation = mLocationManager.getLastKnownLocation(provider);
+        if(mLastLocation == null) Log.e(TAG,"getLastKnownLocation Network == NULL");
         return mLastLocation;
+    }
+
+    public int getIndoorOutdoor(){
+        isWifiAvailable = isWifiAvailable();
+        if(isWifiAvailable || !isGpsAvailable){
+            return Indoor;
+        }
+        return Outdoor;
+    }
+
+    String lastTimeSSID = "lastTimeSSID";
+    private boolean isWifiAvailable(){
+        boolean isSuccessConnected = false;
+        WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+        if(wifiManager != null){
+            int wifiState = wifiManager.getWifiState();
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            String id = wifiInfo.getSSID();
+            //Log.e(TAG,"wifiInfo "+wifiInfo.getSSID());
+            if(id != null && !id.equals("0x") && !id.equals("<unknown ssid>")) {
+                if(!lastTimeSSID.equals(id)){
+                    lastTimeSSID = id;
+                    FileUtil.appendStrToFile(-1,"LocationService wifiInfo "+id);
+                }
+                isSuccessConnected = true;
+            }
+
+        }
+        return isSuccessConnected;
     }
 
     private void initGPS(){
@@ -265,62 +332,94 @@ public class LocationService implements LocationListener
     }
 
     private void deviceInit(int type){
-        if(type == TAG_GPS) initGPS();
-        if(type == TAG_NETWORK) initNetwork();
+        if(type == TYPE_GPS) initGPS();
+        if(type == TYPE_NETWORK) initNetwork();
     }
 
     private void deviceRun(){
         if(provider != null) {
-            Log.e(TAG,"Using provider "+provider);
+            Log.e(TAG,"deviceRun: Using provider "+provider);
+            runBeginTime = System.currentTimeMillis();
             mLocationManager.requestLocationUpdates(provider, 0, 0, this);
+            mLocationManager.addGpsStatusListener(this);
         }
     }
 
     private void deviceStop(){
         mLocationManager.removeUpdates(this);
+        mLocationManager.removeGpsStatusListener(this);
     }
-
-    Runnable mRun = new Runnable() {
-        int num = 0;
-        @Override
-        public void run() {
-
-            if(num == 1){
-                Log.d(TAG,"It is time to stop");
-                stop();
-            }
-            num++;
-            mHandler.postDelayed(mRun,timeInterval);
-        }
-    };
-
-    Handler mHandler = new Handler();
 
     @Override
     public void onLocationChanged(Location location) {
         if(location != null){
-            Log.e(TAG,location.getLatitude()+" "+location.getLongitude()+" "+location.getSpeed()+" "
-            +location.getAltitude()+" "+location.getProvider());
+            Log.e(TAG,"onLocationChanged: "+location.getLatitude()+" "+location.getProvider());
             locationQueue.add(location);
             getTheLocation.onGetLocation(location);
             if(locationQueue.isFull()){
                 stop();
-                Log.e(TAG,locationQueue.toString());
+                FileUtil.appendStrToFile(-1,provider+" get location queue in location service"+locationQueue.toString());
                 getTheLocation.onSearchStop(locationQueue.getCommonLocation());
             }
         }else {
+            runMiddleTime = System.currentTimeMillis();
+            if(runMiddleTime - runBeginTime > runTimePeriod){
+                runBeginTime = 0;
+                runMiddleTime = 0;
+                stop();
+                FileUtil.appendStrToFile(-1,"failed to get the location in location service");
+            }
             Log.e(TAG,"onLocationChanged provider = "+provider+" null");
         }
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
+    public void onStatusChanged(String s, int event, Bundle bundle) {
+        if(mLocationManager == null) mLocationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+        GpsStatus status = mLocationManager.getGpsStatus(null);
+        if(event == GpsStatus.GPS_EVENT_SATELLITE_STATUS){
+                Iterable<GpsSatellite> allgps = status.getSatellites();
+                Iterator<GpsSatellite> items = allgps.iterator();
+                int i = 0;
+                int ii = 0;
+                while (items.hasNext())
+                {
+                    GpsSatellite tmp = (GpsSatellite) items.next();
+                    if (tmp.usedInFix())
+                        ii++;
+                    i++;
+                }
+                if(ii > 4){
+                    isGpsAvailable = true;
+                }else {
+                    isGpsAvailable = false;
+                }
+               Log.e(TAG,"GPS_EVENT_SATELLITE_STATUS i "+String.valueOf(i)+" ii"+String.valueOf(ii));
+            } else if (event == GpsStatus.GPS_EVENT_STARTED) {
+                Iterable<GpsSatellite> allgps = status.getSatellites();
+                Iterator<GpsSatellite> items = allgps.iterator();
+                int i = 0;
+                int ii = 0;
+                while (items.hasNext())
+                {
+                    GpsSatellite tmp = (GpsSatellite) items.next();
+                    if (tmp.usedInFix())
+                        ii++;
+                    i++;
+                }
+                if(ii > 4){
+                    isGpsAvailable = true;
+                }else {
+                    isGpsAvailable = false;
+                }
+                Log.e(TAG,"GPS_EVENT_STARTED started i "+String.valueOf(i)+" ii"+String.valueOf(ii));
+        }
     }
 
     @Override
     public void onProviderEnabled(String s) {
         Log.e(TAG,"onProviderEnabled "+s);
+
     }
 
     @Override
@@ -328,6 +427,11 @@ public class LocationService implements LocationListener
         Log.e(TAG,"onProviderDisabled "+s);
     }
 
+    /**
+     * onGetLocation
+     *
+     * onSearchStop
+     */
     public interface GetTheLocation{
 
         void onGetLocation(Location location);
@@ -336,7 +440,7 @@ public class LocationService implements LocationListener
     }
 
     /**
-     * A queue to collect the location and to
+     * A queue to collect locations and to get the most possible location from collections.
      */
     private class LocationQueue extends ArrayList{
 
@@ -408,7 +512,7 @@ public class LocationService implements LocationListener
                 }
             }
             //todo find a way to select the most possible location
-            if(size() > 1) result = get(0);
+            if(size() > 1) result = get(size()-1);
             return result;
         }
     }

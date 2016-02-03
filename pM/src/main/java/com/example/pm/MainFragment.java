@@ -459,7 +459,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     }
 
     private void text2Initial(){
-        Log.e(TAG,"hour: "+String.valueOf(PMBreatheHour)+" "+ShortcutUtil.ugScale(PMBreatheHour, 2));
+        //Log.e(TAG,"hour: "+String.valueOf(PMBreatheHour)+" "+ShortcutUtil.ugScale(PMBreatheHour, 2));
         mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) + " 微克");
         mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " 微克");
         mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1)) + " 微克");

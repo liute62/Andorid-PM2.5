@@ -28,7 +28,7 @@ public class Const {
 
     public static String CURRENT_USER_GENDER = "-1";
 
-    public static boolean CURRENT_INDOOR = false;
+    public static int CURRENT_OUTDOOR = 0;
 
     public static boolean CURRENT_NEED_REFRESH = false;
 

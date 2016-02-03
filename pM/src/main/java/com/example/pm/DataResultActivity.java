@@ -233,7 +233,7 @@ public class DataResultActivity extends Activity implements OnClickListener{
                     viewHolder.mStatus.setText("Wa");
                 else if(status == 3)
                     viewHolder.mStatus.setText("Run");
-                viewHolder.mOutdoor.setText(Integer.valueOf(mdata.get(position).getOutdoor())== 1? "in":"out");
+                viewHolder.mOutdoor.setText(Integer.valueOf(mdata.get(position).getOutdoor())== 1? "out":"in");
                 viewHolder.mAir.setText(mdata.get(position).getVentilation_volume().length() < 5?
                         mdata.get(position).getVentilation_volume() : mdata.get(position).getVentilation_volume().substring(0, 4));
                 viewHolder.mPMDensity.setText(mdata.get(position).getDensity().length() < 5?
