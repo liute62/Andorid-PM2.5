@@ -53,7 +53,8 @@ public class ProfileFragment extends Fragment implements
     Button mTurnOffUpload;
     Button mClear;
     Button mRegister;
-    Button mTurnOffService;
+    //Button mTurnOffService;
+    Button mHelp;
     Button mBluetooth;
     Button mModifyPwd;
     Button mShare;
@@ -113,7 +114,8 @@ public class ProfileFragment extends Fragment implements
         mLogin = (Button) view.findViewById(R.id.profile_login);
         mExit = (Button) view.findViewById(R.id.profile_exit);
         mTurnOffUpload = (Button) view.findViewById(R.id.profile_turnoff_upload);
-        mTurnOffService = (Button) view.findViewById(R.id.profile_turnoff_service);
+        //mTurnOffService = (Button) view.findViewById(R.id.profile_turnoff_service);
+        mHelp = (Button)view.findViewById(R.id.profile_help);
         mClear = (Button) view.findViewById(R.id.profile_clear_data);
         mRegister = (Button) view.findViewById(R.id.profile_rigister);
         mBluetooth = (Button) view.findViewById(R.id.profile_bluetooth);
@@ -166,7 +168,8 @@ public class ProfileFragment extends Fragment implements
         mScrollView.setOnTurnListener(this);
         mLogin.setOnClickListener(this);
         mExit.setOnClickListener(this);
-        mTurnOffService.setOnClickListener(this);
+        //mTurnOffService.setOnClickListener(this);
+        mHelp.setOnClickListener(this);
         mTurnOffUpload.setOnClickListener(this);
         mClear.setOnClickListener(this);
         mRegister.setOnClickListener(this);
@@ -208,20 +211,25 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_logoff:
                 logOff();
                 break;
-            case R.id.profile_turnoff_service:
-                if (v.getTag() == null || v.getTag().equals("on")) {
-                    v.setTag("off");
-                    intent = new Intent(mActivity, DBService.class);
-                    mActivity.stopService(intent);
-                    ((TextView) v).setText(Const.Info_Turn_On_Service);
-                    Toast.makeText(mActivity, Const.Info_Turn_Off_Service, Toast.LENGTH_SHORT).show();
-                } else if (v.getTag().equals("off")) {
-                    v.setTag("on");
-                    intent = new Intent(mActivity, DBService.class);
-                    mActivity.startService(intent);
-                    ((TextView) v).setText(Const.Info_Turn_Off_Service);
-                    Toast.makeText(mActivity, Const.Info_Turn_On_Service, Toast.LENGTH_SHORT).show();
-                }
+//            case R.id.profile_turnoff_service:
+//                if (v.getTag() == null || v.getTag().equals("on")) {
+//                    v.setTag("off");
+//                    intent = new Intent(mActivity, DBService.class);
+//                    mActivity.stopService(intent);
+//                    ((TextView) v).setText(Const.Info_Turn_On_Service);
+//                    Toast.makeText(mActivity, Const.Info_Turn_Off_Service, Toast.LENGTH_SHORT).show();
+//                } else if (v.getTag().equals("off")) {
+//                    v.setTag("on");
+//                    intent = new Intent(mActivity, DBService.class);
+//                    mActivity.startService(intent);
+//                    ((TextView) v).setText(Const.Info_Turn_Off_Service);
+//                    Toast.makeText(mActivity, Const.Info_Turn_On_Service, Toast.LENGTH_SHORT).show();
+//                }
+//                break;
+            case R.id.profile_help:
+                DialogNotification helpDialog = new DialogNotification(mActivity);
+                helpDialog.setResId(R.layout.widget_dialog_help);
+                helpDialog.show();
                 break;
             case R.id.profile_turnoff_upload:
                 if (v.getTag() == null || v.getTag().equals("on")) {

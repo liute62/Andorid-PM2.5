@@ -19,16 +19,17 @@ import java.util.jar.Attributes;
 public class DialogNotification extends Dialog {
 
     Button mBack;
-
+    int resId;
     public DialogNotification(Context context) {
         super(context);
+        resId = R.layout.widget_dialog_notification;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.widget_dialog_notification);
+        setContentView(resId);
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.height = RelativeLayout.LayoutParams.FILL_PARENT;
         params.width = RelativeLayout.LayoutParams.FILL_PARENT;
@@ -40,5 +41,9 @@ public class DialogNotification extends Dialog {
                 DialogNotification.this.dismiss();
             }
         });
+    }
+
+    public void setResId(int resId){
+        this.resId = resId;
     }
 }

@@ -140,6 +140,8 @@ public class Const {
 
     public static final String Intent_User_Weight = "Intent_User_Weight";
 
+    public static final String Intent_Bluetooth_HearthRate = "Intent_Bluetooth_HearthRate";
+
     /**
      * Service & Activity Code*
      */

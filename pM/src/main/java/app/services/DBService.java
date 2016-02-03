@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import app.Entity.State;
+import app.bluetooth.BluetoothService;
 import app.model.PMModel;
 import app.movement.SimpleStepDetector;
 import app.movement.StepListener;
@@ -133,6 +134,7 @@ public class DBService extends Service {
     private PowerManager powerManager;
     PowerManager.WakeLock wakeLock;
     LocationService locationService;
+    private String avg_rate;
 
     Handler DBHandler = new Handler(){
         @Override
@@ -367,6 +369,7 @@ public class DBService extends Service {
         enough_longi = -0.1;
         DBCanRun = false;
         DBRunTime = 0;
+        avg_rate = "12";
         isPMSearchRun = false;
         isUploadTaskRun = false;
         isLocationChanged = false;
@@ -594,7 +597,7 @@ public class DBService extends Service {
                 String.valueOf(lati),
                 String.valueOf(Const.CURRENT_OUTDOOR),
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numStepsTmp), "12", String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
+                Integer.toString(numStepsTmp), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
         numStepsTmp = 0;
         return state;
     }
@@ -895,7 +898,16 @@ public class DBService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(Const.Action_Bluetooth_Hearth)){
-
+                String hearthStr = intent.getStringExtra(Const.Intent_Bluetooth_HearthRate);
+                if(ShortcutUtil.isStringOK(hearthStr)){
+                    FileUtil.appendStrToFile(DBRunTime,"using hearth rate from bluetooth "+hearthStr);
+                    try {
+                        int rate = Integer.valueOf(hearthStr);
+                        avg_rate = String.valueOf(rate);
+                    }catch (Exception e){
+                        avg_rate = "12";
+                    }
+                }
             }else if(intent.getAction().equals(Const.Action_Search_Density_ToService)){
                 Log.e(TAG,"Action_Search_Density_ToService");
                 Intent intentTmp = new Intent(Const.Action_DB_Running_State);

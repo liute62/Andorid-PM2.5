@@ -39,7 +39,7 @@ public class MainActivity extends SlidingActivity {
         offset = getOffsetByResolution(width);
         MyInitial();
         FileUtil.appendStrToFile(-1,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height)
-        +" "+"density: "+String.valueOf(density)+" densityDPI"+String.valueOf(densityDPI));
+        +" "+"density: "+String.valueOf(density)+" densityDPI "+String.valueOf(densityDPI));
         Log.e(TAG,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height));
     }
 

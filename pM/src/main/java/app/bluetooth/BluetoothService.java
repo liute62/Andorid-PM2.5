@@ -37,6 +37,8 @@ import android.util.Log;
 import java.util.List;
 import java.util.UUID;
 
+import app.utils.Const;
+
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
@@ -58,9 +60,10 @@ public class BluetoothService extends Service {
     public final static String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
     public final static String ACTION_GATT_SERVICES_DISCOVERED = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
-    public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
-    public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
-
+    //public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
+    public final static String ACTION_DATA_AVAILABLE = Const.Action_Bluetooth_Hearth;
+    //public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
+    public final static String EXTRA_DATA = Const.Intent_Bluetooth_HearthRate;
     public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
     public final static UUID UUID_FFE0 = UUID.fromString(SampleGattAttributes.FFE0);
 

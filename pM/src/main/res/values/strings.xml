@@ -57,4 +57,6 @@
     <string name="dialog_base_loading">载入中</string>
     <string name="dialog_base_searching">搜索中</string>
     <string name="dialog_base_begin">开始</string>
+    <string name="dialog_base_back">返回</string>
+    <string name="profile_btn_help">使用说明</string>
 </resources>

@@ -104,7 +104,7 @@
         android:id="@+id/dialog_notification_back"
         android:layout_width="140dp"
         android:layout_height="wrap_content"
-        android:text="返回"
+        android:text="@string/dialog_base_back"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="24dp"/>
