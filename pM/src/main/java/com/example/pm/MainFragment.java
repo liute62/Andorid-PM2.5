@@ -204,7 +204,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         Log.d(TAG,"onPause");
         mActivity.unregisterReceiver(dbReceiver);
         aCache.put(Const.Cache_Is_Background, "true");
-        aCache.put(Const.Cache_Pause_Time,String.valueOf(System.currentTimeMillis()));
+        aCache.put(Const.Cache_Pause_Time, String.valueOf(System.currentTimeMillis()));
         super.onPause();
     }
 
@@ -332,7 +332,31 @@ public class MainFragment extends Fragment implements OnClickListener {
         dataInitial();
         chartInitial(current_chart1_index, current_chart2_index);
         taskInitial();
+        checkForRefresh();
         return view;
+    }
+
+    private void checkForRefresh(){
+        String refresh = aCache.getAsString(Const.Cache_DB_Lastime_Refresh);
+        if(!ShortcutUtil.isStringOK(refresh)){
+            aCache.put(Const.Cache_DB_Lastime_Refresh,String.valueOf(System.currentTimeMillis()));
+        }else {
+            long refTime = 0;
+            long curTime = 0;
+            try {
+                refTime = Long.valueOf(refresh);
+                curTime = System.currentTimeMillis();
+            }catch (Exception e){
+                Log.e(TAG,"checkForRefresh error "+refresh);
+            }
+            Log.e(TAG,"checkForRefresh ref: "+ShortcutUtil.refFormatDateAndTime(refTime)+" cur: "+ShortcutUtil.refFormatDateAndTime(curTime));
+            if(curTime - refTime > Const.Refresh_Chart_Interval){
+                //notify the service to refresh the chart
+                Intent intent = new Intent(Const.Action_Refresh_Chart_ToService);
+                mActivity.sendBroadcast(intent);
+            }
+            aCache.put(Const.Cache_DB_Lastime_Refresh,String.valueOf(curTime));
+        }
     }
 
     private void setListener() {
@@ -689,7 +713,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(Const.Action_DB_Running_State)){
                 int state = intent.getIntExtra(Const.Intent_DB_Run_State,0);
-               // Log.e("state",String.valueOf(state));
+                //Log.e(TAG,String.valueOf(state));
                 if(state == 1){
                     mDensityError.setVisibility(View.VISIBLE);
                     mDensityError.setOnClickListener(MainFragment.this);
@@ -702,6 +726,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                     if(mRunError.getVisibility() == View.VISIBLE)
                         mRunError.setVisibility(View.GONE);
                 }
+                text1Initial();
             }
             if (intent.getAction().equals(Const.Action_DB_MAIN_PMDensity)) {
                 //Update the density of PM

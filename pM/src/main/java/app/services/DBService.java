@@ -110,7 +110,7 @@ public class DBService extends Service {
     private boolean DBCanRun;
     private boolean isLocationChanged;
     private boolean isUploadRunning;
-
+    private String isBackground = null;
     /** Location**/
     LocationService locationService;
     Location mLastLocation;
@@ -143,6 +143,44 @@ public class DBService extends Service {
             if(DBRunnable != null) {
                 wakeLock.acquire();
                 DBRunnable.run();
+            }
+        }
+    };
+
+    Handler refreshHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Intent intentChart;
+            Bundle mBundle = new Bundle();
+            Log.e(TAG,"refreshHandler "+msg.what+" "+ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
+            if(msg.what == Const.Handler_Refresh_Chart1){
+                intentChart = new Intent(Const.Action_Chart_Result_1);
+                DataCalculator.getIntance(db).updateLastTwoHourState();
+                mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                intentChart.putExtras(mBundle);
+                sendBroadcast(intentChart);
+            }else if(msg.what == Const.Handler_Refresh_Chart2){
+                intentChart = new Intent(Const.Action_Chart_Result_2);
+                DataCalculator.getIntance(db).updateLastDayState();
+                mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
+                intentChart.putExtras(mBundle);
+                sendBroadcast(intentChart);
+            }else if(msg.what == Const.Handler_Refresh_Chart3){
+                intentChart = new Intent(Const.Action_Chart_Result_3);
+                DataCalculator.getIntance(db).updateLastWeekState();
+                mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                intentChart.putExtras(mBundle);
+                sendBroadcast(intentChart);
             }
         }
     };
@@ -193,7 +231,7 @@ public class DBService extends Service {
                 sendBroadcast(intent);
             }
 
-            String isBackground = aCache.getAsString(Const.Cache_Is_Background);
+            isBackground = aCache.getAsString(Const.Cache_Is_Background);
             String userId = aCache.getAsString(Const.Cache_User_Id);
             if (isBackground == null) { //App first run
                 isBackground = "false";
@@ -203,98 +241,80 @@ public class DBService extends Service {
             /***** DB Running Normally *****/
             if (DBCanRun) {
                 if (DBRunTime == 0) { //Initialize the state when DB start
-                    if(state != null && state.getId() > State_Much_Index){
+                    if (state != null && state.getId() > State_Much_Index) {
                         DBRunTime = 1;
-                    }else {
+                    } else {
                         state = calculatePM25(longitude, latitude);
                         state.print();
                         DBRunTime = 1;
                     }
                 }
-                if(state.getId() > State_Much_Index) DB_Chart_Loop = 24;
-                else DB_Chart_Loop = 12;
-                Bundle mBundle = new Bundle();
-                switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
-                    case 1:
-                        checkPMDataForUpload();
-                        break;
-                    case 3:
-                        UpdateService.run(getApplicationContext(),aCache,dbHelper);
-                        break;
-                    case 5:
-                        intentChart = new Intent(Const.Action_Chart_Result_1);
-                        DataCalculator.getIntance(db).updateLastTwoHourState();
-                        mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
-                        mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
-                        mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
-                        if (isBackground.equals("false")) {
+                //Log.e(TAG,"isBackground == "+isBackground);
+                if (isBackground.equals("false")) {
+                    if (state.getId() > State_Much_Index) DB_Chart_Loop = 24;
+                    else DB_Chart_Loop = 12;
+                    Bundle mBundle = new Bundle();
+                    switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
+                        case 1:
+                            checkPMDataForUpload();
+                            break;
+                        case 3:
+                            UpdateService.run(getApplicationContext(), aCache, dbHelper);
+                            break;
+                        case 5:
+                            intentChart = new Intent(Const.Action_Chart_Result_1);
+                            DataCalculator.getIntance(db).updateLastTwoHourState();
+                            mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                            mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                            mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
                             intentChart.putExtras(mBundle);
                             sendBroadcast(intentChart);
-                        }
-                        break;
-                    case 7:
-                        intentChart = new Intent(Const.Action_Chart_Result_2);
-                        DataCalculator.getIntance(db).updateLastDayState();
-                        mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
-                        mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
-                        mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
-                        mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
-                        mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
-                        if (isBackground.equals("false")) {
+                            break;
+                        case 7:
+                            intentChart = new Intent(Const.Action_Chart_Result_2);
+                            DataCalculator.getIntance(db).updateLastDayState();
+                            mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                            mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                            mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                            mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                            mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
                             intentChart.putExtras(mBundle);
                             sendBroadcast(intentChart);
-                        }
-                        break;
-                    case 10:
-                        intentChart = new Intent(Const.Action_Chart_Result_3);
-                        DataCalculator.getIntance(db).updateLastWeekState();
-                        mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
-                        mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                        mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
-                        mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                        if (isBackground.equals("false")) {
+                            break;
+                        case 10:
+                            intentChart = new Intent(Const.Action_Chart_Result_3);
+                            DataCalculator.getIntance(db).updateLastWeekState();
+                            mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                            mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                            mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                            mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
                             intentChart.putExtras(mBundle);
                             sendBroadcast(intentChart);
-                        }
-                        break;
-                }
-                //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
-                int mul = 1;
-                if(state != null && state.getId() > State_Much_Index) {
-                    mul = 2;
-                }
+                            break;
+                    }
+
+                    //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
+                    int mul = 1;
+                    if (state != null && state.getId() > State_Much_Index) {
+                        mul = 2;
+                    }
                     //to much data here, we need to slow it down, every 1 min to check it
                     intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                     if(DBRunTime % (3 * mul) == 0) { //15s 30s
-                         intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
-                     }
-                     if(DBRunTime % (6 * mul) == 0) {//30s 1min
-                        intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                     }if(DBRunTime % (12 * mul) == 0) {//1min 2min
-                        intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
-                     }
-                if (isBackground.equals("false")) {
-                    sendBroadcast(intentText);
-                }
-                String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
-                if(! ShortcutUtil.isStringOK(lastTime))  {
-                    aCache.put(Const.Cache_DB_Lastime_searchDensity,String.valueOf(System.currentTimeMillis()));
-                    searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
-                }else {
-                    Long curTime = System.currentTimeMillis();
-                    //every 1 hour to search the PM density from server
-                    if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
-                        FileUtil.appendStrToFile(DBRunTime,"every 1 hour to search the PM density from server");
-                        aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
-                        searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                    if (DBRunTime % (3 * mul) == 0) { //15s 30s
+                        intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                     }
+                    if (DBRunTime % (6 * mul) == 0) {//30s 1min
+                        intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                    }
+                    if (DBRunTime % (12 * mul) == 0) {//1min 2min
+                        intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                    }
+                    sendBroadcast(intentText);
                 }
                 //every 10 min to open the GPS and if get the last location, close it.
                 if(DBRunTime % 120 == 0){ //120 * 5s = 10min
                     FileUtil.appendStrToFile(DBRunTime,"Add status listener and request location Updates");
-                    if(locationService.isGpsAvailable)
-                         locationService.run(LocationService.TYPE_GPS);
-                    else locationService.run(LocationService.TYPE_NETWORK);
+                    locationService.run(LocationService.TYPE_BAIDU);
                 }if(DBRunTime == 160){ //160 * 5s = 15min
                     FileUtil.appendStrToFile(DBRunTime,"remove status listener, remove request location Updates");
                     locationService.stop();
@@ -312,6 +332,20 @@ public class DBService extends Service {
                         reset();
                     }
                 }
+                //every 1 hour to check if it need to search the PM density from server
+                String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
+                if(! ShortcutUtil.isStringOK(lastTime))  {
+                    aCache.put(Const.Cache_DB_Lastime_searchDensity,String.valueOf(System.currentTimeMillis()));
+                    searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                }else {
+                    Long curTime = System.currentTimeMillis();
+                    if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
+                        FileUtil.appendStrToFile(DBRunTime,"every 1 hour to search the PM density from server");
+                        aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
+                        searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                    }
+                }
+
                 //every 1 hour to check if some data need to be uploaded
                 String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
                 if(! ShortcutUtil.isStringOK(lastUploadTime))  aCache.put(Const.Cache_DB_Lastime_Upload,String.valueOf(System.currentTimeMillis()));
@@ -320,8 +354,8 @@ public class DBService extends Service {
                     //every 1 hour to check pm data for upload
                     if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
                         aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
-                        FileUtil.appendStrToFile(DBRunTime,"every 1 hour to check pm data for upload");
-                        if(ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))){
+                        FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
+                        if (ShortcutUtil.isStringOK(aCache.getAsString(Const.Cache_User_Id))) {
                             //means currently user has login
                             checkPMDataForUpload();
                         }
@@ -329,13 +363,11 @@ public class DBService extends Service {
                 }
                 DBRunTime++;
                 if(DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle
-                if (DBRunTime % 5 == 0) {
+                if (DBRunTime % 5 == 0 && isBackground.equals("false")) {
                     intentText = new Intent(Const.Action_DB_MAIN_Location);
                     intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
                     intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
-                    if (isBackground.equals("false")) {
-                        sendBroadcast(intentText);
-                    }
+                    sendBroadcast(intentText);
                 }
             } else {
                 //using a more soft way to notify user that DB is not running
@@ -391,7 +423,7 @@ public class DBService extends Service {
             intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
             sendBroadcast(intentText);
         }
-        DBHandler.sendEmptyMessageDelayed(0,10000);
+        DBHandler.sendEmptyMessageDelayed(0,15000);//15s
     }
 
     private void registerAReceiver(){
@@ -399,6 +431,8 @@ public class DBService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Const.Action_Search_Density_ToService);
         filter.addAction(Const.Action_Bluetooth_Hearth);
+        filter.addAction(Const.Action_Get_Location_ToService);
+        filter.addAction(Const.Action_Refresh_Chart_ToService);
         this.registerReceiver(receiver,filter);
     }
 
@@ -514,7 +548,7 @@ public class DBService extends Service {
                 searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
             }else {
                 FileUtil.appendStrToFile(DBRunTime, "locationInitial new a thread to get the location");
-                locationService.run(LocationService.TYPE_NETWORK);
+                locationService.run(LocationService.TYPE_BAIDU);
             }
         }
     }
@@ -552,22 +586,21 @@ public class DBService extends Service {
     private State calculatePM25(double longi, double lati) {
         Double breath = 0.0;
         Double density = PM25Density;
-
         boolean isConnected = ShortcutUtil.isNetworkAvailable(this);
-        double ratio = 1;
-        if (!isConnected) {
-            ratio = this.getLastSevenDaysInOutRatio();
-            density = ratio * density + (1-ratio)*density/3;
-            if (ratio>0.5) {
-                Const.CURRENT_OUTDOOR = 0;
-            } else {
-                Const.CURRENT_OUTDOOR = 1;
-            }
-        } else {
-            if (Const.CURRENT_OUTDOOR == 0) {
-                density /= 3;
-            }
-        }
+//        double ratio = 1;
+//        if (!isConnected) {
+//            ratio = this.getLastSevenDaysInOutRatio();
+//            density = ratio * density + (1-ratio)*density/3;
+//            if (ratio>0.5) {
+//                Const.CURRENT_OUTDOOR = 0;
+//            } else {
+//                Const.CURRENT_OUTDOOR = 1;
+//            }
+//        } else {
+//            if (Const.CURRENT_OUTDOOR == 0) {
+//                density /= 3;
+//            }
+//        }
         double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
         if(static_breath == 0.0){
             Toast.makeText(getApplicationContext(),Const.Info_Weight_Null,Toast.LENGTH_SHORT).show();
@@ -879,6 +912,7 @@ public class DBService extends Service {
                 sendBroadcast(intentTmp);
                 isPMSearchSuccess = true;
                 PM25Density = intent.getDoubleExtra(Const.Intent_PM_Density,0.0);
+                aCache.put(Const.Cache_PM_Density,PM25Density);
             }else if(intent.getAction().equals(Const.Action_Get_Location_ToService)){
                 Log.e(TAG,"Action_Get_Location_ToService");
                 double lati = intent.getDoubleExtra(Const.Intent_DB_PM_Lati,0.0);
@@ -887,6 +921,11 @@ public class DBService extends Service {
                     latitude = lati;
                     longitude = longi;
                 }
+            }else if(intent.getAction().equals(Const.Action_Refresh_Chart_ToService)){
+                //when open the phone, check if it need to refresh.
+                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1,1000);
+                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2,5000);
+                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3,10000);
             }
         }
     }

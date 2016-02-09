@@ -43,6 +43,7 @@ public class Const {
     public static final String Cache_Pause_Time = "Cache_Pause_Time";
     public static final String Cache_DB_Lastime_searchDensity = "Cache_DB_Lastime_searchDensity";
     public static final String Cache_DB_Lastime_Upload = "Cache_DB_Lastime_Upload";
+    public static final String Cache_DB_Lastime_Refresh = "Cache_DB_Lastime_Refresh";
     public static final String Cache_User_Id = "Cache_User_Id";
     public static final String Cache_User_Name = "Cache_User_Name";
     public static final String Cache_User_Nickname = "Cache_User_Nickname";
@@ -98,6 +99,12 @@ public class Const {
     public static final int Handler_Add_City = 100008;
 
     public static final int Handler_Refresh_All = 100009;
+
+    public static final int Handler_Refresh_Chart1 = 100010;
+
+    public static final int Handler_Refresh_Chart2 = 100011;
+
+    public static final int Handler_Refresh_Chart3 = 100012;
 
     /**
      * Intent Tag Code*
@@ -169,6 +176,8 @@ public class Const {
 
     public static final String Action_Get_Location_ToService = "Action_Get_Location_ToService";
 
+    public static final String Action_Refresh_Chart_ToService = "Action_Refresh_Chart_ToService";
+
     public static final int Action_Profile_Register = 200001;
 
     /**
@@ -180,6 +189,8 @@ public class Const {
      * Time related values*
      */
     public final static int DB_Run_Time_INTERVAL = 1000 * 5; //5s
+
+    public final static long Refresh_Chart_Interval = 1000 * 60 * 10; //10min
 
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 
@@ -195,7 +206,7 @@ public class Const {
     /**
      * Movement*
      */
-    public static enum MotionStatus {
+    public enum MotionStatus {
         NULL, STATIC, WALK, RUN
     }
 
@@ -291,48 +302,6 @@ public class Const {
     public static final String Info_No_PMDensity = "当前地区无法获得有关PM浓度信息";
 
     public static final String Info_Location_Saved = "地理位置信息保存成功";
-
-    public static String[] cityName =
-            {
-                    "北京市",
-                    "天津市",
-                    "上海市",
-                    "重庆市",
-                    "河北省",
-                    "河南省",
-                    "云南省",
-                    "辽宁省",
-                    "黑龙江省",
-                    "湖南省",
-                    "安徽省",
-                    "山东省",
-                    "新疆",
-                    "江苏省",
-                    "浙江省",
-                    "江西省",
-                    "湖北省",
-                    "广西",
-                    "甘肃省",
-                    "山西省",
-                    "内蒙古",
-                    "陕西省",
-                    "吉林省",
-                    "福建省 ",
-                    "贵州省 ",
-                    "广东省",
-                    "青海省",
-                    "西藏",
-                    "四川省",
-                    "宁夏",
-                    "海南省",
-                    "台湾省",
-                    "香港",
-                    "澳门"
-            };
-
-//    public static String[] airQuality = {
-//            "空气质量优", "空气质量良", "轻度污染", "中度污染", "重度污染", "严重污染"
-//    };
 
     public static String[] airQuality = {
             "优", "良", "轻度污染", "中度污染", "重度污染", "严重污染"
