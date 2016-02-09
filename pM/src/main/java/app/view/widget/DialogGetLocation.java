@@ -117,7 +117,12 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.get_location_back:
-                DialogGetLocation.this.dismiss();
+                if(isSearching){
+                    stop();
+                    mCancel.setText(mContext.getString(R.string.str_back));
+                }else {
+                    DialogGetLocation.this.dismiss();
+                }
                 break;
             case R.id.get_location_search:
                 if(!isSearching)
@@ -145,20 +150,32 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     }
 
     private void begin(){
+        isRunnable = true;
         beforeSearch();
+        mCancel.setText(mContext.getString(R.string.str_stop));
         locationService.setGetTheLocationListener(this);
         isSearching = true;
         int tag = LocationService.TYPE_GPS;
         if(mGPS.isChecked())tag = LocationService.TYPE_GPS;
-        if(mNetwork.isChecked()) tag = LocationService.TYPE_NETWORK;
+        else if(mNetwork.isChecked()) tag = LocationService.TYPE_NETWORK;
+        else if(mBaidu.isChecked()) tag = LocationService.TYPE_BAIDU;
         Log.e(TAG,"begin tag = "+tag);
         locationService.run(tag);
         runnable.run();
         onSearch();
     }
 
+    private void stop(){
+        mSearch.setText(mContext.getString(R.string.dialog_base_begin));
+        mSearch.setEnabled(true);
+        mSearch.setClickable(true);
+        isRunnable = false;
+        isSearching = false;
+        if(locationService != null)
+            locationService.stop();
+    }
+
     private void beforeSearch(){
-        isRunnable = true;
         mNewLati.setText("0");
         mNewLongi.setText("0");
         mSearch.setText(mContext.getString(R.string.dialog_base_begin));
@@ -236,6 +253,8 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         isSearching = false;
         isRunnable = false;
         afterSearch();
+        stop();
+        mCancel.setText(mContext.getString(R.string.str_back));
         if(location != null) {
             mNewLati.setText(String.valueOf(location.getLatitude()));
             mNewLongi.setText(String.valueOf(location.getLongitude()));

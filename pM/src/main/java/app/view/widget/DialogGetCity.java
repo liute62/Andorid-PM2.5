@@ -41,6 +41,7 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
     TextView mLongi;
     Button mConfirm;
     Button mBack;
+    Button mReLocalization;
     ACache aCache;
     boolean isSearchTaskRun;
     boolean isSuccess;
@@ -106,6 +107,8 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
         mConfirm.setOnClickListener(this);
         mBack = (Button)findViewById(R.id.localization_back);
         mBack.setOnClickListener(this);
+        mReLocalization = (Button)findViewById(R.id.get_city_localization);
+        mReLocalization.setOnClickListener(this);
         mLati = (TextView)findViewById(R.id.localization_lati);
         mLongi = (TextView)findViewById(R.id.localization_longi);
         mCity = (TextView)findViewById(R.id.localization_city_name);
@@ -180,6 +183,11 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
                     mHandler.sendMessage(message);
                 }
                 this.dismiss();
+                break;
+            case R.id.get_city_localization:
+                DialogGetLocation dialogGetLocation = new DialogGetLocation(mContext);
+                dialogGetLocation.show();
+                DialogGetCity.this.dismiss();
                 break;
         }
     }

@@ -24,7 +24,7 @@ public class DialogRefresh extends Dialog implements View.OnClickListener
     TextView mLongi;
     TextView mLati;
     TextView mLoading;
-
+    Handler mHandler;
     LocationService locationService;
     boolean isStop;
     boolean isRunning;
@@ -46,17 +46,18 @@ public class DialogRefresh extends Dialog implements View.OnClickListener
                 }
                 num++;
             }
-            mHandler.postDelayed(runnable,300);
+            handler.postDelayed(runnable,300);
         }
     };
 
-    Handler mHandler = new Handler();
+    Handler handler = new Handler();
 
-    public DialogRefresh(Context context) {
+    public DialogRefresh(Context context,Handler parent) {
         super(context);
         isStop = false;
         isRunning = false;
         mContext = context;
+        mHandler = parent;
         locationService = LocationService.getInstance(mContext);
     }
 

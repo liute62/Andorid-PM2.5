@@ -23,6 +23,13 @@ android {
         exclude 'META-INF/LICENSE'
 
     }
+
+    sourceSets{
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
 }
 
 repositories {
@@ -37,4 +44,6 @@ dependencies {
     compile files('src/main/jniLibs/BaiduLBS_Android.jar')
     compile files('src/main/jniLibs/locSDK_6.03.jar')
     compile project(':umeng_share_library')
+    compile files('libs/baidumapapi_v3_5_0.jar')
+    compile files('libs/locSDK_6.13.jar')
 }

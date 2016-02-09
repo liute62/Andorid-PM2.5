@@ -86,6 +86,9 @@ public class DataResultActivity extends Activity implements OnClickListener{
             case 720:
                 resolution_type = 1;
                 break;
+            case 1080:
+                resolution_type = 1;
+                break;
             case 1440:
                 resolution_type = 2;
                 break;

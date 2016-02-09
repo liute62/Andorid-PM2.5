@@ -46,6 +46,7 @@ public class MainActivity extends SlidingActivity {
     /**
      * for 540 X 960 case 540
      * for 720 X 1280 case 720
+     * for 1080 X 1920 case 1080
      * for 1440 X 2560 case 1440
      * @param width
      * @return
@@ -58,6 +59,9 @@ public class MainActivity extends SlidingActivity {
                 break;
             case 720:
                 result = 100;
+                break;
+            case 1080:
+                result = 160;
                 break;
             case 1440:
                 result = 220;

@@ -10,9 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Parcelable;
 import android.util.Log;
-
-import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
-
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

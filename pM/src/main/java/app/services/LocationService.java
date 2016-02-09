@@ -216,31 +216,42 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             sb.append(location.getLongitude());
             sb.append("\nradius : ");
             sb.append(location.getRadius());
-            if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
+            if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS
                 sb.append("\nspeed : ");
-                sb.append(location.getSpeed());// 单位：公里每小时
+                sb.append(location.getSpeed());//  km/h
                 sb.append("\nsatellite : ");
                 sb.append(location.getSatelliteNumber());
                 sb.append("\nheight : ");
-                sb.append(location.getAltitude());// 单位：米
+                sb.append(location.getAltitude());// m
                 sb.append("\ndirection : ");
-                sb.append(location.getDirection());// 单位度
+                sb.append(location.getDirection());// degree
                 sb.append("\naddr : ");
                 sb.append(location.getAddrStr());
                 sb.append("\ndescribe : ");
-                sb.append("gps定位成功");
-
-            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
+                sb.append("gps localization success");
+                Location locationGPS = new Location(LocationManager.GPS_PROVIDER);
+                locationGPS.setLongitude(location.getLongitude());
+                locationGPS.setLatitude(location.getLatitude());
+                getLocation(locationGPS);
+            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// network localization result
                 sb.append("\naddr : ");
                 sb.append(location.getAddrStr());
-                //运营商信息
+                //phone operations info
                 sb.append("\noperationers : ");
                 sb.append(location.getOperators());
                 sb.append("\ndescribe : ");
-                sb.append("网络定位成功");
-            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
+                sb.append("network localization success");
+                Location locationNetwork = new Location(LocationManager.NETWORK_PROVIDER);
+                locationNetwork.setLongitude(location.getLongitude());
+                locationNetwork.setLatitude(location.getLatitude());
+                getLocation(locationNetwork);
+            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// offline localization result
                 sb.append("\ndescribe : ");
-                sb.append("离线定位成功，离线定位结果也是有效的");
+                sb.append("offline localization success");
+                Location locationPassive = new Location(LocationManager.PASSIVE_PROVIDER);
+                locationPassive.setLongitude(location.getLongitude());
+                locationPassive.setLatitude(location.getLatitude());
+                getLocation(locationPassive);
             } else if (location.getLocType() == BDLocation.TypeServerError) {
                 sb.append("\ndescribe : ");
                 sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
@@ -253,7 +264,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             }
             sb.append("\nlocationdescribe : ");
             sb.append(location.getLocationDescribe());// 位置语义化信息
-            List<Poi> list = location.getPoiList();// POI数据
+            List<Poi> list = location.getPoiList();// POI data
             if (list != null) {
                 sb.append("\npoilist size = : ");
                 sb.append(list.size());
@@ -355,17 +366,21 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         mLocationManager.removeGpsStatusListener(this);
     }
 
+    private void getLocation(Location location){
+        locationQueue.add(location);
+        getTheLocation.onGetLocation(location);
+        if(locationQueue.isFull()){
+            stop();
+            FileUtil.appendStrToFile(-1,provider+" get location queue in location service"+locationQueue.toString());
+            getTheLocation.onSearchStop(locationQueue.getCommonLocation());
+        }
+    }
+
     @Override
     public void onLocationChanged(Location location) {
-        if(location != null){
-            Log.e(TAG,"onLocationChanged: "+location.getLatitude()+" "+location.getProvider());
-            locationQueue.add(location);
-            getTheLocation.onGetLocation(location);
-            if(locationQueue.isFull()){
-                stop();
-                FileUtil.appendStrToFile(-1,provider+" get location queue in location service"+locationQueue.toString());
-                getTheLocation.onSearchStop(locationQueue.getCommonLocation());
-            }
+        if (location != null) {
+            Log.e(TAG, "onLocationChanged: " + location.getLatitude()+" "+location.getProvider());
+            getLocation(location);
         }else {
             runMiddleTime = System.currentTimeMillis();
             if(runMiddleTime - runBeginTime > runTimePeriod){

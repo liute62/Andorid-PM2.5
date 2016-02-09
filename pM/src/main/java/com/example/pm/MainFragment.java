@@ -191,6 +191,9 @@ public class MainFragment extends Fragment implements OnClickListener {
                     mAddCity.setVisibility(View.GONE);
                     mCity.setText(currentCity);
                     break;
+                case Const.Handler_Refresh_All:
+
+                    break;
             }
 
         }
@@ -573,7 +576,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 break;
             case R.id.main_run_error:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
-                DialogRefresh refresh = new DialogRefresh(mActivity);
+                DialogRefresh refresh = new DialogRefresh(mActivity,mDataHandler);
                 refresh.show();
                 break;
             case R.id.main_chart_1_alert:
