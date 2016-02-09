@@ -148,9 +148,11 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
                         intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
                         //set current pm density for calculation
                         PM25Density = Double.valueOf(pmModel.getPm25());
+                        int source = pmModel.getSource();
                         Log.e(TAG, "searchPMRequest PM2.5 Density " + String.valueOf(PM25Density));
                         mDensity.setText(String.valueOf(PM25Density));
                         aCache.put(Const.Cache_PM_Density, PM25Density);
+                        aCache.put(Const.Cache_PM_Source,String.valueOf(source));
                         notifyService(PM25Density);
                         Toast.makeText(mContext.getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
                     }else {
@@ -166,14 +168,19 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Log.e(TAG,"dialog get density searchPMRequest error");
+                Toast.makeText(mContext.getApplicationContext(),Const.Info_Failed_PMDensity,Toast.LENGTH_SHORT).show();
                 if(error != null){
                     if(error.getMessage() != null) {
                         Log.e(TAG, error.getMessage());
                         mDensity.setText(error.getMessage());
                         if (error.getMessage().trim().equals("org.json.JSONException: End of input at character 0 of")) {
                             mDensity.setText(Const.Info_No_PMDensity);
-                            //Toast.makeText(mContext.getApplicationContext(),Const.Info_No_PMDensity,Toast.LENGTH_SHORT).show();
+
                         }
+                    }
+                    if(error.networkResponse != null){
+                        Log.e(TAG,"dialog get density status code = "+error.networkResponse.statusCode);
                     }
                 }
                 isRunning = false;

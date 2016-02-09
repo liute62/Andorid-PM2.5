@@ -411,6 +411,14 @@ public class DBService extends Service {
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
             Log.e(TAG,"onCreate PM25 Density "+String.valueOf(PM25Density));
+        }if(aCache.getAsString(Const.Cache_PM_Source) != null){
+            int source;
+            try {
+                source = Integer.valueOf(aCache.getAsString(Const.Cache_PM_Source));
+            }catch (Exception e){
+                source = 0;
+            }
+            PM25Source = source;
         }
         registerAReceiver();
         locationInitial();
@@ -766,8 +774,9 @@ public class DBService extends Service {
                         //set current pm density for calculation
                         PM25Density = Double.valueOf(pmModel.getPm25());
                         PM25Source = pmModel.getSource();
-                        Log.e(TAG,"searchPMRequest PM2.5 Density "+String.valueOf(PM25Density));
+                        Log.e(TAG,"searchPMRequest PM2.5 Density "+String.valueOf(PM25Density)+" Source: "+PM25Source);
                         aCache.put(Const.Cache_PM_Density, PM25Density);
+                        aCache.put(Const.Cache_PM_Source,String.valueOf(PM25Source));
                         sendBroadcast(intent);
                         DBCanRun = true;
                         isPMSearchSuccess = true;
@@ -909,7 +918,7 @@ public class DBService extends Service {
             }else if(intent.getAction().equals(Const.Action_Search_Density_ToService)){
                 Log.e(TAG,"Action_Search_Density_ToService");
                 Intent intentTmp = new Intent(Const.Action_DB_Running_State);
-                intent.putExtra(Const.Intent_DB_Run_State,1);
+                intent.putExtra(Const.Intent_DB_Run_State,0);
                 sendBroadcast(intentTmp);
                 isPMSearchSuccess = true;
                 PM25Density = intent.getDoubleExtra(Const.Intent_PM_Density,0.0);
@@ -925,8 +934,8 @@ public class DBService extends Service {
             }else if(intent.getAction().equals(Const.Action_Refresh_Chart_ToService)){
                 //when open the phone, check if it need to refresh.
                 refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1,1000);
-                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2,5000);
-                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3,10000);
+                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2,3000);
+                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3,6000);
             }
         }
     }

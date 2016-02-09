@@ -672,19 +672,13 @@ public class MainFragment extends Fragment implements OnClickListener {
     private void searchCityRequest(String lati, final String Longi) {
         String url = HttpUtil.SearchCity_url;
         url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;
-        //Log.e("url", url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                //Log.e("searchCityRequest",response.toString());
                 try {
-                    //Log.e("searchCityRequest 1",response.toString());
                     JSONObject result = response.getJSONObject("result");
-                    //Log.e("searchCityRequest resul",result.toString());
                     JSONObject component = result.getJSONObject("addressComponent");
-                    //Log.e("searchCityRequest comp",component.toString());
                     String cityName = component.getString("city");
-                   // Log.e("searchCityRequest city",cityName);
                     if (cityName != null && !cityName.trim().equals("")) {
                         Message msg = new Message();
                         msg.what = Const.Handler_City_Name;
@@ -716,7 +710,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(Const.Action_DB_Running_State)){
                 int state = intent.getIntExtra(Const.Intent_DB_Run_State,0);
-                //Log.e(TAG,String.valueOf(state));
                 if(state == 1){
                     mDensityError.setVisibility(View.VISIBLE);
                     mDensityError.setOnClickListener(MainFragment.this);

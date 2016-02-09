@@ -89,6 +89,7 @@ public class PMModel {
         co = "0";
         pressure = "0";
         wind = "0";
+        source = 0;
         pm_breath_hour = "0";
         pm_breath_today = "0";
         pm_breath_week = "0";
@@ -137,6 +138,8 @@ public class PMModel {
         }
         if (object.has(WIND)) {
             bean.setWind(object.getString(WIND));
+        }if(object.has(Source)){
+            bean.setSource(object.getInt(Source));
         }
         return bean;
     }

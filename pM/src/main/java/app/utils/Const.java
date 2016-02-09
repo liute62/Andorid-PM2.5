@@ -51,6 +51,7 @@ public class Const {
     public static final String Cache_Access_Token = "Cache_Access_Token";
 
     public static final String Cache_PM_Density = "Cache_PM_Density";
+    public static final String Cache_PM_Source = "Cache_PM_Source";
     public static final String Cache_PM_Success = "Cache_PM_Success";
     public static final String Cache_PM_LastHour = "Cache_PM_LastHour";
     public static final String Cache_PM_LastDay = "Cache_PM_LastDay";
@@ -300,6 +301,8 @@ public class Const {
     public static final String Info_Weight_Null = "当前体重数据为零，请输入相关体重数据";
 
     public static final String Info_No_PMDensity = "当前地区无法获得有关PM浓度信息";
+
+    public static final String Info_Failed_PMDensity = "获取PM2.5浓度信息失败";
 
     public static final String Info_Location_Saved = "地理位置信息保存成功";
 
