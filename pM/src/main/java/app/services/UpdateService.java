@@ -44,6 +44,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  */
 public class UpdateService {
 
+    public static final String TAG = "UpdateService";
     private static UpdateService instance = null;
     boolean isRunning;
     private Context mContext;
@@ -69,14 +70,14 @@ public class UpdateService {
     private void runInner() {
         boolean isConnected = isNetworkAvailable(mContext);
         if (!isConnected) {
-            Log.d("connection","update is not start cause no network");
+            Log.e(TAG,"runInner, update is not start cause no network");
             return;
         }
-        Log.d("connection","update starts with network");
+        Log.e(TAG,"runInner, update starts with network");
         if (isConnected) {
             synchronized (this) {
                 List<State> states = this.getAllNotConnection();
-                Log.d("connection","not connection is "+states.size());
+                Log.e(TAG,"runInner, not connection is "+states.size());
                 if (states != null) {
                     while (states.size() > 0 && isConnected) {
                         State s = states.remove(0);
@@ -161,6 +162,7 @@ public class UpdateService {
                 try {
                     Log.d("connection","connection is ok now");
                     String mDensity = String.valueOf(response.getJSONObject(0).getDouble("PM25"));
+                    Log.e(TAG,"UpdateDensity new density "+mDensity);
                     //update density
                     updateStateDensity(state, mDensity);
                     //update connection
@@ -171,13 +173,16 @@ public class UpdateService {
                     state.setDensity(mDensity);
                     upload(state);
                 } catch (JSONException e) {
-                    Log.e("error",e.getMessage());
+                    // TODO: 16/2/9  A Json parse bug
+                    //org.json.JSONException: Value {"data":{"source":2,"time_point":"2016-02-09 00:00:00","PM25":"69","AQI":"93"},"message":"successfully get data","status":1}
+                    //of type org.json.JSONObject cannot be converted to JSONArray
+                    //Log.e(TAG,"UpdateDensity jsonError "+e.getMessage());
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("error",error.toString());
+                Log.e(TAG,"UpdateDensity error"+error.toString());
                 //Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
             }
         });

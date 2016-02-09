@@ -181,7 +181,7 @@
             <Button
                 android:id="@+id/profile_clear_data"
                 style="@style/main_left_button_style"
-                android:text="清空本地数据" />
+                android:text="@string/profile_clear_cache" />
 
             <Button
                 android:id="@+id/profile_modify_password"

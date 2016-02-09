@@ -849,11 +849,18 @@ public class DBService extends Service {
      * Check DB if there are some data for uploading
      */
     public void checkPMDataForUpload() {
+        /*
+         TODO: 16/2/9
+         TODO 1.Size of states should have a range. Ex. just query last week data for upload
+         TODO 2.The largest size of a week data should be 7 * 24 * 3600, is it decent to upload at one time?
+         TODO 3.Is is necessary for server to have a authentication, since it looks currently everyone could upload through api.
+          */
+
         String idStr = aCache.getAsString(Const.Cache_User_Id);
         if(ShortcutUtil.isStringOK(idStr) && !idStr.equals("0")){
-            Log.d("upload", "upload batch start");
+            Log.e("upload", "upload batch start");
             final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD + "=?", "0").list();
-            Log.d("upload", "upload size " + states.size());
+            Log.e("upload", "upload size " + states.size());
             FileUtil.appendStrToFile(DBRunTime,"checkPMDataForUpload upload batch start size = "+states.size());
             isUploadRunning = true;
             String url = HttpUtil.UploadBatch_url;
@@ -869,12 +876,12 @@ public class DBService extends Service {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            Log.d("batchData", batchData.toString());
+            //Log.e("batchData", batchData.toString());
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     isUploadRunning = false;
-                    Log.d("response", response.toString());
+                    Log.e(TAG,"checkPMDataForUpload response "+ response.toString());
                     try {
                         String value = response.getString("succeed_count");
                         FileUtil.appendStrToFile(DBRunTime,"checkPMDataForUpload upload success value = "+value);
@@ -891,6 +898,11 @@ public class DBService extends Service {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    if(error.getMessage() != null)
+                        Log.e(TAG,"checkPMDataForUpload error getMessage"+error.getMessage());
+                    if(error.networkResponse != null)
+                        Log.e(TAG,"checkPMDataForUpload networkResponse statusCode "+error.networkResponse.statusCode);
+
                     isUploadRunning = false;
                     Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
                 }

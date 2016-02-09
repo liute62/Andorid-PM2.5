@@ -168,7 +168,7 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG,"dialog get density searchPMRequest error");
+                Log.e(TAG,"dialog get density searchPMRequest error "+error.toString());
                 Toast.makeText(mContext.getApplicationContext(),Const.Info_Failed_PMDensity,Toast.LENGTH_SHORT).show();
                 if(error != null){
                     if(error.getMessage() != null) {
