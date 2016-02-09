@@ -102,7 +102,7 @@ public class MainActivity extends SlidingActivity {
     }
 
     /**
-     * 各个fragment间的切换
+     *
      */
     public void switchContent(Fragment fragment) {
         newFragment = fragment;

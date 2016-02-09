@@ -303,6 +303,8 @@ public class Const {
 
     public static final String Info_Location_Saved = "地理位置信息保存成功";
 
+    public static final String Info_Refresh_Chart_Success = "更新图表成功";
+
     public static String[] airQuality = {
             "优", "良", "轻度污染", "中度污染", "重度污染", "严重污染"
     };

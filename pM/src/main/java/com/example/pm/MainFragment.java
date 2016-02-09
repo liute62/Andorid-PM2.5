@@ -46,6 +46,7 @@ import app.utils.VolleyQueue;
 import app.view.widget.DialogConfirm;
 import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
+import app.view.widget.DialogGetLocation;
 import app.view.widget.DialogRefresh;
 import app.view.widget.LoadingDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
@@ -600,8 +601,10 @@ public class MainFragment extends Fragment implements OnClickListener {
                 break;
             case R.id.main_run_error:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
-                DialogRefresh refresh = new DialogRefresh(mActivity,mDataHandler);
-                refresh.show();
+                DialogGetLocation getLocation = new DialogGetLocation(mActivity);
+                getLocation.show();
+                //DialogRefresh refresh = new DialogRefresh(mActivity,mDataHandler);
+                //refresh.show();
                 break;
             case R.id.main_chart_1_alert:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();

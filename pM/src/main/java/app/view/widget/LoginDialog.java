@@ -67,6 +67,7 @@ public class LoginDialog extends Dialog implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        setCancelable(false);
         setContentView(R.layout.widget_dialog_login);
         mLoadingDialog = new LoadingDialog(mActivity);
         mSure = (Button) findViewById(R.id.activitytitle_sure);

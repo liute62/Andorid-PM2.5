@@ -105,6 +105,7 @@
         android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:text="@string/dialog_base_back"
+        android:alpha="0.5"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="24dp"/>

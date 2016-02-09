@@ -181,6 +181,7 @@ public class DBService extends Service {
                 mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
                 intentChart.putExtras(mBundle);
                 sendBroadcast(intentChart);
+                Toast.makeText(DBService.this.getApplicationContext(),Const.Info_Refresh_Chart_Success,Toast.LENGTH_SHORT).show();
             }
         }
     };

@@ -191,6 +191,8 @@ public class ProfileFragment extends Fragment implements
         Intent intent = null;
         switch (v.getId()) {
             case R.id.profile_modify_personal_state:
+                MainActivity main1Activity = (MainActivity)mActivity;
+                main1Activity.toggle();
                 DialogPersonalState dialogPersonalState = new DialogPersonalState(mActivity, mHandler);
                 dialogPersonalState.show();
                 break;
@@ -199,6 +201,8 @@ public class ProfileFragment extends Fragment implements
                 dialogNotification.show();
                 break;
             case R.id.profile_login:
+                MainActivity main2Activity = (MainActivity)mActivity;
+                main2Activity.toggle();
                 LoginDialog loginDialog = new LoginDialog(mActivity, loginHandler);
                 loginDialog.show();
                 break;

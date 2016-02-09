@@ -51,6 +51,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setCanceledOnTouchOutside(false);
+
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.widget_dialog_personal_state);
         mSaveWeight = (TextView)findViewById(R.id.personal_state_weight_save);
