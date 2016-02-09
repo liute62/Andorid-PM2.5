@@ -4,6 +4,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.example.pm.MainActivity;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -379,6 +381,7 @@ public class DataCalculator {
             return map;
         }
         Map<Integer, Float> tmpMap = new HashMap<>();
+        Map<Integer,Integer> mapSize = new HashMap<>();
         for (int i = 0; i != states.size(); i++) {
             State state = states.get(i);
             int index = ShortcutUtil.timeToPointOfDay(Long.valueOf(state.getTime_point()));
@@ -389,13 +392,23 @@ public class DataCalculator {
                 air = Float.valueOf(state.getVentilation_volume()) - Float.valueOf(states.get(i - 1).getVentilation_volume());
             }
             //now we get the index of time and the pm25 of that point
-            tmpMap.put(index, air);
+            //Log.e(TAG,"calChart6Data "+i+" "+index+" "+air);
+            if(tmpMap.containsKey(index)){
+                int airSize = mapSize.get(index) + 1;
+                float airTotal = tmpMap.get(index);
+                tmpMap.put(index,airTotal+air);
+                mapSize.put(index,airSize);
+            }else {
+                mapSize.put(index,1);
+                tmpMap.put(index, air);
+            }
         }
         //now calculate the sum of value
         for (int i = 0; i != 48; i++) {
 //            Log.d(TAG,"cal Chart 6 "+String.valueOf(i)+" "+String.valueOf(tmpMap.get(i)));
             if (tmpMap.containsKey(i)) {
-                map.put(i,tmpMap.get(i));
+                //Log.e(TAG,"i "+i+" "+"tmpMap "+tmpMap.get(i)+" mapSize "+mapSize.get(i));
+                map.put(i,tmpMap.get(i) / mapSize.get(i));
                 //map.put(i, ShortcutUtil.avgOfArrayNum(tmpMap.values().toArray()));
             }
         }
