@@ -749,7 +749,7 @@ public class DBService extends Service {
         IDToday++;
         str += " idToday = "+IDToday;
         aCache.put(Const.Cache_Lastime_Timepoint,state.getTime_point());
-        FileUtil.appendStrToFile(DBRunTime,"insert state "+str);
+        //FileUtil.appendStrToFile(DBRunTime,"insert state "+str);
     }
 
     /**
@@ -934,7 +934,8 @@ public class DBService extends Service {
                 sendBroadcast(intentTmp);
                 isPMSearchSuccess = true;
                 PM25Density = intent.getDoubleExtra(Const.Intent_PM_Density,0.0);
-                aCache.put(Const.Cache_PM_Density,PM25Density);
+                if(PM25Density != 0.0)
+                    aCache.put(Const.Cache_PM_Density,PM25Density);
             }else if(intent.getAction().equals(Const.Action_Get_Location_ToService)){
                 Log.e(TAG,"Action_Get_Location_ToService");
                 double lati = intent.getDoubleExtra(Const.Intent_DB_PM_Lati,0.0);
@@ -977,7 +978,7 @@ public class DBService extends Service {
         venVolToday = Long.valueOf(0);
         PM25Today = 0;
         PM25Source = 0;
-        PM25Density = 0.0;
+        //PM25Density = 0.0;
         DBCanRun = true;
         DBRunTime = 0;
         isPMSearchRunning = false;

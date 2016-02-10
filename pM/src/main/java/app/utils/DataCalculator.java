@@ -314,22 +314,33 @@ public class DataCalculator {
             return map;
         }
         HashMap<Integer, Float> tmpMap = new HashMap<>();
+        HashMap<Integer,Integer> mapSize = new HashMap<>();
         for (int i = 0; i != states.size(); i++) {
             State state = states.get(i);
             int index = ShortcutUtil.timeToPointOfTwoHour(Long.valueOf(states.get(0).getTime_point()), Long.valueOf(state.getTime_point()));
             Float pm25Density;
             pm25Density = Float.valueOf(state.getDensity());
-            //Log.e("calChart4Data index",String.valueOf(i)+" "+String.valueOf(index));
+            //Log.e(TAG,"calChart4Data index"+String.valueOf(i)+" "+String.valueOf(index)+" "+pm25Density);
             //Log.e("calChart4Data Density",String.valueOf(i)+" "+state.getDensity());
             //now we get the index of time and the pm25 density of that point
             if (tmpMap.containsKey(index)) {
                 Float last = tmpMap.get(index);
-                tmpMap.put(index, (last + pm25Density) / 2);
+                int size = mapSize.get(index) + 1;
+                tmpMap.put(index,last + pm25Density);
+                mapSize.put(index,size);
             } else {
                 tmpMap.put(index, pm25Density);
+                mapSize.put(index,1);
             }
         }
-        return tmpMap;
+        HashMap<Integer,Float> result = new HashMap<>();
+        for(Integer i : tmpMap.keySet()){
+            float density = tmpMap.get(i);
+            int size = mapSize.get(i);
+            result.put(i,density / size);
+            //Log.e(TAG,"calChart4Data result "+result.get(i));
+        }
+        return result;
     }
 
     /**

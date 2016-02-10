@@ -3,6 +3,7 @@ package app.utils;
 import android.graphics.Color;
 import android.util.Log;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import lecho.lib.hellocharts.util.ChartUtils;
  */
 public class DataGenerator {
 
+    public static final String TAG = "DataGenerator";
     private static DataGenerator instance = null;
 
     public static DataGenerator Instance() {
@@ -620,6 +622,7 @@ public class DataGenerator {
         LineChartData data;
         //data generation
         for (int j = 0; j < numberOfPoints; ++j) {
+            //Log.e(TAG,j+" "+map.get(j));
             if (map.containsKey(j)) {
                 randomNumbersTab[0][j] = map.get(j).floatValue();
             } else {

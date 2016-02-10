@@ -162,7 +162,7 @@ public class UpdateService {
                 try {
                     Log.d("connection","connection is ok now");
                     String mDensity = String.valueOf(response.getJSONObject(0).getDouble("PM25"));
-                    Log.e(TAG,"UpdateDensity new density "+mDensity);
+                    //Log.e(TAG,"UpdateDensity new density "+mDensity);
                     //update density
                     updateStateDensity(state, mDensity);
                     //update connection
@@ -182,7 +182,7 @@ public class UpdateService {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG,"UpdateDensity error"+error.toString());
+                //Log.e(TAG,"UpdateDensity error"+error.toString());
                 //Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
             }
         });
