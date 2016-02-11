@@ -193,7 +193,6 @@ public class MainFragment extends Fragment implements OnClickListener {
                     mCity.setText(currentCity);
                     break;
                 case Const.Handler_Refresh_All:
-
                     break;
             }
 
@@ -237,6 +236,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         currentMin = t.minute;
         currentHour = t.hour;
         mClockHandler.sendEmptyMessage(1);
+        checkForRefresh();
         super.onResume();
         Log.d(TAG, "onResume");
     }
@@ -333,7 +333,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         dataInitial();
         chartInitial(current_chart1_index, current_chart2_index);
         taskInitial();
-        checkForRefresh();
         return view;
     }
 
@@ -483,7 +482,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
         mHint.setTextColor(DataGenerator.setHeathHintColor(PMDensity));
-
     }
 
     private void text2Initial(){
