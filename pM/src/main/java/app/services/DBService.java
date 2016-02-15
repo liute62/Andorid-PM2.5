@@ -116,7 +116,9 @@ public class DBService extends Service {
     private boolean DBCanRun;
     private boolean isLocationChanged;
     private boolean isUploadRunning;
+    private boolean isRefreshRunning;
     private String isBackground = null;
+    private final static String bgStr = "false";
     /**
      * Location
      **/
@@ -172,6 +174,7 @@ public class DBService extends Service {
                 mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
                 mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
                 mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
                 intentChart.putExtras(mBundle);
                 sendBroadcast(intentChart);
             } else if (msg.what == Const.Handler_Refresh_Chart2) {
@@ -193,6 +196,7 @@ public class DBService extends Service {
                 mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
                 intentChart.putExtras(mBundle);
                 sendBroadcast(intentChart);
+                isRefreshRunning = false;
                 Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
             }
         }
@@ -205,6 +209,7 @@ public class DBService extends Service {
 
         @Override
         public void run() {
+            int runTimeInterval = Const.DB_Run_Time_INTERVAL;
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
@@ -241,7 +246,7 @@ public class DBService extends Service {
             }
 
             if (isBackground.equals("false")) {
-
+                runTimeInterval = Const.DB_Run_Time_INTERVAL;
                 /** notify user whether using the old PM2.5 density **/
                 if ((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess) {
                     Intent intent = new Intent(Const.Action_DB_Running_State);
@@ -289,6 +294,7 @@ public class DBService extends Service {
                             mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
                             mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
                             mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                            aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
                             intentChart.putExtras(mBundle);
                             sendBroadcast(intentChart);
                             break;
@@ -332,21 +338,21 @@ public class DBService extends Service {
                         intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
                     }
                     sendBroadcast(intentText);
-                }
-                else {
+                } else {
                     //using a more soft way to notify user that DB is not running
                     Intent intent = new Intent(Const.Action_DB_Running_State);
                     intent.putExtra(Const.Intent_DB_Run_State, -1);
                     sendBroadcast(intent);
                 }
+            }
 
                 //every 10 min to open the GPS and if get the last location, close it.
                 if (DBRunTime % 120 == 0) { //120 * 5s = 10min
-                    FileUtil.appendStrToFile(DBRunTime, "Add status listener and request location Updates");
+                    //FileUtil.appendStrToFile(DBRunTime, "Add status listener and request location Updates");
                     locationService.run(LocationService.TYPE_BAIDU);
                 }
                 if (DBRunTime % 130 == 0) { //open for 10 * 5 = 50s
-                    FileUtil.appendStrToFile(DBRunTime, "remove status listener, remove request location Updates");
+                    //FileUtil.appendStrToFile(DBRunTime, "remove status listener, remove request location Updates");
                     locationService.stop();
                 }
 
@@ -371,7 +377,7 @@ public class DBService extends Service {
                 } else {
                     Long curTime = System.currentTimeMillis();
                     if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
-                        FileUtil.appendStrToFile(DBRunTime, "every 1 hour to search the PM density from server");
+                        //FileUtil.appendStrToFile(DBRunTime, "every 1 hour to search the PM density from server");
                         aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
@@ -386,15 +392,15 @@ public class DBService extends Service {
                     //every 1 hour to check pm data for upload
                     if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
                         aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
-                        FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
+                        //FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
                         //check it user have login
                         checkPMDataForUpload();
                     }
                 }
                 DBRunTime++;
                 if (DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle
-            }
-            DBHandler.postDelayed(DBRunnable, Const.DB_Run_Time_INTERVAL);
+
+            DBHandler.postDelayed(DBRunnable, runTimeInterval);
         }
     };
 
@@ -418,6 +424,7 @@ public class DBService extends Service {
         isLocationChanged = false;
         isUploadRunning = false;
         isPMSearchSuccess = false;
+        isRefreshRunning = false;
         aCache = ACache.get(getApplicationContext());
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
@@ -633,7 +640,8 @@ public class DBService extends Service {
 //        }
         double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
         if (static_breath == 0.0) {
-            Toast.makeText(getApplicationContext(), Const.Info_Weight_Null, Toast.LENGTH_SHORT).show();
+            if(isBackground != null && isBackground.equals(bgStr))
+                Toast.makeText(getApplicationContext(), Const.Info_Weight_Null, Toast.LENGTH_SHORT).show();
             static_breath = 6.6; // using the default one
         }
         Log.d(TAG, "Static Breath " + String.valueOf(static_breath));
@@ -806,13 +814,15 @@ public class DBService extends Service {
                         isPMSearchRunning = false;
                         isPMSearchSuccess = false;
                         FileUtil.appendStrToFile(DBRunTime, "search pm density failed");
-                        Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+                        if(isBackground != null && isBackground.equals(bgStr))
+                             Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 Log.v(TAG, "searchPMRequest resp:" + response.toString());
-                Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
+                if(isBackground != null && isBackground.equals(bgStr))
+                    Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -820,7 +830,8 @@ public class DBService extends Service {
                 isPMSearchRunning = false;
                 isPMSearchSuccess = false;
                 FileUtil.appendStrToFile(DBRunTime, "search pm density failed");
-                Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+                if(isBackground != null && isBackground.equals(bgStr))
+                    Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -914,7 +925,8 @@ public class DBService extends Service {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
+                    if(isBackground != null && isBackground.equals(bgStr))
+                         Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -925,7 +937,8 @@ public class DBService extends Service {
                         Log.e(TAG, "checkPMDataForUpload networkResponse statusCode " + error.networkResponse.statusCode);
 
                     isUploadRunning = false;
-                    Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+                    if(isBackground != null && isBackground.equals(bgStr))
+                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
                 }
 
             });
@@ -967,9 +980,12 @@ public class DBService extends Service {
                 }
             } else if (intent.getAction().equals(Const.Action_Refresh_Chart_ToService)) {
                 //when open the phone, check if it need to refresh.
-                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 1000);
-                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
-                refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 6000);
+                if(!isRefreshRunning) {
+                    isRefreshRunning = true;
+                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 1000);
+                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
+                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 6000);
+                }
             }
         }
     }

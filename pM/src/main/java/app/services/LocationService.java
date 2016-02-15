@@ -204,75 +204,78 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         @Override
         public void onReceiveLocation(BDLocation location) {
             //Receive Location
-            StringBuffer sb = new StringBuffer(256);
-            sb.append("time : ");
-            sb.append(location.getTime());
-            sb.append("\nerror code : ");
-            sb.append(location.getLocType());
-            sb.append("\nlatitude : ");
-            sb.append(location.getLatitude());
-            sb.append("\nlontitude : ");
-            sb.append(location.getLongitude());
-            sb.append("\nradius : ");
-            sb.append(location.getRadius());
+//            StringBuffer sb = new StringBuffer(256);
+//            sb.append("time : ");
+//            sb.append(location.getTime());
+//            sb.append("\nerror code : ");
+//            sb.append(location.getLocType());
+//            sb.append("\nlatitude : ");
+//            sb.append(location.getLatitude());
+//            sb.append("\nlontitude : ");
+//            sb.append(location.getLongitude());
+//            sb.append("\nradius : ");
+//            sb.append(location.getRadius());
             if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS
-                sb.append("\nspeed : ");
-                sb.append(location.getSpeed());//  km/h
-                sb.append("\nsatellite : ");
-                sb.append(location.getSatelliteNumber());
-                sb.append("\nheight : ");
-                sb.append(location.getAltitude());// m
-                sb.append("\ndirection : ");
-                sb.append(location.getDirection());// degree
-                sb.append("\naddr : ");
-                sb.append(location.getAddrStr());
-                sb.append("\ndescribe : ");
-                sb.append("gps localization success");
+//                sb.append("\nspeed : ");
+//                sb.append(location.getSpeed());//  km/h
+//                sb.append("\nsatellite : ");
+//                sb.append(location.getSatelliteNumber());
+//                sb.append("\nheight : ");
+//                sb.append(location.getAltitude());// m
+//                sb.append("\ndirection : ");
+//                sb.append(location.getDirection());// degree
+//                sb.append("\naddr : ");
+//                sb.append(location.getAddrStr());
+//                sb.append("\ndescribe : ");
+//                sb.append("gps localization success");
                 Location locationGPS = new Location(LocationManager.GPS_PROVIDER);
                 locationGPS.setLongitude(location.getLongitude());
                 locationGPS.setLatitude(location.getLatitude());
                 getLocation(locationGPS);
             } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// network localization result
-                sb.append("\naddr : ");
-                sb.append(location.getAddrStr());
-                //phone operations info
-                sb.append("\noperationers : ");
-                sb.append(location.getOperators());
-                sb.append("\ndescribe : ");
-                sb.append("network localization success");
+//                sb.append("\naddr : ");
+//                sb.append(location.getAddrStr());
+//                //phone operations info
+//                sb.append("\noperationers : ");
+//                sb.append(location.getOperators());
+//                sb.append("\ndescribe : ");
+//                sb.append("network localization success");
                 Location locationNetwork = new Location(LocationManager.NETWORK_PROVIDER);
                 locationNetwork.setLongitude(location.getLongitude());
                 locationNetwork.setLatitude(location.getLatitude());
                 getLocation(locationNetwork);
             } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// offline localization result
-                sb.append("\ndescribe : ");
-                sb.append("offline localization success");
+//                sb.append("\ndescribe : ");
+//                sb.append("offline localization success");
                 Location locationPassive = new Location(LocationManager.PASSIVE_PROVIDER);
                 locationPassive.setLongitude(location.getLongitude());
                 locationPassive.setLatitude(location.getLatitude());
                 getLocation(locationPassive);
             } else if (location.getLocType() == BDLocation.TypeServerError) {
-                sb.append("\ndescribe : ");
-                sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
+                //sb.append("\ndescribe : ");
+                FileUtil.appendStrToFile(-1, "服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
+                //sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
             } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
-                sb.append("\ndescribe : ");
-                sb.append("网络不同导致定位失败，请检查网络是否通畅");
+                //sb.append("\ndescribe : ");
+                FileUtil.appendStrToFile(-1, "网络不同导致定位失败，请检查网络是否通畅");
+                //sb.append("网络不同导致定位失败，请检查网络是否通畅");
             } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
-                sb.append("\ndescribe : ");
-                sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+                FileUtil.appendStrToFile(-1, "无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+//                sb.append("\ndescribe : ");
+//                sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
             }
-            sb.append("\nlocationdescribe : ");
-            sb.append(location.getLocationDescribe());// 位置语义化信息
-            List<Poi> list = location.getPoiList();// POI data
-            if (list != null) {
-                sb.append("\npoilist size = : ");
-                sb.append(list.size());
-                for (Poi p : list) {
-                    sb.append("\npoi= : ");
-                    sb.append(p.getId() + " " + p.getName() + " " + p.getRank());
-                }
-            }
-            Log.e("BaiduLocationApiDem", sb.toString());
+//            sb.append("\nlocationdescribe : ");
+//            sb.append(location.getLocationDescribe());// 位置语义化信息
+//            List<Poi> list = location.getPoiList();// POI data
+//            if (list != null) {
+//                sb.append("\npoilist size = : ");
+//                sb.append(list.size());
+//                for (Poi p : list) {
+//                    sb.append("\npoi= : ");
+//                    sb.append(p.getId() + " " + p.getName() + " " + p.getRank());
+//                }
+//            }
+//            Log.e("BaiduLocationApiDem", sb.toString());
         }
     }
 

@@ -28,6 +28,14 @@
             android:layout_marginRight="5dip"
             android:layout_alignParentRight="true"
             android:src="@drawable/ofm_location_icon" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_refresh_chart"
+            android:src="@drawable/nav_refresh"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/textView1" />
     </RelativeLayout>
 
     <RelativeLayout

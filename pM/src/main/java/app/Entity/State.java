@@ -5,6 +5,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import app.model.BaseModel;
 import app.utils.DBConstants;
 import app.utils.ShortcutUtil;
 import nl.qbusict.cupboard.annotation.Column;
@@ -45,7 +46,6 @@ public class State {
     private int connection;//0 not connect to network, 1 connect to network
 
     public State() {
-
     }
 
     public State(Long id, String userid, String time_point, String longtitude, String latitude,

@@ -74,6 +74,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     Activity mActivity;
     ImageView mProfile;
     ImageView mHotMap;
+    ImageView mRefreshChart;
     TextView mTime;
     TextView mAirQuality;
     TextView mCity;
@@ -304,6 +305,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         mProfile = (ImageView) view.findViewById(R.id.main_profile);
         mHotMap = (ImageView) view.findViewById(R.id.main_hot_map);
+        mRefreshChart = (ImageView)view.findViewById(R.id.main_refresh_chart);
         mTime = (TextView) view.findViewById(R.id.main_current_time);
         mAirQuality = (TextView) view.findViewById(R.id.main_air_quality);
         mCity = (TextView) view.findViewById(R.id.main_current_city);
@@ -362,6 +364,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     private void setListener() {
         mProfile.setOnClickListener(this);
         mHotMap.setOnClickListener(this);
+        mRefreshChart.setOnClickListener(this);
         mChangeChart1.setOnClickListener(this);
         mChangeChart2.setOnClickListener(this);
         mAddCity.setOnClickListener(this);
@@ -555,6 +558,10 @@ public class MainFragment extends Fragment implements OnClickListener {
             case R.id.main_hot_map:
                 Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.main_refresh_chart:
+                Intent intentR = new Intent(Const.Action_Refresh_Chart_ToService);
+                mActivity.sendBroadcast(intentR);
                 break;
             case R.id.main_chart_1_change:
                 if (current_chart1_index == 7) {
