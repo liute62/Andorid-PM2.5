@@ -23,6 +23,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -835,6 +836,10 @@ public class DBService extends Service {
             }
 
         });
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                Const.Default_Timeout,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
@@ -998,8 +1003,15 @@ public class DBService extends Service {
      */
     private boolean isSurpass(State lasttime, State nowTime) {
         boolean result = false;
-        String last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lasttime.getTime_point()));
-        String now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
+        String last = null;
+        String now = null;
+        try {
+            last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lasttime.getTime_point()));
+            now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
         if (last.equals(now)) result = false;
         else result = true;
         return result;

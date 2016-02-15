@@ -36,6 +36,8 @@ public class Const {
 
     public static final double latitude_for_test = 39.972465;
 
+    public static final int Default_Timeout = 1000 * 60;
+
     /**
      * Cache*
      */

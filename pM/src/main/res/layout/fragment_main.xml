@@ -35,6 +35,7 @@
             android:id="@+id/main_refresh_chart"
             android:src="@drawable/nav_refresh"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="6dp"
             android:layout_toEndOf="@+id/textView1" />
     </RelativeLayout>
 

@@ -136,7 +136,7 @@ public class BluetoothFragment extends Fragment implements View.OnClickListener,
         super.onResume();
         // To make sure bluetooth could work. If not,  ask user for permission
         mProgress.setVisibility(View.GONE);
-        if (!mBluetoothAdapter.isEnabled()) {
+        if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
