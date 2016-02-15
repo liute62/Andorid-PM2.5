@@ -214,6 +214,8 @@ public class Const {
     }
 
     /****/
+    // TODO: 16/2/15 Change such hard code string to xml string of resource
+
     public static final String Info_No_Network = "无法连接服务器，请检查网络设置";
 
     public static final String Info_No_Initial = "系统检测到本机并无数据，请确保网络和GPS正常，按确认键进行初始化。";
@@ -309,6 +311,22 @@ public class Const {
     public static final String Info_Location_Saved = "地理位置信息保存成功";
 
     public static final String Info_Refresh_Chart_Success = "更新图表成功";
+
+    //服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因
+    public static final int code_file_baidu_exception1 = 21;
+    //网络不通导致定位失败，请检查网络是否通畅
+    public static final int code_file_baidu_exception2 = 22;
+
+    //无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机
+    public static final int code_file_baidu_exception3 = 23;
+
+    public static final int code_file_wifi_info = 24;
+
+    public static final int code_location_queue_full = 25;
+
+    public static final int code_get_location_failed = 26;
+
+
 
     public static String[] airQuality = {
             "优", "良", "轻度污染", "中度污染", "重度污染", "严重污染"

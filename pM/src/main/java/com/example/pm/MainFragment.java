@@ -700,7 +700,9 @@ public class MainFragment extends Fragment implements OnClickListener {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(mActivity.getApplicationContext(), Const.ERROR_NO_CITY_RESULT, Toast.LENGTH_SHORT).show();
+                String bg = aCache.getAsString(Const.Cache_Is_Background);
+                if(ShortcutUtil.isStringOK(bg) && bg.equals("false"))
+                   Toast.makeText(mActivity.getApplicationContext(), Const.ERROR_NO_CITY_RESULT, Toast.LENGTH_SHORT).show();
             }
 
         });

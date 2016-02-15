@@ -1,6 +1,7 @@
 package app.services;
 
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -21,6 +22,7 @@ import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -157,6 +159,13 @@ public class DBService extends Service {
             }
             if (DBRunnable != null) {
                 wakeLock.acquire();
+                isBackground = aCache.getAsString(Const.Cache_Is_Background);
+                String userId = aCache.getAsString(Const.Cache_User_Id);
+                if (isBackground == null) { //App first run
+                    isBackground = "false";
+                    aCache.put(Const.Cache_Is_Background, isBackground);
+                    if (userId == null) aCache.put(Const.Cache_User_Id, "0");
+                }
                 DBRunnable.run();
             }
         }
@@ -240,15 +249,6 @@ public class DBService extends Service {
                     sendBroadcast(intentChart);
                 }
             }
-
-            isBackground = aCache.getAsString(Const.Cache_Is_Background);
-            String userId = aCache.getAsString(Const.Cache_User_Id);
-            if (isBackground == null) { //App first run
-                isBackground = "false";
-                aCache.put(Const.Cache_Is_Background, isBackground);
-                if (userId == null) aCache.put(Const.Cache_User_Id, "0");
-            }
-
             if (isBackground.equals("false")) {
                 runTimeInterval = Const.DB_Run_Time_INTERVAL;
                 /** notify user whether using the old PM2.5 density **/
@@ -267,8 +267,6 @@ public class DBService extends Service {
                     intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
                     sendBroadcast(intentText);
                 }
-
-
                 /***** DB Running Normally *****/
                 if (DBCanRun) {
 
@@ -388,7 +386,6 @@ public class DBService extends Service {
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
                 }
-
                 //every 1 hour to check if some data need to be uploaded
                 String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
                 if (!ShortcutUtil.isStringOK(lastUploadTime))
@@ -456,7 +453,7 @@ public class DBService extends Service {
         locationInitial();
         DBInitial();
         serviceStateInitial();
-        sensorInitial();
+        //sensorInitial();
         if (mLastLocation != null) {
             locationService.stop();
             Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
@@ -992,6 +989,7 @@ public class DBService extends Service {
                 //when open the phone, check if it need to refresh.
                 if(!isRefreshRunning) {
                     isRefreshRunning = true;
+                    //ProgressDialog.show(getApplicationContext(),"title","message",true,false);
                     refreshHandler.sendEmptyMessage(Const.Handler_Refresh_Chart1);
                     refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 1000);
                     refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 2000);

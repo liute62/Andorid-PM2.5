@@ -18,12 +18,14 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.location.LocationClientOption.LocationMode;
 import com.baidu.location.Poi;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import app.utils.Const;
 import app.utils.FileUtil;
 
 /**
@@ -54,7 +56,6 @@ public class LocationService implements LocationListener,GpsStatus.Listener
     public final String[] providers = {LocationManager.GPS_PROVIDER, LocationManager.PASSIVE_PROVIDER, LocationManager.NETWORK_PROVIDER};
     LocationManager mLocationManager;
     LocationQueue locationQueue;
-    Long timeInterval;
     int localization_type;
 
     long runBeginTime;
@@ -253,14 +254,19 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 getLocation(locationPassive);
             } else if (location.getLocType() == BDLocation.TypeServerError) {
                 //sb.append("\ndescribe : ");
-                FileUtil.appendStrToFile(-1, "服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
+                FileUtil.appendStrToFile(Const.code_file_baidu_exception1, "failed due to server, please send IMEI code and localization time to loc-bugs@baidu.com, someone will find the reason.");
+                getLocation(null);
                 //sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
             } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
                 //sb.append("\ndescribe : ");
-                FileUtil.appendStrToFile(-1, "网络不同导致定位失败，请检查网络是否通畅");
+                FileUtil.appendStrToFile(Const.code_file_baidu_exception2, "failed due to bad network, please check if network is enable.");
+                getLocation(null);
                 //sb.append("网络不同导致定位失败，请检查网络是否通畅");
             } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
-                FileUtil.appendStrToFile(-1, "无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+                FileUtil.appendStrToFile(Const.code_file_baidu_exception3,
+                        "unable to get the location by criteria，most of time due to the mobile," +
+                                "especially when mobile is in the air mode, so try to restart it.");
+                getLocation(null);
 //                sb.append("\ndescribe : ");
 //                sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
             }
@@ -317,7 +323,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             if(id != null && !id.equals("0x") && !id.equals("<unknown ssid>")) {
                 if(!lastTimeSSID.equals(id)){
                     lastTimeSSID = id;
-                    FileUtil.appendStrToFile(-1,"LocationService wifiInfo "+id);
+                    FileUtil.appendStrToFile(Const.code_file_wifi_info,"LocationService wifiInfo "+id);
                 }
                 isSuccessConnected = true;
             }
@@ -369,11 +375,15 @@ public class LocationService implements LocationListener,GpsStatus.Listener
     }
 
     private void getLocation(Location location){
-        locationQueue.add(location);
-        getTheLocation.onGetLocation(location);
+        if(location == null) {
+            locationQueue.addNull();
+        }else {
+            locationQueue.add(location);
+            getTheLocation.onGetLocation(location);
+        }
         if(locationQueue.isFull()){
             stop();
-            FileUtil.appendStrToFile(-1,provider+" get location queue in location service"+locationQueue.toString());
+            FileUtil.appendStrToFile(Const.code_location_queue_full, "getLocation is full, " + provider + " location queue in location service" + locationQueue.toString());
             getTheLocation.onSearchStop(locationQueue.getCommonLocation());
         }
     }
@@ -389,7 +399,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 runBeginTime = 0;
                 runMiddleTime = 0;
                 stop();
-                FileUtil.appendStrToFile(-1,"failed to get the location in location service");
+                FileUtil.appendStrToFile(Const.code_get_location_failed,"failed to get the location in location service, running for "+String.valueOf(runTimePeriod)+" (ms)");
             }
             Log.e(TAG,"onLocationChanged provider = "+provider+" null");
         }
@@ -468,6 +478,10 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
         private int threshed = 1;
 
+        private int nullObjectAccNum = 0;
+
+        private int nullObjectThreshed = 10; //if there are accumulated 10 null objects, stop the thread.
+
         public void setThreshed(int t){
             threshed = t;
         }
@@ -491,11 +505,22 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             }else {
                 return false;
             }
+            nullObjectAccNum = 0;
             return super.add(object);
         }
 
+        public void addNull(){
+            nullObjectAccNum++;
+        }
+
         public boolean isFull(){
-            return size()>threshed;
+            boolean result = size() > threshed;
+            if(result == true) return true;
+            else if(nullObjectAccNum > nullObjectThreshed) {
+                nullObjectAccNum = 0;
+                return true;
+            }
+            return false;
         }
 
         @Override
@@ -533,7 +558,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                     longis.put(longi,1);
                 }
             }
-            //todo find a way to select the most possible location
+            //Todo find a way to select the most possible location
             if(size() > 1) result = get(size()-1);
             return result;
         }
