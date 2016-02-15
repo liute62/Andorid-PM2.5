@@ -47,7 +47,6 @@ import app.view.widget.DialogConfirm;
 import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
 import app.view.widget.DialogGetLocation;
-import app.view.widget.DialogRefresh;
 import app.view.widget.LoadingDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
@@ -463,6 +462,9 @@ public class MainFragment extends Fragment implements OnClickListener {
             chartData12 = (HashMap<Integer, Float>) chart12;
             chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
         }
+        Object chart8obj = aCache.getAsObject(Const.Cache_Chart_8_Time);
+        if(chart8obj != null)
+            chart8Time = (ArrayList) chart8obj;
     }
 
     private void dataInitial() {

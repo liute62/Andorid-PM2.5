@@ -337,9 +337,12 @@ public class DataCalculator {
         for(Integer i : tmpMap.keySet()){
             float density = tmpMap.get(i);
             int size = mapSize.get(i);
-            result.put(i,density / size);
+            result.put(i, density / size);
             //Log.e(TAG,"calChart4Data result "+result.get(i));
         }
+        // TODO: 16/2/15 A bug that if all the data are the same, the line chart couldn't show
+        // TODO: so that's why we always set data at index 0 to 0.0f, by that way, the chart could show.
+        result.put(0,0.0f);
         return result;
     }
 

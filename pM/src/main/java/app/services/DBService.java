@@ -217,6 +217,9 @@ public class DBService extends Service {
                 if (state != null && state.getId() > State_Much_Index) {
                     //so many data stored, don't want to refresh every time after starting
                 } else {
+                    DataCalculator.getIntance(db).updateLastTwoHourState();
+                    DataCalculator.getIntance(db).updateLastDayState();
+                    DataCalculator.getIntance(db).updateLastWeekState();
                     aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
                     aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
                     aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
@@ -281,7 +284,6 @@ public class DBService extends Service {
                     //Log.e(TAG,"isBackground == "+isBackground);
                     if (state.getId() > State_Much_Index) DB_Chart_Loop = 24;
                     else DB_Chart_Loop = 12;
-                    Bundle mBundle = new Bundle();
                     switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                         case 1:
                             checkPMDataForUpload();
@@ -290,6 +292,7 @@ public class DBService extends Service {
                             UpdateService.run(getApplicationContext(), aCache, dbHelper);
                             break;
                         case 5:
+                            Bundle mBundle = new Bundle();
                             intentChart = new Intent(Const.Action_Chart_Result_1);
                             DataCalculator.getIntance(db).updateLastTwoHourState();
                             mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
@@ -302,22 +305,24 @@ public class DBService extends Service {
                         case 7:
                             intentChart = new Intent(Const.Action_Chart_Result_2);
                             DataCalculator.getIntance(db).updateLastDayState();
-                            mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
-                            mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
-                            mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
-                            mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
-                            mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
-                            intentChart.putExtras(mBundle);
+                            Bundle mBundle2 = new Bundle();
+                            mBundle2.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                            mBundle2.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                            mBundle2.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                            mBundle2.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                            mBundle2.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
+                            intentChart.putExtras(mBundle2);
                             sendBroadcast(intentChart);
                             break;
                         case 10:
                             intentChart = new Intent(Const.Action_Chart_Result_3);
                             DataCalculator.getIntance(db).updateLastWeekState();
-                            mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
-                            mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                            mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
-                            mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                            intentChart.putExtras(mBundle);
+                            Bundle mBundle3 = new Bundle();
+                            mBundle3.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                            mBundle3.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                            mBundle3.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                            mBundle3.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                            intentChart.putExtras(mBundle3);
                             sendBroadcast(intentChart);
                             break;
                     }
@@ -529,7 +534,7 @@ public class DBService extends Service {
         simpleStepDetector.registerListener(new StepListener() {
             @Override
             public void step(long timeNs) {
-                Log.d(TAG, "Time: " + ShortcutUtil.refFormatNowDate(timeNs) + " Step: " + String.valueOf(numSteps));
+                //Log.d(TAG, "Time: " + ShortcutUtil.refFormatNowDate(timeNs) + " Step: " + String.valueOf(numSteps));
                 numSteps++;
                 numStepsTmp++;
             }
@@ -552,7 +557,7 @@ public class DBService extends Service {
                         mMotionStatus = Const.MotionStatus.STATIC;
                     numSteps = 0;
                     time1 = time2;
-                    Log.v(TAG, "Motion Status: " + String.valueOf(mMotionStatus));
+                    //Log.v(TAG, "Motion Status: " + String.valueOf(mMotionStatus));
                 }
             }
 
@@ -569,7 +574,7 @@ public class DBService extends Service {
             isGPSRun = true;
             longitude = mLastLocation.getLongitude();
             latitude = mLastLocation.getLatitude();
-            Log.d(TAG, "Location Service is running" + String.valueOf(latitude) + " " + String.valueOf(longitude));
+            //Log.d(TAG, "Location Service is running" + String.valueOf(latitude) + " " + String.valueOf(longitude));
             FileUtil.appendStrToFile(DBRunTime, "locationInitial getLastKnownLocation " + String.valueOf(latitude) + " " + String.valueOf(longitude));
             aCache.put(Const.Cache_Latitude, latitude);
             aCache.put(Const.Cache_Longitude, longitude);
@@ -770,9 +775,9 @@ public class DBService extends Service {
         if (db == null)
             str = "db = null ";
         else str = "db != null ";
-        Log.d(TAG, "-------insert ------state --------- begin");
+        //Log.d(TAG, "-------insert ------state --------- begin");
         state.print();
-        Log.d(TAG, "-------insert ------state --------- finish");
+        //Log.d(TAG, "-------insert ------state --------- finish");
         long r = cupboard().withDatabase(db).put(state);
         str += "entity Id " + String.valueOf(r);
         IDToday++;
@@ -987,9 +992,9 @@ public class DBService extends Service {
                 //when open the phone, check if it need to refresh.
                 if(!isRefreshRunning) {
                     isRefreshRunning = true;
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 1000);
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 6000);
+                    refreshHandler.sendEmptyMessage(Const.Handler_Refresh_Chart1);
+                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 1000);
+                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 2000);
                 }
             }
         }
