@@ -15,6 +15,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
@@ -60,7 +61,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by liuhaodong1 on 15/11/10.
  * //need update ....
  * DBService Sequences
- * -----Oncreate-----
+ * -----onCreate-----
  * 1.params Initial.
  * 2.Get default PM density from cache.
  * 3.DB Initial: get the value of last hour, today, last week avg pm from database and set cache.
@@ -95,8 +96,7 @@ public class DBService extends Service {
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
-    PMModel pmModel;
-
+    private PMModel pmModel;
     /**
      * PM State
      **/
@@ -123,8 +123,8 @@ public class DBService extends Service {
     /**
      * Location
      **/
-    LocationService locationService;
-    Location mLastLocation;
+    private LocationService locationService;
+    private Location mLastLocation;
     private boolean isGPSRun = false;
     /**
      * Sensor
@@ -139,69 +139,12 @@ public class DBService extends Service {
     private final int Motion_Detection_Interval = 60 * 1000; //1min
     private final int Motion_Run_Thred = 100; //100 step / min
     private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
-    /**
-     * Wake the thread
-     **/
-    private PowerManager powerManager;
-    PowerManager.WakeLock wakeLock;
+    private PowerManager.WakeLock wakeLock;
 
-    Handler DBHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if ((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0) {
-                Log.e(TAG, "DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
-                DBCanRun = false;
-            } else {
-                DBCanRun = true;
-            }
-            if (DBRunnable != null) {
-                wakeLock.acquire();
-                DBRunnable.run();
-            }
-        }
-    };
+    private volatile HandlerThread mHandlerThread;
 
-    Handler refreshHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            Intent intentChart;
-            Bundle mBundle = new Bundle();
-            Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
-            if (msg.what == Const.Handler_Refresh_Chart1) {
-                intentChart = new Intent(Const.Action_Chart_Result_1);
-                DataCalculator.getIntance(db).updateLastTwoHourState();
-                mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
-                mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
-                mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
-                aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-            } else if (msg.what == Const.Handler_Refresh_Chart2) {
-                intentChart = new Intent(Const.Action_Chart_Result_2);
-                DataCalculator.getIntance(db).updateLastDayState();
-                mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
-                mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
-                mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
-                mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
-                mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-            } else if (msg.what == Const.Handler_Refresh_Chart3) {
-                intentChart = new Intent(Const.Action_Chart_Result_3);
-                DataCalculator.getIntance(db).updateLastWeekState();
-                mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
-                mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
-                mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-                isRefreshRunning = false;
-                Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
+    private Handler DBHandler;
+    private Handler refreshHandler;
 
     private Runnable DBRunnable = new Runnable() {
         State state;
@@ -405,6 +348,70 @@ public class DBService extends Service {
         }
     };
 
+    private void initialThread() {
+        mHandlerThread = new HandlerThread("DBHandlerThread");
+        mHandlerThread.start();
+
+        DBHandler = new Handler(mHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if ((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0) {
+                    Log.e(TAG, "DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
+                    DBCanRun = false;
+                } else {
+                    DBCanRun = true;
+                }
+                if (DBRunnable != null) {
+                    wakeLock.acquire();
+                    DBRunnable.run();
+                }
+            }
+        };
+
+        refreshHandler = new Handler(mHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                Intent intentChart;
+                Bundle mBundle = new Bundle();
+                Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
+                if (msg.what == Const.Handler_Refresh_Chart1) {
+                    intentChart = new Intent(Const.Action_Chart_Result_1);
+                    DataCalculator.getIntance(db).updateLastTwoHourState();
+                    mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                    mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                    mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                    aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                } else if (msg.what == Const.Handler_Refresh_Chart2) {
+                    intentChart = new Intent(Const.Action_Chart_Result_2);
+                    DataCalculator.getIntance(db).updateLastDayState();
+                    mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                    mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                    mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                    mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                    mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                } else if (msg.what == Const.Handler_Refresh_Chart3) {
+                    intentChart = new Intent(Const.Action_Chart_Result_3);
+                    DataCalculator.getIntance(db).updateLastWeekState();
+                    mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                    mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                    mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                    mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                    isRefreshRunning = false;
+                    Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -413,6 +420,7 @@ public class DBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        initialThread();
         mLastLocation = null;
         PM25Source = 0;
         PM25Density = 0.0;
@@ -430,7 +438,10 @@ public class DBService extends Service {
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
         locationService.getIndoorOutdoor();
-        powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        /*
+        Wake the thread
+        */
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
         wakeLock.acquire();
         //todo each time to run the data and
@@ -476,6 +487,7 @@ public class DBService extends Service {
     public void onDestroy() {
         if (wakeLock != null) wakeLock.release();
         super.onDestroy();
+        mHandlerThread.quit();
         DBRunnable = null;
     }
 
@@ -999,33 +1011,32 @@ public class DBService extends Service {
      * Check if service running surpass a day
      *
      * @param lasttime
-     * @return
+     * @return result
      */
-    private boolean isSurpass(State lasttime, State nowTime) {
-        boolean result = false;
-        String last = null;
-        String now = null;
+    private boolean isSurpass(State lastTime, State nowTime) {
+        boolean result;
+        String last;
+        String now;
         try {
-            last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lasttime.getTime_point()));
+            last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lastTime.getTime_point()));
             now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
-        if (last.equals(now)) result = false;
-        else result = true;
+        result = !last.equals(now);
         return result;
     }
 
     /**
-     * if Service running surpass a day, then reset data parmas
+     * if Service running surpass a day, then reset data params
      */
     private void reset() {
         //todo test it !
         longitude = 0.0;
         latitude = 0.0;
-        IDToday = Long.valueOf(0);
-        venVolToday = Long.valueOf(0);
+        IDToday = 0L;
+        venVolToday = 0L;
         PM25Today = 0;
         PM25Source = 0;
         //PM25Density = 0.0;
