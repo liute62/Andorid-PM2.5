@@ -98,7 +98,7 @@ public class DBService extends Service {
     private SQLiteDatabase db;
     private ACache aCache;
     PMModel pmModel;
-
+    State state;
     /**
      * PM State
      **/
@@ -145,7 +145,7 @@ public class DBService extends Service {
      * Wake the thread
      **/
     private PowerManager powerManager;
-    PowerManager.WakeLock wakeLock;
+    PowerManager.WakeLock wakeLock = null;
 
     Handler DBHandler = new Handler() {
         @Override
@@ -158,14 +158,6 @@ public class DBService extends Service {
                 DBCanRun = true;
             }
             if (DBRunnable != null) {
-                wakeLock.acquire();
-                isBackground = aCache.getAsString(Const.Cache_Is_Background);
-                String userId = aCache.getAsString(Const.Cache_User_Id);
-                if (isBackground == null) { //App first run
-                    isBackground = "false";
-                    aCache.put(Const.Cache_Is_Background, isBackground);
-                    if (userId == null) aCache.put(Const.Cache_User_Id, "0");
-                }
                 DBRunnable.run();
             }
         }
@@ -178,7 +170,13 @@ public class DBService extends Service {
             Intent intentChart;
             Bundle mBundle = new Bundle();
             Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
-            if (msg.what == Const.Handler_Refresh_Chart1) {
+            if(msg.what == Const.Handler_Refresh_Text){
+                Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
+                intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                sendBroadcast(intentText);
+            }else if (msg.what == Const.Handler_Refresh_Chart1) {
                 intentChart = new Intent(Const.Action_Chart_Result_1);
                 DataCalculator.getIntance(db).updateLastTwoHourState();
                 mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
@@ -213,7 +211,6 @@ public class DBService extends Service {
     };
 
     private Runnable DBRunnable = new Runnable() {
-        State state;
         Intent intentText;
         Intent intentChart;
 
@@ -248,6 +245,18 @@ public class DBService extends Service {
                     }
                     sendBroadcast(intentChart);
                 }
+
+            }
+            if(wakeLock == null){
+                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+                wakeLock.acquire();
+            }
+            isBackground = aCache.getAsString(Const.Cache_Is_Background);
+            String userId = aCache.getAsString(Const.Cache_User_Id);
+            if (isBackground == null) { //App first run
+                isBackground = "false";
+                aCache.put(Const.Cache_Is_Background, isBackground);
+                if (userId == null) aCache.put(Const.Cache_User_Id, "0");
             }
             if (isBackground.equals("false")) {
                 runTimeInterval = Const.DB_Run_Time_INTERVAL;
@@ -476,6 +485,7 @@ public class DBService extends Service {
 
     @Override
     public void onDestroy() {
+        FileUtil.appendStrToFile(-100,"DBService onDestory");
         if (wakeLock != null) wakeLock.release();
         super.onDestroy();
         DBRunnable = null;
@@ -990,12 +1000,17 @@ public class DBService extends Service {
                 if(!isRefreshRunning) {
                     isRefreshRunning = true;
                     //ProgressDialog.show(getApplicationContext(),"title","message",true,false);
-                    refreshHandler.sendEmptyMessage(Const.Handler_Refresh_Chart1);
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 1000);
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 2000);
+                    refreshAll();
                 }
             }
         }
+    }
+
+    private void refreshAll(){
+        refreshHandler.sendEmptyMessage(Const.Handler_Refresh_Text);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 2000);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
     }
 
     /**
@@ -1038,6 +1053,7 @@ public class DBService extends Service {
         isLocationChanged = false;
         isUploadRunning = false;
         isPMSearchSuccess = false;
+        refreshAll();
         locationInitial();
         DBInitial();
         sensorInitial();
