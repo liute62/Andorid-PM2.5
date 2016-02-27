@@ -60,7 +60,8 @@
     <string name="dialog_base_begin">开始</string>
     <string name="dialog_base_back">返回</string>
     <string name="profile_btn_help">使用说明</string>
-
+    <string name="profile_btn_saving_battery_on">开启省电模式</string>
+    <string name="profile_btn_saving_battery_off">关闭省电模式</string>
     <string name="help_para_title">帮助与说明</string>
     <string name="help_para_1">1.点击定位城市，可进行手动定位当前城市</string>
     <string name="help_para_2">2.点击当前空气质量，可查看当前浓度，可进行手动获取当前位置浓度。</string>

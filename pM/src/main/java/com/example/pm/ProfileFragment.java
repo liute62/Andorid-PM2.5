@@ -58,6 +58,7 @@ public class ProfileFragment extends Fragment implements
     Button mBluetooth;
     Button mModifyPwd;
     Button mShare;
+    Button mSavingBattery;
     TextView mResetPwd;
     TextView mNotification;
     TextView mModifyAndView;
@@ -125,6 +126,8 @@ public class ProfileFragment extends Fragment implements
         mNotification = (TextView)view.findViewById(R.id.profile_view_notification);
         mModifyAndView = (TextView)view.findViewById(R.id.profile_modify_personal_state);
         mLogOff = (TextView)view.findViewById(R.id.profile_logoff);
+        mSavingBattery = (Button)view.findViewById(R.id.profile_saving_battery);
+        setSizeByWidth();
         checkCache();
         setListener();
         return view;
@@ -179,6 +182,7 @@ public class ProfileFragment extends Fragment implements
         mNotification.setOnClickListener(this);
         mModifyAndView.setOnClickListener(this);
         mLogOff.setOnClickListener(this);
+        mSavingBattery.setOnClickListener(this);
     }
 
     @Override
@@ -199,6 +203,15 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_view_notification:
                 DialogNotification dialogNotification = new DialogNotification(mActivity);
                 dialogNotification.show();
+                break;
+            case R.id.profile_saving_battery:
+                if (v.getTag() == null || v.getTag().equals("on")) {
+                    v.setTag("off");
+                    ((TextView) v).setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_on));
+                } else if (v.getTag().equals("off")) {
+                    v.setTag("on");
+                    ((TextView) v).setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_off));
+                }
                 break;
             case R.id.profile_login:
                 MainActivity main2Activity = (MainActivity)mActivity;
@@ -425,6 +438,15 @@ public class ProfileFragment extends Fragment implements
     private void shareProcess(){
         ShareUtils shareUtils = new ShareUtils(mActivity);
         shareUtils.share();
+    }
+
+    private void setSizeByWidth(){
+        int width = Const.CURRENT_WIDTH;
+        if(width == -1) return;
+        if(width <= Const.Resolution_Small){
+            mLogin.setWidth(40);
+            mLogin.setHeight(28);
+        }
     }
 
 }

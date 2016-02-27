@@ -373,6 +373,7 @@ public class DataGenerator {
         return data;
     }
 
+    static boolean hasAxis = true;
     public static ColumnChartData chart1DataGenerator(Map<Integer, Float> maps) {
         if(ShortcutUtil.isDataLost(maps))
             Const.Chart_Alert_Show[1] = true;
@@ -395,7 +396,6 @@ public class DataGenerator {
             } else {
                 value = new SubcolumnValue(0.0f);
             }
-
             values.add(value);
             Column column = new Column(values);
             column.setHasLabelsOnlyForSelected(true);
@@ -404,8 +404,11 @@ public class DataGenerator {
 
         data = new ColumnChartData(columns);
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
+        Axis axisX = new Axis(axisValues).setHasLines(true);
         data.setAxisYLeft(axisY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[1]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -456,9 +459,11 @@ public class DataGenerator {
         data = new LineChartData(lines);
         Axis axisX = new Axis(axisValues);
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
         data.setBaseValue(Float.NEGATIVE_INFINITY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[2]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -570,9 +575,11 @@ public class DataGenerator {
         data = new LineChartData(lines);
         Axis axisX = new Axis(axisValues);
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
         data.setBaseValue(Float.NEGATIVE_INFINITY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[3]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -649,9 +656,11 @@ public class DataGenerator {
         Axis axisX = new Axis(axisValues);
         axisX.setFormatter(new SimpleAxisValueFormatter().setAppendedText("分钟".toCharArray()));
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
         data.setBaseValue(Float.NEGATIVE_INFINITY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[4]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -683,9 +692,12 @@ public class DataGenerator {
         }
 
         data = new ColumnChartData(columns);
+        Axis axisX = new Axis(axisValues).setHasLines(true);
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
         data.setAxisYLeft(axisY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[5]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -720,9 +732,12 @@ public class DataGenerator {
         }
 
         data = new ColumnChartData(columns);
+        Axis axisX = new Axis(axisValues).setHasLines(true);
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
         data.setAxisYLeft(axisY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[6]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -759,8 +774,10 @@ public class DataGenerator {
         data = new ColumnChartData(columns);
         Axis axisX = new Axis(axisValues).setHasLines(true);
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[7]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -795,9 +812,12 @@ public class DataGenerator {
         }
 
         data = new ColumnChartData(columns);
+        Axis axisX = new Axis(axisValues).setHasLines(true);
         Axis axisY = new Axis().setHasLines(true).setMaxLabelChars(4);
-        data.setAxisXBottom(new Axis(axisValues).setHasLines(true));
         data.setAxisYLeft(axisY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[8]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -863,9 +883,11 @@ public class DataGenerator {
         data = new LineChartData(lines);
         Axis axisX = new Axis(axisValues);
         Axis axisY = new Axis().setHasLines(true);
-        data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
         data.setBaseValue(Float.NEGATIVE_INFINITY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[10]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 
@@ -938,8 +960,10 @@ public class DataGenerator {
         data = new ColumnChartData(columns);
         Axis axisX = new Axis(axisValues).setHasLines(true);
         Axis axisY = new Axis().setHasLines(true).setMaxLabelChars(4);
-        data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
+        if(hasAxis)
+            axisX.setName(ChartsConst.Chart_bottom[12]);
+        data.setAxisXBottom(axisX);
         return data;
     }
 

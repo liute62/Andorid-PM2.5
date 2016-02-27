@@ -4,6 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+ <ScrollView
+     android:id="@+id/notification_scrollview"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:layout_above="@+id/notification_cancel"
+     android:layout_marginBottom="6dp">
+   <RelativeLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -90,6 +99,10 @@
         android:paddingLeft="10dip"
         android:paddingRight="10dip"
         android:textSize="17sp" />
+
+   </RelativeLayout>
+
+ </ScrollView>
 
     <Button
         android:id="@+id/notification_cancel"

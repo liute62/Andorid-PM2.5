@@ -20,6 +20,8 @@ public class Const {
 
     public static Long Min_Upload_Check_Time = Long.valueOf(60 * 60 * 1000);
 
+    public static int CURRENT_WIDTH = -1;
+
     public static String CURRENT_ACCESS_TOKEN = "-1";
 
     public static String CURRENT_USER_NAME = "-1";
@@ -37,6 +39,8 @@ public class Const {
     public static final double latitude_for_test = 39.972465;
 
     public static final int Default_Timeout = 1000 * 60;
+
+    public static final int Resolution_Small = 541;
 
     /**
      * Cache*

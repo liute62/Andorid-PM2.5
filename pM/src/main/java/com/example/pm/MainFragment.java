@@ -329,6 +329,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAddCity = (ImageView)view.findViewById(R.id.main_add_city);
         mViewMore2 = (TextView)view.findViewById(R.id.main_view_more_2);
         setFonts(view);
+        setTextSizeByWidth();
         setListener();
         cacheInitial();
         dataInitial();
@@ -883,6 +884,15 @@ public class MainFragment extends Fragment implements OnClickListener {
 //               return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
         }
         return null;
+    }
+
+    private void setTextSizeByWidth(){
+        int width = Const.CURRENT_WIDTH;
+        if(width == -1) return;
+        if(width <= Const.Resolution_Small){
+            mChart1Title.setTextSize(12);
+            mChart2Title.setTextSize(12);
+        }
     }
 
 }

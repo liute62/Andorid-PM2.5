@@ -44,6 +44,7 @@ public class MainActivity extends SlidingActivity {
     }
 
     /**
+     * for 480 X
      * for 540 X 960 case 540
      * for 720 X 1280 case 720
      * for 1080 X 1920 case 1080
@@ -52,21 +53,10 @@ public class MainActivity extends SlidingActivity {
      * @return
      */
     private int getOffsetByResolution(int width){
-        int result = 20;
-        switch(width){
-            case 540:
-                result = 80;
-                break;
-            case 720:
-                result = 100;
-                break;
-            case 1080:
-                result = 160;
-                break;
-            case 1440:
-                result = 220;
-                break;
-        }
+        Const.CURRENT_WIDTH = width;
+        int result;
+        int num = width / 160;
+        result = num * 20;
         return result;
     }
 

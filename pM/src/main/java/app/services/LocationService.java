@@ -292,14 +292,18 @@ public class LocationService implements LocationListener,GpsStatus.Listener
      */
     public Location getLastKnownLocation() {
         initGPS();
-        mLastLocation = mLocationManager.getLastKnownLocation(provider);
-        if(mLastLocation != null){
-            Log.e(TAG,"getLastKnownLocation gps == NULL");
-            return mLastLocation;
+        try {
+            mLastLocation = mLocationManager.getLastKnownLocation(provider);
+            if(mLastLocation != null){
+                Log.e(TAG,"getLastKnownLocation gps == NULL");
+                return mLastLocation;
+            }
+            initNetwork();
+            mLastLocation = mLocationManager.getLastKnownLocation(provider);
+            if(mLastLocation == null) Log.e(TAG,"getLastKnownLocation Network == NULL");
+        }catch (SecurityException e){
+            // TODO: 2/27/2016 add a way to tell the user to set Location permission
         }
-        initNetwork();
-        mLastLocation = mLocationManager.getLastKnownLocation(provider);
-        if(mLastLocation == null) Log.e(TAG,"getLastKnownLocation Network == NULL");
         return mLastLocation;
     }
 
