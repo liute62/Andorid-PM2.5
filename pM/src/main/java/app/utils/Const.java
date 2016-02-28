@@ -20,6 +20,8 @@ public class Const {
 
     public static Long Min_Upload_Check_Time = Long.valueOf(60 * 60 * 1000);
 
+    public static int CURRENT_WIDTH = -1;
+
     public static String CURRENT_ACCESS_TOKEN = "-1";
 
     public static String CURRENT_USER_NAME = "-1";
@@ -37,6 +39,12 @@ public class Const {
     public static final double latitude_for_test = 39.972465;
 
     public static final int Default_Timeout = 1000 * 60;
+
+    public static final int Resolution_Small = 541;
+
+    public static final String Not_SAVING_BATTERY = "false";
+
+    public static final String IS_SAVING_BATTERY = "true";
 
     /**
      * Cache*
@@ -80,6 +88,7 @@ public class Const {
     public static final String Cache_Chart_Alert = "Cache_Chart_Alert";
     public static final String Cache_User_Weight = "Cache_User_Weight";
     public static final String Cache_Lastime_Timepoint = "Cache_Lastime_Timepoint";
+    public static final String Cache_Is_Saving_Battery = "Cache_Is_Saving_Battery";
 
 
     /**
@@ -108,6 +117,8 @@ public class Const {
     public static final int Handler_Refresh_Chart2 = 100011;
 
     public static final int Handler_Refresh_Chart3 = 100012;
+
+    public static final int Handler_Refresh_Text = 100013;
 
     /**
      * Intent Tag Code*
@@ -154,6 +165,8 @@ public class Const {
 
     public static final String Intent_Bluetooth_HearthRate = "Intent_Bluetooth_HearthRate";
 
+    public static final String Intent_Low_Battery_State = "Intent_Low_Battery_State";
+
     /**
      * Service & Activity Code*
      */
@@ -180,6 +193,8 @@ public class Const {
     public static final String Action_Get_Location_ToService = "Action_Get_Location_ToService";
 
     public static final String Action_Refresh_Chart_ToService = "Action_Refresh_Chart_ToService";
+
+    public static final String Action_Low_Battery_ToService = "Action_Low_Battery_ToService";
 
     public static final int Action_Profile_Register = 200001;
 
@@ -214,6 +229,8 @@ public class Const {
     }
 
     /****/
+    // TODO: 16/2/15 Change such hard code string to xml string of resource
+
     public static final String Info_No_Network = "无法连接服务器，请检查网络设置";
 
     public static final String Info_No_Initial = "系统检测到本机并无数据，请确保网络和GPS正常，按确认键进行初始化。";
@@ -310,6 +327,22 @@ public class Const {
 
     public static final String Info_Refresh_Chart_Success = "更新图表成功";
 
+    //服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因
+    public static final int code_file_baidu_exception1 = -21;
+    //网络不通导致定位失败，请检查网络是否通畅
+    public static final int code_file_baidu_exception2 = -22;
+
+    //无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机
+    public static final int code_file_baidu_exception3 = -23;
+
+    public static final int code_file_wifi_info = -24;
+
+    public static final int code_location_queue_full = -25;
+
+    public static final int code_get_location_failed = -26;
+
+
+
     public static String[] airQuality = {
             "优", "良", "轻度污染", "中度污染", "重度污染", "严重污染"
     };
@@ -338,7 +371,7 @@ public class Const {
      * DayMaxOfTheMonth[1] = 31 January : number of days = 31
      */
     public static int[] DayMaxOfTheMonth = {
-       0,31,29,31,30,31,30,31,31,30,31,30,31
+       0,31,28,31,30,31,30,31,31,30,31,30,31
     };
 
 }

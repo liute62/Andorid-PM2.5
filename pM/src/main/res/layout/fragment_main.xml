@@ -273,7 +273,8 @@
                 android:paddingLeft="18dp"
                 android:paddingRight="18dp"
                 android:paddingTop="8dp"
-                android:visibility="invisible" />
+                android:visibility="invisible"
+                android:layout_above="@+id/main_chart_1_subtitle"/>
 
             <lecho.lib.hellocharts.view.LineChartView
                 android:id="@+id/main_chart_1_line"
@@ -284,7 +285,8 @@
                 android:layout_marginTop="5dip"
                 android:paddingLeft="18dp"
                 android:paddingTop="8dp"
-                android:visibility="invisible" />
+                android:visibility="invisible"
+                android:layout_above="@+id/main_chart_1_subtitle"/>
 
             <ImageView
                 android:layout_width="20dip"

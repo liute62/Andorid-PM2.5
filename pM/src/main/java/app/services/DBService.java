@@ -1,6 +1,7 @@
 package app.services;
 
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -21,6 +22,7 @@ import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -99,7 +101,7 @@ public class DBService extends Service {
     private SQLiteDatabase db;
     private ACache aCache;
     PMModel pmModel;
-
+    State state;
     /**
      * PM State
      **/
@@ -146,7 +148,8 @@ public class DBService extends Service {
      * Wake the thread
      **/
     private PowerManager powerManager;
-    PowerManager.WakeLock wakeLock;
+    PowerManager.WakeLock wakeLock = null;
+    private boolean isSavingBattery;
 
     Handler DBHandler = new Handler() {
         @Override
@@ -159,7 +162,6 @@ public class DBService extends Service {
                 DBCanRun = true;
             }
             if (DBRunnable != null) {
-                wakeLock.acquire();
                 DBRunnable.run();
             }
         }
@@ -172,7 +174,13 @@ public class DBService extends Service {
             Intent intentChart;
             Bundle mBundle = new Bundle();
             Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
-            if (msg.what == Const.Handler_Refresh_Chart1) {
+            if(msg.what == Const.Handler_Refresh_Text){
+                Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
+                intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                sendBroadcast(intentText);
+            }else if (msg.what == Const.Handler_Refresh_Chart1) {
                 intentChart = new Intent(Const.Action_Chart_Result_1);
                 DataCalculator.getIntance(db).updateLastTwoHourState();
                 mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
@@ -207,7 +215,6 @@ public class DBService extends Service {
     };
 
     private Runnable DBRunnable = new Runnable() {
-        State state;
         Intent intentText;
         Intent intentChart;
 
@@ -220,6 +227,9 @@ public class DBService extends Service {
                 if (state != null && state.getId() > State_Much_Index) {
                     //so many data stored, don't want to refresh every time after starting
                 } else {
+                    DataCalculator.getIntance(db).updateLastTwoHourState();
+                    DataCalculator.getIntance(db).updateLastDayState();
+                    DataCalculator.getIntance(db).updateLastWeekState();
                     aCache.put(Const.Cache_Chart_1, DataCalculator.getIntance(db).calChart1Data());
                     aCache.put(Const.Cache_Chart_2, DataCalculator.getIntance(db).calChart2Data());
                     aCache.put(Const.Cache_Chart_3, DataCalculator.getIntance(db).calChart3Data());
@@ -239,8 +249,12 @@ public class DBService extends Service {
                     }
                     sendBroadcast(intentChart);
                 }
-            }
 
+            }
+            if(wakeLock == null){
+                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+                wakeLock.acquire();
+            }
             isBackground = aCache.getAsString(Const.Cache_Is_Background);
             String userId = aCache.getAsString(Const.Cache_User_Id);
             if (isBackground == null) { //App first run
@@ -248,7 +262,6 @@ public class DBService extends Service {
                 aCache.put(Const.Cache_Is_Background, isBackground);
                 if (userId == null) aCache.put(Const.Cache_User_Id, "0");
             }
-
             if (isBackground.equals("false")) {
                 runTimeInterval = Const.DB_Run_Time_INTERVAL;
                 /** notify user whether using the old PM2.5 density **/
@@ -267,8 +280,6 @@ public class DBService extends Service {
                     intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
                     sendBroadcast(intentText);
                 }
-
-
                 /***** DB Running Normally *****/
                 if (DBCanRun) {
 
@@ -285,7 +296,6 @@ public class DBService extends Service {
                     if (state.getId() > State_Much_Index) DB_Chart_Loop = 24;
                     else DB_Chart_Loop = 12;
                     Bundle mBundle = new Bundle();
-                    Log.e(TAG,"run time "+DBRunTime % DB_Chart_Loop);
                     switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                         case 1:
                             Log.e(TAG,"check for upload start");
@@ -298,6 +308,7 @@ public class DBService extends Service {
                             Log.e(TAG, "check  for update end");
                             break;
                         case 5:
+                            Bundle mBundle = new Bundle();
                             intentChart = new Intent(Const.Action_Chart_Result_1);
                             DataCalculator.getIntance(db).updateLastTwoHourState();
                             mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
@@ -310,22 +321,24 @@ public class DBService extends Service {
                         case 7:
                             intentChart = new Intent(Const.Action_Chart_Result_2);
                             DataCalculator.getIntance(db).updateLastDayState();
-                            mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
-                            mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
-                            mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
-                            mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
-                            mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
-                            intentChart.putExtras(mBundle);
+                            Bundle mBundle2 = new Bundle();
+                            mBundle2.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                            mBundle2.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                            mBundle2.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                            mBundle2.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                            mBundle2.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
+                            intentChart.putExtras(mBundle2);
                             sendBroadcast(intentChart);
                             break;
                         case 10:
                             intentChart = new Intent(Const.Action_Chart_Result_3);
                             DataCalculator.getIntance(db).updateLastWeekState();
-                            mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
-                            mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                            mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
-                            mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                            intentChart.putExtras(mBundle);
+                            Bundle mBundle3 = new Bundle();
+                            mBundle3.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                            mBundle3.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                            mBundle3.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                            mBundle3.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                            intentChart.putExtras(mBundle3);
                             sendBroadcast(intentChart);
                             break;
                     }
@@ -358,7 +371,8 @@ public class DBService extends Service {
                 //every 10 min to open the GPS and if get the last location, close it.
                 if (DBRunTime % 120 == 0) { //120 * 5s = 10min
                     //FileUtil.appendStrToFile(DBRunTime, "Add status listener and request location Updates");
-                    locationService.run(LocationService.TYPE_BAIDU);
+                    if(!isSavingBattery)
+                        locationService.run(LocationService.TYPE_BAIDU);
                 }
                 if (DBRunTime % 130 == 0) { //open for 10 * 5 = 50s
                     //FileUtil.appendStrToFile(DBRunTime, "remove status listener, remove request location Updates");
@@ -391,7 +405,6 @@ public class DBService extends Service {
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
                 }
-
                 //every 1 hour to check if some data need to be uploaded
                 String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
                 if (!ShortcutUtil.isStringOK(lastUploadTime))
@@ -434,6 +447,7 @@ public class DBService extends Service {
         isUploadRunning = false;
         isPMSearchSuccess = false;
         isRefreshRunning = false;
+        isSavingBattery = false;
         aCache = ACache.get(getApplicationContext());
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
@@ -459,7 +473,7 @@ public class DBService extends Service {
         locationInitial();
         DBInitial();
         serviceStateInitial();
-        sensorInitial();
+        //sensorInitial();
         if (mLastLocation != null) {
             locationService.stop();
             Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
@@ -467,6 +481,10 @@ public class DBService extends Service {
             intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
             sendBroadcast(intentText);
         }
+        String isSaving = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+        if(ShortcutUtil.isStringOK(isSaving) && isSaving.equals(Const.IS_SAVING_BATTERY))
+            openSavingBattery();
+        else closeSavingBattery();
         DBHandler.sendEmptyMessageDelayed(0, 15000);//15s
     }
 
@@ -482,6 +500,7 @@ public class DBService extends Service {
 
     @Override
     public void onDestroy() {
+        FileUtil.appendStrToFile(-100,"DBService onDestory");
         if (wakeLock != null) wakeLock.release();
         super.onDestroy();
         DBRunnable = null;
@@ -539,38 +558,13 @@ public class DBService extends Service {
         simpleStepDetector.registerListener(new StepListener() {
             @Override
             public void step(long timeNs) {
-                Log.d(TAG, "Time: " + ShortcutUtil.refFormatNowDate(timeNs) + " Step: " + String.valueOf(numSteps));
+                //Log.d(TAG, "Time: " + ShortcutUtil.refFormatNowDate(timeNs) + " Step: " + String.valueOf(numSteps));
                 numSteps++;
                 numStepsTmp++;
             }
         });
         time1 = System.currentTimeMillis();
-        mSensorManager.registerListener(new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                    simpleStepDetector.updateAccel(
-                            event.timestamp, event.values[0], event.values[1], event.values[2]);
-                }
-                long time2 = System.currentTimeMillis();
-                if (time2 - time1 > Motion_Detection_Interval) {
-                    if (numSteps > Motion_Run_Thred)
-                        mMotionStatus = Const.MotionStatus.RUN;
-                    else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
-                        mMotionStatus = Const.MotionStatus.WALK;
-                    else
-                        mMotionStatus = Const.MotionStatus.STATIC;
-                    numSteps = 0;
-                    time1 = time2;
-                    Log.v(TAG, "Motion Status: " + String.valueOf(mMotionStatus));
-                }
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
-
-            }
-        }, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void locationInitial() {
@@ -579,7 +573,7 @@ public class DBService extends Service {
             isGPSRun = true;
             longitude = mLastLocation.getLongitude();
             latitude = mLastLocation.getLatitude();
-            Log.d(TAG, "Location Service is running" + String.valueOf(latitude) + " " + String.valueOf(longitude));
+            //Log.d(TAG, "Location Service is running" + String.valueOf(latitude) + " " + String.valueOf(longitude));
             FileUtil.appendStrToFile(DBRunTime, "locationInitial getLastKnownLocation " + String.valueOf(latitude) + " " + String.valueOf(longitude));
             aCache.put(Const.Cache_Latitude, latitude);
             aCache.put(Const.Cache_Longitude, longitude);
@@ -600,6 +594,32 @@ public class DBService extends Service {
         }
     }
 
+    SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                simpleStepDetector.updateAccel(
+                        event.timestamp, event.values[0], event.values[1], event.values[2]);
+            }
+            long time2 = System.currentTimeMillis();
+            if (time2 - time1 > Motion_Detection_Interval) {
+                if (numSteps > Motion_Run_Thred)
+                    mMotionStatus = Const.MotionStatus.RUN;
+                else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
+                    mMotionStatus = Const.MotionStatus.WALK;
+                else
+                    mMotionStatus = Const.MotionStatus.STATIC;
+                numSteps = 0;
+                time1 = time2;
+                //Log.v(TAG, "Motion Status: " + String.valueOf(mMotionStatus));
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
 
     LocationService.GetTheLocation getTheLocation = new LocationService.GetTheLocation() {
         @Override
@@ -778,9 +798,9 @@ public class DBService extends Service {
         if (db == null)
             str = "db = null ";
         else str = "db != null ";
-        Log.d(TAG, "-------insert ------state --------- begin");
+        //Log.d(TAG, "-------insert ------state --------- begin");
         state.print();
-        Log.d(TAG, "-------insert ------state --------- finish");
+        //Log.d(TAG, "-------insert ------state --------- finish");
         long r = cupboard().withDatabase(db).put(state);
         str += "entity Id " + String.valueOf(r);
         IDToday++;
@@ -1007,12 +1027,35 @@ public class DBService extends Service {
                 //when open the phone, check if it need to refresh.
                 if(!isRefreshRunning) {
                     isRefreshRunning = true;
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 1000);
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
-                    refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 6000);
+                    //ProgressDialog.show(getApplicationContext(),"title","message",true,false);
+                    refreshAll();
                 }
+            }else if(intent.getAction().equals(Const.Action_Low_Battery_ToService)){
+                String state = intent.getStringExtra(Const.Intent_Low_Battery_State);
+                if(state != null && state.equals(Const.IS_SAVING_BATTERY))
+                    openSavingBattery();
+                else if(state != null && state.equals(Const.Not_SAVING_BATTERY))
+                    closeSavingBattery();
             }
         }
+    }
+
+    private void openSavingBattery(){
+        isSavingBattery = true;
+        if(mSensorManager != null)mSensorManager.registerListener(sensorEventListener,
+                mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private void closeSavingBattery(){
+        isSavingBattery = false;
+        if(mSensorManager != null)mSensorManager.unregisterListener(sensorEventListener);
+    }
+
+    private void refreshAll(){
+        refreshHandler.sendEmptyMessage(Const.Handler_Refresh_Text);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 2000);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
     }
 
     /**
@@ -1055,6 +1098,7 @@ public class DBService extends Service {
         isLocationChanged = false;
         isUploadRunning = false;
         isPMSearchSuccess = false;
+        refreshAll();
         locationInitial();
         DBInitial();
         sensorInitial();

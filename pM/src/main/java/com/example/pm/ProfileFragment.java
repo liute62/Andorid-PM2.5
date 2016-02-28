@@ -58,6 +58,7 @@ public class ProfileFragment extends Fragment implements
     Button mBluetooth;
     Button mModifyPwd;
     Button mShare;
+    Button mSavingBattery;
     TextView mResetPwd;
     TextView mNotification;
     TextView mModifyAndView;
@@ -125,6 +126,8 @@ public class ProfileFragment extends Fragment implements
         mNotification = (TextView)view.findViewById(R.id.profile_view_notification);
         mModifyAndView = (TextView)view.findViewById(R.id.profile_modify_personal_state);
         mLogOff = (TextView)view.findViewById(R.id.profile_logoff);
+        mSavingBattery = (Button)view.findViewById(R.id.profile_saving_battery);
+        setSizeByWidth();
         checkCache();
         setListener();
         return view;
@@ -162,6 +165,13 @@ public class ProfileFragment extends Fragment implements
                 mGender.setText("Gender");
             }
         }
+        String battery = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+        if(ShortcutUtil.isStringOK(battery)) {
+            if (battery.equals(Const.IS_SAVING_BATTERY))
+                mSavingBattery.setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_off));
+            else
+                mSavingBattery.setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_on));
+        }
     }
 
     private void setListener() {
@@ -179,6 +189,7 @@ public class ProfileFragment extends Fragment implements
         mNotification.setOnClickListener(this);
         mModifyAndView.setOnClickListener(this);
         mLogOff.setOnClickListener(this);
+        mSavingBattery.setOnClickListener(this);
     }
 
     @Override
@@ -199,6 +210,21 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_view_notification:
                 DialogNotification dialogNotification = new DialogNotification(mActivity);
                 dialogNotification.show();
+                break;
+            case R.id.profile_saving_battery:
+                String is = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+                if(! ShortcutUtil.isStringOK(is))
+                    aCache.put(Const.Cache_Is_Saving_Battery,Const.Not_SAVING_BATTERY);
+                is = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+                if (is.equals(Const.Not_SAVING_BATTERY)) {
+                    ((TextView) v).setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_off));
+                    aCache.put(Const.Cache_Is_Saving_Battery, Const.IS_SAVING_BATTERY);
+                    notifySavingBattery(true);
+                } else if (is.equals(Const.IS_SAVING_BATTERY)) {
+                    aCache.put(Const.Cache_Is_Saving_Battery, Const.Not_SAVING_BATTERY);
+                    ((TextView) v).setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_on));
+                    notifySavingBattery(true);
+                }
                 break;
             case R.id.profile_login:
                 MainActivity main2Activity = (MainActivity)mActivity;
@@ -425,6 +451,22 @@ public class ProfileFragment extends Fragment implements
     private void shareProcess(){
         ShareUtils shareUtils = new ShareUtils(mActivity);
         shareUtils.share();
+    }
+
+    private void setSizeByWidth(){
+        int width = Const.CURRENT_WIDTH;
+        if(width == -1) return;
+        if(width <= Const.Resolution_Small){
+            mLogin.setWidth(40);
+            mLogin.setHeight(28);
+        }
+    }
+
+    private void notifySavingBattery(boolean is){
+        Intent intent = new Intent(Const.Action_Low_Battery_ToService);
+        if(is) intent.putExtra(Const.Intent_Low_Battery_State,Const.IS_SAVING_BATTERY);
+        else intent.putExtra(Const.Intent_Low_Battery_State,Const.Not_SAVING_BATTERY);
+        mActivity.sendBroadcast(intent);
     }
 
 }

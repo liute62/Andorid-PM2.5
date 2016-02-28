@@ -15,194 +15,229 @@
             android:text="@string/register_title" />
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="邀请码"
-        android:id="@+id/textView2"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
         android:layout_below="@+id/register_top_layout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="30dip"
-        android:layout_marginLeft="20dip"
-        android:textSize="20sp" />
+        android:layout_marginBottom="20dp"
+        android:layout_above="@+id/register_bottom_layout">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_invite_code"
-        android:minWidth="220dip"
-        android:layout_toRightOf="@+id/textView2"
-        android:layout_marginLeft="30dip"
-        android:layout_alignBaseline="@+id/textView2"
-        android:layout_below="@id/register_top_layout"
-        android:numeric="integer" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="用户名"
-        android:id="@+id/textView3"
-        android:layout_below="@+id/textView2"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+            <RelativeLayout
+                android:id="@+id/register_center_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textView2"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="6dp">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_username"
-        android:minWidth="220dip"
-        android:layout_toRightOf="@+id/textView3"
-        android:layout_marginLeft="30dip"
-        android:layout_alignBaseline="@+id/textView3"
-        android:layout_below="@id/register_invite_code" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView23"
+                    android:text="@string/register_para_1"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="密码"
-        android:id="@+id/textView4"
-        android:layout_below="@+id/textView3"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+                <TextView
+                    android:layout_below="@+id/textView23"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="@string/register_para_2"/>
+            </RelativeLayout>
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_password"
-        android:minWidth="220dip"
-        android:layout_toRightOf="@+id/textView4"
-        android:layout_alignLeft="@+id/register_username"
-        android:layout_alignBaseline="@+id/textView4"
-        android:layout_below="@id/register_username"
-        android:inputType="textPassword" />
+            <TextView
+                android:layout_below="@+id/register_center_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="邀请码"
+                android:id="@+id/textView2"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="30dip"
+                android:layout_marginLeft="20dip"
+                android:textSize="20sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="确认密码"
-        android:id="@+id/textView5"
-        android:layout_below="@+id/textView4"
-        android:layout_alignLeft="@+id/textView4"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_invite_code"
+                android:minWidth="220dip"
+                android:layout_toRightOf="@+id/textView2"
+                android:layout_marginLeft="30dip"
+                android:layout_alignBaseline="@+id/textView2"
+                android:numeric="integer" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_confirm_pwd"
-        android:minWidth="220dip"
-        android:layout_toRightOf="@+id/textView5"
-        android:layout_alignLeft="@+id/register_password"
-        android:layout_alignBaseline="@+id/textView5"
-        android:layout_below="@id/register_password"
-        android:inputType="textPassword" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="用户名"
+                android:id="@+id/textView3"
+                android:layout_below="@+id/textView2"
+                android:layout_alignLeft="@+id/textView2"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="性别"
-        android:id="@+id/textView6"
-        android:layout_below="@+id/textView5"
-        android:layout_alignLeft="@+id/textView5"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_username"
+                android:minWidth="220dip"
+                android:layout_toRightOf="@+id/textView3"
+                android:layout_marginLeft="30dip"
+                android:layout_alignBaseline="@+id/textView3"
+                android:layout_below="@id/register_invite_code" />
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_gender_male"
-        android:text="男"
-        android:layout_toRightOf="@+id/textView6"
-        android:layout_alignLeft="@+id/register_confirm_pwd"
-        android:layout_alignBaseline="@+id/textView6"
-        android:layout_below="@id/register_confirm_pwd" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="密码"
+                android:id="@+id/textView4"
+                android:layout_below="@+id/textView3"
+                android:layout_alignLeft="@+id/textView3"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_gender_female"
-        android:text="女"
-        android:layout_toRightOf="@+id/register_gender_male"
-        android:layout_marginLeft="20dip"
-        android:layout_alignBaseline="@+id/textView6"
-        android:layout_below="@id/register_confirm_pwd" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_password"
+                android:minWidth="220dip"
+                android:layout_toRightOf="@+id/textView4"
+                android:layout_alignLeft="@+id/register_username"
+                android:layout_alignBaseline="@+id/textView4"
+                android:layout_below="@id/register_username"
+                android:inputType="textPassword" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="姓"
-        android:id="@+id/textView7"
-        android:layout_below="@+id/textView6"
-        android:layout_alignLeft="@+id/textView6"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="确认密码"
+                android:id="@+id/textView5"
+                android:layout_below="@+id/textView4"
+                android:layout_alignLeft="@+id/textView4"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_lastname"
-        android:minWidth="50dip"
-        android:layout_alignLeft="@+id/register_confirm_pwd"
-        android:layout_alignBaseline="@+id/textView7" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_confirm_pwd"
+                android:minWidth="220dip"
+                android:layout_toRightOf="@+id/textView5"
+                android:layout_alignLeft="@+id/register_password"
+                android:layout_alignBaseline="@+id/textView5"
+                android:layout_below="@id/register_password"
+                android:inputType="textPassword" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="名"
-        android:id="@+id/textView7_2"
-        android:layout_below="@+id/textView6"
-        android:layout_toRightOf="@id/register_lastname"
-        android:layout_marginLeft="20dip"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="性别"
+                android:id="@+id/textView6"
+                android:layout_below="@+id/textView5"
+                android:layout_alignLeft="@+id/textView5"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_firstname"
-        android:minWidth="110dip"
-        android:layout_toRightOf="@id/textView7_2"
-        android:layout_marginLeft="20dip"
-        android:layout_alignBaseline="@+id/textView7" />
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_gender_male"
+                android:text="男"
+                android:layout_toRightOf="@+id/textView6"
+                android:layout_alignLeft="@+id/register_confirm_pwd"
+                android:layout_alignBaseline="@+id/textView6"
+                android:layout_below="@id/register_confirm_pwd" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="电话"
-        android:id="@+id/textView8"
-        android:layout_below="@+id/textView7"
-        android:layout_alignLeft="@+id/textView7"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_gender_female"
+                android:text="女"
+                android:layout_toRightOf="@+id/register_gender_male"
+                android:layout_marginLeft="20dip"
+                android:layout_alignBaseline="@+id/textView6"
+                android:layout_below="@id/register_confirm_pwd" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_phone"
-        android:minWidth="220dip"
-        android:layout_alignLeft="@+id/register_lastname"
-        android:layout_alignBaseline="@+id/textView8" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="姓"
+                android:id="@+id/textView7"
+                android:layout_below="@+id/textView6"
+                android:layout_alignLeft="@+id/textView6"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="邮箱"
-        android:id="@+id/textView9"
-        android:layout_below="@+id/textView8"
-        android:layout_alignLeft="@+id/textView8"
-        android:layout_marginTop="30dip"
-        android:textSize="20sp" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_lastname"
+                android:minWidth="50dip"
+                android:layout_alignLeft="@+id/register_confirm_pwd"
+                android:layout_alignBaseline="@+id/textView7" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/register_mail"
-        android:minWidth="220dip"
-        android:layout_alignLeft="@+id/register_lastname"
-        android:layout_alignBaseline="@+id/textView9" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="名"
+                android:id="@+id/textView7_2"
+                android:layout_below="@+id/textView6"
+                android:layout_toRightOf="@id/register_lastname"
+                android:layout_marginLeft="20dip"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_firstname"
+                android:minWidth="110dip"
+                android:layout_toRightOf="@id/textView7_2"
+                android:layout_marginLeft="20dip"
+                android:layout_alignBaseline="@+id/textView7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="电话"
+                android:id="@+id/textView8"
+                android:layout_below="@+id/textView7"
+                android:layout_alignLeft="@+id/textView7"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_phone"
+                android:minWidth="220dip"
+                android:layout_alignLeft="@+id/register_lastname"
+                android:layout_alignBaseline="@+id/textView8" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="邮箱"
+                android:id="@+id/textView9"
+                android:layout_below="@+id/textView8"
+                android:layout_alignLeft="@+id/textView8"
+                android:layout_marginTop="30dip"
+                android:textSize="20sp" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/register_mail"
+                android:minWidth="220dip"
+                android:layout_alignLeft="@+id/register_lastname"
+                android:layout_alignBaseline="@+id/textView9" />
+        </RelativeLayout>
+    </ScrollView>
 
 
     <RelativeLayout

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="350dp"
+    android:layout_width="300dp"
     android:layout_height="match_parent"
+    android:minWidth="300dp"
     android:background="@android:color/white">
 
     <RelativeLayout
@@ -74,21 +75,23 @@
             android:id="@+id/textView15" />
 
         <EditText
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/personal_state_weight"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="10dp"
-            android:layout_toEndOf="@+id/textView15" />
+            android:layout_toEndOf="@+id/textView15"
+            android:layout_marginRight="6dp"
+            android:layout_toStartOf="@+id/personal_state_weight_save"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="保存"
             android:id="@+id/personal_state_weight_save"
-            android:layout_marginStart="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/personal_state_weight"
             android:textColor="@color/AccentBlue"/>
     </RelativeLayout>
 
@@ -130,12 +133,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="返回"
+            android:text=" 返回 "
             android:layout_marginTop="8dp"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="40dp"
             android:layout_centerHorizontal="true"
             android:id="@+id/personal_state_btn"/>
 
