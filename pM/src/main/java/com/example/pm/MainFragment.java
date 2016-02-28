@@ -48,8 +48,11 @@ import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
 import app.view.widget.DialogGetLocation;
 import app.view.widget.LoadingDialog;
+import lecho.lib.hellocharts.model.AbstractChartData;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.view.AbstractChartView;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.LineChartView;
 
@@ -503,26 +506,29 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (ChartsConst.Chart_type[chart1_index] == 0) {
             mChart1column.setVisibility(View.VISIBLE);
             mChart1line.setVisibility(View.INVISIBLE);
-            mChart1column.setColumnChartData((ColumnChartData) setChartDataByIndex(chart1_index));
+            //mChart1column.setColumnChartData((ColumnChartData) setChartDataByIndex(chart1_index));
+            setChartViewport(mChart1column, setChartDataByIndex(chart1_index));
         } else if (ChartsConst.Chart_type[chart1_index] == 1) {
             mChart1column.setVisibility(View.INVISIBLE);
             mChart1line.setVisibility(View.VISIBLE);
-            mChart1line.setLineChartData((LineChartData) setChartDataByIndex(chart1_index));
+            //mChart1line.setLineChartData((LineChartData) setChartDataByIndex(chart1_index));
+            setChartViewport(mChart1line, setChartDataByIndex(chart1_index));
         } else {
             mChart1column.setVisibility(View.INVISIBLE);
             mChart1line.setVisibility(View.INVISIBLE);
         }
-
         mChart2Title.setText(ChartsConst.Chart_title[chart2_index]);
         if (ChartsConst.Chart_type[chart2_index] == 0) {
             mChart2column.setVisibility(View.VISIBLE);
             mChart2line.setVisibility(View.INVISIBLE);
-            ColumnChartData tmp = (ColumnChartData) setChartDataByIndex(chart2_index);
-            mChart2column.setColumnChartData(tmp);
+            //ColumnChartData tmp = (ColumnChartData) setChartDataByIndex(chart2_index);
+            //mChart2column.setColumnChartData(tmp);
+            setChartViewport(mChart2column, setChartDataByIndex(chart2_index));
         } else if (ChartsConst.Chart_type[chart2_index] == 1) {
             mChart2column.setVisibility(View.INVISIBLE);
             mChart2line.setVisibility(View.VISIBLE);
-            mChart2line.setLineChartData((LineChartData) setChartDataByIndex(chart2_index));
+            //mChart2line.setLineChartData((LineChartData) setChartDataByIndex(chart2_index));
+            setChartViewport(mChart2line, setChartDataByIndex(chart2_index));
         } else {
             mChart2column.setVisibility(View.INVISIBLE);
             mChart2line.setVisibility(View.INVISIBLE);
@@ -884,6 +890,26 @@ public class MainFragment extends Fragment implements OnClickListener {
 //               return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
         }
         return null;
+    }
+
+    private Viewport calChartViewport(AbstractChartView view,Object data){
+        view.setViewportCalculationEnabled(true);
+        if(view instanceof LineChartView){
+            ((LineChartView) view).setLineChartData((LineChartData)data);
+        }else if(view instanceof ColumnChartView) {
+            ((ColumnChartView) view).setColumnChartData((ColumnChartData) data);
+        }
+        view.resetViewports();
+        return view.getCurrentViewport();
+    }
+
+    private void setChartViewport(AbstractChartView view,Object data){
+        final Viewport v = calChartViewport(view,data);
+        v.top = v.top * 1.2f;
+        v.bottom = 0;
+        view.setMaximumViewport(v);
+        view.setCurrentViewport(v);
+        view.setViewportCalculationEnabled(false);
     }
 
     private void setTextSizeByWidth(){
