@@ -30,4 +30,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         cupboard().withDatabase(db).upgradeTables();
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        this.close();
+        super.finalize();
+    }
+
 }

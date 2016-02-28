@@ -19,11 +19,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import app.Entity.State;
+import app.model.PMModel;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBConstants;
@@ -46,13 +49,11 @@ public class UpdateService {
 
     public static final String TAG = "UpdateService";
     private static UpdateService instance = null;
-    boolean isRunning;
     private Context mContext;
     private DBHelper dbHelper;
-    private SQLiteDatabase db;
     private ACache aCache;
 
-    public static void run(Context context,ACache aCache,DBHelper dbHelper){
+    public synchronized static void run(Context context,ACache aCache,DBHelper dbHelper){
         if(instance == null){
             instance = new UpdateService(context,aCache,dbHelper);
         }
@@ -60,10 +61,10 @@ public class UpdateService {
     }
 
     private UpdateService(Context context,ACache aCache,DBHelper dbHelper){
+        Log.e(TAG,"init updateService");
         this.mContext = context;
         this.aCache = aCache;
         this.dbHelper = dbHelper;
-        db = dbHelper.getReadableDatabase();
     }
 
     //main process
@@ -86,21 +87,27 @@ public class UpdateService {
                 }
             }
         }
-        isRunning = false;
     }
 
     /*
     get all after state
      */
     private List<State> getAllAfterState(State state) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_TIME_POINT_COL + ">=?", state.getTime_point()).list();
         return states;
     }
 
     /*
-    get all not uploaded
+    get all not connected
      */
     private List<State> getAllNotConnection() {
+        Calendar nowTime = Calendar.getInstance();
+        nowTime.add(Calendar.DAY_OF_MONTH, -7);
+        nowTime.add(Calendar.MINUTE, -5);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String left = formatter.format(nowTime.getTime());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0").list();
         return states;
     }
@@ -108,24 +115,28 @@ public class UpdateService {
     private void updateStateDensity(State state,String density) {
         ContentValues values = new ContentValues();
         values.put(DBConstants.DB_MetaData.STATE_DENSITY_COL, density);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
     }
 
     private void updateStateConnection(State state,int connection) {
         ContentValues values = new ContentValues();
         values.put(DBConstants.DB_MetaData.STATE_CONNECTION, connection);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
     }
 
     private void updateStateHasUpload(State state,int hasUpload) {
         ContentValues values = new ContentValues();
         values.put(DBConstants.DB_MetaData.STATE_HAS_UPLOAD, hasUpload);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
     }
 
     private void updateStatePM25(State state,double pm25) {
         ContentValues values = new ContentValues();
         values.put(DBConstants.DB_MetaData.STATE_PM25_COL, pm25);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         cupboard().withDatabase(db).update(State.class,values,"id = ?",state.getId()+"");
     }
 
@@ -154,14 +165,15 @@ public class UpdateService {
      */
     public void UpdateDensity(final State state) {
         String url = HttpUtil.Search_PM_url + "?longitude=" + state.getLongtitude() + "&latitude=" + state.getLatitude()
-                + "&time_point=" + ShortcutUtil.refFormatNowDate(Long.valueOf(state.getTime_point())).substring(0, 19);
+                + "&time_point=" + ShortcutUtil.refFormatDateAndTimeInHour(Long.valueOf(state.getTime_point()));
         Log.d("url",url);
-        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(Request.Method.GET, url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
                     Log.d("connection","connection is ok now");
-                    String mDensity = String.valueOf(response.getJSONObject(0).getDouble("PM25"));
+                    PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
+                    String mDensity = String.valueOf(pmModel.getPm25());
                     //Log.e(TAG,"UpdateDensity new density "+mDensity);
                     //update density
                     updateStateDensity(state, mDensity);
@@ -171,8 +183,12 @@ public class UpdateService {
                     updateTotalPM25(state,mDensity);
                     //upload state and check whether upload success
                     state.setDensity(mDensity);
-                    upload(state);
+                    //have been upload before, upload again
+                    if (state.getUpload()==1) {
+                        upload(state);
+                    }
                 } catch (JSONException e) {
+                    Log.e(TAG,"JSONException error"+e.toString());
                     // TODO: 16/2/9  A Json parse bug
                     //org.json.JSONException: Value {"data":{"source":2,"time_point":"2016-02-09 00:00:00","PM25":"69","AQI":"93"},"message":"successfully get data","status":1}
                     //of type org.json.JSONObject cannot be converted to JSONArray
@@ -182,7 +198,7 @@ public class UpdateService {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //Log.e(TAG,"UpdateDensity error"+error.toString());
+                Log.e(TAG,"UpdateDensity error"+error.toString());
                 //Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
             }
         });

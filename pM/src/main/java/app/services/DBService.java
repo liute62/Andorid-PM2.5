@@ -23,6 +23,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -38,7 +39,9 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.Entity.State;
 import app.model.PMModel;
@@ -282,12 +285,17 @@ public class DBService extends Service {
                     if (state.getId() > State_Much_Index) DB_Chart_Loop = 24;
                     else DB_Chart_Loop = 12;
                     Bundle mBundle = new Bundle();
+                    Log.e(TAG,"run time "+DBRunTime % DB_Chart_Loop);
                     switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                         case 1:
+                            Log.e(TAG,"check for upload start");
                             checkPMDataForUpload();
+                            Log.e(TAG, "check for upload end");
                             break;
                         case 3:
+                            Log.e(TAG,"check  for update start");
                             UpdateService.run(getApplicationContext(), aCache, dbHelper);
+                            Log.e(TAG, "check  for update end");
                             break;
                         case 5:
                             intentChart = new Intent(Const.Action_Chart_Result_1);
@@ -480,7 +488,9 @@ public class DBService extends Service {
     }
 
     private void DBInitial() {
-        dbHelper = new DBHelper(getApplicationContext());
+        if (null==dbHelper) {
+            dbHelper = new DBHelper(getApplicationContext());
+        }
         db = dbHelper.getReadableDatabase();
 
         Calendar calendar = Calendar.getInstance();
@@ -669,8 +679,6 @@ public class DBService extends Service {
 
 
     private double getLastSevenDaysInOutRatio() {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
         List<State> states = new ArrayList<State>();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -765,8 +773,8 @@ public class DBService extends Service {
     private void insertState(State state) {
         //check a conflict,
         //ex. 12.2 23.59 - 12.3 0.01 check if current day == insert day, if yes, insert it, else not insert it
-        String str = "";
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String str = "";
         if (db == null)
             str = "db = null ";
         else str = "db != null ";
@@ -877,6 +885,7 @@ public class DBService extends Service {
     }
 
     private void updateStateUpLoad(State state, int upload) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DBConstants.DB_MetaData.STATE_HAS_UPLOAD, upload);
         cupboard().withDatabase(db).update(State.class, values, "id = ?", state.getId() + "");
@@ -902,8 +911,9 @@ public class DBService extends Service {
             isUploadRunning = true;
             String url = HttpUtil.UploadBatch_url;
             JSONArray array = new JSONArray();
-            for (State state : states) {
-                JSONObject tmp = State.toJsonobject(state, aCache.getAsString(Const.Cache_User_Id));
+            final int size = states.size()<1000?states.size():1000;
+            for (int i=0;i<size;i++) {
+                JSONObject tmp = State.toJsonobject(states.get(i), aCache.getAsString(Const.Cache_User_Id));
                 array.put(tmp);
             }
             JSONObject batchData = null;
@@ -922,16 +932,16 @@ public class DBService extends Service {
                     try {
                         String value = response.getString("succeed_count");
                         FileUtil.appendStrToFile(DBRunTime, "checkPMDataForUpload upload success value = " + value);
-                        if (Integer.valueOf(value) == states.size()) {
-                            for (State state : states) {
-                                updateStateUpLoad(state, 1);
+                        if (Integer.valueOf(value) == size) {
+                            for (int i=0;i<size;i++) {
+                                updateStateUpLoad(states.get(i), 1);
                             }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if(isBackground != null && isBackground.equals(bgStr))
-                         Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
+                    if (isBackground != null && isBackground.equals(bgStr))
+                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -940,15 +950,25 @@ public class DBService extends Service {
                         Log.e(TAG, "checkPMDataForUpload error getMessage" + error.getMessage());
                     if (error.networkResponse != null)
                         Log.e(TAG, "checkPMDataForUpload networkResponse statusCode " + error.networkResponse.statusCode);
-
+                    Log.e(TAG, "checkPMDataForUpload error " + error.toString());
                     isUploadRunning = false;
-                    if(isBackground != null && isBackground.equals(bgStr))
+                    if (isBackground != null && isBackground.equals(bgStr))
                         Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
                 }
-
-            });
+            }) {
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    headers.put("Content-Type", "application/json; charset=utf-8");
+                    return headers;
+                }
+            };
+            jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    Const.Default_Timeout,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
         }
+
     }
 
     class Receiver extends BroadcastReceiver {
