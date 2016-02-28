@@ -109,8 +109,8 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         String longi = aCache.getAsString(Const.Cache_Longitude);
         if(ShortcutUtil.isStringOK(lati)) mLati.setText(lati);
         if(ShortcutUtil.isStringOK(longi)) mLongi.setText(longi);
-        //baiduChecked();
-        GPSChecked();
+        baiduChecked();
+        //GPSChecked();
     }
 
     @Override

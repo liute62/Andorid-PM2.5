@@ -124,6 +124,7 @@ public class DataCalculator {
                     month = 12;
                 }
                 day = Const.DayMaxOfTheMonth[month] + day - i;
+                if(month == 2 && (year % 4 == 0)) day = 29 + day - i;
             } else {
                 day = day - i;
             }

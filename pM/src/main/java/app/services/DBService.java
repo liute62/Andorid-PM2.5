@@ -146,6 +146,7 @@ public class DBService extends Service {
      **/
     private PowerManager powerManager;
     PowerManager.WakeLock wakeLock = null;
+    private boolean isSavingBattery;
 
     Handler DBHandler = new Handler() {
         @Override
@@ -362,7 +363,8 @@ public class DBService extends Service {
                 //every 10 min to open the GPS and if get the last location, close it.
                 if (DBRunTime % 120 == 0) { //120 * 5s = 10min
                     //FileUtil.appendStrToFile(DBRunTime, "Add status listener and request location Updates");
-                    locationService.run(LocationService.TYPE_BAIDU);
+                    if(!isSavingBattery)
+                        locationService.run(LocationService.TYPE_BAIDU);
                 }
                 if (DBRunTime % 130 == 0) { //open for 10 * 5 = 50s
                     //FileUtil.appendStrToFile(DBRunTime, "remove status listener, remove request location Updates");
@@ -437,6 +439,7 @@ public class DBService extends Service {
         isUploadRunning = false;
         isPMSearchSuccess = false;
         isRefreshRunning = false;
+        isSavingBattery = false;
         aCache = ACache.get(getApplicationContext());
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
@@ -470,6 +473,10 @@ public class DBService extends Service {
             intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
             sendBroadcast(intentText);
         }
+        String isSaving = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+        if(ShortcutUtil.isStringOK(isSaving) && isSaving.equals(Const.IS_SAVING_BATTERY))
+            openSavingBattery();
+        else closeSavingBattery();
         DBHandler.sendEmptyMessageDelayed(0, 15000);//15s
     }
 
@@ -547,32 +554,7 @@ public class DBService extends Service {
             }
         });
         time1 = System.currentTimeMillis();
-        mSensorManager.registerListener(new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                    simpleStepDetector.updateAccel(
-                            event.timestamp, event.values[0], event.values[1], event.values[2]);
-                }
-                long time2 = System.currentTimeMillis();
-                if (time2 - time1 > Motion_Detection_Interval) {
-                    if (numSteps > Motion_Run_Thred)
-                        mMotionStatus = Const.MotionStatus.RUN;
-                    else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
-                        mMotionStatus = Const.MotionStatus.WALK;
-                    else
-                        mMotionStatus = Const.MotionStatus.STATIC;
-                    numSteps = 0;
-                    time1 = time2;
-                    //Log.v(TAG, "Motion Status: " + String.valueOf(mMotionStatus));
-                }
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
-
-            }
-        }, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void locationInitial() {
@@ -602,6 +584,32 @@ public class DBService extends Service {
         }
     }
 
+    SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                simpleStepDetector.updateAccel(
+                        event.timestamp, event.values[0], event.values[1], event.values[2]);
+            }
+            long time2 = System.currentTimeMillis();
+            if (time2 - time1 > Motion_Detection_Interval) {
+                if (numSteps > Motion_Run_Thred)
+                    mMotionStatus = Const.MotionStatus.RUN;
+                else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
+                    mMotionStatus = Const.MotionStatus.WALK;
+                else
+                    mMotionStatus = Const.MotionStatus.STATIC;
+                numSteps = 0;
+                time1 = time2;
+                //Log.v(TAG, "Motion Status: " + String.valueOf(mMotionStatus));
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
 
     LocationService.GetTheLocation getTheLocation = new LocationService.GetTheLocation() {
         @Override
@@ -1002,8 +1010,25 @@ public class DBService extends Service {
                     //ProgressDialog.show(getApplicationContext(),"title","message",true,false);
                     refreshAll();
                 }
+            }else if(intent.getAction().equals(Const.Action_Low_Battery_ToService)){
+                String state = intent.getStringExtra(Const.Intent_Low_Battery_State);
+                if(state != null && state.equals(Const.IS_SAVING_BATTERY))
+                    openSavingBattery();
+                else if(state != null && state.equals(Const.Not_SAVING_BATTERY))
+                    closeSavingBattery();
             }
         }
+    }
+
+    private void openSavingBattery(){
+        isSavingBattery = true;
+        if(mSensorManager != null)mSensorManager.registerListener(sensorEventListener,
+                mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private void closeSavingBattery(){
+        isSavingBattery = false;
+        if(mSensorManager != null)mSensorManager.unregisterListener(sensorEventListener);
     }
 
     private void refreshAll(){

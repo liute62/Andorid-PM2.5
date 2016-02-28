@@ -27,7 +27,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <RelativeLayout
+                android:id="@+id/register_center_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textView2"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView23"
+                    android:text="@string/register_para_1"/>
+
+                <TextView
+                    android:layout_below="@+id/textView23"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="@string/register_para_2"/>
+            </RelativeLayout>
+
             <TextView
+                android:layout_below="@+id/register_center_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="邀请码"

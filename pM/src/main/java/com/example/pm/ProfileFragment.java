@@ -165,6 +165,13 @@ public class ProfileFragment extends Fragment implements
                 mGender.setText("Gender");
             }
         }
+        String battery = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+        if(ShortcutUtil.isStringOK(battery)) {
+            if (battery.equals(Const.IS_SAVING_BATTERY))
+                mSavingBattery.setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_off));
+            else
+                mSavingBattery.setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_on));
+        }
     }
 
     private void setListener() {
@@ -205,12 +212,18 @@ public class ProfileFragment extends Fragment implements
                 dialogNotification.show();
                 break;
             case R.id.profile_saving_battery:
-                if (v.getTag() == null || v.getTag().equals("on")) {
-                    v.setTag("off");
-                    ((TextView) v).setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_on));
-                } else if (v.getTag().equals("off")) {
-                    v.setTag("on");
+                String is = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+                if(! ShortcutUtil.isStringOK(is))
+                    aCache.put(Const.Cache_Is_Saving_Battery,Const.Not_SAVING_BATTERY);
+                is = aCache.getAsString(Const.Cache_Is_Saving_Battery);
+                if (is.equals(Const.Not_SAVING_BATTERY)) {
                     ((TextView) v).setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_off));
+                    aCache.put(Const.Cache_Is_Saving_Battery, Const.IS_SAVING_BATTERY);
+                    notifySavingBattery(true);
+                } else if (is.equals(Const.IS_SAVING_BATTERY)) {
+                    aCache.put(Const.Cache_Is_Saving_Battery, Const.Not_SAVING_BATTERY);
+                    ((TextView) v).setText(mActivity.getResources().getString(R.string.profile_btn_saving_battery_on));
+                    notifySavingBattery(true);
                 }
                 break;
             case R.id.profile_login:
@@ -447,6 +460,13 @@ public class ProfileFragment extends Fragment implements
             mLogin.setWidth(40);
             mLogin.setHeight(28);
         }
+    }
+
+    private void notifySavingBattery(boolean is){
+        Intent intent = new Intent(Const.Action_Low_Battery_ToService);
+        if(is) intent.putExtra(Const.Intent_Low_Battery_State,Const.IS_SAVING_BATTERY);
+        else intent.putExtra(Const.Intent_Low_Battery_State,Const.Not_SAVING_BATTERY);
+        mActivity.sendBroadcast(intent);
     }
 
 }

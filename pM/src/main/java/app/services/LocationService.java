@@ -97,7 +97,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
     }
 
     private void setDefaultTag(){
-        localization_type = TYPE_GPS;
+        localization_type = TYPE_BAIDU;
     }
 
     public void run(){

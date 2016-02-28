@@ -42,6 +42,10 @@ public class Const {
 
     public static final int Resolution_Small = 541;
 
+    public static final String Not_SAVING_BATTERY = "false";
+
+    public static final String IS_SAVING_BATTERY = "true";
+
     /**
      * Cache*
      */
@@ -84,6 +88,7 @@ public class Const {
     public static final String Cache_Chart_Alert = "Cache_Chart_Alert";
     public static final String Cache_User_Weight = "Cache_User_Weight";
     public static final String Cache_Lastime_Timepoint = "Cache_Lastime_Timepoint";
+    public static final String Cache_Is_Saving_Battery = "Cache_Is_Saving_Battery";
 
 
     /**
@@ -160,6 +165,8 @@ public class Const {
 
     public static final String Intent_Bluetooth_HearthRate = "Intent_Bluetooth_HearthRate";
 
+    public static final String Intent_Low_Battery_State = "Intent_Low_Battery_State";
+
     /**
      * Service & Activity Code*
      */
@@ -186,6 +193,8 @@ public class Const {
     public static final String Action_Get_Location_ToService = "Action_Get_Location_ToService";
 
     public static final String Action_Refresh_Chart_ToService = "Action_Refresh_Chart_ToService";
+
+    public static final String Action_Low_Battery_ToService = "Action_Low_Battery_ToService";
 
     public static final int Action_Profile_Register = 200001;
 
@@ -362,7 +371,7 @@ public class Const {
      * DayMaxOfTheMonth[1] = 31 January : number of days = 31
      */
     public static int[] DayMaxOfTheMonth = {
-       0,31,29,31,30,31,30,31,31,30,31,30,31
+       0,31,28,31,30,31,30,31,31,30,31,30,31
     };
 
 }
