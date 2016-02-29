@@ -782,6 +782,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 String longi = intent.getStringExtra(Const.Intent_DB_PM_Longi);
                 String last_lati = aCache.getAsString(Const.Cache_Latitude);
                 String last_longi = aCache.getAsString(Const.Cache_Longitude);
+                Log.e(TAG,"lati "+lati+" last_lati"+last_lati+" longi"+longi+" last_longi"+last_longi);
                 if (last_lati == null || last_longi == null) {
                     //Log.e("MainFragment","lati or longi null");
                     aCache.put(Const.Cache_Latitude, lati);

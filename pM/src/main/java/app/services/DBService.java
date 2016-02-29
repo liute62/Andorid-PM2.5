@@ -175,6 +175,9 @@ public class DBService extends Service {
             Bundle mBundle = new Bundle();
             Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
             if(msg.what == Const.Handler_Refresh_Text){
+                if(state == null) return;
+                DataCalculator.getIntance(db).updateLastTwoHourState();
+                DataCalculator.getIntance(db).updateLastWeekState();
                 Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
                 intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
                 intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
@@ -1055,6 +1058,11 @@ public class DBService extends Service {
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 2000);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
+
+        Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
+        intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
+        intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
+        sendBroadcast(intentText);
     }
 
     /**
