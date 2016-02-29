@@ -126,6 +126,11 @@ public class ShortcutUtil {
         return retStrFormatNowDate;
     }
 
+    public static String refFormatDateAndTimeInHour(long currentTimeMillis) {
+        String retStrFormatNowDate = refFormatDateAndTime(currentTimeMillis);
+        return retStrFormatNowDate.substring(0,13)+":00:00";
+    }
+
     public static String refFormatOnlyDate(long currentTimeMillis) {
         Date nowTime = new Date(currentTimeMillis);
         SimpleDateFormat sdFormatter = new SimpleDateFormat("yyyy-MM-dd");
