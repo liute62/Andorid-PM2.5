@@ -308,7 +308,6 @@ public class DBService extends Service {
                             Log.e(TAG, "check  for update end");
                             break;
                         case 5:
-                            Bundle mBundle = new Bundle();
                             intentChart = new Intent(Const.Action_Chart_Result_1);
                             DataCalculator.getIntance(db).updateLastTwoHourState();
                             mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
