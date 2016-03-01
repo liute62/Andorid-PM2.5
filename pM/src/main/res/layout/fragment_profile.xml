@@ -131,8 +131,8 @@
 
                 <ImageView
                     android:id="@+id/user_avatar"
-                    android:layout_width="68dp"
-                    android:layout_height="68dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="21dp"
                     android:background="@android:color/white"
                     android:contentDescription="@null"
@@ -197,6 +197,10 @@
                 android:id="@+id/profile_help"
                 style="@style/main_left_button_style"
                 android:text="@string/profile_btn_help" />
+            <Button
+                android:id="@+id/profile_saving_battery"
+                style="@style/main_left_button_style"
+                android:text="@string/profile_btn_saving_battery_on"/>
 
             <Button
                 android:id="@+id/profile_exit"

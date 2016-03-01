@@ -20,6 +20,7 @@ public class NotificationActivity extends Activity implements View.OnClickListen
     Button mSure;
     Button mCancel;
     ACache aCache;
+    boolean isFinished;
 
     Handler mHandler = new Handler(){
 
@@ -27,6 +28,7 @@ public class NotificationActivity extends Activity implements View.OnClickListen
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if(msg.what == Const.Handler_Input_Weight) {
+                isFinished = true;
               SharedPreferencesUtil
                      .setValue(getBaseContext(), "isAlreadyInit"
                              + ShortcutUtil.getAppVersionCode(getBaseContext()), true);
@@ -44,6 +46,7 @@ public class NotificationActivity extends Activity implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+        isFinished = false;
         aCache = ACache.get(this);
         mSure = (Button) findViewById(R.id.notification_sure);
         mCancel = (Button) findViewById(R.id.notification_cancel);
@@ -59,11 +62,19 @@ public class NotificationActivity extends Activity implements View.OnClickListen
                 dialogInputWeight.show();
                 break;
             case R.id.notification_cancel:
-                SharedPreferencesUtil
-                        .setValue(getBaseContext(), "isAlreadyInit"
-                                + ShortcutUtil.getAppVersionCode(getBaseContext()), false);
+                isFinished = false;
                 this.finish();
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(!isFinished){
+            SharedPreferencesUtil
+                    .setValue(getBaseContext(), "isAlreadyInit"
+                            + ShortcutUtil.getAppVersionCode(getBaseContext()), false);
+        }
+        super.onDestroy();
     }
 }

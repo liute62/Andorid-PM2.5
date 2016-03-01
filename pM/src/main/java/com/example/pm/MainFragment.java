@@ -47,10 +47,12 @@ import app.view.widget.DialogConfirm;
 import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
 import app.view.widget.DialogGetLocation;
-import app.view.widget.DialogRefresh;
 import app.view.widget.LoadingDialog;
+import lecho.lib.hellocharts.model.AbstractChartData;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.view.AbstractChartView;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.LineChartView;
 
@@ -330,6 +332,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAddCity = (ImageView)view.findViewById(R.id.main_add_city);
         mViewMore2 = (TextView)view.findViewById(R.id.main_view_more_2);
         setFonts(view);
+        setTextSizeByWidth();
         setListener();
         cacheInitial();
         dataInitial();
@@ -463,6 +466,9 @@ public class MainFragment extends Fragment implements OnClickListener {
             chartData12 = (HashMap<Integer, Float>) chart12;
             chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
         }
+        Object chart8obj = aCache.getAsObject(Const.Cache_Chart_8_Time);
+        if(chart8obj != null)
+            chart8Time = (ArrayList) chart8obj;
     }
 
     private void dataInitial() {
@@ -500,26 +506,29 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (ChartsConst.Chart_type[chart1_index] == 0) {
             mChart1column.setVisibility(View.VISIBLE);
             mChart1line.setVisibility(View.INVISIBLE);
-            mChart1column.setColumnChartData((ColumnChartData) setChartDataByIndex(chart1_index));
+            //mChart1column.setColumnChartData((ColumnChartData) setChartDataByIndex(chart1_index));
+            setChartViewport(mChart1column, setChartDataByIndex(chart1_index));
         } else if (ChartsConst.Chart_type[chart1_index] == 1) {
             mChart1column.setVisibility(View.INVISIBLE);
             mChart1line.setVisibility(View.VISIBLE);
-            mChart1line.setLineChartData((LineChartData) setChartDataByIndex(chart1_index));
+            //mChart1line.setLineChartData((LineChartData) setChartDataByIndex(chart1_index));
+            setChartViewport(mChart1line, setChartDataByIndex(chart1_index));
         } else {
             mChart1column.setVisibility(View.INVISIBLE);
             mChart1line.setVisibility(View.INVISIBLE);
         }
-
         mChart2Title.setText(ChartsConst.Chart_title[chart2_index]);
         if (ChartsConst.Chart_type[chart2_index] == 0) {
             mChart2column.setVisibility(View.VISIBLE);
             mChart2line.setVisibility(View.INVISIBLE);
-            ColumnChartData tmp = (ColumnChartData) setChartDataByIndex(chart2_index);
-            mChart2column.setColumnChartData(tmp);
+            //ColumnChartData tmp = (ColumnChartData) setChartDataByIndex(chart2_index);
+            //mChart2column.setColumnChartData(tmp);
+            setChartViewport(mChart2column, setChartDataByIndex(chart2_index));
         } else if (ChartsConst.Chart_type[chart2_index] == 1) {
             mChart2column.setVisibility(View.INVISIBLE);
             mChart2line.setVisibility(View.VISIBLE);
-            mChart2line.setLineChartData((LineChartData) setChartDataByIndex(chart2_index));
+            //mChart2line.setLineChartData((LineChartData) setChartDataByIndex(chart2_index));
+            setChartViewport(mChart2line, setChartDataByIndex(chart2_index));
         } else {
             mChart2column.setVisibility(View.INVISIBLE);
             mChart2line.setVisibility(View.INVISIBLE);
@@ -698,7 +707,9 @@ public class MainFragment extends Fragment implements OnClickListener {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(mActivity.getApplicationContext(), Const.ERROR_NO_CITY_RESULT, Toast.LENGTH_SHORT).show();
+                String bg = aCache.getAsString(Const.Cache_Is_Background);
+                if(ShortcutUtil.isStringOK(bg) && bg.equals("false"))
+                   Toast.makeText(mActivity.getApplicationContext(), Const.ERROR_NO_CITY_RESULT, Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -771,6 +782,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 String longi = intent.getStringExtra(Const.Intent_DB_PM_Longi);
                 String last_lati = aCache.getAsString(Const.Cache_Latitude);
                 String last_longi = aCache.getAsString(Const.Cache_Longitude);
+                Log.e(TAG,"lati "+lati+" last_lati"+last_lati+" longi"+longi+" last_longi"+last_longi);
                 if (last_lati == null || last_longi == null) {
                     //Log.e("MainFragment","lati or longi null");
                     aCache.put(Const.Cache_Latitude, lati);
@@ -879,6 +891,35 @@ public class MainFragment extends Fragment implements OnClickListener {
 //               return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
         }
         return null;
+    }
+
+    private Viewport calChartViewport(AbstractChartView view,Object data){
+        view.setViewportCalculationEnabled(true);
+        if(view instanceof LineChartView){
+            ((LineChartView) view).setLineChartData((LineChartData)data);
+        }else if(view instanceof ColumnChartView) {
+            ((ColumnChartView) view).setColumnChartData((ColumnChartData) data);
+        }
+        view.resetViewports();
+        return view.getCurrentViewport();
+    }
+
+    private void setChartViewport(AbstractChartView view,Object data){
+        final Viewport v = calChartViewport(view,data);
+        v.top = v.top * 1.2f;
+        v.bottom = 0;
+        view.setMaximumViewport(v);
+        view.setCurrentViewport(v);
+        view.setViewportCalculationEnabled(false);
+    }
+
+    private void setTextSizeByWidth(){
+        int width = Const.CURRENT_WIDTH;
+        if(width == -1) return;
+        if(width <= Const.Resolution_Small){
+            mChart1Title.setTextSize(12);
+            mChart2Title.setTextSize(12);
+        }
     }
 
 }

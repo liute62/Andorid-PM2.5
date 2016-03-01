@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.pm.MainActivity;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -123,6 +124,7 @@ public class DataCalculator {
                     month = 12;
                 }
                 day = Const.DayMaxOfTheMonth[month] + day - i;
+                if(month == 2 && (year % 4 == 0)) day = 29 + day - i;
             } else {
                 day = day - i;
             }
@@ -337,8 +339,24 @@ public class DataCalculator {
         for(Integer i : tmpMap.keySet()){
             float density = tmpMap.get(i);
             int size = mapSize.get(i);
-            result.put(i,density / size);
+            result.put(i, density / size);
             //Log.e(TAG,"calChart4Data result "+result.get(i));
+        }
+        // TODO: 16/2/15 A bug that if all the data are the same, the line chart couldn't show
+        // TODO: so that's why we always set data at index 0 to 0.0f in this situation, by that way, the chart could show.
+        if(result.size() >= 2) {
+            boolean isSet = true;
+            float tmp = 0.0f;
+            int index = 0;
+            tmp = result.get(0).floatValue();
+            for (Integer tmpKey : result.keySet()) {
+                if(result.get(tmpKey).floatValue() != tmp){
+                    isSet = false;
+                    break;
+                }
+            }
+            if(isSet)
+            result.put(0,0.0f);
         }
         return result;
     }

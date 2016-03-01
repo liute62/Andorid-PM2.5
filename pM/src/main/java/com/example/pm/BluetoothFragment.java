@@ -37,6 +37,7 @@ import app.utils.Const;
  */
 public class BluetoothFragment extends Fragment implements View.OnClickListener,AdapterView.OnItemClickListener{
 
+    // TODO: 16/2/15 add something for min sdk version < 17 since le.. must above 18
     Activity mActivity;
     ImageView mProfile;
     ImageView mBack;
