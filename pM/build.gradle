@@ -41,6 +41,7 @@ dependencies {
     compile 'com.github.lecho:hellocharts-library:1.5.8@aar'
     compile 'com.mcxiaoke.volley:library:1.0.18'
     compile 'nl.qbusict:cupboard:2.1.2'
+    compile 'com.github.orhanobut:logger:1.12'
     compile files('src/main/jniLibs/BaiduLBS_Android.jar')
     compile files('src/main/jniLibs/locSDK_6.03.jar')
     compile project(':umeng_share_library')

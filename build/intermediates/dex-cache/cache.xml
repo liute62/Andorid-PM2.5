@@ -2,18 +2,368 @@
 <items version="2" >
 
     <item
-        jar="/Users/liuhaodong1/Documents/Git/Andorid-PM2.5/pM/libs/locSDK_6.13.jar"
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_shake.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="2cdb37444b41b42e1ce5a8a27e5d3c22e1c57479">
-        <dex dex="/Users/liuhaodong1/Documents/Git/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/locSDK_6.13-e307c720bba9d2ee2c7a5b5e515e6b1da6f7d7e7.jar" />
+        sha1="164492c68547d5cf55865b6da6e243b3cfc6265c">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_shake_4e759b2bfbc316c5b60b2617a58f8c6e53de4716.jar" />
     </item>
     <item
-        jar="/Users/liuhaodong1/Documents/Git/Andorid-PM2.5/pM/libs/baidumapapi_v3_5_0.jar"
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_like.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="cacc925d3017b90684c21adbfab0ee63d8875938">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_like_f35ce83718730e4e683a19780b3afb673eafc75c.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_flickr.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="38d24f89069ad29d1951fd79248ffa942cda7b30">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_flickr_8e2f47c9de1d776c4dfc76e3aca9c7534699e385.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_comment.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ffdf1d403beeda7830906b6e3d5ad0dccc8e5b8e">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_comment_06c575cd0493fd18fc529474b807d4382f94cf7d.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_WeiXin_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="1dd0833925638a0e2c62fc818445501693359f10">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_WeiXin_2_685344fa933fadfab6d9ea45300cfcba651ca749.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_facebook_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="858536c7d380e22f65b6fb0298f31ef0583c795d">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_facebook_1_df8b2b0c899096f2eb6551ae002f92527abcd1de.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_yixin_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="f40ddf23b6dd871c22dcfbd5721e78ab78ab01a6">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_yixin_2_e5ae24124521b9422d6d5f490e46b0b57fcec6c2.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_linkedin.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="e37c9c4495f93acaf418e1e32b64b31633ed20af">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_linkedin_10e35b78f943e2605a326428e68635aec4114d8d.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_facebook_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="c07d22c9053ac49b2b56580d2a7d4fbc3166b7c5">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_facebook_2_a0914dbe5bcdf56c4288db162bc5e0b8a8550bd5.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_evernote.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="a134a83e21a016ae871ec4bbde4a3cc76dc4a5ab">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_evernote_44ed8116d1d8ab673a0e1d157cf301e39aa14105.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_UserCenter.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ee7fb5b3cad5f85e0c08dccdc1726f49885a1359">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_UserCenter_d154c04084db2bbe79b28d39d9c415ddbeddde45.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_kakao.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="c16c11c54e7529f20f02b14b9fa19c37455272f6">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_kakao_76215d5cbbf8e7ccdac1bf3a1d57416c450b748e.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_email.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="dd3cbfffe553cf5f0df001259ca75767fe5659bf">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_email_91218a6dee14188ce3288deae891f97f558be886.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_Sina.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="beec66ab86a9b8310a6f3da5c1a2043230768fb6">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_Sina_8f30df4fa4f22ad8e21d0a838c069f2466d55508.jar" />
+    </item>
+    <item
+        jar="/opt/android-sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.0/support-annotations-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="92e3fc113ec3ee36b64603a38857b95700025633">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/support-annotations-23.1.0_d41efdc78caad0b96629ae0ef638ea52db411703.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_QQZone_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="d498d63bdfc1494270efb2468451168c8debe0b8">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_QQZone_2_e4e330e921cad09183598ce1137ea532796dcc19.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/libs/baidumapapi_v3_5_0.jar"
         jumboMode="false"
         revision="23.0.1"
         sha1="b63b092a660a70370a05e00be60fd2b4ed290fcb">
-        <dex dex="/Users/liuhaodong1/Documents/Git/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/baidumapapi_v3_5_0-cd97520b81f04877afc6fac61ec9d1bd2f21155a.jar" />
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/baidumapapi_v3_5_0_570bb756068c6f92519dffe6374485c662e260ae.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_QQZone_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="74a0f2a32bf304b6a08c7df5e646da61a807016d">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_QQZone_1_47b907a9f78a645e2d32cf5e95a03889b45e9edc.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_foursquare.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="453f9771f4192d130ee4bf51ba1eada0d5ab0485">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_foursquare_bc20884d8430a72e26c3a7b5eda329efdb92dce6.jar" />
+    </item>
+    <item
+        jar="/home/sweet/.gradle/caches/modules-2/files-2.1/nl.qbusict/cupboard/2.1.2/aa2654568535e3a29af7a3b86453b8ff85af6d12/cupboard-2.1.2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="aa2654568535e3a29af7a3b86453b8ff85af6d12">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/cupboard-2.1.2_aee8ff6250291f04eb895ef9dc805f4d5bd528fa.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_AtFriends.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8d7e3b4ce906c279725fdd90aae52fbe4e4a7ca5">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_AtFriends_10a460ac61515a08509cc175e9f960be6e6a6585.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="132de605575f093107461141986d3bdff91a0e66">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/Andorid-PM2.5-umeng_share_library-unspecified_a0b57c8d9e2fb0b31ca9eb3f5635f1f9b568fccf.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_renren_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="11dd25e0ef919986b59c16b4924d7e37f7216e0d">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_renren_1_77d054600ab3212d144714820bfcf5fab696904c.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/com.android.support-support-v4-23.1.0_e18e74d60103c685dbba1184aedd716144ff7f54.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_tencentWB_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="127623ee04f550a51a53ba3e1f8b3a0ecd947695">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_tencentWB_2_11c96e3ea40a2ad6c7c49b26dab8c81565281ed2.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/com.github.lecho/hellocharts-library/1.5.8/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="56c6a22c42588628903e9dda5d8f3aa1c1b4372f">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/com.github.lecho-hellocharts-library-1.5.8_74af94414fce363a6fcc8e275a550f6960e306e4.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.0/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="57ae0d750ff83f0c738d21720224ac7ea866a094">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-23.1.0_e1e18a127f856ceedeb4eaae57ca9023de45bcd6.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_laiwang_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ecd4e41114e358864226e24847df0a1ec99a9591">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_laiwang_1_20c3ee82e3a2ed752a751219aafab4f07fc92cf9.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/bolts-android-1.1.4.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="7f06a446d5e601432f25daa6a65e73afe4f465ba">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/bolts-android-1.1.4_59d7600e42755ca8447d1838cc84622a1491bf1b.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_QQZone_3.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="0d979f7c1bffd771b21de49168d460607582cfcb">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_QQZone_3_5c2b342165af1740cf94fd7ac7bdf7a3f45c3116.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/jars/libs/internal_impl-23.1.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/internal_impl-23.1.0_d5073177bd1053003a022a3292fe7f5ddf6e6708.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_ynote.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="2969a8bef7fa6746f7ea7cd21fb75ff71ebee44a">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_ynote_f1b2adb26a2170cc1298d94a0b13019316b6e711.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/slidingmenu_library/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="7f445c4edd2824bf594ed3e54e6f330011c9291c">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/Andorid-PM2.5-slidingmenu_library-unspecified_ea8e11fc2f69a5da3491ab0809986a2dead53ca3.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_whatsapp.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="242490d2558679ab67cb964e36d4db1282d54037">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_whatsapp_85da6181cd09d60ec10624020cff181a6be4f81c.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_yixin_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="d5d0e875fad494c27d1454bdcb3c81620de832a7">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_yixin_1_8a04de1107ff4e5176c56549d9eee52b2dce18be.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/httpmime-4.1.3.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="e094a6668bec96aa7ec454b3af9176bf824c8660">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/httpmime-4.1.3_8e421c08f2affe7b87555000d12f48494cdcf1d4.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_laiwang_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="64e276baf19e45deee48960d982f56ac7634bcf5">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_laiwang_2_eba23ae927234cf3f7f6ddf2e2ec96abcd9e4234.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_line.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="bf3a3414a75ca6931afce560397cade54d9cd7c4">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_line_880a3ee60b94da152949930dae5e00754e30cb7a.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_scrshot.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="42d94fc3522f593c987917ed3c5cd30836ac5bda">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_scrshot_c66f7d046a759fc245bdf54cb239bb43f232f689.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_WeiXin_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="5e06fe51c9e882a63f98e9bb8c0bae14f5bf7bb5">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_WeiXin_1_9a6264f64f1f65cd7de3b1aa4b5ed98ffdbf5a3a.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/libs/locSDK_6.13.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="2cdb37444b41b42e1ce5a8a27e5d3c22e1c57479">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/locSDK_6.13_4a0c75deeed60b5d09fc71b37a1c65d70d956aae.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_renren_2.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="4a9e663f0954e899aa96b298eee5ac97ef919872">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_renren_2_c421aca773d164b30915741e61b856e566e0d05e.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_pocket.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="c3968cd78649ad541d9448cf59a5e4a02b44a689">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_pocket_782fff524f191db07e3834845fff4d27482602c8.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_actionbarview.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="0585b8014475743a603dff749e268ebb4013bb97">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_actionbarview_077b139d06fa1597a0c294162072860fabfbeb84.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_tencentWB_1.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="461913ce7b4184d3efe3752ea3982ccd920615e1">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_tencentWB_1_88bd3fc76c10cd0aaeddc033cbe19b515f8475ef.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_pinterest.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="cb4b82241a8c3c12351517d9a9008efcc7b2c596">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_pinterest_375294db87c5a77fedbd46cd93d9fb979c07e3e9.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_sms.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="5634183b838fbf46c01757a9b6f95e5fa9fd907c">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_sms_528eb38b2675ce018f4902dafd6ec86d4f8bd104.jar" />
+    </item>
+    <item
+        jar="/home/sweet/.gradle/caches/modules-2/files-2.1/com.mcxiaoke.volley/library/1.0.18/38da306aafee11459cd935a01d2c92a98dc670a4/library-1.0.18.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/library-1.0.18_382819a040656eb31f3d50e664590cdac9de5c72.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_tumblr.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="c4c20db4185070360751b0f9ec52eb8f7eb3386e">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_tumblr_46c46bf58369e7caba4738bc7543286ff2bdaa78.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_instagram.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="681f9b4566b8a5fd82fde48b87140940dd7f0817">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_instagram_65e43757798be547a53b2b3a2db1c34f8071d746.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/umeng_social_sdk.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="9ad68234b59b9f4c3bdd451413031d650ebb257c">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/umeng_social_sdk_2f1938f055b8c2bd53cf262c1e7d0f5fc8a5bda4.jar" />
+    </item>
+    <item
+        jar="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/exploded-aar/Andorid-PM2.5/umeng_share_library/unspecified/jars/libs/SocialSDK_tencentWB_3.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="25a92423cce580a2606d5be505aa48243ac9f7a3">
+        <dex dex="/home/sweet/AndroidStudioProjects/Andorid-PM2.5/pM/build/intermediates/pre-dexed/debug/SocialSDK_tencentWB_3_e0c125d9ab2ba667c50057dc6345a7ae593fa114.jar" />
     </item>
 
 </items>
