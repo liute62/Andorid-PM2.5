@@ -153,23 +153,8 @@ public class DBService extends Service {
     private boolean isSavingBattery;
 
     private volatile HandlerThread mHandlerThread;
+    private Handler DBHandler;
     private Handler refreshHandler;
-
-    Handler DBHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if ((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0) {
-                Log.e(TAG, "DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
-                DBCanRun = false;
-            } else {
-                DBCanRun = true;
-            }
-            if (DBRunnable != null) {
-                DBRunnable.run();
-            }
-        }
-    };
 
     private Runnable DBRunnable = new Runnable() {
         Intent intentText;
@@ -385,6 +370,23 @@ public class DBService extends Service {
     private void initialThread() {
         mHandlerThread = new HandlerThread("DBHandlerThread");
         mHandlerThread.start();
+
+        DBHandler = new Handler(mHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if ((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0) {
+                    Log.e(TAG, "DBCanRun == False, longitude == 0.0 && latitude == 0.0 && PM25Density == 0.0");
+                    DBCanRun = false;
+                } else {
+                    DBCanRun = true;
+                }
+                if (DBRunnable != null) {
+                    DBRunnable.run();
+                }
+            }
+        };
+
         refreshHandler = new Handler(mHandlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
@@ -488,7 +490,7 @@ public class DBService extends Service {
         locationInitial();
         DBInitial();
         serviceStateInitial();
-        sensorInitial();
+        //sensorInitial();
         if (mLastLocation != null) {
             locationService.stop();
             Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
@@ -543,13 +545,13 @@ public class DBService extends Service {
         if (states.isEmpty()) {
             PM25Today = 0.0;
             venVolToday = 0.0;
-            IDToday = 0L;
+            IDToday = Long.valueOf(0);
         } else {
             State state = states.get(states.size() - 1);
             state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
-            IDToday = state.getId() + 1;
+            IDToday = Long.valueOf(state.getId()) + 1;
         }
     }
 
@@ -1056,14 +1058,14 @@ public class DBService extends Service {
         }
     }
 
-    private void closeSavingBattery(){
-        isSavingBattery = false;
+    private void openSavingBattery(){
+        isSavingBattery = true;
         if(mSensorManager != null)mSensorManager.registerListener(sensorEventListener,
                 mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private void openSavingBattery(){
-        isSavingBattery = true;
+    private void closeSavingBattery(){
+        isSavingBattery = false;
         if(mSensorManager != null)mSensorManager.unregisterListener(sensorEventListener);
     }
 
