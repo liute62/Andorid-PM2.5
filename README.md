@@ -22,6 +22,26 @@ It contains features as below:
 
 9.	A Thread pool for network operations by using Volley Framework.
 
+## Development
+Please add your own applied baidu map API KEY in the `pM/src/main/AndroidManifest.xml` like this:
+```
+<application
+    android:name=".MyApplication"
+    ...
+    >
+
+    ...
+
+    <!--<meta-data-->
+        <!--android:name="com.baidu.lbsapi.API_KEY"-->
+        <!--android:value="In8U2gwdA6i5Q0lyDHne342u">-->
+    <!--</meta-data>-->
+
+    ...
+
+</application>
+```
+
 
 ## Licence: All Rights Reserved. 
 
