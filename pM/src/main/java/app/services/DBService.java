@@ -145,14 +145,12 @@ public class DBService extends Service {
     private final int Motion_Detection_Interval = 60 * 1000; //1min
     private final int Motion_Run_Thred = 100; //100 step / min
     private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
-
     /**
      * Wake the thread
      **/
     private PowerManager powerManager;
     private PowerManager.WakeLock wakeLock;
     private boolean isSavingBattery;
-
 
     private volatile HandlerThread mHandlerThread;
     private Handler DBHandler;
@@ -389,56 +387,55 @@ public class DBService extends Service {
             }
         };
 
-    refreshHandler = new Handler(mHandlerThread.getLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            Intent intentChart;
-            Bundle mBundle = new Bundle();
-            Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
-            if(msg.what == Const.Handler_Refresh_Text){
-                if(state == null) return;
-                DataCalculator.getIntance(db).updateLastTwoHourState();
-                DataCalculator.getIntance(db).updateLastWeekState();
-                Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
-                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
-                sendBroadcast(intentText);
-            }else if (msg.what == Const.Handler_Refresh_Chart1) {
-                intentChart = new Intent(Const.Action_Chart_Result_1);
-                DataCalculator.getIntance(db).updateLastTwoHourState();
-                mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
-                mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
-                mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
-                aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-            } else if (msg.what == Const.Handler_Refresh_Chart2) {
-                intentChart = new Intent(Const.Action_Chart_Result_2);
-                DataCalculator.getIntance(db).updateLastDayState();
-                mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
-                mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
-                mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
-                mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
-                mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-            } else if (msg.what == Const.Handler_Refresh_Chart3) {
-                intentChart = new Intent(Const.Action_Chart_Result_3);
-                DataCalculator.getIntance(db).updateLastWeekState();
-                mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
-                mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
-                mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-                isRefreshRunning = false;
-                Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
+        refreshHandler = new Handler(mHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                Intent intentChart;
+                Bundle mBundle = new Bundle();
+                Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
+                if(msg.what == Const.Handler_Refresh_Text){
+                    if(state == null) return;
+                    DataCalculator.getIntance(db).updateLastTwoHourState();
+                    DataCalculator.getIntance(db).updateLastWeekState();
+                    Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
+                    intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                    intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                    intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                    sendBroadcast(intentText);
+                }else if (msg.what == Const.Handler_Refresh_Chart1) {
+                    intentChart = new Intent(Const.Action_Chart_Result_1);
+                    DataCalculator.getIntance(db).updateLastTwoHourState();
+                    mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                    mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                    mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                    aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                } else if (msg.what == Const.Handler_Refresh_Chart2) {
+                    intentChart = new Intent(Const.Action_Chart_Result_2);
+                    DataCalculator.getIntance(db).updateLastDayState();
+                    mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                    mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                    mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                    mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                    mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                } else if (msg.what == Const.Handler_Refresh_Chart3) {
+                    intentChart = new Intent(Const.Action_Chart_Result_3);
+                    DataCalculator.getIntance(db).updateLastWeekState();
+                    mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                    mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                    mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                    mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                    isRefreshRunning = false;
+                    Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
+                }
             }
-        }
-    };
-
+        };
 
     }
 

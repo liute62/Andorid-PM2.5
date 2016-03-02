@@ -43,14 +43,24 @@
             android:enabled="true"
             android:process=":remote" />
 
+        <!--请在下面添加自己申请的百度地图API的KEY-->
+
         <!--<meta-data-->
             <!--android:name="com.baidu.lbsapi.API_KEY"-->
-            <!--android:value="In8U2gwdA6i5Q0lyDHne342u"></meta-data>-->
+            <!--android:value="In8U2gwdA6i5Q0lyDHne342u">-->
+        <!--</meta-data>-->
 
+        <!--######################Luo Yi#############################-->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="BpPXGTGM7lpksZ2e0GZSbN6A">
+            android:value="2fVGi6VIr8dwoKofTl6Gd3L5">
         </meta-data>
+
+        <!--<meta-data-->
+            <!--android:name="com.baidu.lbsapi.API_KEY"-->
+            <!--android:value="BpPXGTGM7lpksZ2e0GZSbN6A">-->
+        <!--</meta-data>-->
+
         <!-- ###################添加UmengAppkey###################### -->
         <meta-data
             android:name="UMENG_APPKEY"
