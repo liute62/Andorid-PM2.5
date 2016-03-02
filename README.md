@@ -32,10 +32,10 @@ Please add your own applied baidu map API KEY in the `pM/src/main/AndroidManifes
 
     ...
 
-    <!--<meta-data-->
-        <!--android:name="com.baidu.lbsapi.API_KEY"-->
-        <!--android:value="In8U2gwdA6i5Q0lyDHne342u">-->
-    <!--</meta-data>-->
+    <meta-data
+        android:name="com.baidu.lbsapi.API_KEY"
+        android:value="In8U2gwdA6i5Q0lyDHne342u">
+    </meta-data>
 
     ...
 
