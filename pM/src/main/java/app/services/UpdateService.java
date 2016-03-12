@@ -31,6 +31,7 @@ import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.DBHelper;
+import app.utils.FileUtil;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
@@ -174,6 +175,7 @@ public class UpdateService {
                     Log.d("connection","connection is ok now");
                     PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
                     String mDensity = String.valueOf(pmModel.getPm25());
+                    FileUtil.appendStrToFile("update density url "+mDensity);
                     //Log.e(TAG,"UpdateDensity new density "+mDensity);
                     //update density
                     updateStateDensity(state, mDensity);
@@ -189,6 +191,7 @@ public class UpdateService {
                     }
                 } catch (JSONException e) {
                     Log.e(TAG,"JSONException error"+e.toString());
+                    FileUtil.appendStrToFile(" update density url JSONException error"+e.toString());
                     // TODO: 16/2/9  A Json parse bug
                     //org.json.JSONException: Value {"data":{"source":2,"time_point":"2016-02-09 00:00:00","PM25":"69","AQI":"93"},"message":"successfully get data","status":1}
                     //of type org.json.JSONObject cannot be converted to JSONArray
@@ -221,6 +224,9 @@ public class UpdateService {
             breath = static_breath * 2.1;
         } else if (mMotionStatus == Const.MotionStatus.RUN) {
             breath = static_breath * 6;
+        }
+        if (mIndoor) {
+            density /= 3;
         }
         double PM25 = density*breath/60/1000;
         List<State> states = this.getAllAfterState(state);
