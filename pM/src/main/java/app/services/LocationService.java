@@ -16,19 +16,17 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.LocationClientOption.LocationMode;
-import com.baidu.location.Poi;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import app.utils.Const;
 import app.utils.FileUtil;
 
 /**
+ * This class aims to contain all the necessary function for localization.
  * @author haodong
  */
 public class LocationService implements LocationListener,GpsStatus.Listener
@@ -46,35 +44,54 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
     public static final int Indoor = 0;
 
+    public final String[] providers = {LocationManager.GPS_PROVIDER, LocationManager.PASSIVE_PROVIDER, LocationManager.NETWORK_PROVIDER};
+
     public static LocationService instance;
 
-    GetTheLocation getTheLocation = null;
-
-    Location mLastLocation = null;
-    Context mContext;
-    String provider = null;
-    public final String[] providers = {LocationManager.GPS_PROVIDER, LocationManager.PASSIVE_PROVIDER, LocationManager.NETWORK_PROVIDER};
-    LocationManager mLocationManager;
-    LocationQueue locationQueue;
-    int localization_type;
-
-    long runBeginTime;
-
-    long runMiddleTime;
-
-    private long runTimePeriod = 1000 * 10;
-
-    boolean isRunning;
+    /**
+     * The call-back listener for getting the filtered location
+     */
+    private GetTheLocation getTheLocation = null;
 
     /**
-     * Baidu Map
+     * The last knowable location for quick access
      */
-    LocationClient locationClient;
-    BDLocationListener bdLocationListener = new MyLocationListener();
+    private Location mLastLocation = null;
 
-    boolean isGpsAvailable;
+    private Context mContext;
 
-    boolean isWifiAvailable;
+    private String provider = null;
+
+    private LocationManager mLocationManager;
+
+    /**
+     * A queue for storing location,
+     */
+    LocationQueue locationQueue;
+
+    private int localization_type;
+
+    private long runBeginTime;
+
+    private static final long runTimePeriod = 1000 * 10;
+
+    private boolean isRunning;
+
+    /**
+     * Class for Baidu Map library
+     */
+    private LocationClient locationClient;
+
+    private BDLocationListener bdLocationListener = new MyLocationListener();
+
+    /**
+     * Using for determining indoor or outdoor situation
+     * param isGpsAvailable to see whether gps signal is enough strong
+     * param isWifiAvailable to see whether wifi is connected
+     */
+    private boolean isGpsAvailable;
+
+    private boolean isWifiAvailable;
 
     public static LocationService getInstance(Context context){
         if(instance == null)
@@ -89,26 +106,27 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         mContext = context.getApplicationContext();
         locationQueue = new LocationQueue();
         setDefaultTag();
-        //initMethodByType(localization_type);
-    }
-
-    public void setGetTheLocationListener(GetTheLocation getTheLocation){
-        this.getTheLocation = getTheLocation;
     }
 
     private void setDefaultTag(){
         localization_type = TYPE_BAIDU;
     }
 
+    public void setGetTheLocationListener(GetTheLocation getTheLocation){
+        this.getTheLocation = getTheLocation;
+    }
+
     public void run(){
+        isRunning = true;
         initMethodByType(localization_type);
         runMethodByType(localization_type);
     }
 
     public void run(int type){
-        isRunning = true;
         if(type == TYPE_BAIDU || type == TYPE_GPS || type == TYPE_NETWORK)
             localization_type = type;
+        else return;
+        isRunning = true;
         initMethodByType(localization_type);
         runMethodByType(localization_type);
     }
@@ -122,13 +140,16 @@ public class LocationService implements LocationListener,GpsStatus.Listener
     private void initMethodByType(int type){
         switch (type){
             case TYPE_BAIDU:
-                 baiduInit();
+                baiduInit();
                 break;
             case TYPE_GPS:
                 deviceInit(TYPE_GPS);
                 break;
             case TYPE_NETWORK:
                 deviceInit(TYPE_NETWORK);
+                break;
+            default:
+                Log.e(TAG, "initMethodByType type error");
                 break;
         }
     }
@@ -162,7 +183,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
      */
     private void baiduInit(){
         baiduCreate();
-        baiduInitLoc();
+        baiduInitOption();
     }
 
     private void baiduRun(){
@@ -178,7 +199,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         locationClient.registerLocationListener(bdLocationListener);
     }
 
-    private void baiduInitLoc(){
+    private void baiduInitOption(){
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationMode.Hight_Accuracy);
         option.setCoorType("bd09ll");
@@ -186,7 +207,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         option.setScanSpan(span);
         option.setIsNeedAddress(true);
         option.setOpenGps(true);
-        option.setLocationNotify(true);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
+        option.setLocationNotify(false); //可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
         option.setIsNeedLocationDescribe(false);
         option.setIsNeedLocationPoiList(false);
         option.setIgnoreKillProcess(false);
@@ -288,22 +309,24 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
     /**
      * For GPS / NETWORK Method
-     * @return
+     * @return the last knowable location by GPS(1st) or Network(2nd)
      */
     public Location getLastKnownLocation() {
         initGPS();
         try {
             mLastLocation = mLocationManager.getLastKnownLocation(provider);
             if(mLastLocation != null){
-                Log.e(TAG,"getLastKnownLocation gps == NULL");
+                FileUtil.appendStrToFile(Const.code_get_lastlocation_gps_notnull, "getLastKnownLocation gps != NULL");
                 return mLastLocation;
             }
             initNetwork();
             mLastLocation = mLocationManager.getLastKnownLocation(provider);
-            if(mLastLocation == null) Log.e(TAG,"getLastKnownLocation Network == NULL");
+            if(mLastLocation != null)
+                FileUtil.appendStrToFile(Const.code_get_last_location_network_notnull, "getLastKnownLocation network != NULL");
         }catch (SecurityException e){
-            // TODO: 2/27/2016 add a way to tell the user to set Location permission
+            e.printStackTrace();
         }
+        if(mLastLocation == null) FileUtil.appendStrToFile(Const.code_get_last_location_isnull, "getLastKnownLocation == NULL");
         return mLastLocation;
     }
 
@@ -315,7 +338,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         return Outdoor;
     }
 
-    String lastTimeSSID = "lastTimeSSID";
+    private String lastTimeSSID = "lastTimeSSID";
     private boolean isWifiAvailable(){
         boolean isSuccessConnected = false;
         WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
@@ -323,15 +346,13 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             int wifiState = wifiManager.getWifiState();
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             String id = wifiInfo.getSSID();
-            //Log.e(TAG,"wifiInfo "+wifiInfo.getSSID());
             if(id != null && !id.equals("0x") && !id.equals("<unknown ssid>")) {
                 if(!lastTimeSSID.equals(id)){
                     lastTimeSSID = id;
-                    FileUtil.appendStrToFile(Const.code_file_wifi_info,"LocationService wifiInfo "+id);
+                    FileUtil.appendStrToFile(Const.code_file_wifi_info,"LocationService wifiInfo "+id + "wifistate "+wifiState);
                 }
                 isSuccessConnected = true;
             }
-
         }
         return isSuccessConnected;
     }
@@ -346,14 +367,6 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         provider = providers[2];
     }
 
-    private void setDefaultProvider(){
-        for (int i = 0; i != providers.length; i++){
-            if(mLocationManager.isProviderEnabled(providers[i])){
-                provider = providers[i];
-            }
-        }
-    }
-
     private void deviceInit(int type){
         if(type == TYPE_GPS) initGPS();
         if(type == TYPE_NETWORK) initNetwork();
@@ -361,21 +374,25 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
     private void deviceRun(){
         if(provider != null) {
-            Log.e(TAG,"deviceRun: Using provider "+provider);
             runBeginTime = System.currentTimeMillis();
             if(mLocationManager.isProviderEnabled(provider)) {
-                mLocationManager.requestLocationUpdates(provider, 0, 0, this);
-                mLocationManager.addGpsStatusListener(this);
-            }else {
-                Log.e(TAG,"provider = "+provider+" is not enabled");
-                stop();
+                try {
+                    mLocationManager.requestLocationUpdates(provider, 0, 0, this);
+                    mLocationManager.addGpsStatusListener(this);
+                }catch (SecurityException e){
+                   e.printStackTrace();
+                }
             }
         }
     }
 
     private void deviceStop(){
-        mLocationManager.removeUpdates(this);
-        mLocationManager.removeGpsStatusListener(this);
+        try {
+            mLocationManager.removeUpdates(this);
+            mLocationManager.removeGpsStatusListener(this);
+        }catch (SecurityException e){
+            e.printStackTrace();
+        }
     }
 
     private void getLocation(Location location){
@@ -394,6 +411,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
     @Override
     public void onLocationChanged(Location location) {
+        long runMiddleTime;
         if (location != null) {
             Log.e(TAG, "onLocationChanged: " + location.getLatitude()+" "+location.getProvider());
             getLocation(location);
@@ -401,7 +419,6 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             runMiddleTime = System.currentTimeMillis();
             if(runMiddleTime - runBeginTime > runTimePeriod){
                 runBeginTime = 0;
-                runMiddleTime = 0;
                 stop();
                 FileUtil.appendStrToFile(Const.code_get_location_failed,"failed to get the location in location service, running for "+String.valueOf(runTimePeriod)+" (ms)");
             }
@@ -420,16 +437,14 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 int ii = 0;
                 while (items.hasNext())
                 {
-                    GpsSatellite tmp = (GpsSatellite) items.next();
+                    GpsSatellite tmp = items.next();
                     if (tmp.usedInFix())
                         ii++;
                     i++;
                 }
-                if(ii > 4){
-                    isGpsAvailable = true;
-                }else {
-                    isGpsAvailable = false;
-                }
+                if(ii > 4) isGpsAvailable = true;
+                else  isGpsAvailable = false;
+
                Log.e(TAG,"GPS_EVENT_SATELLITE_STATUS i "+String.valueOf(i)+" ii"+String.valueOf(ii));
             } else if (event == GpsStatus.GPS_EVENT_STARTED) {
                 Iterable<GpsSatellite> allgps = status.getSatellites();
@@ -438,33 +453,27 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 int ii = 0;
                 while (items.hasNext())
                 {
-                    GpsSatellite tmp = (GpsSatellite) items.next();
+                    GpsSatellite tmp =  items.next();
                     if (tmp.usedInFix())
                         ii++;
                     i++;
                 }
-                if(ii > 4){
-                    isGpsAvailable = true;
-                }else {
-                    isGpsAvailable = false;
-                }
+                if(ii > 4) isGpsAvailable = true;
+                else isGpsAvailable = false;
                 Log.e(TAG,"GPS_EVENT_STARTED started i "+String.valueOf(i)+" ii"+String.valueOf(ii));
         }
     }
 
     @Override
     public void onProviderEnabled(String s) {
-        Log.e(TAG,"onProviderEnabled "+s);
-
     }
 
     @Override
     public void onProviderDisabled(String s) {
-        Log.e(TAG,"onProviderDisabled "+s);
     }
 
     /**
-     * onGetLocation
+     * onGetLocation: continue
      *
      * onSearchStop
      */

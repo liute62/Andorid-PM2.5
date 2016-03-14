@@ -341,6 +341,11 @@ public class Const {
 
     public static final int code_get_location_failed = -26;
 
+    public static final int code_get_lastlocation_gps_notnull = -27;
+
+    public static final int code_get_last_location_network_notnull = -28;
+
+    public static final int code_get_last_location_isnull = -29;
 
 
     public static String[] airQuality = {

@@ -114,6 +114,7 @@ public class DBService extends Service {
     private Long IDToday;
     private double venVolToday;
     private String avg_rate;
+    private int inOutDoor;
     /****/
     private int DBRunTime;
     private final int State_Much_Index = 500;
@@ -463,7 +464,7 @@ public class DBService extends Service {
         aCache = ACache.get(getApplicationContext());
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
-        locationService.getIndoorOutdoor();
+        inOutDoor = locationService.getIndoorOutdoor();
         /*
         Wake the thread
         */
@@ -574,7 +575,6 @@ public class DBService extends Service {
         simpleStepDetector.registerListener(new StepListener() {
             @Override
             public void step(long timeNs) {
-                //Log.d(TAG, "Time: " + ShortcutUtil.refFormatNowDate(timeNs) + " Step: " + String.valueOf(numSteps));
                 numSteps++;
                 numStepsTmp++;
             }
@@ -589,7 +589,6 @@ public class DBService extends Service {
             isGPSRun = true;
             longitude = mLastLocation.getLongitude();
             latitude = mLastLocation.getLatitude();
-            //Log.d(TAG, "Location Service is running" + String.valueOf(latitude) + " " + String.valueOf(longitude));
             FileUtil.appendStrToFile(DBRunTime, "locationInitial getLastKnownLocation " + String.valueOf(latitude) + " " + String.valueOf(longitude));
             aCache.put(Const.Cache_Latitude, latitude);
             aCache.put(Const.Cache_Longitude, longitude);
@@ -671,27 +670,22 @@ public class DBService extends Service {
         Double breath = 0.0;
         Double density = PM25Density;
         boolean isConnected = ShortcutUtil.isNetworkAvailable(this);
-//        double ratio = 1;
-//        if (!isConnected) {
-//            ratio = this.getLastSevenDaysInOutRatio();
-//            density = ratio * density + (1-ratio)*density/3;
-//            if (ratio>0.5) {
-//                Const.CURRENT_OUTDOOR = 0;
-//            } else {
-//                Const.CURRENT_OUTDOOR = 1;
-//            }
-//        } else {
-//            if (Const.CURRENT_OUTDOOR == 0) {
-//                density /= 3;
-//            }
-//        }
+        inOutDoor = locationService.getIndoorOutdoor();
+        double ratio = 1;
+        if (!isConnected) {
+            ratio = this.getLastSevenDaysInOutRatio();
+            density = ratio * density + (1-ratio)*density/3;
+            if (ratio > 0.5)  inOutDoor = LocationService.Indoor;
+             else inOutDoor = LocationService.Outdoor;
+        } else {
+            if (inOutDoor == LocationService.Indoor) density /= 3;
+        }
         double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
         if (static_breath == 0.0) {
             if(isBackground != null && isBackground.equals(bgStr))
                 Toast.makeText(getApplicationContext(), Const.Info_Weight_Null, Toast.LENGTH_SHORT).show();
             static_breath = 6.6; // using the default one
         }
-        Log.d(TAG, "Static Breath " + String.valueOf(static_breath));
         if (mMotionStatus == Const.MotionStatus.STATIC) {
             breath = static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {
@@ -702,11 +696,10 @@ public class DBService extends Service {
         venVolToday += breath;
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
-        Const.CURRENT_OUTDOOR = locationService.getIndoorOutdoor();
         State state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
-                String.valueOf(Const.CURRENT_OUTDOOR),
+                String.valueOf(inOutDoor),
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
                 Integer.toString(numStepsTmp), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
         numStepsTmp = 0;
