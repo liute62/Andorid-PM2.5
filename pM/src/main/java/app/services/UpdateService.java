@@ -177,6 +177,10 @@ public class UpdateService {
                     Log.d("connection","connection is ok now");
                     PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
                     String mDensity = String.valueOf(pmModel.getPm25());
+                    String inOutDoor = state.getOutdoor();
+                    if (inOutDoor.equals(LocationService.Indoor)) {
+                        mDensity = Integer.valueOf(mDensity) / 3 + "";
+                    }
                     FileUtil.appendStrToFile("update density  "+mDensity);
                     //Log.e(TAG,"UpdateDensity new density "+mDensity);
                     //update density
