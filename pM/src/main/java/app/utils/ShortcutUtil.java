@@ -6,15 +6,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -410,5 +417,36 @@ public class ShortcutUtil {
         if(location.length() >= cut)
             locationStr.substring(0,cut - 1);
         return locationStr;
+    }
+
+    public static Bitmap getNormalScreenShot(View rootView) {
+        FileUtil.makeTmpDir();
+        String fname = FileUtil.tmp_path + refFormatNowDate(System.currentTimeMillis()) + ".png";
+        rootView.setDrawingCacheEnabled(true);
+        rootView.buildDrawingCache();
+        Bitmap bitmap = rootView.getDrawingCache();
+        if (bitmap != null) {
+            try {
+                FileOutputStream out = new FileOutputStream(fname);
+                bitmap.compress(Bitmap.CompressFormat.PNG,100,out);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        }else {
+            Log.e(TAG,"getNormalScreenShot bitmap == null");
+        }
+        return bitmap;
+    }
+
+    public static void removeNormalScreenShots() {
+       File dir = new File(FileUtil.tmp_path);
+       if(dir.exists() && dir.isDirectory()){
+           String[] children = dir.list();
+           for (int i = 0; i < children.length; i++)
+           {
+               new File(dir, children[i]).delete();
+           }
+       }
     }
 }

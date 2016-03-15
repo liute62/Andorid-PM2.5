@@ -80,4 +80,6 @@
     <string name="str_stop">停止</string>
     <string name="str_back">返回</string>
     <string name="str_hint">提示：</string>
+    <string name="share_title">自由呼吸(Bio³Air)的分享</string>
+    <string name="share_content">生态 健康 生活</string>
 </resources>

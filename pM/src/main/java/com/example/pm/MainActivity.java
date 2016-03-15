@@ -12,6 +12,9 @@ import android.view.WindowManager;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
+import com.umeng.socialize.controller.UMServiceFactory;
+import com.umeng.socialize.controller.UMSocialService;
+import com.umeng.socialize.sso.UMSsoHandler;
 
 import app.services.UpdateService;
 import app.utils.ACache;
@@ -24,6 +27,8 @@ public class MainActivity extends SlidingActivity {
     public static final String TAG = "MainActivity";
     ACache aCache;
     Fragment newFragment;
+    private final UMSocialService mController = UMServiceFactory
+            .getUMSocialService("com.umeng.share");
     int offset = 20;
 
     @Override
@@ -101,6 +106,23 @@ public class MainActivity extends SlidingActivity {
                 .replace(R.id.content, fragment)
                 .commit();
         getSlidingMenu().showContent();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMSsoHandler ssoHandler = mController.getConfig().getSsoHandler(requestCode) ;
+        if(ssoHandler != null){
+            ssoHandler.authorizeCallBack(requestCode, resultCode, data);
+        }
+    }
+
+    public Fragment getMainFragment(){
+        return newFragment;
+    }
+
+    public UMSocialService getShareController(){
+        return mController;
     }
 
     @Override

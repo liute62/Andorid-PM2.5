@@ -30,7 +30,6 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <application
         android:screenOrientation="portrait"
         android:name=".MyApplication"
@@ -115,9 +114,10 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".WXEntryActivity">
 
+        <activity android:name=".wxapi.WXEntryActivity">
         </activity>
+
         <receiver android:name="app.services.WifiReceiver">
             <intent-filter >
                 <action android:name="android.net.wifi.RSSI_CHANGED"/>

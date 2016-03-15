@@ -4,6 +4,7 @@ package com.example.pm;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -390,7 +391,6 @@ public class ProfileFragment extends Fragment implements
 
         int type; // 1 sure, 2 cancel
         InfoDialog infoDialog;
-
         public ResetPwdListener(int type, InfoDialog infoDialog) {
             this.type = type;
             this.infoDialog = infoDialog;
@@ -453,8 +453,11 @@ public class ProfileFragment extends Fragment implements
 
 
     private void shareProcess(){
-        ShareUtils shareUtils = new ShareUtils(mActivity);
-        shareUtils.share();
+        MainActivity mainActivity = (MainActivity)mActivity;
+        mainActivity.toggle();
+        ShareUtils shareUtils = new ShareUtils(mActivity,mainActivity.getShareController());
+        Bitmap bitmap = ShortcutUtil.getNormalScreenShot(mainActivity.getMainFragment().getView());
+        shareUtils.share(bitmap);
     }
 
     private void setSizeByWidth(){

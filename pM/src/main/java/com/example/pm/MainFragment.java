@@ -40,6 +40,7 @@ import app.utils.ACache;
 import app.utils.ChartsConst;
 import app.utils.Const;
 import app.utils.DataGenerator;
+import app.utils.FileUtil;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
@@ -245,6 +246,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 
     @Override
     public void onDestroy() {
+        ShortcutUtil.removeNormalScreenShots();
         super.onDestroy();
         Log.d(TAG, "onDestroy");
     }

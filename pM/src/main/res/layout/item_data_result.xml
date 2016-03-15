@@ -14,6 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="44"
+            android:textSize="14dp"
             android:id="@+id/data_result_id" />
 
         <TextView
@@ -21,6 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="null"
+            android:textSize="14dp"
             android:id="@+id/data_result_user_id" />
 
         <TextView
@@ -28,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2016-01-02 23:15:52 Sat"
+            android:textSize="14dp"
             android:id="@+id/data_result_time" />
 
         <TextView
@@ -42,6 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="39.9776624"
+            android:textSize="14dp"
             android:id="@+id/data_result_lati" />
 
         <TextView
@@ -49,6 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
+            android:textSize="14dp"
             android:id="@+id/data_result_outdoor" />
 
     </LinearLayout>
@@ -63,6 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1"
+            android:textSize="14dp"
             android:id="@+id/data_result_status" />
 
         <TextView
@@ -77,6 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="12"
+            android:textSize="14dp"
             android:id="@+id/data_result_avg_rate" />
 
         <TextView
@@ -84,6 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="349.800"
+            android:textSize="14dp"
             android:id="@+id/data_result_air" />
 
         <TextView
@@ -91,6 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="20.0"
+            android:textSize="14dp"
             android:id="@+id/data_result_density" />
 
         <TextView
@@ -98,6 +107,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="6.863"
+            android:textSize="14dp"
             android:id="@+id/data_result_pm" />
 
         <TextView
@@ -105,6 +115,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
+            android:textSize="14dp"
             android:id="@+id/data_result_source" />
 
         <TextView
@@ -112,6 +123,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
+            android:textSize="14dp"
             android:id="@+id/data_result_upload" />
 
         <TextView
@@ -119,6 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
+            android:textSize="14dp"
             android:id="@+id/data_result_connection" />
 
     </LinearLayout>
