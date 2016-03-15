@@ -16,6 +16,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
@@ -65,7 +66,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by liuhaodong1 on 15/11/10.
  * //need update ....
  * DBService Sequences
- * -----Oncreate-----
+ * -----onCreate-----
  * 1.params Initial.
  * 2.Get default PM density from cache.
  * 3.DB Initial: get the value of last hour, today, last week avg pm from database and set cache.
@@ -100,8 +101,8 @@ public class DBService extends Service {
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
-    PMModel pmModel;
-    State state;
+    private PMModel pmModel;
+    private State state;
     /**
      * PM State
      **/
@@ -113,10 +114,11 @@ public class DBService extends Service {
     private Long IDToday;
     private double venVolToday;
     private String avg_rate;
+    private int inOutDoor;
     /****/
     private int DBRunTime;
-    final int State_Much_Index = 500;
-    int DB_Chart_Loop = 12;
+    private final int State_Much_Index = 500;
+    private int DB_Chart_Loop = 12;
     private boolean isPMSearchRunning;
     private boolean isPMSearchSuccess;
     private boolean DBCanRun;
@@ -128,8 +130,8 @@ public class DBService extends Service {
     /**
      * Location
      **/
-    LocationService locationService;
-    Location mLastLocation;
+    private LocationService locationService;
+    private Location mLastLocation;
     private boolean isGPSRun = false;
     /**
      * Sensor
@@ -148,8 +150,11 @@ public class DBService extends Service {
      * Wake the thread
      **/
     private PowerManager powerManager;
-    PowerManager.WakeLock wakeLock = null;
+    private PowerManager.WakeLock wakeLock;
     private boolean isSavingBattery;
+
+    private volatile HandlerThread mHandlerThread;
+    private Handler refreshHandler;
 
     Handler DBHandler = new Handler() {
         @Override
@@ -163,53 +168,6 @@ public class DBService extends Service {
             }
             if (DBRunnable != null) {
                 DBRunnable.run();
-            }
-        }
-    };
-
-    Handler refreshHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            Intent intentChart;
-            Bundle mBundle = new Bundle();
-            Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
-            if(msg.what == Const.Handler_Refresh_Text){
-                Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
-                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
-                sendBroadcast(intentText);
-            }else if (msg.what == Const.Handler_Refresh_Chart1) {
-                intentChart = new Intent(Const.Action_Chart_Result_1);
-                DataCalculator.getIntance(db).updateLastTwoHourState();
-                mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
-                mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
-                mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
-                aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-            } else if (msg.what == Const.Handler_Refresh_Chart2) {
-                intentChart = new Intent(Const.Action_Chart_Result_2);
-                DataCalculator.getIntance(db).updateLastDayState();
-                mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
-                mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
-                mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
-                mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
-                mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-            } else if (msg.what == Const.Handler_Refresh_Chart3) {
-                intentChart = new Intent(Const.Action_Chart_Result_3);
-                DataCalculator.getIntance(db).updateLastWeekState();
-                mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
-                mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
-                mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
-                intentChart.putExtras(mBundle);
-                sendBroadcast(intentChart);
-                isRefreshRunning = false;
-                Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -425,6 +383,61 @@ public class DBService extends Service {
         }
     };
 
+    private void initialThread() {
+        mHandlerThread = new HandlerThread("DBHandlerThread");
+        mHandlerThread.start();
+        refreshHandler = new Handler(mHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                Intent intentChart;
+                Bundle mBundle = new Bundle();
+                Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
+                if(msg.what == Const.Handler_Refresh_Text){
+                    if(state == null) return;
+                    DataCalculator.getIntance(db).updateLastTwoHourState();
+                    DataCalculator.getIntance(db).updateLastWeekState();
+                    Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
+                    intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                    intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                    intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                    sendBroadcast(intentText);
+                }else if (msg.what == Const.Handler_Refresh_Chart1) {
+                    intentChart = new Intent(Const.Action_Chart_Result_1);
+                    DataCalculator.getIntance(db).updateLastTwoHourState();
+                    mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
+                    mBundle.putSerializable(Const.Intent_chart5_data, DataCalculator.getIntance(db).calChart5Data());
+                    mBundle.putSerializable(Const.Intent_chart8_data, DataCalculator.getIntance(db).calChart8Data());
+                    aCache.put(Const.Cache_Chart_8_Time, DataCalculator.getIntance(db).getLastTwoHourTime());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                } else if (msg.what == Const.Handler_Refresh_Chart2) {
+                    intentChart = new Intent(Const.Action_Chart_Result_2);
+                    DataCalculator.getIntance(db).updateLastDayState();
+                    mBundle.putSerializable(Const.Intent_chart1_data, DataCalculator.getIntance(db).calChart1Data());
+                    mBundle.putSerializable(Const.Intent_chart2_data, DataCalculator.getIntance(db).calChart2Data());
+                    mBundle.putSerializable(Const.Intent_chart3_data, DataCalculator.getIntance(db).calChart3Data());
+                    mBundle.putSerializable(Const.Intent_chart6_data, DataCalculator.getIntance(db).calChart6Data());
+                    mBundle.putSerializable(Const.Intent_chart10_data, DataCalculator.getIntance(db).calChart10Data());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                } else if (msg.what == Const.Handler_Refresh_Chart3) {
+                    intentChart = new Intent(Const.Action_Chart_Result_3);
+                    DataCalculator.getIntance(db).updateLastWeekState();
+                    mBundle.putSerializable(Const.Intent_chart7_data, DataCalculator.getIntance(db).calChart7Data());
+                    mBundle.putSerializable(Const.Intent_chart_7_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                    mBundle.putSerializable(Const.Intent_chart12_data, DataCalculator.getIntance(db).calChart12Data());
+                    mBundle.putSerializable(Const.Intent_chart_12_data_date, DataCalculator.getIntance(db).getLastWeekDate());
+                    intentChart.putExtras(mBundle);
+                    sendBroadcast(intentChart);
+                    isRefreshRunning = false;
+                    Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -433,6 +446,7 @@ public class DBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        initialThread();
         mLastLocation = null;
         PM25Source = 0;
         PM25Density = 0.0;
@@ -450,8 +464,11 @@ public class DBService extends Service {
         aCache = ACache.get(getApplicationContext());
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
-        locationService.getIndoorOutdoor();
-        powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        inOutDoor = locationService.getIndoorOutdoor();
+        /*
+        Wake the thread
+        */
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
         wakeLock.acquire();
         //todo each time to run the data and
@@ -472,7 +489,7 @@ public class DBService extends Service {
         locationInitial();
         DBInitial();
         serviceStateInitial();
-        //sensorInitial();
+        sensorInitial();
         if (mLastLocation != null) {
             locationService.stop();
             Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
@@ -499,8 +516,9 @@ public class DBService extends Service {
 
     @Override
     public void onDestroy() {
-        FileUtil.appendStrToFile(-100,"DBService onDestory");
+        FileUtil.appendStrToFile(-100, "DBService onDestory");
         if (wakeLock != null) wakeLock.release();
+        mHandlerThread.quit();
         super.onDestroy();
         DBRunnable = null;
     }
@@ -526,13 +544,13 @@ public class DBService extends Service {
         if (states.isEmpty()) {
             PM25Today = 0.0;
             venVolToday = 0.0;
-            IDToday = Long.valueOf(0);
+            IDToday = 0L;
         } else {
             State state = states.get(states.size() - 1);
             state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
-            IDToday = Long.valueOf(state.getId()) + 1;
+            IDToday = state.getId() + 1;
         }
     }
 
@@ -557,7 +575,6 @@ public class DBService extends Service {
         simpleStepDetector.registerListener(new StepListener() {
             @Override
             public void step(long timeNs) {
-                //Log.d(TAG, "Time: " + ShortcutUtil.refFormatNowDate(timeNs) + " Step: " + String.valueOf(numSteps));
                 numSteps++;
                 numStepsTmp++;
             }
@@ -572,7 +589,6 @@ public class DBService extends Service {
             isGPSRun = true;
             longitude = mLastLocation.getLongitude();
             latitude = mLastLocation.getLatitude();
-            //Log.d(TAG, "Location Service is running" + String.valueOf(latitude) + " " + String.valueOf(longitude));
             FileUtil.appendStrToFile(DBRunTime, "locationInitial getLastKnownLocation " + String.valueOf(latitude) + " " + String.valueOf(longitude));
             aCache.put(Const.Cache_Latitude, latitude);
             aCache.put(Const.Cache_Longitude, longitude);
@@ -654,27 +670,22 @@ public class DBService extends Service {
         Double breath = 0.0;
         Double density = PM25Density;
         boolean isConnected = ShortcutUtil.isNetworkAvailable(this);
-//        double ratio = 1;
-//        if (!isConnected) {
-//            ratio = this.getLastSevenDaysInOutRatio();
-//            density = ratio * density + (1-ratio)*density/3;
-//            if (ratio>0.5) {
-//                Const.CURRENT_OUTDOOR = 0;
-//            } else {
-//                Const.CURRENT_OUTDOOR = 1;
-//            }
-//        } else {
-//            if (Const.CURRENT_OUTDOOR == 0) {
-//                density /= 3;
-//            }
-//        }
+        inOutDoor = locationService.getIndoorOutdoor();
+        double ratio = 1;
+        if (!isConnected) {
+            ratio = this.getLastSevenDaysInOutRatio();
+            density = ratio * density + (1-ratio)*density/3;
+            if (ratio > 0.5)  inOutDoor = LocationService.Indoor;
+             else inOutDoor = LocationService.Outdoor;
+        } else {
+            if (inOutDoor == LocationService.Indoor) density /= 3;
+        }
         double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
         if (static_breath == 0.0) {
             if(isBackground != null && isBackground.equals(bgStr))
                 Toast.makeText(getApplicationContext(), Const.Info_Weight_Null, Toast.LENGTH_SHORT).show();
             static_breath = 6.6; // using the default one
         }
-        Log.d(TAG, "Static Breath " + String.valueOf(static_breath));
         if (mMotionStatus == Const.MotionStatus.STATIC) {
             breath = static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {
@@ -685,11 +696,10 @@ public class DBService extends Service {
         venVolToday += breath;
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
-        Const.CURRENT_OUTDOOR = locationService.getIndoorOutdoor();
         State state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
-                String.valueOf(Const.CURRENT_OUTDOOR),
+                String.valueOf(inOutDoor),
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
                 Integer.toString(numStepsTmp), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
         numStepsTmp = 0;
@@ -1039,14 +1049,14 @@ public class DBService extends Service {
         }
     }
 
-    private void openSavingBattery(){
-        isSavingBattery = true;
+    private void closeSavingBattery(){
+        isSavingBattery = false;
         if(mSensorManager != null)mSensorManager.registerListener(sensorEventListener,
                 mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private void closeSavingBattery(){
-        isSavingBattery = false;
+    private void openSavingBattery(){
+        isSavingBattery = true;
         if(mSensorManager != null)mSensorManager.unregisterListener(sensorEventListener);
     }
 
@@ -1055,39 +1065,45 @@ public class DBService extends Service {
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 2000);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
+
+        Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
+        intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
+        intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
+        sendBroadcast(intentText);
     }
 
     /**
      * Check if service running surpass a day
      *
-     * @param lasttime
-     * @return
+     * @param lastTime
+     * @param nowTime
+     *
+     * @return result
      */
-    private boolean isSurpass(State lasttime, State nowTime) {
-        boolean result = false;
-        String last = null;
-        String now = null;
+    private boolean isSurpass(State lastTime, State nowTime) {
+        boolean result;
+        String last;
+        String now;
         try {
-            last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lasttime.getTime_point()));
+            last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lastTime.getTime_point()));
             now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
-        if (last.equals(now)) result = false;
-        else result = true;
+        result = !last.equals(now);
         return result;
     }
 
     /**
-     * if Service running surpass a day, then reset data parmas
+     * if Service running surpass a day, then reset data params
      */
     private void reset() {
         //todo test it !
         longitude = 0.0;
         latitude = 0.0;
-        IDToday = Long.valueOf(0);
-        venVolToday = Long.valueOf(0);
+        IDToday = 0L;
+        venVolToday = 0L;
         PM25Today = 0;
         PM25Source = 0;
         //PM25Density = 0.0;

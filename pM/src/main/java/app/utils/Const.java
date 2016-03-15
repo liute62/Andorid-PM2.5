@@ -20,6 +20,10 @@ public class Const {
 
     public static Long Min_Upload_Check_Time = Long.valueOf(60 * 60 * 1000);
 
+    public final static int Gender_Male = 1;
+
+    public final static int Gender_Female = 2;
+
     public static int CURRENT_WIDTH = -1;
 
     public static String CURRENT_ACCESS_TOKEN = "-1";
@@ -154,6 +158,8 @@ public class Const {
     public static final String Intent_chart_7_data_date = "Intent_chart_7_data_date";
 
     public static final String Intent_chart8_data = "Intent_chart8_data";
+
+    public static final String Intent_chart8_time = "Intent_chart8_time";
 
     public static final String Intent_chart10_data = "Intent_chart10_data";
 
@@ -341,6 +347,11 @@ public class Const {
 
     public static final int code_get_location_failed = -26;
 
+    public static final int code_get_lastlocation_gps_notnull = -27;
+
+    public static final int code_get_last_location_network_notnull = -28;
+
+    public static final int code_get_last_location_isnull = -29;
 
 
     public static String[] airQuality = {

@@ -88,7 +88,6 @@ public class MainFragment extends Fragment implements OnClickListener {
     TextView mChangeChart2;
     TextView mChart1Title;
     TextView mChart2Title;
-    ImageView mChart1Hint;
     ImageView mChart2Hint;
     ImageView mDensityError;
     ImageView mRunError;
@@ -134,7 +133,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     HashMap<Integer, Float> chartData7; //data for chart 7
     List<String> chart7Date;           //date(mm.dd) for chart 7
     HashMap<Integer, Float> chartData8; //data for chart 8
-    List<String> chart8Time;
+    ArrayList<String> chart8Time;
     HashMap<Integer, Float> chartData10; //data for chart 10
     HashMap<Integer, Float> chartData12; //data for chart 12
     List<String> chart12Date;           //date(mm.dd) for chart 12
@@ -317,7 +316,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         mWeekPM = (TextView) view.findViewById(R.id.main_week_pm);
         mDensityError = (ImageView)view.findViewById(R.id.main_density_error);
         mRunError = (ImageView)view.findViewById(R.id.main_run_error);
-        mChart1Hint = (ImageView)view.findViewById(R.id.main_chart_hint_1);
         mChart2Hint = (ImageView)view.findViewById(R.id.main_chart_hint_2);
         mChart1column = (ColumnChartView) view.findViewById(R.id.main_chart_1_column);
         mChart1line = (LineChartView) view.findViewById(R.id.main_chart_1_line);
@@ -506,12 +504,10 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (ChartsConst.Chart_type[chart1_index] == 0) {
             mChart1column.setVisibility(View.VISIBLE);
             mChart1line.setVisibility(View.INVISIBLE);
-            //mChart1column.setColumnChartData((ColumnChartData) setChartDataByIndex(chart1_index));
             setChartViewport(mChart1column, setChartDataByIndex(chart1_index));
         } else if (ChartsConst.Chart_type[chart1_index] == 1) {
             mChart1column.setVisibility(View.INVISIBLE);
             mChart1line.setVisibility(View.VISIBLE);
-            //mChart1line.setLineChartData((LineChartData) setChartDataByIndex(chart1_index));
             setChartViewport(mChart1line, setChartDataByIndex(chart1_index));
         } else {
             mChart1column.setVisibility(View.INVISIBLE);
@@ -521,13 +517,10 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (ChartsConst.Chart_type[chart2_index] == 0) {
             mChart2column.setVisibility(View.VISIBLE);
             mChart2line.setVisibility(View.INVISIBLE);
-            //ColumnChartData tmp = (ColumnChartData) setChartDataByIndex(chart2_index);
-            //mChart2column.setColumnChartData(tmp);
             setChartViewport(mChart2column, setChartDataByIndex(chart2_index));
         } else if (ChartsConst.Chart_type[chart2_index] == 1) {
             mChart2column.setVisibility(View.INVISIBLE);
             mChart2line.setVisibility(View.VISIBLE);
-            //mChart2line.setLineChartData((LineChartData) setChartDataByIndex(chart2_index));
             setChartViewport(mChart2line, setChartDataByIndex(chart2_index));
         } else {
             mChart2column.setVisibility(View.INVISIBLE);
@@ -601,9 +594,6 @@ public class MainFragment extends Fragment implements OnClickListener {
                 }else mChart2Alert.setVisibility(View.GONE);
                 mChart2Title.setText(ChartsConst.Chart_title[current_chart2_index]);
                 chartInitial(current_chart1_index, current_chart2_index);
-                break;
-            case R.id.main_chart_hint_1:
-                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Chart_Data_Lost,Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_chart_hint_2:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Chart_Data_Lost,Toast.LENGTH_SHORT).show();
@@ -775,15 +765,14 @@ public class MainFragment extends Fragment implements OnClickListener {
                 chartData10 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_10);
                 chartData12 = (HashMap<Integer, Float>) aCache.getAsObject(Const.Cache_Chart_12);
                 chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
-
                 chartInitial(current_chart1_index, current_chart2_index);
             } else if (intent.getAction().equals(Const.Action_DB_MAIN_Location)) {
                 String lati = intent.getStringExtra(Const.Intent_DB_PM_Lati);
                 String longi = intent.getStringExtra(Const.Intent_DB_PM_Longi);
                 String last_lati = aCache.getAsString(Const.Cache_Latitude);
                 String last_longi = aCache.getAsString(Const.Cache_Longitude);
+                Log.e(TAG,"lati "+lati+" last_lati"+last_lati+" longi"+longi+" last_longi"+last_longi);
                 if (last_lati == null || last_longi == null) {
-                    //Log.e("MainFragment","lati or longi null");
                     aCache.put(Const.Cache_Latitude, lati);
                     aCache.put(Const.Cache_Longitude, longi);
                     searchCityRequest(lati, longi);
@@ -804,7 +793,6 @@ public class MainFragment extends Fragment implements OnClickListener {
                 }
 
             } else if (intent.getAction().equals(Const.Action_Chart_Result_1)) {
-//                Log.e("Action_Chart_Cache","Action_Chart_Cache");
                 HashMap data4 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart4_data);
                 chartData4 = data4;
                 aCache.put(Const.Cache_Chart_4, chartData4);
@@ -814,6 +802,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 HashMap data8 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart8_data);
                 chartData8 = data8;
                 aCache.put(Const.Cache_Chart_8, chartData8);
+                chart8Time = (ArrayList) aCache.getAsObject(Const.Cache_Chart_8_Time);
                 chartInitial(current_chart1_index, current_chart2_index);
             } else if (intent.getAction().equals(Const.Action_Chart_Result_2)) {
                 HashMap data1 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart1_data);

@@ -117,7 +117,6 @@ public class DataCalculator {
             int month = monthOrigin;
             int year = yearOrigin;
             if (day - i < 1) {
-                //TODO for Febarury.
                 month = month - 1;
                 if (month < 1) {
                     year = year - 1;
@@ -128,7 +127,6 @@ public class DataCalculator {
             } else {
                 day = day - i;
             }
-
             lastWeekDate.add(i, String.valueOf((month + 1)>12?12:(month+1)) + "." + String.valueOf(day));
             calendar.set(year, month, day, 0, 0, 0);
             Long TodayNowTime = calendar.getTime().getTime();
@@ -138,10 +136,8 @@ public class DataCalculator {
             if (states == null || states.isEmpty()) {
                 states = new ArrayList<>();
             }
-            //Log.d(TAG,String.valueOf(i)+" "+lastWeekDate.get(i)+" "+String.valueOf(states.size()));
             mData.add(i, states);
         }
-        //Log.d(TAG,"end");
         return mData;
     }
 

@@ -56,6 +56,7 @@
         <item name="android:layout_marginBottom">5dip</item>
         <item name="android:background">@drawable/main_top_bg</item>
         <item name="android:textColor">@color/White</item>
+        <item name="android:textSize">14dp</item>
     </style>
 
     <style name="Dialog_bocop">

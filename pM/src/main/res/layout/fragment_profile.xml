@@ -51,7 +51,7 @@
                         android:layout_marginTop="4dp"
                         android:singleLine="true"
                         android:ellipsize="end"
-                        android:text="Username"
+                        android:text="@string/profile_username"
                         android:textSize="12sp"
                         android:textColor="#A1A1A1" />
 
@@ -64,7 +64,7 @@
                         android:layout_marginTop="4dp"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:text="Gender"
+                        android:text="@string/profile_gender"
                         android:textColor="#A1A1A1"
                         android:textSize="12sp" />
 
@@ -78,6 +78,7 @@
                         android:id="@+id/profile_login"
                         android:textColor="@color/White"
                         android:text="登陆"
+                        android:textSize="14dp"
                         android:visibility="visible"
                         android:background="@drawable/main_top_bg" />
 
@@ -88,7 +89,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="10dip"
                         android:layout_marginRight="20dip"
-                        android:textSize="15sp"
+                        android:textSize="15dp"
                         android:text="重置密码"
                         android:textColor="@color/AccentBlue"
                         android:visibility="invisible" />
@@ -99,18 +100,21 @@
                         android:text="用户须知"
                         android:id="@+id/profile_view_notification"
                         android:textColor="@color/AccentBlue"
+                        android:textSize="14dp"
                         android:layout_marginStart="30dp"
                         android:layout_alignParentBottom="true"
                         android:layout_marginBottom="12dp"
                         android:layout_alignParentStart="true" />
 
                     <TextView
-                        android:layout_width="34dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="查看修改"
+                        android:text="状态"
+                        android:layout_toStartOf="@+id/profile_login"
                         android:id="@+id/profile_modify_personal_state"
                         android:textColor="@color/AccentBlue"
-                        android:layout_marginLeft="6dp"
+                        android:layout_marginLeft="12dp"
+                        android:textSize="14dp"
                         android:layout_alignTop="@+id/profile_username"
                         android:layout_toEndOf="@+id/profile_username" />
 
@@ -120,8 +124,8 @@
                         android:text="退出登录"
                         android:id="@+id/profile_logoff"
                         android:layout_below="@+id/profile_reset_pwd"
-                        android:layout_marginTop="20dp"
-                        android:textSize="15sp"
+                        android:layout_marginTop="18dp"
+                        android:textSize="15dp"
                         android:textColor="@color/Red"
                         android:visibility="invisible"
                         android:layout_alignLeft="@+id/profile_reset_pwd"/>
@@ -151,8 +155,8 @@
                     android:shadowDx="3.0"
                     android:shadowDy="3.0"
                     android:shadowRadius="5.0"
-                    android:text="Name"
-                    android:textSize="20sp"
+                    android:text="@string/profile_name"
+                    android:textSize="20dp"
                     android:textColor="@android:color/white" />
 
             </RelativeLayout>

@@ -85,9 +85,9 @@ public class ProfileFragment extends Fragment implements
             if (msg.what == Const.Handler_Gender_Updated){
                 String gender = aCache.getAsString(Const.Cache_User_Gender);
                 if(gender != null){
-                    if(Integer.valueOf(gender) == 1){
+                    if(Integer.valueOf(gender) == Const.Gender_Female){
                         mGender.setText(mActivity.getResources().getString(R.string.profile_gender_female));
-                    }else if(Integer.valueOf(gender) == 0){
+                    }else if(Integer.valueOf(gender) == Const.Gender_Male){
                         mGender.setText(mActivity.getResources().getString(R.string.profile_gender_male));
                     }
                 }
@@ -151,19 +151,24 @@ public class ProfileFragment extends Fragment implements
             mResetPwd.setOnClickListener(null);
             mLogOff.setVisibility(View.INVISIBLE);
             mLogOff.setOnClickListener(null);
-            mGender.setText("Gender");
-            mUsername.setText("Username");
-            mName.setText("Name");
+            mGender.setText(mActivity.getResources().getString(R.string.profile_gender));
+            mUsername.setText(mActivity.getResources().getString(R.string.profile_username));
+            mName.setText(mActivity.getResources().getString(R.string.profile_name));
         }
         String gender = aCache.getAsString(Const.Cache_User_Gender);
         if(ShortcutUtil.isStringOK(gender)){
-            if (gender.equals("0")) {
-                mGender.setText("男");
-            } else if (gender.equals("1")) {
-                mGender.setText("女");
-            } else {
-                mGender.setText("Gender");
+            int genderInt;
+            try {
+                genderInt = Integer.valueOf(gender);
+            }catch (Exception e){
+                genderInt = 0;
             }
+            if (genderInt == Const.Gender_Male)
+                mGender.setText(mActivity.getResources().getString(R.string.profile_gender_male));
+            else if (genderInt == Const.Gender_Female)
+                mGender.setText(mActivity.getResources().getString(R.string.profile_gender_female));
+            else
+                mGender.setText(mActivity.getResources().getString(R.string.profile_gender));
         }
         String battery = aCache.getAsString(Const.Cache_Is_Saving_Battery);
         if(ShortcutUtil.isStringOK(battery)) {
@@ -178,7 +183,6 @@ public class ProfileFragment extends Fragment implements
         mScrollView.setOnTurnListener(this);
         mLogin.setOnClickListener(this);
         mExit.setOnClickListener(this);
-        //mTurnOffService.setOnClickListener(this);
         mHelp.setOnClickListener(this);
         mTurnOffUpload.setOnClickListener(this);
         mClear.setOnClickListener(this);
@@ -199,7 +203,7 @@ public class ProfileFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
-        Intent intent = null;
+        Intent intent;
         switch (v.getId()) {
             case R.id.profile_modify_personal_state:
                 MainActivity main1Activity = (MainActivity)mActivity;

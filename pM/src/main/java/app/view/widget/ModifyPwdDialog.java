@@ -122,9 +122,8 @@ public class ModifyPwdDialog extends Dialog implements OnClickListener {
                         Toast.makeText(mActivity.getApplicationContext(), Const.Info_Modify_Pwd_Success, Toast.LENGTH_SHORT).show();
                         Const.CURRENT_ACCESS_TOKEN = response.getString("access_token");
                         aCache.put(Const.Cache_Access_Token, Const.CURRENT_ACCESS_TOKEN);
-                        if (parentHandler != null) {
+                        if (parentHandler != null)
                             parentHandler.sendEmptyMessage(Const.Handler_Modify_Pwd_Success);
-                        }
                         ModifyPwdDialog.this.dismiss();
                     } else {
                         mLoadingDialog.dismiss();
