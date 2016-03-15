@@ -87,10 +87,10 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     private void setGender(String gender){
         Log.e("Gender",gender);
         Integer sex = Integer.valueOf(gender);
-        if(sex == 0){
+        if(sex == Const.Gender_Male){
             mMale.setChecked(true);
             mFemale.setChecked(false);
-        }else if(sex == 1){
+        }else if(sex == Const.Gender_Female){
             mMale.setChecked(false);
             mFemale.setChecked(true);
         }
@@ -119,12 +119,12 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
             case R.id.personal_state_male:
                 mMale.setChecked(true);
                 mFemale.setChecked(false);
-                aCache.put(Const.Cache_User_Gender,"0");
+                aCache.put(Const.Cache_User_Gender,String.valueOf(Const.Gender_Male));
                 break;
             case R.id.personal_state_female:
                 mMale.setChecked(false);
                 mFemale.setChecked(true);
-                aCache.put(Const.Cache_User_Gender,"1");
+                aCache.put(Const.Cache_User_Gender,String.valueOf(Const.Gender_Female));
                 break;
             case R.id.personal_state_get_location:
                 DialogGetLocation getLocation = new DialogGetLocation(mContext);

@@ -34,7 +34,6 @@ import app.utils.VolleyQueue;
 public class LoginDialog extends Dialog implements OnClickListener {
 
     public static final String TAG = "LoginDialog";
-    //todo to fix the bug
     Activity mActivity;
     Button mSure;
     Button mBack;
@@ -73,28 +72,7 @@ public class LoginDialog extends Dialog implements OnClickListener {
         mSure = (Button) findViewById(R.id.activitytitle_sure);
         mBack = (Button) findViewById(R.id.activitytitle_cancel);
         mUser = (EditText) findViewById(R.id.activitytitle_title);
-        try {
-            mUser.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    Log.e(TAG,"username focus == "+String.valueOf(hasFocus));
-                }
-            });
-        }catch (Exception e){
-            Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG).show();
-        }
         mPass = (EditText) findViewById(R.id.login_password);
-        try {
-            mPass.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    Log.e(TAG,"password focus == "+String.valueOf(hasFocus));
-                }
-            });
-        }catch (Exception e){
-            Toast.makeText(mActivity,e.getMessage(),Toast.LENGTH_LONG).show();
-        }
-
         mSure.setOnClickListener(this);
         mBack.setOnClickListener(this);
     }
@@ -105,7 +83,7 @@ public class LoginDialog extends Dialog implements OnClickListener {
             case R.id.activitytitle_sure:
                 username = mUser.getText().toString();
                 password = mPass.getText().toString();
-                int result = 3;//ShortcutUtil.judgeInput(username, password);
+                int result = 3;
                 if (result == 3) {
                     mLoadingDialog.show();
                     if (flag) {
@@ -116,15 +94,12 @@ public class LoginDialog extends Dialog implements OnClickListener {
                         }
                     }
                 }
-                if (result == 0) {
+                if (result == 0)
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Empty, Toast.LENGTH_SHORT).show();
-                }
-                if (result == 1) {
+                else if (result == 1)
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Short, Toast.LENGTH_SHORT).show();
-                }
-                if (result == 2) {
+                else if (result == 2)
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Space, Toast.LENGTH_SHORT).show();
-                }
                 break;
             case R.id.activitytitle_cancel:
                 this.dismiss();
@@ -149,6 +124,7 @@ public class LoginDialog extends Dialog implements OnClickListener {
                 LogInModel model = result.toLogInModel();
                 if (result.toLogInModel().getStatus().equals("1")) {
                     Toast.makeText(mActivity.getApplicationContext(), Const.Info_Login_Success, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG,model.getFirstname()+model.getLastname());
                     Const.CURRENT_ACCESS_TOKEN = model.getAccess_token();
                     Const.CURRENT_USER_NAME = username;
                     Const.CURRENT_USER_NICKNAME = model.getLastname() + model.getFirstname();
@@ -158,9 +134,9 @@ public class LoginDialog extends Dialog implements OnClickListener {
                     aCache.put(Const.Cache_User_Name, Const.CURRENT_USER_NAME);
                     aCache.put(Const.Cache_User_Nickname, Const.CURRENT_USER_NICKNAME);
                     aCache.put(Const.Cache_User_Gender, Const.CURRENT_USER_GENDER);
-                    if (parentHandler != null) {
+                    if (parentHandler != null)
                         parentHandler.sendEmptyMessage(Const.Handler_Login_Success);
-                    }
+
                     LoginDialog.this.dismiss();
                 } else {
                     mLoadingDialog.dismiss();
@@ -172,7 +148,6 @@ public class LoginDialog extends Dialog implements OnClickListener {
             public void onErrorResponse(VolleyError error) {
                 mLoadingDialog.dismiss();
                 Toast.makeText(mActivity.getApplicationContext(), Const.Info_No_Network, Toast.LENGTH_SHORT).show();
-
             }
         });
         VolleyQueue.getInstance(mActivity.getApplicationContext()).addToRequestQueue(jsonObjectRequest);

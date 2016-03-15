@@ -178,6 +178,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/main_top_t_first"
                 android:id="@+id/textView6"
+                android:textSize="14dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="20dp"
@@ -187,6 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="100mg"
+                android:textSize="14dp"
                 android:id="@+id/main_hour_pm"
                 android:layout_alignBaseline="@+id/textView6"
                 android:layout_toRightOf="@+id/textView6"
@@ -196,6 +198,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/main_top_t_second"
+                android:textSize="14dp"
                 android:id="@+id/textView7"
                 android:layout_alignLeft="@+id/textView6"
                 android:layout_below="@+id/textView6"
@@ -205,6 +208,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2000mg"
+                android:textSize="14dp"
                 android:id="@+id/main_day_pm"
                 android:layout_alignBaseline="@+id/textView7"
                 android:layout_alignLeft="@+id/main_hour_pm" />
@@ -213,6 +217,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/main_top_t_third"
+                android:textSize="14dp"
                 android:id="@+id/textView8"
                 android:layout_alignLeft="@+id/textView6"
                 android:layout_below="@+id/textView7"
@@ -222,6 +227,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3000mg"
+                android:textSize="14dp"
                 android:id="@+id/main_week_pm"
                 android:layout_alignBaseline="@+id/textView8"
                 android:layout_alignLeft="@+id/main_hour_pm" />
@@ -331,6 +337,7 @@
                 android:text="查看"
                 android:layout_marginRight="2dp"
                 android:visibility="gone"
+                android:textSize="14dp"
                 android:textColor="@color/AccentBlue"
                 android:id="@+id/main_view_more_1"
                 android:layout_alignBaseline="@+id/main_chart_1_column"
@@ -366,7 +373,7 @@
                 android:layout_alignTop="@+id/main_chart2_title"
                 android:textColor="@color/White"
                 android:background="@color/AccentBlue"
-                android:textSize="18sp" />
+                android:textSize="18dp" />
 
 
             <ImageView
@@ -421,6 +428,7 @@
                 android:textColor="@color/AccentBlue"
                 android:id="@+id/main_view_more_2"
                 android:layout_marginRight="2dp"
+                android:textSize="14dp"
                 android:layout_alignBaseline="@+id/main_chart_2_column"
                 android:layout_toStartOf="@+id/main_chart_2_alert" />
 

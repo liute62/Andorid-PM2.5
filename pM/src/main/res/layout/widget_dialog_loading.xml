@@ -24,7 +24,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:padding="3dp"
-                android:src="@drawable/ic_launcher" />
+                android:src="@drawable/icon" />
 
             <ImageView
                 android:id="@+id/loading_dialog_rotate"
