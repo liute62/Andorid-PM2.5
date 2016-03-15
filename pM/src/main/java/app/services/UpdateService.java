@@ -167,7 +167,9 @@ public class UpdateService {
     public void UpdateDensity(final State state) {
         String url = HttpUtil.Search_PM_url + "?longitude=" + state.getLongtitude() + "&latitude=" + state.getLatitude()
                 + "&time_point=" + ShortcutUtil.refFormatDateAndTimeInHour(Long.valueOf(state.getTime_point()));
+        url = url.replace(" ","%20");
         Log.d("url",url);
+        FileUtil.appendStrToFile("update url is:  " + url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -175,7 +177,7 @@ public class UpdateService {
                     Log.d("connection","connection is ok now");
                     PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
                     String mDensity = String.valueOf(pmModel.getPm25());
-                    FileUtil.appendStrToFile("update density url "+mDensity);
+                    FileUtil.appendStrToFile("update density  "+mDensity);
                     //Log.e(TAG,"UpdateDensity new density "+mDensity);
                     //update density
                     updateStateDensity(state, mDensity);
