@@ -128,7 +128,18 @@ public class ShortcutUtil {
 
     public static String refFormatDateAndTimeInHour(long currentTimeMillis) {
         String retStrFormatNowDate = refFormatDateAndTime(currentTimeMillis);
-        return retStrFormatNowDate.substring(0,13)+":00:00";
+        int hour = Integer.valueOf(retStrFormatNowDate.substring(11, 13));
+        int minute = Integer.valueOf(retStrFormatNowDate.substring(14,16));
+        if (minute<16) {
+            hour-=2;
+        } else {
+            hour-=1;
+        }
+        if (hour<10) {
+            return retStrFormatNowDate.substring(0,11)+"0"+hour+":00:00";
+        } else {
+            return retStrFormatNowDate.substring(0,11)+hour+":00:00";
+        }
     }
 
     public static String refFormatOnlyDate(long currentTimeMillis) {
