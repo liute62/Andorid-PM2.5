@@ -21,11 +21,19 @@ public class FileUtil {
 
     public static final String base_path = Environment.getExternalStorageDirectory().getPath();
 
-    public static final String log_path = base_path+"/Bio3Air";
+    public static final String log_path = base_path+File.separator+"Bio3Air"+File.separator;
 
-    public static final String log_file_name = log_path +"/bio3AirLog";
+    public static final String tmp_path = log_path+File.separator+"tmp"+File.separator;
 
-    public static final String error_file_name = log_path + "/bio3AirError";
+    public static final String log_file_name = log_path +"bio3AirLog";
+
+    public static final String error_file_name = log_path + "bio3AirError";
+
+    public static void makeTmpDir(){
+        File dir = new File(tmp_path);
+        if(!dir.exists())
+            dir.mkdirs();
+    }
 
     public static void appendErrorToFile(int runTime,String errorMsg){
         long time = System.currentTimeMillis();

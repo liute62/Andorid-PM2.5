@@ -79,20 +79,8 @@ public class DataResultActivity extends Activity implements OnClickListener{
         Display d = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int width = d.getWidth();
         int height = d.getHeight();
-        switch(width){
-            case 540:
-                resolution_type = 1;
-                break;
-            case 720:
-                resolution_type = 1;
-                break;
-            case 1080:
-                resolution_type = 1;
-                break;
-            case 1440:
-                resolution_type = 2;
-                break;
-        }
+        if(width < 1440) resolution_type = 1;
+        else resolution_type = 2;
     }
 
     private List<State> getTodayState(){
