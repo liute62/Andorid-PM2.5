@@ -934,7 +934,8 @@ public class DBService extends Service {
         String idStr = aCache.getAsString(Const.Cache_User_Id);
         if (ShortcutUtil.isStringOK(idStr) && !idStr.equals("0")) {
             Log.e("upload", "upload batch start");
-            final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD + "=?", "0").list();
+            final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD +
+                    "=? AND " + DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0", "1").list();
             Log.e("upload", "upload size " + states.size());
             FileUtil.appendStrToFile(DBRunTime, "checkPMDataForUpload upload batch start size = " + states.size());
             isUploadRunning = true;
