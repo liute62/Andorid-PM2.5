@@ -21,6 +21,9 @@
     <string name="main_fig_4_title">平均单位时间吸入的空气量(L/min)</string>
     <string name="main_fig_5_title"></string>
     <string name="main_fig_6_title">累积吸入的空气量(L)</string>
+    <string name="profile_name">姓名</string>
+    <string name="profile_username">用户名</string>
+    <string name="profile_gender">性别</string>
     <string name="profile_gender_male">男</string>
     <string name="profile_gender_female">女</string>
     <string name="profile_clear_cache">清空本地缓存</string>
@@ -32,8 +35,7 @@
     <string name="first_para_4">4.健康空气(Bio³Air)手机APP为您提供的大气污染物浓度和暴露量数据、以及健康提示，不应用于医学诊断、治疗相关等目的。</string>
     <string name="first_para_5">5.使用健康空气(Bio³Air)手机APP，会产生一定的数据流量，并导致相关费用。</string>
     <string name="first_para_6">6.北京圣马山环保科技有限公司获专利授权，发布自由呼吸系列产品。本声明版权及其修改权、更新权和最终解释权均属北京圣马山环保科技有限公司所有。</string>
-    <string name="register_title">用户注册</string>
-    <!--For Bluetooth -->
+    <string name="register_title">用户注册</string><!--For Bluetooth -->
     <string name="ble_not_supported">该设备不支持蓝牙4.3协议</string>
     <string name="label_data">选择接受数据值:</string>
     <string name="label_device_address">设备地址:</string>
@@ -69,6 +71,7 @@
     <string name="help_para_4">4.侧边菜单，修改查看，可重新定位，有GPS和网络两种方式选择。</string>
     <string name="help_para_5">5.侧边菜单，蓝牙，可连接手环计算心率，连接803检测装置获得准确的室内PM2.5浓度。</string>
     <string name="help_para_6">6.为保证APP持续的在后台运行，请保持电量充足，并关闭低电量模式，以获得最准确的数据。</string>
+    <string name="help_para_ver">App版本号：3.15</string>
     <string name="register_para_1">用户注册信息用于本公司与合作单位开展的环境健康研究。建议参加相关研究的志愿者，获得邀请码后，进行注册。</string>
     <string name="register_para_2">一般用户不必注册。（非注册状态下使用本APP，享受与注册用户同样的功能）。</string>
     <string name="str_re_localization">重新定位</string>

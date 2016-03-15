@@ -155,6 +155,8 @@ public class Const {
 
     public static final String Intent_chart8_data = "Intent_chart8_data";
 
+    public static final String Intent_chart8_time = "Intent_chart8_time";
+
     public static final String Intent_chart10_data = "Intent_chart10_data";
 
     public static final String Intent_chart12_data = "Intent_chart12_data";

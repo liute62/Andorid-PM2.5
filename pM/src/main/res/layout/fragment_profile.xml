@@ -51,7 +51,7 @@
                         android:layout_marginTop="4dp"
                         android:singleLine="true"
                         android:ellipsize="end"
-                        android:text="Username"
+                        android:text="@string/profile_username"
                         android:textSize="12sp"
                         android:textColor="#A1A1A1" />
 
@@ -64,7 +64,7 @@
                         android:layout_marginTop="4dp"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:text="Gender"
+                        android:text="@string/profile_gender"
                         android:textColor="#A1A1A1"
                         android:textSize="12sp" />
 
@@ -105,12 +105,14 @@
                         android:layout_alignParentStart="true" />
 
                     <TextView
-                        android:layout_width="34dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="查看修改"
+                        android:text="状态"
+                        android:layout_toStartOf="@+id/profile_login"
                         android:id="@+id/profile_modify_personal_state"
                         android:textColor="@color/AccentBlue"
-                        android:layout_marginLeft="6dp"
+                        android:layout_marginLeft="12dp"
+                        android:textSize="14dp"
                         android:layout_alignTop="@+id/profile_username"
                         android:layout_toEndOf="@+id/profile_username" />
 
@@ -120,7 +122,7 @@
                         android:text="退出登录"
                         android:id="@+id/profile_logoff"
                         android:layout_below="@+id/profile_reset_pwd"
-                        android:layout_marginTop="20dp"
+                        android:layout_marginTop="18dp"
                         android:textSize="15sp"
                         android:textColor="@color/Red"
                         android:visibility="invisible"
@@ -151,7 +153,7 @@
                     android:shadowDx="3.0"
                     android:shadowDy="3.0"
                     android:shadowRadius="5.0"
-                    android:text="Name"
+                    android:text="@string/profile_name"
                     android:textSize="20sp"
                     android:textColor="@android:color/white" />
 

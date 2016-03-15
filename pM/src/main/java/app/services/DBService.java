@@ -516,10 +516,10 @@ public class DBService extends Service {
 
     @Override
     public void onDestroy() {
-        FileUtil.appendStrToFile(-100,"DBService onDestory");
+        FileUtil.appendStrToFile(-100, "DBService onDestory");
         if (wakeLock != null) wakeLock.release();
-        super.onDestroy();
         mHandlerThread.quit();
+        super.onDestroy();
         DBRunnable = null;
     }
 
