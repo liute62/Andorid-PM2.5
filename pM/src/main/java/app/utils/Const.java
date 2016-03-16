@@ -139,6 +139,8 @@ public class Const {
 
     public static final String Intent_DB_PM_Longi = "Intent_DB_PM_Longi";
 
+    public static final String Intent_DB_City_Ref = "Intent_DB_City_Ref";
+
     public static final String Intent_DB_Run_State = "Intent_DB_Run_State";
 
     public static final String Intent_chart1_data = "Intent_chart1_data";

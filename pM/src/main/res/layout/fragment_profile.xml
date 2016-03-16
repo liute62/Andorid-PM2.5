@@ -202,6 +202,7 @@
                 style="@style/main_left_button_style"
                 android:text="@string/profile_btn_help" />
             <Button
+                android:visibility="gone"
                 android:id="@+id/profile_saving_battery"
                 style="@style/main_left_button_style"
                 android:text="@string/profile_btn_saving_battery_on"/>

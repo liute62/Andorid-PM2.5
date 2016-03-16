@@ -332,6 +332,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
     public int getIndoorOutdoor(){
         isWifiAvailable = isWifiAvailable();
+        isGpsAvailable = isGpsAvailable();
         if(isWifiAvailable || !isGpsAvailable){
             return Indoor;
         }
@@ -355,6 +356,17 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             }
         }
         return isSuccessConnected;
+    }
+
+    private boolean isGpsAvailable(){
+        try {
+            if(mLocationManager == null)
+                mLocationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+            mLocationManager.addGpsStatusListener(this);
+        }catch (SecurityException e){
+
+        }
+        return false;
     }
 
     private void initGPS(){

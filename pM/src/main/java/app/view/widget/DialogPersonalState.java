@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.example.pm.DataResultActivity;
 import com.example.pm.R;
 
+import app.services.LocationService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.ShortcutUtil;
@@ -43,8 +44,8 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     TextView mLatitude;
     Button mBack;
     Button mLocalization;
-    RadioButton mMale;
-    RadioButton mFemale;
+    RadioButton mIndoor;
+    RadioButton mOutdoor;
     Button mDataResult;
 
     @Override
@@ -59,10 +60,10 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         mWeight = (EditText)findViewById(R.id.personal_state_weight);
         mLongitude = (TextView)findViewById(R.id.personal_state_longi);
         mLatitude = (TextView)findViewById(R.id.personal_state_lati);
-        mMale = (RadioButton)findViewById(R.id.personal_state_male);
-        mMale.setOnClickListener(this);
-        mFemale = (RadioButton)findViewById(R.id.personal_state_female);
-        mFemale.setOnClickListener(this);
+        mIndoor = (RadioButton)findViewById(R.id.personal_state_indoor);
+        mIndoor.setOnClickListener(this);
+        mOutdoor = (RadioButton)findViewById(R.id.personal_state_outdoor);
+        mOutdoor.setOnClickListener(this);
         mBack = (Button)findViewById(R.id.personal_state_btn);
         mBack.setOnClickListener(this);
         mDataResult = (Button)findViewById(R.id.personal_state_today);
@@ -77,22 +78,21 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         String lati = aCache.getAsString(Const.Cache_Latitude);
         String longi = aCache.getAsString(Const.Cache_Longitude);
         String weight = aCache.getAsString(Const.Cache_User_Weight);
-        String gender = aCache.getAsString(Const.Cache_User_Gender);
+        String inOut = aCache.getAsString(Const.Cache_Indoor_Outdoor);
         if(lati != null) mLatitude.setText(lati);
         if(longi != null) mLongitude.setText(longi);
         if(weight != null) mWeight.setText(weight);
-        if(gender != null) setGender(gender);
+        if(inOut != null) setGender(inOut);
     }
 
-    private void setGender(String gender){
-        Log.e("Gender",gender);
-        Integer sex = Integer.valueOf(gender);
-        if(sex == Const.Gender_Male){
-            mMale.setChecked(true);
-            mFemale.setChecked(false);
-        }else if(sex == Const.Gender_Female){
-            mMale.setChecked(false);
-            mFemale.setChecked(true);
+    private void setGender(String state){
+        Integer inOut = Integer.valueOf(state);
+        if(inOut == LocationService.Indoor){
+            mIndoor.setChecked(true);
+            mOutdoor.setChecked(false);
+        }else if(inOut == LocationService.Outdoor){
+            mIndoor.setChecked(false);
+            mOutdoor.setChecked(true);
         }
     }
 
@@ -116,15 +116,15 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
             case R.id.personal_state_btn:
                 DialogPersonalState.this.dismiss();
                 break;
-            case R.id.personal_state_male:
-                mMale.setChecked(true);
-                mFemale.setChecked(false);
-                aCache.put(Const.Cache_User_Gender,String.valueOf(Const.Gender_Male));
+            case R.id.personal_state_indoor:
+                mIndoor.setChecked(true);
+                mOutdoor.setChecked(false);
+                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationService.Indoor));
                 break;
-            case R.id.personal_state_female:
-                mMale.setChecked(false);
-                mFemale.setChecked(true);
-                aCache.put(Const.Cache_User_Gender,String.valueOf(Const.Gender_Female));
+            case R.id.personal_state_outdoor:
+                mOutdoor.setChecked(false);
+                mOutdoor.setChecked(true);
+                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationService.Outdoor));
                 break;
             case R.id.personal_state_get_location:
                 DialogGetLocation getLocation = new DialogGetLocation(mContext);

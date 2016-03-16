@@ -352,7 +352,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                 refTime = Long.valueOf(refresh);
                 curTime = System.currentTimeMillis();
             }catch (Exception e){
-                Log.e(TAG,"checkForRefresh error "+refresh);
+                FileUtil.appendErrorToFile(0,"checkForRefresh error "+refresh);
             }
             Log.e(TAG,"checkForRefresh ref: "+ShortcutUtil.refFormatDateAndTime(refTime)+" cur: "+ShortcutUtil.refFormatDateAndTime(curTime));
             if(curTime - refTime > Const.Refresh_Chart_Interval){
@@ -390,7 +390,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 
     private void cacheInitial() {
         String access_token = aCache.getAsString(Const.Cache_Access_Token);
-        String user_id = aCache.getAsString(Const.Cache_User_Id);
         String user_name = aCache.getAsString(Const.Cache_User_Name);
         String user_nickname = aCache.getAsString(Const.Cache_User_Nickname);
         String user_gender = aCache.getAsString(Const.Cache_User_Gender);
@@ -401,36 +400,26 @@ public class MainFragment extends Fragment implements OnClickListener {
         String longitude = aCache.getAsString(Const.Cache_Longitude);
         String latitude = aCache.getAsString(Const.Cache_Latitude);
         String city = aCache.getAsString(Const.Cache_City);
-        if (ShortcutUtil.isStringOK(access_token)) {
+        if (ShortcutUtil.isStringOK(access_token))
             Const.CURRENT_ACCESS_TOKEN = access_token;
-        }
-        if (ShortcutUtil.isStringOK(user_name)) {
+        if (ShortcutUtil.isStringOK(user_name))
             Const.CURRENT_USER_NAME = user_name;
-        }
-        if (ShortcutUtil.isStringOK(user_nickname)) {
+        if (ShortcutUtil.isStringOK(user_nickname))
             Const.CURRENT_USER_NICKNAME = user_nickname;
-        }
-        if (ShortcutUtil.isStringOK(user_gender)) {
+        if (ShortcutUtil.isStringOK(user_gender))
             Const.CURRENT_USER_GENDER = user_gender;
-        }
-        if (ShortcutUtil.isStringOK(density)) {
+        if (ShortcutUtil.isStringOK(density))
             PMDensity = Double.valueOf(density);
-        }
-        if (ShortcutUtil.isStringOK(pm_hour)) {
+        if (ShortcutUtil.isStringOK(pm_hour))
             PMBreatheHour = Double.valueOf(pm_hour);
-        }
-        if (ShortcutUtil.isStringOK(pm_day)) {
+        if (ShortcutUtil.isStringOK(pm_day))
             PMBreatheDay = Double.valueOf(pm_day);
-        }
-        if (ShortcutUtil.isStringOK(pm_week)) {
+        if (ShortcutUtil.isStringOK(pm_week))
             PMBreatheWeekAvg = Double.valueOf(pm_week);
-        }
-        if (ShortcutUtil.isStringOK(longitude)) {
+        if (ShortcutUtil.isStringOK(longitude))
             currentLongitude = longitude;
-        }
-        if (ShortcutUtil.isStringOK(latitude)) {
+        if (ShortcutUtil.isStringOK(latitude))
             currentLatitude = latitude;
-        }
         if (ShortcutUtil.isStringOK(city)) {
             currentCity = city;
             mAddCity.setVisibility(View.GONE);
@@ -438,7 +427,6 @@ public class MainFragment extends Fragment implements OnClickListener {
             currentCity = "null";
             mAddCity.setVisibility(View.VISIBLE);
         }
-
         /*********Chart Data Initial**********/
         Object chart1 = aCache.getAsObject(Const.Cache_Chart_1);
         Object chart2 = aCache.getAsObject(Const.Cache_Chart_2);
@@ -494,10 +482,10 @@ public class MainFragment extends Fragment implements OnClickListener {
     }
 
     private void text2Initial(){
-        //Log.e(TAG,"hour: "+String.valueOf(PMBreatheHour)+" "+ShortcutUtil.ugScale(PMBreatheHour, 2));
-        mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) + " 微克");
-        mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " 微克");
-        mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1)) + " 微克");
+        String ugStr = mActivity.getResources().getString(R.string.str_ug);
+        mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) +" "+ugStr);
+        mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " "+ugStr);
+        mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1))+" "+ugStr);
 
     }
 
@@ -568,11 +556,10 @@ public class MainFragment extends Fragment implements OnClickListener {
                 mActivity.sendBroadcast(intentR);
                 break;
             case R.id.main_chart_1_change:
-                if (current_chart1_index == 7) {
+                if (current_chart1_index == 7)
                     current_chart1_index = 1;
-                } else {
+                 else
                     current_chart1_index += 2;
-                }
                 boolean result1 = Const.Chart_Alert_Show[current_chart1_index];
                 if(result1 == true){
                     mChart1Alert.setVisibility(View.VISIBLE);
@@ -582,11 +569,10 @@ public class MainFragment extends Fragment implements OnClickListener {
                 chartInitial(current_chart1_index, current_chart2_index);
                 break;
             case R.id.main_chart_2_change:
-                if (current_chart2_index == 12) {
+                if (current_chart2_index == 12)
                     current_chart2_index = 2;
-                } else {
+                else
                     current_chart2_index += 2;
-                }
                 if(current_chart2_index == 8) mViewMore2.setVisibility(View.VISIBLE);
                 else mViewMore2.setVisibility(View.GONE);
                 boolean result2 = Const.Chart_Alert_Show[current_chart2_index];
@@ -609,8 +595,6 @@ public class MainFragment extends Fragment implements OnClickListener {
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
                 DialogGetLocation getLocation = new DialogGetLocation(mActivity);
                 getLocation.show();
-                //DialogRefresh refresh = new DialogRefresh(mActivity,mDataHandler);
-                //refresh.show();
                 break;
             case R.id.main_chart_1_alert:
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
@@ -619,13 +603,16 @@ public class MainFragment extends Fragment implements OnClickListener {
                 Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_view_more_2:
-                String start = "暂无数据";
-                String end = "暂无数据";
+                String start = mActivity.getResources().getString(R.string.str_no_data);
+                String end = mActivity.getResources().getString(R.string.str_no_data);
                 if(chart8Time.size() >= 2){
                     start  = chart8Time.get(0);
                     end = chart8Time.get(chart8Time.size() - 1);
                 }
-                DialogConfirm confirm = new DialogConfirm(mActivity,"最近两小时","从: "+start+"到: "+end);
+                String lastTwoHour = mActivity.getResources().getString(R.string.str_last_two_hour);
+                String from = mActivity.getResources().getString(R.string.str_from);
+                String to = mActivity.getResources().getString(R.string.str_to);
+                DialogConfirm confirm = new DialogConfirm(mActivity,lastTwoHour,from+": "+start+to+": "+end);
                 confirm.show();
                 confirm.setAllDismissListener();
                 break;
@@ -655,14 +642,12 @@ public class MainFragment extends Fragment implements OnClickListener {
 
         @Override
         protected void onCancelled() {
-            Log.d(TAG,"clock task onCancelled");
             isClockTaskRun = false;
             super.onCancelled();
         }
 
         @Override
         protected void onPostExecute(Integer integer) {
-            Log.d(TAG,"clock task onPostExecute");
             isClockTaskRun = false;
             super.onPostExecute(integer);
         }
@@ -678,6 +663,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     private void searchCityRequest(String lati, final String Longi) {
         String url = HttpUtil.SearchCity_url;
         url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;
+        Log.e(TAG,"searchCityRequest "+url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -771,6 +757,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             } else if (intent.getAction().equals(Const.Action_DB_MAIN_Location)) {
                 String lati = intent.getStringExtra(Const.Intent_DB_PM_Lati);
                 String longi = intent.getStringExtra(Const.Intent_DB_PM_Longi);
+                int isRefresh = intent.getIntExtra(Const.Intent_DB_City_Ref,0);
                 String last_lati = aCache.getAsString(Const.Cache_Latitude);
                 String last_longi = aCache.getAsString(Const.Cache_Longitude);
                 Log.e(TAG,"lati "+lati+" last_lati"+last_lati+" longi"+longi+" last_longi"+last_longi);
@@ -779,12 +766,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                     aCache.put(Const.Cache_Longitude, longi);
                     searchCityRequest(lati, longi);
                 } else {
-                    //Log.e("MainFragment",  String.valueOf(last_lati) + " " + String.valueOf(last_longi) + " " + String.valueOf(longi)+" "+String.valueOf(lati));
                     if (last_lati.equals(lati) && last_longi.equals(longi)) {
                         //no change
                         //for safe, if current city == null. search City anyway
                         String city = mCity.getText().toString();
-                        if(city == null || city.equals("null")){
+                        if(city == null || city.equals("null") || isRefresh == 1){
                             searchCityRequest(lati,longi);
                         }
                     } else {
@@ -842,43 +828,25 @@ public class MainFragment extends Fragment implements OnClickListener {
     private Object setChartDataByIndex(int index) {
         switch (index) {
             case 1:
-//                return DataGenerator.chart1DataGenerator(DataGenerator.generateDataForChart1());
                 return DataGenerator.chart1DataGenerator(chartData1);
             case 2:
-//                return DataGenerator.chart2DataGenerator(DataGenerator.generateDataForChart2());
                 return DataGenerator.chart2DataGenerator(chartData2);
             case 3:
-//                return DataGenerator.chart3DataGenerator((int) DataGenerator.generateDataForChart3().keySet().toArray()[0],
-//                        (float) DataGenerator.generateDataForChart3().values().toArray()[0]);
                 return DataGenerator.chart3DataGenerator(chartData3);
-                //return DataGenerator.chart3DataGenerator(DataGenerator.generateDataForChart3());
             case 4:
-//                return DataGenerator.chart4DataGenerator(DataGenerator.generateDataForChart4());
                 return DataGenerator.chart4DataGenerator(chartData4);
             case 5:
-//                return DataGenerator.chart5DataGenerator(DataGenerator.generateDataForChart5());
                 return DataGenerator.chart5DataGenerator(chartData5);
             case 6:
-//                return DataGenerator.chart6DataGenerator(DataGenerator.generateDataForChart6());
                 return DataGenerator.chart6DataGenerator(chartData6);
             case 7:
-//                return DataGenerator.chart7DataGenerator(DataGenerator.generateDataForChart7(), DataGenerator.generateChart7Date());
-//                chartData7 = new HashMap<>(); chartData7.put(0,616.0f);
-//                chart7Date = chart12Date;
                 return DataGenerator.chart7DataGenerator(chartData7, chart7Date);
             case 8:
-//                return DataGenerator.chart8DataGenerator(DataGenerator.generateDataForChart8());
                 return DataGenerator.chart8DataGenerator(chartData8);
             case 10:
-//                return DataGenerator.chart10DataGenerator((int) DataGenerator.generateDataForChart10().keySet().toArray()[0],
-//                        (float) DataGenerator.generateDataForChart10().values().toArray()[0]);
                 return DataGenerator.chart10DataGenerator(chartData10);
-//                return DataGenerator.chart10DataGenerator((int) chartData10.keySet().toArray()[0], (float) chartData10.values().toArray()[0]);
             case 12:
-//                chartData12 = new HashMap<>(); chartData12.put(0,5000.0f);
-//
                 return DataGenerator.chart12DataGenerator(chartData12, chart12Date);
-//               return DataGenerator.chart12DataGenerator(DataGenerator.generateDataForChart12(), DataGenerator.generateChart12Date());
         }
         return null;
     }
