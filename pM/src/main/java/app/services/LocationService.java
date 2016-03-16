@@ -253,6 +253,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 Location locationGPS = new Location(LocationManager.GPS_PROVIDER);
                 locationGPS.setLongitude(location.getLongitude());
                 locationGPS.setLatitude(location.getLatitude());
+                isGpsAvailable = true;
                 getLocation(locationGPS);
             } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// network localization result
 //                sb.append("\naddr : ");
@@ -266,6 +267,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 locationNetwork.setLongitude(location.getLongitude());
                 locationNetwork.setLatitude(location.getLatitude());
                 getLocation(locationNetwork);
+                isGpsAvailable = false;
             } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// offline localization result
 //                sb.append("\ndescribe : ");
 //                sb.append("offline localization success");
@@ -275,16 +277,16 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 getLocation(locationPassive);
             } else if (location.getLocType() == BDLocation.TypeServerError) {
                 //sb.append("\ndescribe : ");
-                FileUtil.appendStrToFile(Const.code_file_baidu_exception1, "failed due to server, please send IMEI code and localization time to loc-bugs@baidu.com, someone will find the reason.");
+                FileUtil.appendErrorToFile(Const.code_file_baidu_exception1, "failed due to server, please send IMEI code and localization time to loc-bugs@baidu.com, someone will find the reason.");
                 getLocation(null);
                 //sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
             } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
                 //sb.append("\ndescribe : ");
-                FileUtil.appendStrToFile(Const.code_file_baidu_exception2, "failed due to bad network, please check if network is enable.");
+                FileUtil.appendErrorToFile(Const.code_file_baidu_exception2, "failed due to bad network, please check if network is enable.");
                 getLocation(null);
                 //sb.append("网络不同导致定位失败，请检查网络是否通畅");
             } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
-                FileUtil.appendStrToFile(Const.code_file_baidu_exception3,
+                FileUtil.appendErrorToFile(Const.code_file_baidu_exception3,
                         "unable to get the location by criteria，most of time due to the mobile," +
                                 "especially when mobile is in the air mode, so try to restart it.");
                 getLocation(null);
@@ -332,7 +334,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
     public int getIndoorOutdoor(){
         isWifiAvailable = isWifiAvailable();
-        isGpsAvailable = isGpsAvailable();
+        openGpsAvailable();
         if(isWifiAvailable || !isGpsAvailable){
             return Indoor;
         }
@@ -358,7 +360,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         return isSuccessConnected;
     }
 
-    private boolean isGpsAvailable(){
+    private void openGpsAvailable(){
         try {
             if(mLocationManager == null)
                 mLocationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
@@ -366,7 +368,6 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         }catch (SecurityException e){
 
         }
-        return false;
     }
 
     private void initGPS(){
@@ -416,7 +417,6 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         }
         if(locationQueue.isFull()){
             stop();
-            FileUtil.appendStrToFile(Const.code_location_queue_full, "getLocation is full, " + provider + " location queue in location service" + locationQueue.toString());
             getTheLocation.onSearchStop(locationQueue.getCommonLocation());
         }
     }
@@ -432,12 +432,13 @@ public class LocationService implements LocationListener,GpsStatus.Listener
             if(runMiddleTime - runBeginTime > runTimePeriod){
                 runBeginTime = 0;
                 stop();
-                FileUtil.appendStrToFile(Const.code_get_location_failed,"failed to get the location in location service, running for "+String.valueOf(runTimePeriod)+" (ms)");
+                FileUtil.appendErrorToFile(Const.code_get_location_failed, "failed to get the location in location service, running for " + String.valueOf(runTimePeriod) + " (ms)");
             }
             Log.e(TAG,"onLocationChanged provider = "+provider+" null");
         }
     }
 
+    private static int GPS_Num_Thred = 8;
     @Override
     public void onStatusChanged(String s, int event, Bundle bundle) {
         if(mLocationManager == null) mLocationManager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
@@ -454,11 +455,9 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                         ii++;
                     i++;
                 }
-                if(ii > 4) isGpsAvailable = true;
+                if(ii > GPS_Num_Thred) isGpsAvailable = true;
                 else  isGpsAvailable = false;
-
-               Log.e(TAG,"GPS_EVENT_SATELLITE_STATUS i "+String.valueOf(i)+" ii"+String.valueOf(ii));
-            } else if (event == GpsStatus.GPS_EVENT_STARTED) {
+         } else if (event == GpsStatus.GPS_EVENT_STARTED) {
                 Iterable<GpsSatellite> allgps = status.getSatellites();
                 Iterator<GpsSatellite> items = allgps.iterator();
                 int i = 0;
@@ -470,9 +469,8 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                         ii++;
                     i++;
                 }
-                if(ii > 4) isGpsAvailable = true;
+                if(ii > GPS_Num_Thred) isGpsAvailable = true;
                 else isGpsAvailable = false;
-                Log.e(TAG,"GPS_EVENT_STARTED started i "+String.valueOf(i)+" ii"+String.valueOf(ii));
         }
     }
 

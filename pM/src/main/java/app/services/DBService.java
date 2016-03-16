@@ -317,19 +317,23 @@ public class DBService extends Service {
                     sendBroadcast(intent);
                 }
             }
-
                 //every 10 min to open the GPS and if get the last location, close it.
                 if (DBRunTime % 120 == 0) { //120 * 5s = 10min
-                    //FileUtil.appendStrToFile(DBRunTime, "Add status listener and request location Updates");
                     if(!isSavingBattery)
                         locationService.run(LocationService.TYPE_BAIDU);
                 }
                 if (DBRunTime % 130 == 0) { //open for 10 * 5 = 50s
-                    //FileUtil.appendStrToFile(DBRunTime, "remove status listener, remove request location Updates");
                     locationService.stop();
                 }
 
-                //every 1 min to calculate the pm result
+                if(DBRunTime % 60 == 0){
+                    locationService.run(LocationService.TYPE_GPS);
+                }
+                if(DBRunTime % 65 == 0){
+                    locationService.stop();
+                    inOutDoor = locationService.getIndoorOutdoor();
+                    aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(inOutDoor));
+                }//every 1 min to calculate the pm result
                 if (DBRunTime % 12 == 0) {
                     State last = state;
                     state = calculatePM25(longitude, latitude);
@@ -484,6 +488,7 @@ public class DBService extends Service {
         serviceStateInitial();
         sensorInitial();
         inOutDoor = locationService.getIndoorOutdoor();
+        aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(inOutDoor));
         if (mLastLocation != null) {
             locationService.stop();
             Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
@@ -669,7 +674,7 @@ public class DBService extends Service {
             density = ratio * density + (1-ratio)*density/3;
             FileUtil.appendStrToFile(DBRunTime,"no network connection, using ratio to get density "+density);
             if (ratio > 0.5)  inOutDoor = LocationService.Indoor;
-             else inOutDoor = LocationService.Outdoor;
+            else inOutDoor = LocationService.Outdoor;
         } else {
             if (inOutDoor == LocationService.Indoor) density /= 3;
         }

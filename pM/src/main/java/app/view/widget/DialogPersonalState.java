@@ -34,7 +34,6 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         mContext = context;
         this.mHandler = parent;
     }
-
     Handler mHandler;
     ACache aCache;
     Context mContext;
@@ -52,7 +51,6 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setCanceledOnTouchOutside(false);
-
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.widget_dialog_personal_state);
         mSaveWeight = (TextView)findViewById(R.id.personal_state_weight_save);
@@ -82,10 +80,10 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         if(lati != null) mLatitude.setText(lati);
         if(longi != null) mLongitude.setText(longi);
         if(weight != null) mWeight.setText(weight);
-        if(inOut != null) setGender(inOut);
+        if(inOut != null) setLocation(inOut);
     }
 
-    private void setGender(String state){
+    private void setLocation(String state){
         Integer inOut = Integer.valueOf(state);
         if(inOut == LocationService.Indoor){
             mIndoor.setChecked(true);
@@ -137,10 +135,5 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     @Override
     protected void onStop() {
         super.onStop();
-        genderUpdating();
-    }
-
-    private void genderUpdating(){
-        mHandler.sendEmptyMessage(Const.Handler_Gender_Updated);
     }
 }
