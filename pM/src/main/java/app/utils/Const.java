@@ -42,7 +42,7 @@ public class Const {
 
     public static final double latitude_for_test = 39.972465;
 
-    public static final int Default_Timeout = 1000 * 60;
+    public static final int Default_Timeout = 1000 * 30;
 
     public static final int Resolution_Small = 541;
 
@@ -93,7 +93,7 @@ public class Const {
     public static final String Cache_User_Weight = "Cache_User_Weight";
     public static final String Cache_Lastime_Timepoint = "Cache_Lastime_Timepoint";
     public static final String Cache_Is_Saving_Battery = "Cache_Is_Saving_Battery";
-
+    public static final String Cache_GPS_SATE_NUM = "Cache_GPS_SATE_NUM";
 
     /**
      * Handler Code*
@@ -325,7 +325,7 @@ public class Const {
 
     public static final String Info_Input_Weight_Saved = "体重数据已保存";
 
-    public static final String Info_Weight_Null = "当前体重数据为零，请输入相关体重数据";
+    public static final String Info_Weight_Null = "当前体重数据为零，请在状态栏中输入相关体重数据";
 
     public static final String Info_No_PMDensity = "当前地区无法获得有关PM浓度信息";
 

@@ -37,6 +37,7 @@ import java.util.List;
 import app.model.PMModel;
 import app.services.DBService;
 import app.utils.ACache;
+import app.utils.CacheUtil;
 import app.utils.ChartsConst;
 import app.utils.Const;
 import app.utils.DataGenerator;
@@ -112,6 +113,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     LoadingDialog loadingDialog;
     PMModel pmModel;
     ACache aCache;
+    CacheUtil cacheUtil;
     private IntentFilter intentFilter;
     /**
      * Charts*
@@ -279,8 +281,9 @@ public class MainFragment extends Fragment implements OnClickListener {
         chartData12 = new HashMap<>();
         pmModel = new PMModel();
         loadingDialog = new LoadingDialog(getActivity());
-        aCache = ACache.get(mActivity);
-        ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
+        aCache = ACache.get(mActivity.getApplicationContext());
+        cacheUtil = CacheUtil.getInstance(mActivity);
+        ShortcutUtil.calStaticBreath(cacheUtil.getAsString(Const.Cache_User_Weight));
         //GPS Task
         if (!ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
             dbReceiver = new DBServiceReceiver();

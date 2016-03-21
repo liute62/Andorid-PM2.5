@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import app.utils.ACache;
+import app.utils.CacheUtil;
 import app.utils.Const;
 import app.utils.SharedPreferencesUtil;
 import app.utils.ShortcutUtil;
@@ -19,7 +20,7 @@ public class NotificationActivity extends Activity implements View.OnClickListen
 
     Button mSure;
     Button mCancel;
-    ACache aCache;
+    CacheUtil cacheUtil;
     boolean isFinished;
 
     Handler mHandler = new Handler(){
@@ -33,8 +34,7 @@ public class NotificationActivity extends Activity implements View.OnClickListen
                      .setValue(getBaseContext(), "isAlreadyInit"
                              + ShortcutUtil.getAppVersionCode(getBaseContext()), true);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                aCache = ACache.get(NotificationActivity.this.getApplicationContext());
-                aCache.put(Const.Cache_User_Weight, (String)msg.obj, 10000000);
+                cacheUtil.put(Const.Cache_User_Weight, (String)msg.obj);
                 Log.e("NotificationActivity", (String) msg.obj);
                 startActivity(intent);
                 NotificationActivity.this.finish();
@@ -47,7 +47,7 @@ public class NotificationActivity extends Activity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         isFinished = false;
-        aCache = ACache.get(this);
+        cacheUtil = CacheUtil.getInstance(this);
         mSure = (Button) findViewById(R.id.notification_sure);
         mCancel = (Button) findViewById(R.id.notification_cancel);
         mSure.setOnClickListener(this);

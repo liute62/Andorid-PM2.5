@@ -21,6 +21,7 @@ import com.example.pm.R;
 
 import app.services.LocationService;
 import app.utils.ACache;
+import app.utils.CacheUtil;
 import app.utils.Const;
 import app.utils.ShortcutUtil;
 
@@ -36,6 +37,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     }
     Handler mHandler;
     ACache aCache;
+    CacheUtil cacheUtil;
     Context mContext;
     TextView mSaveWeight;
     EditText mWeight;
@@ -46,6 +48,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     RadioButton mIndoor;
     RadioButton mOutdoor;
     Button mDataResult;
+    TextView mGPSNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,19 +71,23 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         mDataResult.setOnClickListener(this);
         mLocalization = (Button)findViewById(R.id.personal_state_get_location);
         mLocalization.setOnClickListener(this);
+        mGPSNum = (TextView)findViewById(R.id.personal_state_gps_num);
         loadData();
     }
 
     private void loadData(){
         aCache = ACache.get(mContext.getApplicationContext());
+        cacheUtil = CacheUtil.getInstance(mContext);
         String lati = aCache.getAsString(Const.Cache_Latitude);
         String longi = aCache.getAsString(Const.Cache_Longitude);
-        String weight = aCache.getAsString(Const.Cache_User_Weight);
+        String weight = cacheUtil.getAsString(Const.Cache_User_Weight);
         String inOut = aCache.getAsString(Const.Cache_Indoor_Outdoor);
+        String gps = cacheUtil.getAsString(Const.Cache_GPS_SATE_NUM);
         if(lati != null) mLatitude.setText(lati);
         if(longi != null) mLongitude.setText(longi);
         if(weight != null) mWeight.setText(weight);
         if(inOut != null) setLocation(inOut);
+        if(gps != null) mGPSNum.setText(gps);
     }
 
     private void setLocation(String state){
@@ -105,7 +112,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
                 String content = mWeight.getText().toString();
                 if(ShortcutUtil.isWeightInputCorrect(content)){
                     Toast.makeText(mContext.getApplicationContext(),Const.Info_Input_Weight_Saved,Toast.LENGTH_SHORT).show();
-                    aCache.put(Const.Cache_User_Weight, content);
+                    cacheUtil.put(Const.Cache_User_Weight, content);
                     ShortcutUtil.calStaticBreath(Integer.valueOf(content));
                 }else {
                     Toast.makeText(mContext.getApplicationContext(),Const.Info_Input_Weight_Error,Toast.LENGTH_SHORT).show();

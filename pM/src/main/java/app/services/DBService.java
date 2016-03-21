@@ -52,6 +52,7 @@ import app.model.PMModel;
 import app.movement.SimpleStepDetector;
 import app.movement.StepListener;
 import app.utils.ACache;
+import app.utils.CacheUtil;
 import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.DBHelper;
@@ -95,13 +96,13 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 public class DBService extends Service {
 
     public static final String TAG = "app.services.DBService";
-
     /**
      * data
      **/
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private ACache aCache;
+    private CacheUtil cacheUtil;
     private PMModel pmModel;
     private State state;
     /**
@@ -389,7 +390,6 @@ public class DBService extends Service {
                 super.handleMessage(msg);
                 Intent intentChart;
                 Bundle mBundle = new Bundle();
-                Log.e(TAG, "refreshHandler " + msg.what + " " + ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
                 if(msg.what == Const.Handler_Refresh_Text){
                     if(state == null) return;
                     DataCalculator.getIntance(db).updateLastTwoHourState();
@@ -460,6 +460,7 @@ public class DBService extends Service {
         isRefreshRunning = false;
         isSavingBattery = false;
         aCache = ACache.get(getApplicationContext());
+        cacheUtil = CacheUtil.getInstance(this);
         locationService = LocationService.getInstance(this);
         locationService.setGetTheLocationListener(getTheLocation);
         /*
@@ -679,7 +680,7 @@ public class DBService extends Service {
             if (inOutDoor == LocationService.Indoor) density /= 3;
         }
 
-        double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
+        double static_breath = ShortcutUtil.calStaticBreath(cacheUtil.getAsString(Const.Cache_User_Weight));
 
         if (static_breath == 0.0) {
             if(isBackground != null && isBackground.equals(bgStr))

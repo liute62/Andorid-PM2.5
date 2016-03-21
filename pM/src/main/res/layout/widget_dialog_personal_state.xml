@@ -127,6 +127,15 @@
             android:id="@+id/personal_state_outdoor"
             android:layout_toEndOf="@+id/personal_state_indoor"
             android:layout_marginStart="21dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="null"
+            android:id="@+id/personal_state_gps_num"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/personal_state_outdoor" />
     </RelativeLayout>
 
     <RelativeLayout
