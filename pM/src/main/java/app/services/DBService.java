@@ -1,7 +1,6 @@
 package app.services;
 
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -23,7 +22,6 @@ import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.util.Log;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -137,6 +135,7 @@ public class DBService extends Service {
     /**
      * Sensor
      **/
+    private InOutdoorService inOutdoorService;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private SimpleStepDetector simpleStepDetector;
@@ -320,21 +319,19 @@ public class DBService extends Service {
             }
                 //every 10 min to open the GPS and if get the last location, close it.
                 if (DBRunTime % 120 == 0) { //120 * 5s = 10min
-                    if(!isSavingBattery)
-                        locationService.run(LocationService.TYPE_BAIDU);
+                    FileUtil.appendStrToFile(DBRunTime,"the location service open and get in/outdoor state");
+                    inOutdoorService.run();
+                   // if(!isSavingBattery)
+                    locationService.run(LocationService.TYPE_BAIDU);
                 }
-                if (DBRunTime % 130 == 0) { //open for 10 * 5 = 50s
-                    locationService.stop();
-                }
-
-                if(DBRunTime % 60 == 0){
-                    locationService.run(LocationService.TYPE_GPS);
-                }
-                if(DBRunTime % 65 == 0){
-                    locationService.stop();
-                    inOutDoor = locationService.getIndoorOutdoor();
+                if (DBRunTime % 125 == 0) { //open for 5 * 5 = 25s
+                    FileUtil.appendStrToFile(DBRunTime,"the location service close and stop getting in/outdoor state");
+                    inOutDoor = inOutdoorService.getIndoorOutdoor();
                     aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(inOutDoor));
-                }//every 1 min to calculate the pm result
+                    locationService.stop();
+                    inOutdoorService.stop();
+                }
+               //every 1 min to calculate the pm result
                 if (DBRunTime % 12 == 0) {
                     State last = state;
                     state = calculatePM25(longitude, latitude);
@@ -343,7 +340,6 @@ public class DBService extends Service {
                         //uploadPMData(state); //no upload action
                         insertState(state);
                     } else {
-                        //TODO Check if Runtime logic success
                         reset();
                     }
                 }
@@ -462,6 +458,7 @@ public class DBService extends Service {
         aCache = ACache.get(getApplicationContext());
         cacheUtil = CacheUtil.getInstance(this);
         locationService = LocationService.getInstance(this);
+        inOutdoorService = new InOutdoorService(this);
         locationService.setGetTheLocationListener(getTheLocation);
         /*
         Wake the thread
@@ -488,7 +485,7 @@ public class DBService extends Service {
         DBInitial();
         serviceStateInitial();
         sensorInitial();
-        inOutDoor = locationService.getIndoorOutdoor();
+        inOutDoor = LocationService.Indoor;
         aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(inOutDoor));
         if (mLastLocation != null) {
             locationService.stop();
@@ -643,9 +640,28 @@ public class DBService extends Service {
                 mLastLocation = location;
                 longitude = mLastLocation.getLongitude();
                 latitude = mLastLocation.getLatitude();
+                Log.e(TAG,"onSearchStop"+latitude);
+                String lastLati = aCache.getAsString(Const.Cache_Last_Max_Lati);
+                String lastLongi = aCache.getAsString(Const.Cache_Last_Max_Longi);
+                boolean isEnough = false;
+                if(ShortcutUtil.isStringOK(lastLati) && ShortcutUtil.isStringOK(lastLongi)){
+                    try {
+                        isEnough = ShortcutUtil.isLocationChangeEnough(Double.valueOf(lastLati), latitude,
+                                Double.valueOf(lastLongi), longitude);
+                    }catch (Exception e){
+                        isEnough = false;
+                    }
+                }else {
+                    aCache.put(Const.Cache_Last_Max_Lati,latitude);
+                    aCache.put(Const.Cache_Last_Max_Longi,longitude);
+                }
+                if(isEnough){
+                    searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                    aCache.put(Const.Cache_Last_Max_Lati,latitude);
+                    aCache.put(Const.Cache_Last_Max_Longi, longitude);
+                }
                 aCache.put(Const.Cache_Longitude, longitude);
                 aCache.put(Const.Cache_Latitude, latitude);
-                searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
             }
         }
     };
@@ -837,8 +853,8 @@ public class DBService extends Service {
                         isPMSearchRunning = false;
                         isPMSearchSuccess = false;
                         FileUtil.appendErrorToFile(DBRunTime, "search pm density failed, status != 1");
-                        if(isBackground != null && isBackground.equals(bgStr))
-                             Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+                        //if(isBackground != null && isBackground.equals(bgStr))
+                             //Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -852,8 +868,8 @@ public class DBService extends Service {
                 isPMSearchRunning = false;
                 isPMSearchSuccess = false;
                 FileUtil.appendErrorToFile(DBRunTime, "search pm density failed "+error.getMessage()+" "+error);
-                if(isBackground != null && isBackground.equals(bgStr))
-                    Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+                //if(isBackground != null && isBackground.equals(bgStr))
+                    //Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
             }
 
         });

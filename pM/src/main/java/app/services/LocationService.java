@@ -127,12 +127,14 @@ public class LocationService implements LocationListener,GpsStatus.Listener
         if(type == TYPE_BAIDU || type == TYPE_GPS || type == TYPE_NETWORK)
             localization_type = type;
         else return;
+        Log.e(TAG,"is running"+localization_type);
         isRunning = true;
         initMethodByType(localization_type);
         runMethodByType(localization_type);
     }
 
     public void stop(){
+        Log.e(TAG,"is stop"+localization_type);
         if(isRunning)
           stopMethodByType(localization_type);
         isRunning = false;

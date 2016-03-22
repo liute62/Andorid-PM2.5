@@ -136,7 +136,7 @@ public class ShortcutUtil {
     public static String refFormatDateAndTimeInHour(long currentTimeMillis) {
         String retStrFormatNowDate = refFormatDateAndTime(currentTimeMillis);
         int hour = Integer.valueOf(retStrFormatNowDate.substring(11, 13));
-        int minute = Integer.valueOf(retStrFormatNowDate.substring(14,16));
+        int minute = Integer.valueOf(retStrFormatNowDate.substring(14, 16));
         if (minute<16) {
             hour-=2;
         } else {
@@ -352,9 +352,21 @@ public class ShortcutUtil {
         return max - min;
     }
 
+    /**
+     *
+     * @param lati1
+     * @param lati2
+     * @param longi1
+     * @param longi2
+     * @return
+     */
     public static boolean isLocationChangeEnough(double lati1,double lati2,double longi1,double longi2){
-        // TODO: 1/24/2016 set a threshod to see if location changed enough
-        return true;
+        if(Math.abs(lati1 - lati2) > 0.0005){
+            return true;
+        }else if(Math.abs(longi1 - longi2) > 0.0005){
+            return true;
+        }
+        return false;
     }
 
     public static boolean isDataLost(Map<Integer,Float> map){

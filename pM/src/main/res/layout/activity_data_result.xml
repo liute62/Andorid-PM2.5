@@ -50,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="id"
+            android:textSize="14dp"
             android:id="@+id/textView17" />
 
         <TextView
@@ -57,6 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="user_id"
+            android:textSize="14dp"
             android:id="@+id/textView18"
             android:layout_alignParentLeft="true"/>
 
@@ -65,6 +67,7 @@
             android:layout_marginLeft="120dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="14dp"
             android:text="time"/>
 
         <TextView
@@ -72,6 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="longitude"
+            android:textSize="14dp"
             android:layout_toEndOf="@+id/textView2"
             android:id="@+id/textView23"/>
 
@@ -79,6 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="latitude"
+            android:textSize="14dp"
             android:layout_marginLeft="20dp"
             android:layout_toEndOf="@+id/textView23"
             android:id="@+id/textView24"/>
@@ -88,6 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="odr"
+            android:textSize="14dp"
             android:id="@+id/textView27"
             android:layout_toEndOf="@+id/textView24"/>
 
@@ -106,6 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="status"
+            android:textSize="14dp"
             android:id="@+id/textView28" />
 
         <TextView
@@ -113,6 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="steps"
+            android:textSize="14dp"
             android:id="@+id/textView26" />
 
         <TextView
@@ -120,6 +128,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="rate"
+            android:textSize="14dp"
             android:id="@+id/textView25" />
 
         <TextView
@@ -127,13 +136,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="air"
+            android:textSize="14dp"
             android:id="@+id/data_result_airtitle" />
 
         <TextView
             android:layout_marginLeft="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="dnsty"
+            android:text="density"
+            android:textSize="14dp"
             android:id="@+id/textView30" />
 
         <TextView
@@ -141,6 +152,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="pm"
+            android:textSize="14dp"
             android:id="@+id/textView31" />
 
         <TextView
@@ -148,6 +160,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="src"
+            android:textSize="14dp"
             android:id="@+id/textView32" />
 
         <TextView
@@ -155,6 +168,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="upld"
+            android:textSize="14dp"
             android:id="@+id/textView33" />
 
         <TextView
@@ -162,6 +176,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="conn"
+            android:textSize="14dp"
             android:id="@+id/textView19" />
 
     </LinearLayout>

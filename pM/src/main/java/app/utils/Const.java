@@ -73,6 +73,8 @@ public class Const {
 
     public static final String Cache_Longitude = "Cache_Longitude";
     public static final String Cache_Latitude = "Cache_Latitude";
+    public static final String Cache_Last_Max_Longi = "Cache_Last_Max_Longi";
+    public static final String Cache_Last_Max_Lati = "Cache_Last_Max_Lati";
     public static final String Cache_City = "Cache_City";
     public static final String Cache_Indoor_Outdoor = "Cache_Indoor_Outdoor";
 
