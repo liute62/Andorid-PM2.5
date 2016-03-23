@@ -39,7 +39,7 @@ public class SimpleStepDetector {
     /**
      * Accepts updates from the accelerometer.
      */
-    public void updateAccel(long timeNs, float x, float y, float z) {
+    public void updateAccel(float x, float y, float z) {
         float[] currentAccel = new float[3];
         currentAccel[0] = x;
         currentAccel[1] = y;
@@ -49,7 +49,6 @@ public class SimpleStepDetector {
         currentAccel[1] = -currentAccel[1]/ SensorManager.GRAVITY_EARTH;
         currentAccel[2] = currentAccel[2]/SensorManager.GRAVITY_EARTH;
         float result = (float) Math.sqrt(currentAccel[0]*currentAccel[0] + currentAccel[1]*currentAccel[1] + currentAccel[2]*currentAccel[2]);
-
         // First step is to update our guess of where the global z vector is.
        // Log.d(TAG,String.valueOf(result));
         if(result > thred){

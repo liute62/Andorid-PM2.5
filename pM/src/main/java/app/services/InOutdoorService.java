@@ -51,6 +51,7 @@ public class InOutdoorService{
 
     public void run(){
         if(!isRunning) {
+            Log.e(TAG,""+executionTimer);
             resultFetch = new ResultFetch(0);
             resultFetch.execute();
         }
@@ -119,7 +120,6 @@ public class InOutdoorService{
                 return;
             }
             executionTimer = (executionTimer + 1);
-            Log.e(TAG,"doInBackground executionTimer");
         }
 
         private void onPostExecute(Object o) {
@@ -340,16 +340,13 @@ public class InOutdoorService{
             if(event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
                 if(event.values[0] == event.sensor.getMaximumRange()) {
                     lightBlocked = false;
-                    Log.e(TAG,"event.sensor.getMaximumRange");
                     return;
                 }
-                Log.e(TAG,"lightBlocked true");
                 lightBlocked = true;
                 return;
             }
             if(event.sensor.getType() == Sensor.TYPE_LIGHT)
                 lightIntensity = event.values[0];
-            Log.e(TAG,"lightIntensity "+lightIntensity);
         }
 
         @Override

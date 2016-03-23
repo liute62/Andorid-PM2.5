@@ -37,7 +37,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -115,10 +114,15 @@ public class DBService extends Service {
     private double venVolToday;
     private String avg_rate;
     private int inOutDoor;
-    /****/
+    /**
+     * **/
     private int DBRunTime;
     private final int State_Much_Index = 500;
     private int DB_Chart_Loop = 12;
+    private int Loc_Runtime = 0;
+    private int IO_Runtime = 0;
+    private final int DB_Loc_Close_Per = 6;
+    private final int DB_IO_Close_Per = 12;
     private boolean isPMSearchRunning;
     private boolean isPMSearchSuccess;
     private boolean DBCanRun;
@@ -140,7 +144,7 @@ public class DBService extends Service {
     private Sensor mAccelerometer;
     private SimpleStepDetector simpleStepDetector;
     private int numSteps;
-    private int numStepsTmp; //to insert the step value to state
+    private int numStepsForRecord; //to insert the step value to state
     private long time1;
     private static Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC;
     private final int Motion_Detection_Interval = 60 * 1000; //1min
@@ -318,17 +322,30 @@ public class DBService extends Service {
                 }
             }
                 //every 10 min to open the GPS and if get the last location, close it.
-                if (DBRunTime % 120 == 0) { //120 * 5s = 10min
+                if (DBRunTime % 120 == 0) { //120， 240， 360, 480, 600, 720
                     FileUtil.appendStrToFile(DBRunTime,"the location service open and get in/outdoor state");
                     inOutdoorService.run();
-                   // if(!isSavingBattery)
                     locationService.run(LocationService.TYPE_BAIDU);
+                    Loc_Runtime = 0;
+                    IO_Runtime = 0;
                 }
-                if (DBRunTime % 125 == 0) { //open for 5 * 5 = 25s
-                    FileUtil.appendStrToFile(DBRunTime,"the location service close and stop getting in/outdoor state");
-                    inOutDoor = inOutdoorService.getIndoorOutdoor();
-                    aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(inOutDoor));
+                IO_Runtime++;
+                Loc_Runtime++;
+                if(Loc_Runtime >= DB_Loc_Close_Per){
+                    Loc_Runtime = Integer.MIN_VALUE;
+                    FileUtil.appendStrToFile(DBRunTime, "the location service close");
                     locationService.stop();
+                }
+                if(IO_Runtime >= DB_IO_Close_Per) {
+                    IO_Runtime = Integer.MIN_VALUE;
+                    FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state");
+                    inOutDoor = inOutdoorService.getIndoorOutdoor();
+                    int tmp = locationService.getIndoorOutdoor();
+                    if(tmp != inOutDoor) {
+                        FileUtil.appendStrToFile(DBRunTime, "inOutdoorService says "+inOutDoor +
+                                " while locationService says "+tmp);
+                    }
+                    aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
                     inOutdoorService.stop();
                 }
                //every 1 min to calculate the pm result
@@ -337,7 +354,6 @@ public class DBService extends Service {
                     state = calculatePM25(longitude, latitude);
                     State now = state;
                     if (!isSurpass(last, now)) {
-                        //uploadPMData(state); //no upload action
                         insertState(state);
                     } else {
                         reset();
@@ -351,7 +367,7 @@ public class DBService extends Service {
                 } else {
                     Long curTime = System.currentTimeMillis();
                     if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
-                        //FileUtil.appendStrToFile(DBRunTime, "every 1 hour to search the PM density from server");
+                        FileUtil.appendStrToFile(DBRunTime, "every 1 hour to search the PM density from server");
                         aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
                         searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
                     }
@@ -365,7 +381,7 @@ public class DBService extends Service {
                     //every 1 hour to check pm data for upload
                     if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
                         aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
-                        //FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
+                        FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
                         //check it user have login
                         checkPMDataForUpload();
                     }
@@ -569,7 +585,6 @@ public class DBService extends Service {
             @Override
             public void step(long timeNs) {
                 numSteps++;
-                numStepsTmp++;
             }
         });
         time1 = System.currentTimeMillis();
@@ -605,8 +620,7 @@ public class DBService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                simpleStepDetector.updateAccel(
-                        event.timestamp, event.values[0], event.values[1], event.values[2]);
+                simpleStepDetector.updateAccel(event.values[0], event.values[1], event.values[2]);
             }
             long time2 = System.currentTimeMillis();
             if (time2 - time1 > Motion_Detection_Interval) {
@@ -616,6 +630,7 @@ public class DBService extends Service {
                     mMotionStatus = Const.MotionStatus.WALK;
                 else
                     mMotionStatus = Const.MotionStatus.STATIC;
+                numStepsForRecord = numSteps;
                 numSteps = 0;
                 time1 = time2;
             }
@@ -718,8 +733,8 @@ public class DBService extends Service {
                 String.valueOf(lati),
                 String.valueOf(inOutDoor),
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numStepsTmp), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
-        numStepsTmp = 0;
+                Integer.toString(numStepsForRecord), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
+        numStepsForRecord = 0;
         return state;
     }
 
@@ -933,8 +948,8 @@ public class DBService extends Service {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if (isBackground != null && isBackground.equals(bgStr))
-                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
+//                    if (isBackground != null && isBackground.equals(bgStr))
+//                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -945,8 +960,8 @@ public class DBService extends Service {
                         FileUtil.appendErrorToFile(DBRunTime, "checkPMDataForUpload networkResponse statusCode " + error.networkResponse.statusCode);
                     FileUtil.appendErrorToFile(DBRunTime,"checkPMDataForUpload error " + error.toString());
                     isUploadRunning = false;
-                    if (isBackground != null && isBackground.equals(bgStr))
-                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+//                    if (isBackground != null && isBackground.equals(bgStr))
+//                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
                 }
             }) {
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -956,12 +971,11 @@ public class DBService extends Service {
                 }
             };
             jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    Const.Default_Timeout,
+                    Const.Default_Timeout_Long,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
         }
-
     }
 
     private class Receiver extends BroadcastReceiver {

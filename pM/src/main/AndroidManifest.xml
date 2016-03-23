@@ -118,13 +118,13 @@
         <activity android:name=".wxapi.WXEntryActivity">
         </activity>
 
-        <receiver android:name="app.services.WifiReceiver">
-            <intent-filter >
-                <action android:name="android.net.wifi.RSSI_CHANGED"/>
-                <action android:name="android.net.wifi.STATE_CHANGE"/>
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
-            </intent-filter>
-            </receiver>
+        <!--<receiver android:name="app.services.WifiReceiver">-->
+            <!--<intent-filter >-->
+                <!--<action android:name="android.net.wifi.RSSI_CHANGED"/>-->
+                <!--<action android:name="android.net.wifi.STATE_CHANGE"/>-->
+                <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>-->
+            <!--</intent-filter>-->
+            <!--</receiver>-->
 
         <service
             android:name="app.services.DBService"

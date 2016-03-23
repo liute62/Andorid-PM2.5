@@ -44,6 +44,8 @@ public class Const {
 
     public static final int Default_Timeout = 1000 * 30;
 
+    public static final int Default_Timeout_Long = 1000 * 60;
+
     public static final int Resolution_Small = 541;
 
     public static final String Not_SAVING_BATTERY = "false";

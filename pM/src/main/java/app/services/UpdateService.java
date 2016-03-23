@@ -200,7 +200,7 @@ public class UpdateService {
                     }
                 } catch (JSONException e) {
                     Log.e(TAG,"JSONException error"+e.toString());
-                    FileUtil.appendStrToFile(" update density url JSONException error"+e.toString());
+                    FileUtil.appendErrorToFile(0," update density url JSONException error"+e.toString());
                     // TODO: 16/2/9  A Json parse bug
                     //org.json.JSONException: Value {"data":{"source":2,"time_point":"2016-02-09 00:00:00","PM25":"69","AQI":"93"},"message":"successfully get data","status":1}
                     //of type org.json.JSONObject cannot be converted to JSONArray

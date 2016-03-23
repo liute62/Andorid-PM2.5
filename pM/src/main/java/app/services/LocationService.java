@@ -258,6 +258,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 locationGPS.setLatitude(location.getLatitude());
                 isGpsAvailable = true;
                 getLocation(locationGPS);
+                FileUtil.appendStrToFile(0,"Baidu Map  is using GPS as the localization choice");
             } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// network localization result
 //                sb.append("\naddr : ");
 //                sb.append(location.getAddrStr());
@@ -271,6 +272,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 locationNetwork.setLatitude(location.getLatitude());
                 getLocation(locationNetwork);
                 isGpsAvailable = false;
+                FileUtil.appendStrToFile(0,"Baidu Map is using Network as the localization choice");
             } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// offline localization result
 //                sb.append("\ndescribe : ");
 //                sb.append("offline localization success");
@@ -337,7 +339,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
 
     public int getIndoorOutdoor(){
         isWifiAvailable = isWifiAvailable();
-        openGpsAvailable();
+        //openGpsAvailable();
         if(isWifiAvailable || !isGpsAvailable){
             return Indoor;
         }
