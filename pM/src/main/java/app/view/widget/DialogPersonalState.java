@@ -127,7 +127,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
                 aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationService.Indoor));
                 break;
             case R.id.personal_state_outdoor:
-                mOutdoor.setChecked(false);
+                mIndoor.setChecked(false);
                 mOutdoor.setChecked(true);
                 aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationService.Outdoor));
                 break;

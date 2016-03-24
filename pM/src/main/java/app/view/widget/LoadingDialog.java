@@ -71,7 +71,7 @@ public class LoadingDialog extends Dialog {
         mText = (TextView) findViewById(R.id.loading_dialog_text);
         mTextPoint = (TextView) findViewById(R.id.loading_dialog_point);
         initAnim();
-        getWindow().setWindowAnimations(R.anim.alpha_in);
+        //getWindow().setWindowAnimations(R.anim.alpha_in);
     }
 
 

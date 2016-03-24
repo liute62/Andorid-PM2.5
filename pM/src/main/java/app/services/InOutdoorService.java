@@ -6,6 +6,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -17,6 +19,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import app.model.DetectionProfile;
+import app.utils.FileUtil;
 
 /**
  * Created by Haodong on 3/22/2016.
@@ -37,6 +40,20 @@ public class InOutdoorService{
     private static final int Outdoor = 2;
     public static final int executionCircle = 9;
 
+    Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(isRunning) {
+                Log.e(TAG, "" + executionTimer);
+                resultFetch = new ResultFetch(executionTimer);
+                resultFetch.execute();
+                mHandler.postDelayed(mRunnable, 1000 * 30);
+            }
+        }
+    };
+
+    Handler mHandler = new Handler();
+
     public InOutdoorService(Context context){
         isRunning = false;
         this.mContext = context;
@@ -51,13 +68,13 @@ public class InOutdoorService{
 
     public void run(){
         if(!isRunning) {
-            Log.e(TAG,""+executionTimer);
-            resultFetch = new ResultFetch(0);
-            resultFetch.execute();
+            isRunning = true;
+            mHandler.post(mRunnable);
         }
     }
 
     public void stop(){
+        isRunning = false;
         signalDetection.stop();
         magnetDetection.stop();
         lightDetection.stop();
@@ -120,23 +137,24 @@ public class InOutdoorService{
                 return;
             }
             executionTimer = (executionTimer + 1);
+            Log.e(TAG,executionTimer+"");
         }
 
         private void onPostExecute(Object o) {
             if((indoor > outdoor) && (indoor > semi)) {
-                Log.e(TAG,"Detection: You are indoors!");
+                FileUtil.appendStrToFile(0, "Detection: You are indoors!");
                 status = Indoor;
                 signalDetection.setPrevStatus(Indoor);
                 return;
             }
             if((semi > indoor) && (semi > outdoor)) {
-                Log.e(TAG, "Detection: You are semi-outdoors!");
+                FileUtil.appendStrToFile(0, "Detection: You are semi-outdoors!");
                 status = Semi_Outdoor;
                 signalDetection.setPrevStatus(Semi_Outdoor);
                 return;
             }
             if((outdoor > indoor) && (outdoor > semi)) {
-                Log.e(TAG, "Detection: You are outdoors!");
+                FileUtil.appendStrToFile(0, "Detection: You are outdoors!");
                 status = Outdoor;
                 signalDetection.setPrevStatus(Outdoor);
             }
@@ -186,7 +204,11 @@ public class InOutdoorService{
             telephonyManager.listen(phoneStateListener, TelephonyManager.DATA_CONNECTED);
             if(telephonyManager.getSimState() != TelephonyManager.SIM_STATE_UNKNOWN) {
                 cellLocation = (GsmCellLocation)telephonyManager.getCellLocation();
-                currentCID = cellLocation.getCid();
+                if(cellLocation != null) {
+                    currentCID = cellLocation.getCid();
+                }else {
+                    currentCID = 0;
+                }
                 Log.e(TAG,"initTele CID: "+currentCID);
             }
         }
