@@ -45,8 +45,8 @@ public class ShareUtils {
     Activity mActivity;
     private String QQ_APP_ID = "100424468";
     private String QQ_APP_KEY = "c7394704798a158208a74ab60104f0ba";
-    private String WEIXIN_APP_ID = "100424468";
-    private String WEIXIN_APP_SECRETE = "c7394704798a158208a74ab60104f0ba";
+    private String WEIXIN_APP_ID = "wx24d29d8146699834";
+    private String WEIXIN_APP_SECRETE = "2dfbce45b493fde58d7075d7d2aed5fd";
     private String targetUrl = "http://www.bio3air.com/";
     private Bitmap mImage = null;
 
