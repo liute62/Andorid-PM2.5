@@ -674,6 +674,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                     JSONObject result = response.getJSONObject("result");
                     JSONObject component = result.getJSONObject("addressComponent");
                     String cityName = component.getString("city");
+                    FileUtil.appendStrToFile(-2,"5.search city success and city == "+cityName);
                     if (cityName != null && !cityName.trim().equals("")) {
                         Message msg = new Message();
                         msg.what = Const.Handler_City_Name;

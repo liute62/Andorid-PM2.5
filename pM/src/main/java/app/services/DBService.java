@@ -323,31 +323,35 @@ public class DBService extends Service {
             }
                 //every 10 min to open the GPS and if get the last location, close it.
                 if (DBRunTime % 120 == 0) { //120， 240， 360, 480, 600, 720
-                    FileUtil.appendStrToFile(DBRunTime,"the location service open and get in/outdoor state");
-                    inOutdoorService.run();
+                    FileUtil.appendStrToFile(DBRunTime, "the location service open and get in/outdoor state");
+                    //inOutdoorService.run();
                     locationService.run(LocationService.TYPE_BAIDU);
                     Loc_Runtime = 0;
-                    IO_Runtime = 0;
+                    //IO_Runtime = 0;
                 }
-                IO_Runtime++;
+                //IO_Runtime++;
                 Loc_Runtime++;
                 if(Loc_Runtime >= DB_Loc_Close_Per){
                     Loc_Runtime = Integer.MIN_VALUE;
                     FileUtil.appendStrToFile(DBRunTime, "the location service close");
                     locationService.stop();
-                }
-                if(IO_Runtime >= DB_IO_Close_Per) {
-                    IO_Runtime = Integer.MIN_VALUE;
-                    FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state");
-                    inOutDoor = inOutdoorService.getIndoorOutdoor();
                     int tmp = locationService.getIndoorOutdoor();
-                    if(tmp != inOutDoor) {
-                        FileUtil.appendStrToFile(DBRunTime, "inOutdoorService says "+inOutDoor +
-                                " while locationService says "+tmp);
-                    }
+                    inOutDoor = tmp;
                     aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
-                    inOutdoorService.stop();
+                    FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state with state == " + inOutDoor);
                 }
+//                if(IO_Runtime >= DB_IO_Close_Per) {
+//                    IO_Runtime = Integer.MIN_VALUE;
+//                    FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state");
+//                    inOutDoor = inOutdoorService.getIndoorOutdoor();
+//                    int tmp = locationService.getIndoorOutdoor();
+//                    if(tmp != inOutDoor) {
+//                        FileUtil.appendStrToFile(DBRunTime, "inOutdoorService says "+inOutDoor +
+//                                " while locationService says "+tmp);
+//                    }
+//                    aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
+//                    inOutdoorService.stop();
+//                }
                //every 1 min to calculate the pm result
                 if (DBRunTime % 12 == 0) {
                     State last = state;
@@ -474,7 +478,7 @@ public class DBService extends Service {
         aCache = ACache.get(getApplicationContext());
         cacheUtil = CacheUtil.getInstance(this);
         locationService = LocationService.getInstance(this);
-        inOutdoorService = new InOutdoorService(this);
+        //inOutdoorService = new InOutdoorService(this);
         locationService.setGetTheLocationListener(getTheLocation);
         /*
         Wake the thread
@@ -863,7 +867,7 @@ public class DBService extends Service {
                         sendBroadcast(intent);
                         DBCanRun = true;
                         isPMSearchSuccess = true;
-                        FileUtil.appendStrToFile(DBRunTime, " search pm density success, density: " + PM25Density);
+                        FileUtil.appendStrToFile(DBRunTime, "3.search pm density success, density: " + PM25Density);
                     } else {
                         isPMSearchRunning = false;
                         isPMSearchSuccess = false;
@@ -917,7 +921,7 @@ public class DBService extends Service {
         if (ShortcutUtil.isStringOK(idStr) && !idStr.equals("0")) {
             final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD +
                     "=? AND " + DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0", "1").list();
-            FileUtil.appendStrToFile(DBRunTime, "checkPMDataForUpload upload batch start size = " + states.size());
+            //FileUtil.appendStrToFile(DBRunTime, "1.checkPMDataForUpload upload batch start size = " + states.size());
             isUploadRunning = true;
             String url = HttpUtil.UploadBatch_url;
             JSONArray array = new JSONArray();
@@ -939,7 +943,7 @@ public class DBService extends Service {
                     isUploadRunning = false;
                     try {
                         String value = response.getString("succeed_count");
-                        FileUtil.appendStrToFile(DBRunTime, "checkPMDataForUpload upload success value = " + value);
+                        FileUtil.appendStrToFile(DBRunTime, "1.checkPMDataForUpload upload success value = " + value);
                         if (Integer.valueOf(value) == size) {
                             for (int i=0;i<size;i++) {
                                 updateStateUpLoad(states.get(i), 1);
@@ -955,10 +959,10 @@ public class DBService extends Service {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     if (error.getMessage() != null)
-                        FileUtil.appendErrorToFile(DBRunTime,"checkPMDataForUpload error getMessage" + error.getMessage());
+                        FileUtil.appendErrorToFile(DBRunTime,"1.checkPMDataForUpload error getMessage" + error.getMessage());
                     if (error.networkResponse != null)
-                        FileUtil.appendErrorToFile(DBRunTime, "checkPMDataForUpload networkResponse statusCode " + error.networkResponse.statusCode);
-                    FileUtil.appendErrorToFile(DBRunTime,"checkPMDataForUpload error " + error.toString());
+                        FileUtil.appendErrorToFile(DBRunTime, "1.checkPMDataForUpload networkResponse statusCode " + error.networkResponse.statusCode);
+                    FileUtil.appendErrorToFile(DBRunTime,"1.checkPMDataForUpload error " + error.toString());
                     isUploadRunning = false;
 //                    if (isBackground != null && isBackground.equals(bgStr))
 //                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
@@ -1042,6 +1046,8 @@ public class DBService extends Service {
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
         refreshCity();
         refreshInOutDoor();
+        if(!isPMSearchSuccess)
+            searchPMRequest(String.valueOf(longitude),String.valueOf(latitude));
     }
 
     private void refreshCity(){
@@ -1093,7 +1099,6 @@ public class DBService extends Service {
         isPMSearchRunning = false;
         isLocationChanged = false;
         isUploadRunning = false;
-        isPMSearchSuccess = false;
         refreshAll();
         locationInitial();
         DBInitial();

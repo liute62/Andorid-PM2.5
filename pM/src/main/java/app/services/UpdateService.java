@@ -172,7 +172,7 @@ public class UpdateService {
                 + "&time_point=" + ShortcutUtil.refFormatDateAndTimeInHour(Long.valueOf(state.getTime_point()));
         url = url.replace(" ","%20");
         Log.d("url",url);
-        FileUtil.appendStrToFile("update url is:  " + url);
+        //FileUtil.appendStrToFile(-1,"2.UpdateDensity begin with url == "+url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -184,7 +184,7 @@ public class UpdateService {
                     if (inOutDoor.equals(LocationService.Indoor)) {
                         mDensity = Integer.valueOf(mDensity) / 3 + "";
                     }
-                    FileUtil.appendStrToFile("update density  "+mDensity);
+                    FileUtil.appendStrToFile(-1,"2.UpdateDensity success and density updated == "+mDensity);
                     //Log.e(TAG,"UpdateDensity new density "+mDensity);
                     //update density
                     updateStateDensity(state, mDensity);
