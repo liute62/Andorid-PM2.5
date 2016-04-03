@@ -322,7 +322,7 @@ public class DBService extends Service {
                 }
             }
                 //every 10 min to open the GPS and if get the last location, close it.
-                if (DBRunTime % 120 == 0) { //120ï¼Œ 240ï¼Œ 360, 480, 600, 720
+                if (DBRunTime % 120 == 0) { //120ï¼? 240ï¼? 360, 480, 600, 720
                     FileUtil.appendStrToFile(DBRunTime, "the location service open and get in/outdoor state");
                     //inOutdoorService.run();
                     locationService.run(LocationService.TYPE_BAIDU);
@@ -703,7 +703,7 @@ public class DBService extends Service {
             aCache.put(Const.Cache_Indoor_Outdoor,inOutStr);
         }
         inOutDoor = Integer.valueOf(inOutStr);
-        double ratio;
+        /*double ratio;
         if (!isConnected) {
             ratio = this.getLastSevenDaysInOutRatio();
             FileUtil.appendStrToFile(DBRunTime,"no network connection, using ratio == "+ratio);
@@ -713,7 +713,7 @@ public class DBService extends Service {
             else inOutDoor = LocationService.Outdoor;
         } else {
             if (inOutDoor == LocationService.Indoor) density /= 3;
-        }
+        }*/
 
         double static_breath = ShortcutUtil.calStaticBreath(cacheUtil.getAsString(Const.Cache_User_Weight));
 
