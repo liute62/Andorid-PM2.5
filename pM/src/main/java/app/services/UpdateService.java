@@ -168,54 +168,79 @@ public class UpdateService {
     update state with real density
      */
     public void UpdateDensity(final State state) {
-        String url = HttpUtil.Search_PM_url + "?longitude=" + state.getLongtitude() + "&latitude=" + state.getLatitude()
-                + "&time_point=" + ShortcutUtil.refFormatDateAndTimeInHour(Long.valueOf(state.getTime_point()));
-        url = url.replace(" ","%20");
-        Log.d("url",url);
-        //FileUtil.appendStrToFile(-1,"2.UpdateDensity begin with url == "+url);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    Log.d("connection","connection is ok now");
-                    PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
-                    String mDensity = String.valueOf(pmModel.getPm25());
-                    String inOutDoor = state.getOutdoor();
-                    if (inOutDoor.equals(LocationService.Indoor)) {
-                        mDensity = Integer.valueOf(mDensity) / 3 + "";
+        final String timePoint = ShortcutUtil.refFormatDateAndTimeInHour(Long.valueOf(state.getTime_point()));
+        String density = aCache.getAsString(timePoint);
+        if (density!=null) {
+            FileUtil.appendStrToFile(-1,"cache has density, get from the cache "+timePoint);
+            String inOutDoor = state.getOutdoor();
+            if (inOutDoor.equals(LocationService.Indoor)) {
+                density = Integer.valueOf(density) / 3 + "";
+            }
+            //update density
+            updateStateDensity(state, density);
+            //update connection
+            updateStateConnection(state, 1);
+            //update total pm25 volume
+            updateTotalPM25(state, density);
+            //upload state and check whether upload success
+            state.setDensity(density);
+            //have been upload before, upload again
+            if (state.getUpload() == 1) {
+                upload(state);
+            }
+        } else {
+            FileUtil.appendStrToFile(-1,"cache has no density, get from the server "+timePoint);
+            String url = HttpUtil.Search_PM_url + "?longitude=" + state.getLongtitude() + "&latitude=" + state.getLatitude()
+                    + "&time_point=" + timePoint;
+            url = url.replace(" ", "%20");
+            Log.d("url", url);
+            //FileUtil.appendStrToFile(-1,"2.UpdateDensity begin with url == "+url);
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        Log.d("connection", "connection is ok now");
+                        PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
+                        String mDensity = String.valueOf(pmModel.getPm25());
+                        String inOutDoor = state.getOutdoor();
+                        if (inOutDoor.equals(LocationService.Indoor)) {
+                            mDensity = Integer.valueOf(mDensity) / 3 + "";
+                        }
+                        FileUtil.appendStrToFile(-1, "2.UpdateDensity success and density updated == " + mDensity);
+                        //put in the cache
+                        aCache.put(timePoint,mDensity);
+                        //Log.e(TAG,"UpdateDensity new density "+mDensity);
+                        //update density
+                        updateStateDensity(state, mDensity);
+                        //update connection
+                        updateStateConnection(state, 1);
+                        //update total pm25 volume
+                        updateTotalPM25(state, mDensity);
+                        //upload state and check whether upload success
+                        state.setDensity(mDensity);
+                        //have been upload before, upload again
+                        if (state.getUpload() == 1) {
+                            upload(state);
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, "JSONException error" + e.toString());
+                        FileUtil.appendErrorToFile(0, " update density url JSONException error" + e.toString());
+                        // TODO: 16/2/9  A Json parse bug
+                        //org.json.JSONException: Value {"data":{"source":2,"time_point":"2016-02-09 00:00:00","PM25":"69","AQI":"93"},"message":"successfully get data","status":1}
+                        //of type org.json.JSONObject cannot be converted to JSONArray
+                        //Log.e(TAG,"UpdateDensity jsonError "+e.getMessage());
                     }
-                    FileUtil.appendStrToFile(-1,"2.UpdateDensity success and density updated == "+mDensity);
-                    //Log.e(TAG,"UpdateDensity new density "+mDensity);
-                    //update density
-                    updateStateDensity(state, mDensity);
-                    //update connection
-                    updateStateConnection(state, 1);
-                    //update total pm25 volume
-                    updateTotalPM25(state,mDensity);
-                    //upload state and check whether upload success
-                    state.setDensity(mDensity);
-                    //have been upload before, upload again
-                    if (state.getUpload()==1) {
-                        upload(state);
-                    }
-                } catch (JSONException e) {
-                    Log.e(TAG,"JSONException error"+e.toString());
-                    FileUtil.appendErrorToFile(0," update density url JSONException error"+e.toString());
-                    // TODO: 16/2/9  A Json parse bug
-                    //org.json.JSONException: Value {"data":{"source":2,"time_point":"2016-02-09 00:00:00","PM25":"69","AQI":"93"},"message":"successfully get data","status":1}
-                    //of type org.json.JSONObject cannot be converted to JSONArray
-                    //Log.e(TAG,"UpdateDensity jsonError "+e.getMessage());
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG,"UpdateDensity error"+error.toString());
-                //Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
-            }
-        });
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, "UpdateDensity error" + error.toString());
+                    //Toast.makeText(mContext.getApplicationContext(), "cannot connect to the server", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        VolleyQueue.getInstance(mContext.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+            VolleyQueue.getInstance(mContext.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        }
     }
 
     /*
