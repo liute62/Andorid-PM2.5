@@ -224,7 +224,7 @@ public class MapActivity extends Activity {
 
     private void searchPMRequest(final Position position) {
         String url = HttpUtil.Search_PM_url;
-        url = url + "?longitude=" + position.getLongtitude() + "&latitude=" + position.getLatitude();
+        url = url + "?longitude=" + position.getLongitude() + "&latitude=" + position.getLatitude();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -264,7 +264,7 @@ public class MapActivity extends Activity {
                 density = "0";
             }
             //Log.d("result",position.getName()+" "+position.getLatitude()+" "+position.getLongtitude()+" "+position.getDensity());
-            monitorPoints.put(new LatLng(position.getLatitude(), position.getLongtitude()), Double.valueOf(density));
+            monitorPoints.put(new LatLng(position.getLatitude(), position.getLongitude()), Double.valueOf(density));
         }
         for (LatLng point : monitorPoints.keySet()) {
             double distance = getMinimumDistance(point,monitorPoints.keySet());

@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import app.utils.CacheUtil;
+import app.utils.StableCache;
 import app.utils.Const;
 import app.utils.FileUtil;
 
@@ -460,7 +460,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                         ii++;
                     i++;
                 }
-                CacheUtil.getInstance(mContext).put(Const.Cache_GPS_SATE_NUM,ii);
+                StableCache.getInstance(mContext).put(Const.Cache_GPS_SATE_NUM,ii);
                 if(ii > GPS_Num_Thred) isGpsAvailable = true;
                 else  isGpsAvailable = false;
             Log.e(TAG,"GPS_EVENT_SATELLITE_STATUS "+ii);
@@ -478,7 +478,7 @@ public class LocationService implements LocationListener,GpsStatus.Listener
                 }
                 if(ii > GPS_Num_Thred) isGpsAvailable = true;
                 else isGpsAvailable = false;
-                CacheUtil.getInstance(mContext).put(Const.Cache_GPS_SATE_NUM,ii);
+                StableCache.getInstance(mContext).put(Const.Cache_GPS_SATE_NUM,ii);
             Log.e(TAG,"GPS_EVENT_STARTED "+ii);
         }
     }

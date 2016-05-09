@@ -20,7 +20,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
-import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,8 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +46,6 @@ import app.model.PMModel;
 import app.movement.SimpleStepDetector;
 import app.movement.StepListener;
 import app.utils.ACache;
-import app.utils.CacheUtil;
 import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.DBHelper;
@@ -57,6 +53,7 @@ import app.utils.DataCalculator;
 import app.utils.FileUtil;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
+import app.utils.StableCache;
 import app.utils.VolleyQueue;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
@@ -93,18 +90,18 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 public class DBService extends Service {
 
     public static final String TAG = "app.services.DBService";
+
     /**
-     * data
-     **/
+     * for data operations
+     */
     private DBHelper dbHelper;
-    private SQLiteDatabase db;
     private ACache aCache;
-    private CacheUtil cacheUtil;
+    private StableCache stableCache;
     private PMModel pmModel;
     private State state;
     /**
-     * PM State
-     **/
+     * for PM State
+     */
     private double longitude;  //the newest longitude
     private double latitude;  // the newest latitude
     private int PM25Source; //1 or 2
@@ -115,19 +112,16 @@ public class DBService extends Service {
     private String avg_rate;
     private int inOutDoor;
     /**
-     * **/
+     * for cycling
+     */
     private int DBRunTime;
-    private final int State_Much_Index = 500;
+    private final int State_TooMuch = 600;
     private int DB_Chart_Loop = 12;
     private int Loc_Runtime = 0;
     private int IO_Runtime = 0;
     private final int DB_Loc_Close_Per = 6;
-    private final int DB_IO_Close_Per = 12;
-    private boolean isPMSearchRunning;
     private boolean isPMSearchSuccess;
     private boolean DBCanRun;
-    private boolean isLocationChanged;
-    private boolean isUploadRunning;
     private boolean isRefreshRunning;
     private String isBackground = null;
     private final static String bgStr = "false";
@@ -166,7 +160,7 @@ public class DBService extends Service {
             super.handleMessage(msg);
             if ((longitude == 0.0 && latitude == 0.0) && PM25Density == 0.0)
                 DBCanRun = false;
-             else
+            else
                 DBCanRun = true;
             if (DBRunnable != null)
                 DBRunnable.run();
@@ -183,9 +177,10 @@ public class DBService extends Service {
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
                 intentChart = new Intent(Const.Action_Chart_Cache);
-                if (state != null && state.getId() > State_Much_Index) {
+                if (state != null && state.getId() > State_TooMuch) {
                     //so many data stored, don't want to refresh every time after starting
                 } else {
+                    SQLiteDatabase db = dbHelper.getReadableDatabase();
                     DataCalculator.getIntance(db).updateLastTwoHourState();
                     DataCalculator.getIntance(db).updateLastDayState();
                     DataCalculator.getIntance(db).updateLastWeekState();
@@ -208,19 +203,19 @@ public class DBService extends Service {
                     }
                     sendBroadcast(intentChart);
                 }
+                aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
+                searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
 
             }
-            if(wakeLock == null){
-                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
-                wakeLock.acquire();
-            }
             isBackground = aCache.getAsString(Const.Cache_Is_Background);
-            String userId = aCache.getAsString(Const.Cache_User_Id);
             if (isBackground == null) { //App first run
                 isBackground = "false";
                 aCache.put(Const.Cache_Is_Background, isBackground);
+                String userId = aCache.getAsString(Const.Cache_User_Id);
                 if (userId == null) aCache.put(Const.Cache_User_Id, "0");
             }
+
             if (isBackground.equals("false")) {
                 runTimeInterval = Const.DB_Run_Time_INTERVAL;
                 /** notify user whether using the old PM2.5 density **/
@@ -243,7 +238,7 @@ public class DBService extends Service {
                 if (DBCanRun) {
 
                     if (DBRunTime == 0) { //Initialize the state when DB start
-                        if (state != null && state.getId() > State_Much_Index) {
+                        if (state != null && state.getId() > State_TooMuch) {
                             DBRunTime = 1;
                         } else {
                             state = calculatePM25(longitude, latitude);
@@ -252,9 +247,10 @@ public class DBService extends Service {
                         }
                     }
                     //Log.e(TAG,"isBackground == "+isBackground);
-                    if (state.getId() > State_Much_Index) DB_Chart_Loop = 24;
+                    if (state.getId() > State_TooMuch) DB_Chart_Loop = 24;
                     else DB_Chart_Loop = 12;
                     Bundle mBundle = new Bundle();
+                    SQLiteDatabase db = dbHelper.getReadableDatabase();
                     switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                         case 1:
                             checkPMDataForUpload();
@@ -299,19 +295,19 @@ public class DBService extends Service {
 
                     //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
                     int mul = 1;
-                    if (state != null && state.getId() > State_Much_Index) {
+                    if (state != null && state.getId() > State_TooMuch) {
                         mul = 2;
                     }
                     //to much data here, we need to slow it down, every 1 min to check it
                     intentText = new Intent(Const.Action_DB_MAIN_PMResult);
                     if (DBRunTime % (3 * mul) == 0) { //15s 30s
-                        intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                        intentText.putExtra(Const.Intent_DB_PM_Hour, DataCalculator.getIntance(db).calLastHourPM());
                     }
                     if (DBRunTime % (6 * mul) == 0) {//30s 1min
                         intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
                     }
                     if (DBRunTime % (12 * mul) == 0) {//1min 2min
-                        intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                        intentText.putExtra(Const.Intent_DB_PM_Week, DataCalculator.getIntance(db).calLastWeekAvgPM());
                     }
                     sendBroadcast(intentText);
                 } else {
@@ -321,77 +317,64 @@ public class DBService extends Service {
                     sendBroadcast(intent);
                 }
             }
-                //every 10 min to open the GPS and if get the last location, close it.
-                if (DBRunTime % 120 == 0) { //120ï¼? 240ï¼? 360, 480, 600, 720
-                    FileUtil.appendStrToFile(DBRunTime, "the location service open and get in/outdoor state");
-                    //inOutdoorService.run();
-                    locationService.run(LocationService.TYPE_BAIDU);
-                    Loc_Runtime = 0;
-                    //IO_Runtime = 0;
-                }
-                //IO_Runtime++;
-                Loc_Runtime++;
-                if(Loc_Runtime >= DB_Loc_Close_Per){
-                    Loc_Runtime = Integer.MIN_VALUE;
-                    FileUtil.appendStrToFile(DBRunTime, "the location service close");
-                    locationService.stop();
-                    int tmp = locationService.getIndoorOutdoor();
-                    inOutDoor = tmp;
-                    aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
-                    FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state with state == " + inOutDoor);
-                }
-//                if(IO_Runtime >= DB_IO_Close_Per) {
-//                    IO_Runtime = Integer.MIN_VALUE;
-//                    FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state");
-//                    inOutDoor = inOutdoorService.getIndoorOutdoor();
-//                    int tmp = locationService.getIndoorOutdoor();
-//                    if(tmp != inOutDoor) {
-//                        FileUtil.appendStrToFile(DBRunTime, "inOutdoorService says "+inOutDoor +
-//                                " while locationService says "+tmp);
-//                    }
-//                    aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
-//                    inOutdoorService.stop();
-//                }
-               //every 1 min to calculate the pm result
-                if (DBRunTime % 12 == 0) {
-                    State last = state;
-                    state = calculatePM25(longitude, latitude);
-                    State now = state;
-                    if (!isSurpass(last, now)) {
-                        insertState(state);
-                    } else {
-                        reset();
-                    }
-                }
-                //every 1 hour to check if it need to search the PM density from server
-                String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
-                if (!ShortcutUtil.isStringOK(lastTime)) {
-                    aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
-                    searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+            if (wakeLock == null) {
+                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+                wakeLock.acquire();
+            }
+            //every 10 min to open the GPS and if get the last location, close it.
+            if (DBRunTime % 120 == 0) { //120 240 360, 480, 600, 720
+                FileUtil.appendStrToFile(DBRunTime, "the location service open and get in/outdoor state");
+                locationService.run(LocationService.TYPE_BAIDU);
+                Loc_Runtime = 0;
+            }
+            Loc_Runtime++;
+            if (Loc_Runtime >= DB_Loc_Close_Per) {
+                Loc_Runtime = Integer.MIN_VALUE;
+                FileUtil.appendStrToFile(DBRunTime, "the location service close");
+                locationService.stop();
+                int tmp = locationService.getIndoorOutdoor();
+                inOutDoor = tmp;
+                aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
+                FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state with state == " + inOutDoor);
+            }
+            //every 1 min to calculate the pm result
+            if (DBRunTime % 12 == 0) {
+                State last = state;
+                state = calculatePM25(longitude, latitude);
+                State now = state;
+                if (!isSurpass(last, now)) {
+                    insertState(state);
                 } else {
-                    Long curTime = System.currentTimeMillis();
-                    if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
-                        FileUtil.appendStrToFile(DBRunTime, "every 1 hour to search the PM density from server");
-                        aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
-                        searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
-                    }
+                    reset();
                 }
-                //every 1 hour to check if some data need to be uploaded
-                String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
-                if (!ShortcutUtil.isStringOK(lastUploadTime))
-                    aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
-                else {
-                    Long curTime = System.currentTimeMillis();
-                    //every 1 hour to check pm data for upload
-                    if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
-                        aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
-                        FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
-                        //check it user have login
-                        checkPMDataForUpload();
-                    }
-                }
-                DBRunTime++;
-                if (DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle
+            }
+            //every 1 hour to check if it need to search the PM density from server
+            String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
+            if(!ShortcutUtil.isStringOK(lastTime)) {
+                lastTime = String.valueOf(System.currentTimeMillis());
+                aCache.put(Const.Cache_DB_Lastime_searchDensity,lastTime);
+            }
+            Long curTime = System.currentTimeMillis();
+            if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
+                FileUtil.appendStrToFile(DBRunTime, "every 1 hour to search the PM density from server");
+                aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
+                searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+            }
+            //every 1 hour to check if some data need to be uploaded
+            String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
+            if(!ShortcutUtil.isStringOK(lastUploadTime)) {
+                lastUploadTime = String.valueOf(System.currentTimeMillis());
+                aCache.put(Const.Cache_DB_Lastime_Upload,lastUploadTime);
+            }
+            //every 1 hour to check pm data for upload
+            if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
+                aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
+                FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
+                //check it user have login
+                checkPMDataForUpload();
+            }
+            DBRunTime++;
+            if (DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle
 
             DBHandler.postDelayed(DBRunnable, runTimeInterval);
         }
@@ -406,16 +389,17 @@ public class DBService extends Service {
                 super.handleMessage(msg);
                 Intent intentChart;
                 Bundle mBundle = new Bundle();
-                if(msg.what == Const.Handler_Refresh_Text){
-                    if(state == null) return;
+                SQLiteDatabase db = dbHelper.getReadableDatabase();
+                if (msg.what == Const.Handler_Refresh_Text) {
+                    if (state == null) return;
                     DataCalculator.getIntance(db).updateLastTwoHourState();
                     DataCalculator.getIntance(db).updateLastWeekState();
                     Intent intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                    intentText.putExtra(Const.Intent_DB_PM_Hour, calLastHourPM());
+                    intentText.putExtra(Const.Intent_DB_PM_Hour, DataCalculator.getIntance(db).calLastHourPM());
                     intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                    intentText.putExtra(Const.Intent_DB_PM_Week, calLastWeekAvgPM());
+                    intentText.putExtra(Const.Intent_DB_PM_Week, DataCalculator.getIntance(db).calLastWeekAvgPM());
                     sendBroadcast(intentText);
-                }else if (msg.what == Const.Handler_Refresh_Chart1) {
+                } else if (msg.what == Const.Handler_Refresh_Chart1) {
                     intentChart = new Intent(Const.Action_Chart_Result_1);
                     DataCalculator.getIntance(db).updateLastTwoHourState();
                     mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
@@ -461,6 +445,7 @@ public class DBService extends Service {
         super.onCreate();
         FileUtil.appendStrToFile(0, "DBService OnCreate");
         initialThread();
+
         mLastLocation = null;
         PM25Source = 0;
         PM25Density = 0.0;
@@ -469,24 +454,34 @@ public class DBService extends Service {
         DBCanRun = false;
         DBRunTime = 0;
         avg_rate = "12";
-        isPMSearchRunning = false;
-        isLocationChanged = false;
-        isUploadRunning = false;
+
         isPMSearchSuccess = false;
         isRefreshRunning = false;
         isSavingBattery = false;
+
         aCache = ACache.get(getApplicationContext());
-        cacheUtil = CacheUtil.getInstance(this);
+        stableCache = StableCache.getInstance(this);
+        registerAReceiver();
+
+        /**
+         * init location
+         */
         locationService = LocationService.getInstance(this);
         //inOutdoorService = new InOutdoorService(this);
         locationService.setGetTheLocationListener(getTheLocation);
+        locationInitial();
+        inOutDoor = LocationService.Indoor;
+        aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
         /*
         Wake the thread
         */
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
         wakeLock.acquire();
-        //todo each time to run the data and
+
+        /**
+         * init default data
+         */
         if (aCache.getAsString(Const.Cache_PM_Density) != null) {
             PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
         }
@@ -495,18 +490,13 @@ public class DBService extends Service {
             try {
                 source = Integer.valueOf(aCache.getAsString(Const.Cache_PM_Source));
             } catch (Exception e) {
-                FileUtil.appendErrorToFile(0,"error in parse source from string to integer");
+                FileUtil.appendErrorToFile(0, "error in parse source from string to integer");
                 source = 0;
             }
             PM25Source = source;
         }
-        registerAReceiver();
-        locationInitial();
         DBInitial();
-        serviceStateInitial();
         sensorInitial();
-        inOutDoor = LocationService.Indoor;
-        aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(inOutDoor));
         if (mLastLocation != null) {
             locationService.stop();
             Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
@@ -515,9 +505,10 @@ public class DBService extends Service {
             sendBroadcast(intentText);
         }
         String isSaving = aCache.getAsString(Const.Cache_Is_Saving_Battery);
-        if(ShortcutUtil.isStringOK(isSaving) && isSaving.equals(Const.IS_SAVING_BATTERY))
+        if (ShortcutUtil.isStringOK(isSaving) && isSaving.equals(Const.IS_SAVING_BATTERY))
             openSavingBattery();
         else closeSavingBattery();
+        serviceStateInitial();
         DBHandler.sendEmptyMessageDelayed(0, 15000);//15s
     }
 
@@ -535,6 +526,7 @@ public class DBService extends Service {
     public void onDestroy() {
         FileUtil.appendStrToFile(-100, "DBService onDestory");
         if (wakeLock != null) wakeLock.release();
+        if (mSensorManager != null) mSensorManager.unregisterListener(sensorEventListener);
         mHandlerThread.quit();
         super.onDestroy();
         DBRunnable = null;
@@ -543,7 +535,7 @@ public class DBService extends Service {
     private void DBInitial() {
         if (null == dbHelper)
             dbHelper = new DBHelper(getApplicationContext());
-        db = dbHelper.getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -655,28 +647,29 @@ public class DBService extends Service {
         @Override
         public void onSearchStop(Location location) {
             if (location != null) {
-                isLocationChanged = true;
                 mLastLocation = location;
                 longitude = mLastLocation.getLongitude();
                 latitude = mLastLocation.getLatitude();
-                Log.e(TAG,"onSearchStop"+latitude);
+                Log.e(TAG, "onSearchStop" + latitude);
                 String lastLati = aCache.getAsString(Const.Cache_Last_Max_Lati);
                 String lastLongi = aCache.getAsString(Const.Cache_Last_Max_Longi);
                 boolean isEnough = false;
-                if(ShortcutUtil.isStringOK(lastLati) && ShortcutUtil.isStringOK(lastLongi)){
+                if (ShortcutUtil.isStringOK(lastLati) && ShortcutUtil.isStringOK(lastLongi)) {
                     try {
                         isEnough = ShortcutUtil.isLocationChangeEnough(Double.valueOf(lastLati), latitude,
                                 Double.valueOf(lastLongi), longitude);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         isEnough = false;
                     }
-                }else {
-                    aCache.put(Const.Cache_Last_Max_Lati,latitude);
-                    aCache.put(Const.Cache_Last_Max_Longi,longitude);
+                } else {
+                    aCache.put(Const.Cache_Last_Max_Lati, latitude);
+                    aCache.put(Const.Cache_Last_Max_Longi, longitude);
                 }
-                if(isEnough){
+                if (isEnough) {
+                    FileUtil.appendStrToFile(0, "max latitude " + lastLati + " max longitude" + lastLongi + " latitude " + latitude + " " +
+                            "longitude " + longitude);
                     searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
-                    aCache.put(Const.Cache_Last_Max_Lati,latitude);
+                    aCache.put(Const.Cache_Last_Max_Lati, latitude);
                     aCache.put(Const.Cache_Last_Max_Longi, longitude);
                 }
                 aCache.put(Const.Cache_Longitude, longitude);
@@ -689,6 +682,7 @@ public class DBService extends Service {
      * density: (ug/m3)
      * breath:  (L/min)
      * Calculate today the number of pm2.5 breathed until now
+     *
      * @param longi
      * @param lati
      * @return
@@ -697,12 +691,7 @@ public class DBService extends Service {
         Double breath = 0.0;
         Double density = PM25Density;
         boolean isConnected = ShortcutUtil.isNetworkAvailable(this);
-        String inOutStr = aCache.getAsString(Const.Cache_Indoor_Outdoor);
-        if(!ShortcutUtil.isStringOK(inOutStr)){
-            inOutStr = String.valueOf(LocationService.Indoor);
-            aCache.put(Const.Cache_Indoor_Outdoor,inOutStr);
-        }
-        inOutDoor = Integer.valueOf(inOutStr);
+        boolean isSuccessPMDensity = isPMSearchSuccess;
         /*double ratio;
         if (!isConnected) {
             ratio = this.getLastSevenDaysInOutRatio();
@@ -715,10 +704,9 @@ public class DBService extends Service {
             if (inOutDoor == LocationService.Indoor) density /= 3;
         }*/
 
-        double static_breath = ShortcutUtil.calStaticBreath(cacheUtil.getAsString(Const.Cache_User_Weight));
-
+        double static_breath = ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
         if (static_breath == 0.0) {
-            if(isBackground != null && isBackground.equals(bgStr))
+            if (isBackground != null && isBackground.equals(bgStr))
                 Toast.makeText(getApplicationContext(), Const.Info_Weight_Null, Toast.LENGTH_SHORT).show();
             static_breath = 6.6; // using the default one
         }
@@ -729,9 +717,11 @@ public class DBService extends Service {
         } else if (mMotionStatus == Const.MotionStatus.RUN) {
             breath = static_breath * 6;
         }
+
         venVolToday += breath;
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
+
         State state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
@@ -743,94 +733,36 @@ public class DBService extends Service {
     }
 
 
-    private double getLastSevenDaysInOutRatio() {
-        List<State> states = new ArrayList<State>();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for (int i = 1; i <= 7; i++) {
-            Calendar nowTime = Calendar.getInstance();
-            nowTime.add(Calendar.DAY_OF_MONTH, -i);
-            nowTime.add(Calendar.MINUTE, -5);
-            String left = formatter.format(nowTime.getTime());
-            nowTime.add(Calendar.MINUTE, 10);
-            String right = formatter.format(nowTime.getTime());
-            List<State> temp = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", left, right).list();
-            states.addAll(temp);
-        }
-        int count = 0;
-        for (State state : states) {
-            if (state.getOutdoor().equals(LocationService.Outdoor)) {
-                count++;
-            }
-        }
-        if (states.size() == 0) {
-            return 0.5;
-        }
-        double ratio = count * 1.0 / states.size();
-        System.out.println(ratio);
-        return ratio;
-    }
-
-    private String calLastWeekAvgPM() {
-        Double result = 0.0;
-        Double tmp;
-        int num = 0;
-        List<List<State>> datas = DataCalculator.getIntance(db).getLastWeekStates();
-        if (datas.isEmpty()) {
-            return String.valueOf(result);
-        }
-        for (int i = 0; i != datas.size(); i++) {
-            List<State> states = datas.get(i);
-            if (!states.isEmpty()) {
-                num++;
-                tmp = Double.valueOf(states.get(states.size() - 1).getPm25());
-            } else {
-                tmp = 0.0;
-            }
-            result += tmp;
-        }
-        return String.valueOf(result / num);
-    }
-
-    private String calLastHourPM() {
-        boolean firstHour = false;
-        Double result = 0.0;
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        Time t = new Time();
-        t.setToNow();
-        int currentHour = t.hour;
-        int currentMin = t.minute;
-        calendar.set(year, month, day, currentHour, currentMin, 59);
-        Long nowTime = calendar.getTime().getTime();
-        int lastHourH = currentHour - 1;
-        if (lastHourH < 0) lastHourH = 0;
-        calendar.set(year, month, day, lastHourH, currentMin, 0);
-        Long lastTime = calendar.getTime().getTime();
-        calendar.set(year, month, day, 0, 0, 0);
-        Long originTime = calendar.getTime().getTime();
-        List<State> test = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", originTime.toString(), lastTime.toString()).list();
-        if (test.isEmpty()) firstHour = true;
-        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", lastTime.toString(), nowTime.toString()).list();
-        if (states.isEmpty()) {
-            return String.valueOf(result);
-        } else if (states.size() == 1) {
-            return states.get(states.size() - 1).getPm25();
-        } else {
-            State state1 = states.get(states.size() - 1); // the last one
-            if (firstHour) {
-                result = Double.valueOf(state1.getPm25()) - 0;
-            } else {
-                State state2 = states.get(0); //the first one
-                result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
-            }
-        }
-        return String.valueOf(result);
-    }
+//    private double getLastSevenDaysInOutRatio() {
+//        List<State> states = new ArrayList<State>();
+//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        for (int i = 1; i <= 7; i++) {
+//            Calendar nowTime = Calendar.getInstance();
+//            nowTime.add(Calendar.DAY_OF_MONTH, -i);
+//            nowTime.add(Calendar.MINUTE, -5);
+//            String left = formatter.format(nowTime.getTime());
+//            nowTime.add(Calendar.MINUTE, 10);
+//            String right = formatter.format(nowTime.getTime());
+//            List<State> temp = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", left, right).list();
+//            states.addAll(temp);
+//        }
+//        int count = 0;
+//        for (State state : states) {
+//            if (state.getOutdoor().equals(LocationService.Outdoor)) {
+//                count++;
+//            }
+//        }
+//        if (states.size() == 0) {
+//            return 0.5;
+//        }
+//        double ratio = count * 1.0 / states.size();
+//        System.out.println(ratio);
+//        return ratio;
+//    }
 
     /**
      * DB Operations, insert a calculated pm state model to DB
+     *
      * @param state
      */
     private void insertState(State state) {
@@ -843,17 +775,16 @@ public class DBService extends Service {
 
     /**
      * Get and Update Current PM info.
+     *
      * @param longitude
      * @param latitude
      */
     private void searchPMRequest(String longitude, String latitude) {
-        isPMSearchRunning = true;
         String url = HttpUtil.Search_PM_url;
         url = url + "?longitude=" + longitude + "&latitude=" + latitude;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                isPMSearchRunning = false;
                 try {
                     int status = response.getInt("status");
                     if (status == 1) {
@@ -869,26 +800,20 @@ public class DBService extends Service {
                         isPMSearchSuccess = true;
                         FileUtil.appendStrToFile(DBRunTime, "3.search pm density success, density: " + PM25Density);
                     } else {
-                        isPMSearchRunning = false;
                         isPMSearchSuccess = false;
                         FileUtil.appendErrorToFile(DBRunTime, "search pm density failed, status != 1");
-                        //if(isBackground != null && isBackground.equals(bgStr))
-                             //Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if(isBackground != null && isBackground.equals(bgStr))
+                if (isBackground != null && isBackground.equals(bgStr))
                     Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                isPMSearchRunning = false;
                 isPMSearchSuccess = false;
-                FileUtil.appendErrorToFile(DBRunTime, "search pm density failed "+error.getMessage()+" "+error);
-                //if(isBackground != null && isBackground.equals(bgStr))
-                    //Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+                FileUtil.appendErrorToFile(DBRunTime, "search pm density failed " + error.getMessage() + " " + error);
             }
 
         });
@@ -910,23 +835,17 @@ public class DBService extends Service {
      * Check DB if there are some data for uploading
      */
     public void checkPMDataForUpload() {
-        /*
-         TODO: 16/2/9
-         TODO 1.Size of states should have a range. Ex. just query last week data for upload
-         TODO 2.The largest size of a week data should be 7 * 24 * 3600, is it decent to upload at one time?
-         TODO 3.Is is necessary for server to have a authentication, since it looks currently everyone could upload through api.
-          */
 
         String idStr = aCache.getAsString(Const.Cache_User_Id);
         if (ShortcutUtil.isStringOK(idStr) && !idStr.equals("0")) {
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
             final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD +
                     "=? AND " + DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0", "1").list();
             //FileUtil.appendStrToFile(DBRunTime, "1.checkPMDataForUpload upload batch start size = " + states.size());
-            isUploadRunning = true;
             String url = HttpUtil.UploadBatch_url;
             JSONArray array = new JSONArray();
-            final int size = states.size()<1000?states.size():1000;
-            for (int i=0;i<size;i++) {
+            final int size = states.size() < 1000 ? states.size() : 1000;
+            for (int i = 0; i < size; i++) {
                 JSONObject tmp = State.toJsonobject(states.get(i), aCache.getAsString(Const.Cache_User_Id));
                 array.put(tmp);
             }
@@ -940,32 +859,26 @@ public class DBService extends Service {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    isUploadRunning = false;
                     try {
                         String value = response.getString("succeed_count");
                         FileUtil.appendStrToFile(DBRunTime, "1.checkPMDataForUpload upload success value = " + value);
                         if (Integer.valueOf(value) == size) {
-                            for (int i=0;i<size;i++) {
+                            for (int i = 0; i < size; i++) {
                                 updateStateUpLoad(states.get(i), 1);
                             }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-//                    if (isBackground != null && isBackground.equals(bgStr))
-//                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Success, Toast.LENGTH_SHORT).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     if (error.getMessage() != null)
-                        FileUtil.appendErrorToFile(DBRunTime,"1.checkPMDataForUpload error getMessage" + error.getMessage());
+                        FileUtil.appendErrorToFile(DBRunTime, "1.checkPMDataForUpload error getMessage" + error.getMessage());
                     if (error.networkResponse != null)
                         FileUtil.appendErrorToFile(DBRunTime, "1.checkPMDataForUpload networkResponse statusCode " + error.networkResponse.statusCode);
-                    FileUtil.appendErrorToFile(DBRunTime,"1.checkPMDataForUpload error " + error.toString());
-                    isUploadRunning = false;
-//                    if (isBackground != null && isBackground.equals(bgStr))
-//                        Toast.makeText(getApplicationContext(), Const.Info_Upload_Failed, Toast.LENGTH_SHORT).show();
+                    FileUtil.appendErrorToFile(DBRunTime, "1.checkPMDataForUpload error " + error.toString());
                 }
             }) {
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -1014,56 +927,57 @@ public class DBService extends Service {
                 }
             } else if (intent.getAction().equals(Const.Action_Refresh_Chart_ToService)) {
                 //when open the phone, check if it need to refresh.
-                if(!isRefreshRunning) {
+                if (!isRefreshRunning) {
                     isRefreshRunning = true;
                     refreshAll();
                 }
-            }else if(intent.getAction().equals(Const.Action_Low_Battery_ToService)){
+            } else if (intent.getAction().equals(Const.Action_Low_Battery_ToService)) {
                 String state = intent.getStringExtra(Const.Intent_Low_Battery_State);
-                if(state != null && state.equals(Const.IS_SAVING_BATTERY))
+                if (state != null && state.equals(Const.IS_SAVING_BATTERY))
                     openSavingBattery();
-                else if(state != null && state.equals(Const.Not_SAVING_BATTERY))
+                else if (state != null && state.equals(Const.Not_SAVING_BATTERY))
                     closeSavingBattery();
             }
         }
     }
 
-    private void closeSavingBattery(){
+    private void closeSavingBattery() {
         isSavingBattery = false;
-        if(mSensorManager != null)mSensorManager.registerListener(sensorEventListener,
+        if (mSensorManager != null) mSensorManager.registerListener(sensorEventListener,
                 mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private void openSavingBattery(){
+    private void openSavingBattery() {
         isSavingBattery = true;
-        if(mSensorManager != null)mSensorManager.unregisterListener(sensorEventListener);
+        if (mSensorManager != null) mSensorManager.unregisterListener(sensorEventListener);
     }
 
-    private void refreshAll(){
+    private void refreshAll() {
         refreshHandler.sendEmptyMessage(Const.Handler_Refresh_Text);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 2000);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
         refreshCity();
         refreshInOutDoor();
-        if(!isPMSearchSuccess)
-            searchPMRequest(String.valueOf(longitude),String.valueOf(latitude));
+        if (!isPMSearchSuccess)
+            searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
     }
 
-    private void refreshCity(){
+    private void refreshCity() {
         Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
         intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));
         intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
-        intentText.putExtra(Const.Intent_DB_City_Ref,1);
+        intentText.putExtra(Const.Intent_DB_City_Ref, 1);
         sendBroadcast(intentText);
     }
 
-    private void refreshInOutDoor(){
+    private void refreshInOutDoor() {
 
     }
 
     /**
      * Check if service running surpass a day
+     *
      * @param lastTime
      * @param nowTime
      * @return result
@@ -1075,7 +989,7 @@ public class DBService extends Service {
         try {
             last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lastTime.getTime_point()));
             now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -1087,7 +1001,6 @@ public class DBService extends Service {
      * if Service running surpass a day, then reset data params
      */
     private void reset() {
-        //todo test it !
         longitude = 0.0;
         latitude = 0.0;
         IDToday = 0L;
@@ -1096,9 +1009,6 @@ public class DBService extends Service {
         PM25Source = 0;
         DBCanRun = true;
         DBRunTime = 0;
-        isPMSearchRunning = false;
-        isLocationChanged = false;
-        isUploadRunning = false;
         refreshAll();
         locationInitial();
         DBInitial();

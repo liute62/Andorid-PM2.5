@@ -49,6 +49,65 @@ public class DataCalculator {
         this.lastWeekStates = calLastWeekStates(); //only manually invoke this function
     }
 
+    public String calLastHourPM() {
+        boolean firstHour = false;
+        Double result = 0.0;
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        Time t = new Time();
+        t.setToNow();
+        int currentHour = t.hour;
+        int currentMin = t.minute;
+        calendar.set(year, month, day, currentHour, currentMin, 59);
+        Long nowTime = calendar.getTime().getTime();
+        int lastHourH = currentHour - 1;
+        if (lastHourH < 0) lastHourH = 0;
+        calendar.set(year, month, day, lastHourH, currentMin, 0);
+        Long lastTime = calendar.getTime().getTime();
+        calendar.set(year, month, day, 0, 0, 0);
+        Long originTime = calendar.getTime().getTime();
+        List<State> test = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", originTime.toString(), lastTime.toString()).list();
+        if (test.isEmpty()) firstHour = true;
+        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", lastTime.toString(), nowTime.toString()).list();
+        if (states.isEmpty()) {
+            return String.valueOf(result);
+        } else if (states.size() == 1) {
+            return states.get(states.size() - 1).getPm25();
+        } else {
+            State state1 = states.get(states.size() - 1); // the last one
+            if (firstHour) {
+                result = Double.valueOf(state1.getPm25()) - 0;
+            } else {
+                State state2 = states.get(0); //the first one
+                result = Double.valueOf(state1.getPm25()) - Double.valueOf(state2.getPm25());
+            }
+        }
+        return String.valueOf(result);
+    }
+
+    public String calLastWeekAvgPM() {
+        Double result = 0.0;
+        Double tmp;
+        int num = 0;
+        List<List<State>> datas = DataCalculator.getIntance(db).getLastWeekStates();
+        if (datas.isEmpty()) {
+            return String.valueOf(result);
+        }
+        for (int i = 0; i != datas.size(); i++) {
+            List<State> states = datas.get(i);
+            if (!states.isEmpty()) {
+                num++;
+                tmp = Double.valueOf(states.get(states.size() - 1).getPm25());
+            } else {
+                tmp = 0.0;
+            }
+            result += tmp;
+        }
+        return String.valueOf(result / num);
+    }
+
     public void updateLastDayState() {
         this.todayStates = calTodayStates();
     }

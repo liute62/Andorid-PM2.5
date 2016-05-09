@@ -21,21 +21,21 @@ import java.io.Serializable;
  *
  * A light weight util for caching params with unlimited time.
  */
-public class CacheUtil {
+public class StableCache {
 
     public static final String TAG = "CacheUtil";
     public Context mContext;
-    public static CacheUtil instance = null;
+    public static StableCache instance = null;
     public String baseDir = "";
 
-    public static CacheUtil getInstance(Context context){
+    public static StableCache getInstance(Context context){
         if(instance == null){
-            instance = new CacheUtil(context);
+            instance = new StableCache(context);
         }
         return instance;
     }
 
-    private CacheUtil(Context context){
+    private StableCache(Context context){
         mContext = context.getApplicationContext();
         baseDir = context.getCacheDir().getAbsolutePath();
         Log.e(TAG,baseDir);

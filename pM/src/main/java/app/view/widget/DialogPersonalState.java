@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -21,7 +18,7 @@ import com.example.pm.R;
 
 import app.services.LocationService;
 import app.utils.ACache;
-import app.utils.CacheUtil;
+import app.utils.StableCache;
 import app.utils.Const;
 import app.utils.ShortcutUtil;
 
@@ -37,7 +34,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     }
     Handler mHandler;
     ACache aCache;
-    CacheUtil cacheUtil;
+    StableCache stableCache;
     Context mContext;
     TextView mSaveWeight;
     EditText mWeight;
@@ -77,12 +74,12 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
 
     private void loadData(){
         aCache = ACache.get(mContext.getApplicationContext());
-        cacheUtil = CacheUtil.getInstance(mContext);
+        stableCache = StableCache.getInstance(mContext);
         String lati = aCache.getAsString(Const.Cache_Latitude);
         String longi = aCache.getAsString(Const.Cache_Longitude);
-        String weight = cacheUtil.getAsString(Const.Cache_User_Weight);
+        String weight = stableCache.getAsString(Const.Cache_User_Weight);
         String inOut = aCache.getAsString(Const.Cache_Indoor_Outdoor);
-        String gps = cacheUtil.getAsString(Const.Cache_GPS_SATE_NUM);
+        String gps = stableCache.getAsString(Const.Cache_GPS_SATE_NUM);
         if(lati != null) mLatitude.setText(lati);
         if(longi != null) mLongitude.setText(longi);
         if(weight != null) mWeight.setText(weight);
@@ -112,7 +109,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
                 String content = mWeight.getText().toString();
                 if(ShortcutUtil.isWeightInputCorrect(content)){
                     Toast.makeText(mContext.getApplicationContext(),Const.Info_Input_Weight_Saved,Toast.LENGTH_SHORT).show();
-                    cacheUtil.put(Const.Cache_User_Weight, content);
+                    stableCache.put(Const.Cache_User_Weight, content);
                     ShortcutUtil.calStaticBreath(Integer.valueOf(content));
                 }else {
                     Toast.makeText(mContext.getApplicationContext(),Const.Info_Input_Weight_Error,Toast.LENGTH_SHORT).show();

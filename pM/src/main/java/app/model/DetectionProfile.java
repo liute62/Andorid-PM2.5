@@ -2,6 +2,7 @@ package app.model;
 
 /**
  * Created by Haodong on 3/22/2016.
+ * This is a model for indoor and outdoor service detection.
  */
 public class DetectionProfile {
 

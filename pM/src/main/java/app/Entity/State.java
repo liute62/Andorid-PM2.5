@@ -14,6 +14,7 @@ import nl.qbusict.cupboard.annotation.Column;
  * Created by sweet on 15-10-4.
  */
 public class State {
+
     @Column(DBConstants.DB_MetaData.STATE_ID_COL)
     private Long id;
     @Column(DBConstants.DB_MetaData.STATE_USER_ID_COL)

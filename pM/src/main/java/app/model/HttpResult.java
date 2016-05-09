@@ -5,10 +5,9 @@ import org.json.JSONObject;
 
 /**
  * Created by liuhaodong1 on 15/11/9.
+ * @deprecated
  */
 public class HttpResult extends BaseModel {
-
-    public final String RESULTBODY = "ResultBody";
 
     private String resultBody;
 

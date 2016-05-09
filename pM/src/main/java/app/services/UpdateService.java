@@ -6,16 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +25,7 @@ import java.util.Map;
 import app.Entity.State;
 import app.model.PMModel;
 import app.utils.ACache;
-import app.utils.CacheUtil;
+import app.utils.StableCache;
 import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.DBHelper;
@@ -54,7 +51,7 @@ public class UpdateService {
     private Context mContext;
     private DBHelper dbHelper;
     private ACache aCache;
-    private CacheUtil cacheUtil;
+    private StableCache stableCache;
 
     public synchronized static void run(Context context,ACache aCache,DBHelper dbHelper){
         if(instance == null){
@@ -68,7 +65,7 @@ public class UpdateService {
         this.mContext = context;
         this.aCache = aCache;
         this.dbHelper = dbHelper;
-        cacheUtil = CacheUtil.getInstance(context);
+        stableCache = StableCache.getInstance(context);
     }
 
     //main process
@@ -251,7 +248,7 @@ public class UpdateService {
         Double density = new Double(Double.valueOf(mDensity)-Double.valueOf(state.getDensity()));
         Boolean mIndoor =  state.getOutdoor().equals("0")?true:false;
         Const.MotionStatus mMotionStatus = state.getStatus().equals("1")? Const.MotionStatus.STATIC:state.getStatus().equals("2")? Const.MotionStatus.WALK: Const.MotionStatus.RUN;
-        double static_breath = ShortcutUtil.calStaticBreath(cacheUtil.getAsString(Const.Cache_User_Weight));
+        double static_breath = ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
         if (mMotionStatus == Const.MotionStatus.STATIC) {
             breath = static_breath;
         } else if (mMotionStatus == Const.MotionStatus.WALK) {

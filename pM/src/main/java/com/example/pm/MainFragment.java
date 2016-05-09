@@ -37,7 +37,7 @@ import java.util.List;
 import app.model.PMModel;
 import app.services.DBService;
 import app.utils.ACache;
-import app.utils.CacheUtil;
+import app.utils.StableCache;
 import app.utils.ChartsConst;
 import app.utils.Const;
 import app.utils.DataGenerator;
@@ -50,7 +50,6 @@ import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
 import app.view.widget.DialogGetLocation;
 import app.view.widget.LoadingDialog;
-import lecho.lib.hellocharts.model.AbstractChartData;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.Viewport;
@@ -113,7 +112,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     LoadingDialog loadingDialog;
     PMModel pmModel;
     ACache aCache;
-    CacheUtil cacheUtil;
+    StableCache stableCache;
     private IntentFilter intentFilter;
     /**
      * Charts*
@@ -282,8 +281,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         pmModel = new PMModel();
         loadingDialog = new LoadingDialog(getActivity());
         aCache = ACache.get(mActivity.getApplicationContext());
-        cacheUtil = CacheUtil.getInstance(mActivity);
-        ShortcutUtil.calStaticBreath(cacheUtil.getAsString(Const.Cache_User_Weight));
+        stableCache = StableCache.getInstance(mActivity);
+        ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
         //GPS Task
         if (!ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
             dbReceiver = new DBServiceReceiver();
