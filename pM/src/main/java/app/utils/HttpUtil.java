@@ -51,6 +51,8 @@ public class HttpUtil {
 
     public static String deviceNumber=null;
 
+    public static String SDM_url="http://ilab.tongji.edu.cn/pm25/web/restful/device-datas";
+
 
     private static HttpUtil instance;
 
