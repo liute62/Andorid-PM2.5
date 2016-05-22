@@ -29,6 +29,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.pm.MainActivity;
 import com.example.pm.R;
@@ -40,6 +41,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +58,7 @@ import app.utils.DBHelper;
 import app.utils.DataCalculator;
 import app.utils.FileUtil;
 import app.utils.HttpUtil;
+import app.utils.SDMRequest;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 
@@ -322,7 +325,7 @@ public class DBService extends Service {
                 }
             }
                 //every 10 min to open the GPS and if get the last location, close it.
-                if (DBRunTime % 120 == 0) { //120ï¼? 240ï¼? 360, 480, 600, 720
+                if (DBRunTime % 120 == 0) { //120ï¿½? 240ï¿½? 360, 480, 600, 720
                     FileUtil.appendStrToFile(DBRunTime, "the location service open and get in/outdoor state");
                     //inOutdoorService.run();
                     locationService.run(LocationService.TYPE_BAIDU);
@@ -896,7 +899,48 @@ public class DBService extends Service {
                 Const.Default_Timeout,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        //determine whether the equipment in the unified local area nerwork
+        new Thread(new SDMRequest()).start();
+        if (HttpUtil.deviceNumber!=null)
+        {
+            SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String sdmurl=HttpUtil.SDM_url+"?devid="+HttpUtil.deviceNumber+"&time_point="+df.format(new Date());
+            //System.out.println("url......."+url);
+            JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, sdmurl, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        //String data=response.getJSONObject("data").getString("PM25");
+                        //PMModel pmModel=PMModel.parse(response.getJSONObject("data"));
+                        //System.out.println("pmDensity"+pmModel.getPm25());
+                        String issuccess=response.getString("message");
+                        if (issuccess.equals("success"))
+                        {
+                            //System.out.println(response.getJSONArray("data").getString(0));
+                            String tempDensity=response.getJSONArray("data").getString(0).split(":")[4].split("\"")[1];
+                            PM25Density=Double.parseDouble(tempDensity);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    isPMSearchRunning = false;
+                    isPMSearchSuccess = false;
+                    FileUtil.appendErrorToFile(DBRunTime, "search pm density failed "+error.getMessage()+" "+error);
+                    //if(isBackground != null && isBackground.equals(bgStr))
+                    //Toast.makeText(getApplicationContext(), Const.Info_PMDATA_Failed, Toast.LENGTH_SHORT).show();
+                }
+
+            });
+            VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(req);
+        }
+
+
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+
     }
 
     private void updateStateUpLoad(State state, int upload) {
