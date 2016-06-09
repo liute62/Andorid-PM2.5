@@ -17,15 +17,18 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- * Created by Hadong on 3/21/2016.
+ * Created by Haodong on 3/21/2016.
  *
  * A light weight util for caching params with unlimited time.
  */
 public class StableCache {
 
     public static final String TAG = "CacheUtil";
+
     public Context mContext;
+
     public static StableCache instance = null;
+
     public String baseDir = "";
 
     public static StableCache getInstance(Context context){

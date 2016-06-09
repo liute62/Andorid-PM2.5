@@ -9,9 +9,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SharedPreferencesUtil {
 
     private static MySqlLiteHelper sqlLiteHelper = null;
+
     private static final int DB_VERSION = 1;
+
     private static final String DB_NAME = "setting.db";
+
     private static final String TABLE_NAME = "setting_info";
+
     private static SQLiteDatabase db = null;
 
     private static class MySqlLiteHelper extends SQLiteOpenHelper {

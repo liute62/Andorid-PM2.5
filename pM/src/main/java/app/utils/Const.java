@@ -100,7 +100,12 @@ public class Const {
     public static final String Cache_GPS_SATE_NUM = "Cache_GPS_SATE_NUM";
 
     /**
-     * Handler Code*
+     * For stable cache
+     */
+    public static final String Cache_Repeating_Time = "Cache_Repeating_Time";
+
+    /**
+     * Handler Code
      */
     public static final int Handler_Login_Success = 100001;
 

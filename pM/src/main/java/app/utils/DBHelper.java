@@ -13,6 +13,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by sweet on 15-10-4.
  */
 public class DBHelper extends SQLiteOpenHelper {
+
     public DBHelper(Context context) {
         super(context, DBConstants.DB_NAME, null, DBConstants.DB_VERSION);
     }

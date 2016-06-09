@@ -24,7 +24,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import app.services.DBService;
+import app.services.ForegroundService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.HttpUtil;
@@ -273,7 +273,7 @@ public class ProfileFragment extends Fragment implements
                     Toast.makeText(mActivity, Const.Info_Turn_Off_Upload, Toast.LENGTH_SHORT).show();
                 } else if (v.getTag().equals("off")) {
                     v.setTag("on");
-                    intent = new Intent(mActivity, DBService.class);
+                    intent = new Intent(mActivity, ForegroundService.class);
                     mActivity.startService(intent);
                     ((TextView) v).setText(Const.Info_Turn_Off_Upload);
                     Toast.makeText(mActivity, Const.Info_Turn_On_Upload, Toast.LENGTH_SHORT).show();
@@ -282,7 +282,7 @@ public class ProfileFragment extends Fragment implements
             case R.id.profile_clear_data:
                 clearCache();
                 if (ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
-                    intent = new Intent(mActivity, DBService.class);
+                    intent = new Intent(mActivity, ForegroundService.class);
                     mActivity.stopService(intent);
                 }
                 getActivity().finish();
@@ -372,7 +372,7 @@ public class ProfileFragment extends Fragment implements
         confirm.setConfirmListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mActivity, DBService.class);
+                Intent intent = new Intent(mActivity, ForegroundService.class);
                 mActivity.stopService(intent);
                 getActivity().finish();
             }
@@ -382,7 +382,7 @@ public class ProfileFragment extends Fragment implements
 
     private void logOff(){
         clearLoginCache();
-        Intent intent = new Intent(mActivity, DBService.class);
+        Intent intent = new Intent(mActivity, ForegroundService.class);
         mActivity.stopService(intent);
         getActivity().finish();
     }

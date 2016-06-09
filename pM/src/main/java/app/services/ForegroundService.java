@@ -8,17 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -43,8 +38,6 @@ import java.util.Map;
 
 import app.Entity.State;
 import app.model.PMModel;
-import app.movement.SimpleStepDetector;
-import app.movement.StepListener;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DBConstants;
@@ -63,42 +56,19 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * //need update ....
  * DBService Sequences
  * -----onCreate-----
- * 1.params Initial.
- * 2.Get default PM density from cache.
- * 3.DB Initial: get the value of last hour, today, last week avg pm from database and set cache.
- * 4.Sensor Initial
- * 5.GPS Initial:
- * Location Initial:
- * 1.Success, lati&longi are set to  getLastKnownLocation
- * 2.Failed,  lati&longi are set to  Shanghai location
- * For location changed:
- * 1.last time lati&longi equals current lati&longi, means no change, don't need search result from server.
- * 2.If location changed, download pm density from server.
- * 5.DB Runnable begin running.
- * -----DB Runnable-----
- * 0. first time running after app installed, set cache to isbackground = false, that means currently App running in front
- * 1. DB running start, and DBRuntime == 0, get the newest data for chart, set cache and update GUI
- * 2. if DB Can Run, that means we could get the location successfully, otherwise DB couldn't run and we tell user, currently DB is not running
- * 3. if DB == 0, initialize the state, and set DB Runtime = 1, The range of DBRuntime is always between 1 and 1 * 12 * 60 (1 hour)
- * 4. For Chart, if DBRuntime =
- * 5. Every a minute to calculate PM Data and upload it
- * 1. if upload success, change the value of upload to 1, and insert it into DB
- * 2. if upload failed, no change and insert it into DB directly
- * 6. Every a DBRuntime to update the GUI about PM Info Text, no matter there are newly data calculated or not.
- * 7. Every a hour to upload the data and set DBRuntime = 1
  */
-public class DBService extends Service {
+public class ForegroundService extends Service {
 
-    public static final String TAG = "app.services.DBService";
+    public static final String TAG = "app.services.ForegroundService";
 
     /**
      * for data operations
      */
-    private DBHelper dbHelper;
     private ACache aCache;
     private StableCache stableCache;
     private PMModel pmModel;
     private State state;
+    private DataService dataService = null;
     /**
      * for PM State
      */
@@ -130,26 +100,16 @@ public class DBService extends Service {
      **/
     private LocationService locationService;
     private Location mLastLocation;
+
     /**
-     * Sensor
+     * for indoor and outdoor judgement
      **/
     private InOutdoorService inOutdoorService;
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    private SimpleStepDetector simpleStepDetector;
-    private int numSteps;
-    private int numStepsForRecord; //to insert the step value to state
-    private long time1;
-    private static Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC;
-    private final int Motion_Detection_Interval = 60 * 1000; //1min
-    private final int Motion_Run_Thred = 100; //100 step / min
-    private final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
+
     /**
-     * Wake the thread
-     **/
-    private PowerManager powerManager;
-    private PowerManager.WakeLock wakeLock;
-    private boolean isSavingBattery;
+     * for motion detection
+     */
+    MotionService motionService;
 
     private volatile HandlerThread mHandlerThread;
     private Handler refreshHandler;
@@ -180,7 +140,7 @@ public class DBService extends Service {
                 if (state != null && state.getId() > State_TooMuch) {
                     //so many data stored, don't want to refresh every time after starting
                 } else {
-                    SQLiteDatabase db = dbHelper.getReadableDatabase();
+                    SQLiteDatabase db = dataService.getDBHelper().getReadableDatabase();
                     DataCalculator.getIntance(db).updateLastTwoHourState();
                     DataCalculator.getIntance(db).updateLastDayState();
                     DataCalculator.getIntance(db).updateLastWeekState();
@@ -250,13 +210,13 @@ public class DBService extends Service {
                     if (state.getId() > State_TooMuch) DB_Chart_Loop = 24;
                     else DB_Chart_Loop = 12;
                     Bundle mBundle = new Bundle();
-                    SQLiteDatabase db = dbHelper.getReadableDatabase();
+                    SQLiteDatabase db = dataService.getDBHelper().getReadableDatabase();
                     switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                         case 1:
                             checkPMDataForUpload();
                             break;
                         case 3:
-                            UpdateService.run(getApplicationContext(), aCache, dbHelper);
+                            UpdateService.run(getApplicationContext(), aCache, dataService.getDBHelper());
                             break;
                         case 5:
                             intentChart = new Intent(Const.Action_Chart_Result_1);
@@ -317,10 +277,7 @@ public class DBService extends Service {
                     sendBroadcast(intent);
                 }
             }
-            if (wakeLock == null) {
-                wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
-                wakeLock.acquire();
-            }
+
             //every 10 min to open the GPS and if get the last location, close it.
             if (DBRunTime % 120 == 0) { //120 240 360, 480, 600, 720
                 FileUtil.appendStrToFile(DBRunTime, "the location service open and get in/outdoor state");
@@ -343,16 +300,16 @@ public class DBService extends Service {
                 state = calculatePM25(longitude, latitude);
                 State now = state;
                 if (!isSurpass(last, now)) {
-                    insertState(state);
+                    dataService.insertState(state);
                 } else {
                     reset();
                 }
             }
             //every 1 hour to check if it need to search the PM density from server
             String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
-            if(!ShortcutUtil.isStringOK(lastTime)) {
+            if (!ShortcutUtil.isStringOK(lastTime)) {
                 lastTime = String.valueOf(System.currentTimeMillis());
-                aCache.put(Const.Cache_DB_Lastime_searchDensity,lastTime);
+                aCache.put(Const.Cache_DB_Lastime_searchDensity, lastTime);
             }
             Long curTime = System.currentTimeMillis();
             if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
@@ -362,9 +319,9 @@ public class DBService extends Service {
             }
             //every 1 hour to check if some data need to be uploaded
             String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
-            if(!ShortcutUtil.isStringOK(lastUploadTime)) {
+            if (!ShortcutUtil.isStringOK(lastUploadTime)) {
                 lastUploadTime = String.valueOf(System.currentTimeMillis());
-                aCache.put(Const.Cache_DB_Lastime_Upload,lastUploadTime);
+                aCache.put(Const.Cache_DB_Lastime_Upload, lastUploadTime);
             }
             //every 1 hour to check pm data for upload
             if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
@@ -389,7 +346,7 @@ public class DBService extends Service {
                 super.handleMessage(msg);
                 Intent intentChart;
                 Bundle mBundle = new Bundle();
-                SQLiteDatabase db = dbHelper.getReadableDatabase();
+                SQLiteDatabase db = dataService.getDBHelper().getReadableDatabase();
                 if (msg.what == Const.Handler_Refresh_Text) {
                     if (state == null) return;
                     DataCalculator.getIntance(db).updateLastTwoHourState();
@@ -428,7 +385,7 @@ public class DBService extends Service {
                     intentChart.putExtras(mBundle);
                     sendBroadcast(intentChart);
                     isRefreshRunning = false;
-                    Toast.makeText(DBService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ForegroundService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -443,7 +400,8 @@ public class DBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        FileUtil.appendStrToFile(0, "DBService OnCreate");
+
+        FileUtil.appendStrToFile(TAG + " OnCreate");
         initialThread();
 
         mLastLocation = null;
@@ -457,7 +415,6 @@ public class DBService extends Service {
 
         isPMSearchSuccess = false;
         isRefreshRunning = false;
-        isSavingBattery = false;
 
         aCache = ACache.get(getApplicationContext());
         stableCache = StableCache.getInstance(this);
@@ -467,36 +424,29 @@ public class DBService extends Service {
          * init location
          */
         locationService = LocationService.getInstance(this);
-        //inOutdoorService = new InOutdoorService(this);
+        inOutdoorService = new InOutdoorService(this);
         locationService.setGetTheLocationListener(getTheLocation);
         locationInitial();
         inOutDoor = LocationService.Indoor;
         aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
-        /*
-        Wake the thread
-        */
-        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
-        wakeLock.acquire();
-
         /**
          * init default data
          */
-        if (aCache.getAsString(Const.Cache_PM_Density) != null) {
-            PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
-        }
-        if (aCache.getAsString(Const.Cache_PM_Source) != null) {
-            int source;
-            try {
-                source = Integer.valueOf(aCache.getAsString(Const.Cache_PM_Source));
-            } catch (Exception e) {
-                FileUtil.appendErrorToFile(0, "error in parse source from string to integer");
-                source = 0;
-            }
-            PM25Source = source;
-        }
-        DBInitial();
-        sensorInitial();
+        dataService = new DataService(this);
+        dataService.initDefaultData();
+        PM25Density = dataService.getPM25Density();
+        PM25Source = dataService.getPM25Source();
+        PM25Today = dataService.getPM25Today();
+        IDToday = dataService.getIDToday();
+        venVolToday = dataService.getVenVolToday();
+        avg_rate = "12";
+
+        /**
+         * init motion detection
+         */
+        motionService = MotionService.getInstance(this);
+        motionService.start();
+
         if (mLastLocation != null) {
             locationService.stop();
             Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
@@ -504,12 +454,19 @@ public class DBService extends Service {
             intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
             sendBroadcast(intentText);
         }
-        String isSaving = aCache.getAsString(Const.Cache_Is_Saving_Battery);
-        if (ShortcutUtil.isStringOK(isSaving) && isSaving.equals(Const.IS_SAVING_BATTERY))
-            openSavingBattery();
-        else closeSavingBattery();
         serviceStateInitial();
         DBHandler.sendEmptyMessageDelayed(0, 15000);//15s
+        BackgroundService alarm = BackgroundService.getInstance(this);
+        alarm.SetAlarm(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        FileUtil.appendStrToFile(TAG+" onDestory");
+        motionService.stop();
+        mHandlerThread.quit();
+        super.onDestroy();
+        DBRunnable = null;
     }
 
     private void registerAReceiver() {
@@ -520,43 +477,6 @@ public class DBService extends Service {
         filter.addAction(Const.Action_Get_Location_ToService);
         filter.addAction(Const.Action_Refresh_Chart_ToService);
         this.registerReceiver(receiver, filter);
-    }
-
-    @Override
-    public void onDestroy() {
-        FileUtil.appendStrToFile(-100, "DBService onDestory");
-        if (wakeLock != null) wakeLock.release();
-        if (mSensorManager != null) mSensorManager.unregisterListener(sensorEventListener);
-        mHandlerThread.quit();
-        super.onDestroy();
-        DBRunnable = null;
-    }
-
-    private void DBInitial() {
-        if (null == dbHelper)
-            dbHelper = new DBHelper(getApplicationContext());
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        calendar.set(year, month, day, 0, 0, 0);
-        Long nowTime = calendar.getTime().getTime();
-        calendar.set(year, month, day, 23, 59, 59);
-        Long nextTime = calendar.getTime().getTime();
-        /**Get states of today **/
-        List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
-        if (states.isEmpty()) {
-            PM25Today = 0.0;
-            venVolToday = 0.0;
-            IDToday = 0L;
-        } else {
-            State state = states.get(states.size() - 1);
-            state.print();
-            PM25Today = Double.parseDouble(state.getPm25());
-            venVolToday = Double.parseDouble(state.getVentilation_volume());
-            IDToday = state.getId() + 1;
-        }
     }
 
     private void serviceStateInitial() {
@@ -570,21 +490,6 @@ public class DBService extends Service {
                         .setContentIntent(pendingIntent)
                         .setOngoing(true);
         startForeground(12450, mBuilder.build());
-    }
-
-    private void sensorInitial() {
-        numSteps = 0;
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        simpleStepDetector = new SimpleStepDetector();
-        simpleStepDetector.registerListener(new StepListener() {
-            @Override
-            public void step(long timeNs) {
-                numSteps++;
-            }
-        });
-        time1 = System.currentTimeMillis();
-        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private void locationInitial() {
@@ -612,36 +517,9 @@ public class DBService extends Service {
         }
     }
 
-    SensorEventListener sensorEventListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                simpleStepDetector.updateAccel(event.values[0], event.values[1], event.values[2]);
-            }
-            long time2 = System.currentTimeMillis();
-            if (time2 - time1 > Motion_Detection_Interval) {
-                if (numSteps > Motion_Run_Thred)
-                    mMotionStatus = Const.MotionStatus.RUN;
-                else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
-                    mMotionStatus = Const.MotionStatus.WALK;
-                else
-                    mMotionStatus = Const.MotionStatus.STATIC;
-                numStepsForRecord = numSteps;
-                numSteps = 0;
-                time1 = time2;
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-    };
-
     LocationService.GetTheLocation getTheLocation = new LocationService.GetTheLocation() {
         @Override
         public void onGetLocation(Location location) {
-
         }
 
         @Override
@@ -650,7 +528,6 @@ public class DBService extends Service {
                 mLastLocation = location;
                 longitude = mLastLocation.getLongitude();
                 latitude = mLastLocation.getLatitude();
-                Log.e(TAG, "onSearchStop" + latitude);
                 String lastLati = aCache.getAsString(Const.Cache_Last_Max_Lati);
                 String lastLongi = aCache.getAsString(Const.Cache_Last_Max_Longi);
                 boolean isEnough = false;
@@ -703,6 +580,8 @@ public class DBService extends Service {
         } else {
             if (inOutDoor == LocationService.Indoor) density /= 3;
         }*/
+        Const.MotionStatus mMotionStatus = motionService.getMotionStatus();
+        int numStepsForRecord = motionService.getNumStepsForRecord();
 
         double static_breath = ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
         if (static_breath == 0.0) {
@@ -730,47 +609,6 @@ public class DBService extends Service {
                 Integer.toString(numStepsForRecord), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
         numStepsForRecord = 0;
         return state;
-    }
-
-
-//    private double getLastSevenDaysInOutRatio() {
-//        List<State> states = new ArrayList<State>();
-//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        for (int i = 1; i <= 7; i++) {
-//            Calendar nowTime = Calendar.getInstance();
-//            nowTime.add(Calendar.DAY_OF_MONTH, -i);
-//            nowTime.add(Calendar.MINUTE, -5);
-//            String left = formatter.format(nowTime.getTime());
-//            nowTime.add(Calendar.MINUTE, 10);
-//            String right = formatter.format(nowTime.getTime());
-//            List<State> temp = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", left, right).list();
-//            states.addAll(temp);
-//        }
-//        int count = 0;
-//        for (State state : states) {
-//            if (state.getOutdoor().equals(LocationService.Outdoor)) {
-//                count++;
-//            }
-//        }
-//        if (states.size() == 0) {
-//            return 0.5;
-//        }
-//        double ratio = count * 1.0 / states.size();
-//        System.out.println(ratio);
-//        return ratio;
-//    }
-
-    /**
-     * DB Operations, insert a calculated pm state model to DB
-     *
-     * @param state
-     */
-    private void insertState(State state) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        state.print();
-        cupboard().withDatabase(db).put(state);
-        IDToday++;
-        aCache.put(Const.Cache_Lastime_Timepoint, state.getTime_point());
     }
 
     /**
@@ -824,13 +662,6 @@ public class DBService extends Service {
         VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void updateStateUpLoad(State state, int upload) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DBConstants.DB_MetaData.STATE_HAS_UPLOAD, upload);
-        cupboard().withDatabase(db).update(State.class, values, "id = ?", state.getId() + "");
-    }
-
     /**
      * Check DB if there are some data for uploading
      */
@@ -838,9 +669,7 @@ public class DBService extends Service {
 
         String idStr = aCache.getAsString(Const.Cache_User_Id);
         if (ShortcutUtil.isStringOK(idStr) && !idStr.equals("0")) {
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
-            final List<State> states = cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD +
-                    "=? AND " + DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0", "1").list();
+            final List<State> states = dataService.getPMDataForUpload();
             //FileUtil.appendStrToFile(DBRunTime, "1.checkPMDataForUpload upload batch start size = " + states.size());
             String url = HttpUtil.UploadBatch_url;
             JSONArray array = new JSONArray();
@@ -864,7 +693,7 @@ public class DBService extends Service {
                         FileUtil.appendStrToFile(DBRunTime, "1.checkPMDataForUpload upload success value = " + value);
                         if (Integer.valueOf(value) == size) {
                             for (int i = 0; i < size; i++) {
-                                updateStateUpLoad(states.get(i), 1);
+                                dataService.updateStateUpLoad(states.get(i), 1);
                             }
                         }
                     } catch (JSONException e) {
@@ -895,6 +724,9 @@ public class DBService extends Service {
         }
     }
 
+    /**
+     *
+     */
     private class Receiver extends BroadcastReceiver {
 
         @Override
@@ -931,25 +763,8 @@ public class DBService extends Service {
                     isRefreshRunning = true;
                     refreshAll();
                 }
-            } else if (intent.getAction().equals(Const.Action_Low_Battery_ToService)) {
-                String state = intent.getStringExtra(Const.Intent_Low_Battery_State);
-                if (state != null && state.equals(Const.IS_SAVING_BATTERY))
-                    openSavingBattery();
-                else if (state != null && state.equals(Const.Not_SAVING_BATTERY))
-                    closeSavingBattery();
             }
         }
-    }
-
-    private void closeSavingBattery() {
-        isSavingBattery = false;
-        if (mSensorManager != null) mSensorManager.registerListener(sensorEventListener,
-                mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    private void openSavingBattery() {
-        isSavingBattery = true;
-        if (mSensorManager != null) mSensorManager.unregisterListener(sensorEventListener);
     }
 
     private void refreshAll() {
@@ -958,7 +773,6 @@ public class DBService extends Service {
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
         refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
         refreshCity();
-        refreshInOutDoor();
         if (!isPMSearchSuccess)
             searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
     }
@@ -969,10 +783,6 @@ public class DBService extends Service {
         intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
         intentText.putExtra(Const.Intent_DB_City_Ref, 1);
         sendBroadcast(intentText);
-    }
-
-    private void refreshInOutDoor() {
-
     }
 
     /**
@@ -1011,7 +821,7 @@ public class DBService extends Service {
         DBRunTime = 0;
         refreshAll();
         locationInitial();
-        DBInitial();
-        sensorInitial();
+        dataService.reset();
+        motionService.reset();
     }
 }

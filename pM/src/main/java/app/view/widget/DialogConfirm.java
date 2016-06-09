@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.example.pm.R;
 
 /**
- * Created by Administrator on 1/21/2016.
+ * Created by Haodong on 1/21/2016.
  */
 public class DialogConfirm extends Dialog {
 

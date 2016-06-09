@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created by Administrator on 11/25/2015.
+ * Created by liuhaodong1 on 11/25/2015.
  */
 public class ChartModel extends BaseModel {
 

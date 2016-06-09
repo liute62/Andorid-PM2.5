@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import app.model.PMModel;
-import app.services.DBService;
+import app.services.ForegroundService;
 import app.utils.ACache;
 import app.utils.StableCache;
 import app.utils.ChartsConst;
@@ -298,7 +298,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             if(mActivity != null) {
                 mActivity.registerReceiver(dbReceiver, intentFilter);
                 intentFilter = new IntentFilter();
-                Intent mIntent = new Intent(mActivity, DBService.class);
+                Intent mIntent = new Intent(mActivity, ForegroundService.class);
                 mActivity.startService(mIntent);
             }
         }

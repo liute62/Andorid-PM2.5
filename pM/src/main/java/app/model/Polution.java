@@ -1,6 +1,7 @@
 package app.model;
 
 public class Polution {
+
     private int id;
     private int aqi;
     private String area;

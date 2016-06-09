@@ -10,8 +10,11 @@ import com.android.volley.toolbox.Volley;
  * Created by sweet on 15-9-23.
  */
 public class VolleyQueue {
+
     private static VolleyQueue mInstance;
+
     private RequestQueue mRequestQueue;
+
     private static Context mCtx;
 
     private VolleyQueue(Context context) {

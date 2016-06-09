@@ -17,7 +17,7 @@
 package app.movement;
 
 /**
- * Listens for alerts about steps being detected.
+ * The listener for alerts about steps being detected.
  */
 public interface StepListener {
 
