@@ -44,10 +44,10 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Step 4: update the whole pm25
  * Step 5: upload the real state
  */
-public class UpdateService {
+public class UpdateServiceUtil {
 
     public static final String TAG = "UpdateService";
-    private static UpdateService instance = null;
+    private static UpdateServiceUtil instance = null;
     private Context mContext;
     private DBHelper dbHelper;
     private ACache aCache;
@@ -55,12 +55,12 @@ public class UpdateService {
 
     public synchronized static void run(Context context,ACache aCache,DBHelper dbHelper){
         if(instance == null){
-            instance = new UpdateService(context,aCache,dbHelper);
+            instance = new UpdateServiceUtil(context,aCache,dbHelper);
         }
         instance.runInner();
     }
 
-    private UpdateService(Context context,ACache aCache,DBHelper dbHelper){
+    private UpdateServiceUtil(Context context, ACache aCache, DBHelper dbHelper){
         Log.e(TAG,"init updateService");
         this.mContext = context;
         this.aCache = aCache;
@@ -170,7 +170,7 @@ public class UpdateService {
         if (density!=null) {
             FileUtil.appendStrToFile(-1,"cache has density, get from the cache "+timePoint);
             String inOutDoor = state.getOutdoor();
-            if (inOutDoor.equals(LocationService.Indoor)) {
+            if (inOutDoor.equals(LocationServiceUtil.Indoor)) {
                 density = Integer.valueOf(density) / 3 + "";
             }
             //update density
@@ -200,7 +200,7 @@ public class UpdateService {
                         PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
                         String mDensity = String.valueOf(pmModel.getPm25());
                         String inOutDoor = state.getOutdoor();
-                        if (inOutDoor.equals(LocationService.Indoor)) {
+                        if (inOutDoor.equals(LocationServiceUtil.Indoor)) {
                             mDensity = Integer.valueOf(mDensity) / 3 + "";
                         }
                         FileUtil.appendStrToFile(-1, "2.UpdateDensity success and density updated == " + mDensity);

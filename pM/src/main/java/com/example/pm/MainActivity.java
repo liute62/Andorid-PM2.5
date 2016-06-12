@@ -16,11 +16,9 @@ import com.umeng.socialize.controller.UMServiceFactory;
 import com.umeng.socialize.controller.UMSocialService;
 import com.umeng.socialize.sso.UMSsoHandler;
 
-import app.services.UpdateService;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.FileUtil;
-import app.utils.ShortcutUtil;
 
 public class MainActivity extends SlidingActivity {
 

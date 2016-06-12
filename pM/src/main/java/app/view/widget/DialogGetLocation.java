@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.example.pm.R;
 
-import app.services.LocationService;
+import app.services.LocationServiceUtil;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.ShortcutUtil;
@@ -26,7 +26,7 @@ import app.utils.ShortcutUtil;
  * Created by Administrator on 1/18/2016.
  */
 public class DialogGetLocation extends Dialog implements View.OnClickListener,
-        CompoundButton.OnCheckedChangeListener,LocationService.GetTheLocation
+        CompoundButton.OnCheckedChangeListener,LocationServiceUtil.GetTheLocation
 {
 
     public static final String TAG = "DialogGetLocation";
@@ -42,7 +42,7 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     RadioButton mBaidu;
     RadioButton mGPS;
     RadioButton mNetwork;
-    LocationService locationService;
+    LocationServiceUtil locationServiceUtil;
     boolean isSearching;
     boolean isRunnable;
     Handler handler = new Handler();
@@ -74,7 +74,7 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         super(context);
         mContext = context;
         aCache = ACache.get(context);
-        locationService = LocationService.getInstance(context);
+        locationServiceUtil = LocationServiceUtil.getInstance(context);
         isSearching = false;
         isRunnable = true;
     }
@@ -153,14 +153,14 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         isRunnable = true;
         beforeSearch();
         mCancel.setText(mContext.getString(R.string.str_stop));
-        locationService.setGetTheLocationListener(this);
+        locationServiceUtil.setGetTheLocationListener(this);
         isSearching = true;
-        int tag = LocationService.TYPE_GPS;
-        if(mGPS.isChecked())tag = LocationService.TYPE_GPS;
-        else if(mNetwork.isChecked()) tag = LocationService.TYPE_NETWORK;
-        else if(mBaidu.isChecked()) tag = LocationService.TYPE_BAIDU;
+        int tag = LocationServiceUtil.TYPE_GPS;
+        if(mGPS.isChecked())tag = LocationServiceUtil.TYPE_GPS;
+        else if(mNetwork.isChecked()) tag = LocationServiceUtil.TYPE_NETWORK;
+        else if(mBaidu.isChecked()) tag = LocationServiceUtil.TYPE_BAIDU;
         Log.e(TAG,"begin tag = "+tag);
-        locationService.run(tag);
+        locationServiceUtil.run(tag);
         runnable.run();
         onSearch();
     }
@@ -171,8 +171,8 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
         mSearch.setClickable(true);
         isRunnable = false;
         isSearching = false;
-        if(locationService != null)
-            locationService.stop();
+        if(locationServiceUtil != null)
+            locationServiceUtil.stop();
     }
 
     private void beforeSearch(){
@@ -236,8 +236,8 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
 
     @Override
     protected void onStop() {
-        if(locationService != null)
-            locationService.stop();
+        if(locationServiceUtil != null)
+            locationServiceUtil.stop();
         super.onStop();
     }
 

@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.example.pm.DataResultActivity;
 import com.example.pm.R;
 
-import app.services.LocationService;
+import app.services.LocationServiceUtil;
 import app.utils.ACache;
 import app.utils.StableCache;
 import app.utils.Const;
@@ -89,10 +89,10 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
 
     private void setLocation(String state){
         Integer inOut = Integer.valueOf(state);
-        if(inOut == LocationService.Indoor){
+        if(inOut == LocationServiceUtil.Indoor){
             mIndoor.setChecked(true);
             mOutdoor.setChecked(false);
-        }else if(inOut == LocationService.Outdoor){
+        }else if(inOut == LocationServiceUtil.Outdoor){
             mIndoor.setChecked(false);
             mOutdoor.setChecked(true);
         }
@@ -121,12 +121,12 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
             case R.id.personal_state_indoor:
                 mIndoor.setChecked(true);
                 mOutdoor.setChecked(false);
-                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationService.Indoor));
+                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationServiceUtil.Indoor));
                 break;
             case R.id.personal_state_outdoor:
                 mIndoor.setChecked(false);
                 mOutdoor.setChecked(true);
-                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationService.Outdoor));
+                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationServiceUtil.Outdoor));
                 break;
             case R.id.personal_state_get_location:
                 DialogGetLocation getLocation = new DialogGetLocation(mContext);

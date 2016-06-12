@@ -13,9 +13,9 @@ import app.utils.Const;
 /**
  * Created by liuhaodong1 on 16/6/9.
  */
-public class MotionService implements SensorEventListener{
+public class MotionServiceUtil implements SensorEventListener{
 
-    private static MotionService instance = null;
+    private static MotionServiceUtil instance = null;
 
     public final int Motion_Detection_Interval = 60 * 1000; //1min
 
@@ -39,16 +39,16 @@ public class MotionService implements SensorEventListener{
 
     private Context mContext;
 
-    private MotionService(Context context){
+    private MotionServiceUtil(Context context){
         mContext = context;
         mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         simpleStepDetector = new SimpleStepDetector();
     }
 
-    public static MotionService getInstance(Context context){
+    public static MotionServiceUtil getInstance(Context context){
         if(instance == null)
-            instance = new MotionService(context);
+            instance = new MotionServiceUtil(context);
         return instance;
     }
 

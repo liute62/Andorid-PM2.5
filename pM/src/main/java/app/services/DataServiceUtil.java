@@ -3,6 +3,8 @@ package app.services;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,18 +17,26 @@ import app.utils.Const;
 import app.utils.DBConstants;
 import app.utils.DBHelper;
 import app.utils.FileUtil;
+import app.utils.ShortcutUtil;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by liuhaodong1 on 16/6/9.
  * This is a service intended to perform database related operations.
+ *
  */
-public class DataService {
+public class DataServiceUtil {
+
+    public static final String TAG = "DataService";
+
+    private static DataServiceUtil instance = null;
 
     private DBHelper dbHelper = null;
 
     private Context mContext;
+
+    private State state = null;
 
     private double venVolToday;
 
@@ -40,15 +50,28 @@ public class DataService {
 
     private ACache aCache;
 
-    public DataService(Context context){
+    private int inOutDoor;
+
+    private String avg_rate = "12";
+
+    public static DataServiceUtil getInstance(Context context){
+       if(instance == null){
+           instance = new DataServiceUtil(context.getApplicationContext());
+       }
+        return instance;
+    }
+
+    private DataServiceUtil(Context context){
         mContext = context;
         aCache = ACache.get(context);
         DBInitial();
     }
 
     private void DBInitial() {
+
         if (null == dbHelper)
             dbHelper = new DBHelper(mContext.getApplicationContext());
+
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -61,11 +84,13 @@ public class DataService {
         /**Get states of today **/
         List<State> states = cupboard().withDatabase(db).query(State.class).withSelection("time_point > ? AND time_point < ?", nowTime.toString(), nextTime.toString()).list();
         if (states.isEmpty()) {
+            state = null;
             PM25Today = 0.0;
             venVolToday = 0.0;
             IDToday = 0L;
         } else {
             State state = states.get(states.size() - 1);
+            this.state = state;
             state.print();
             PM25Today = Double.parseDouble(state.getPm25());
             venVolToday = Double.parseDouble(state.getVentilation_volume());
@@ -90,6 +115,52 @@ public class DataService {
             }
             PM25Source = source;
         }
+    }
+
+    /**
+     * density: (ug/m3)
+     * breath:  (L/min)
+     * Calculate today the number of pm2.5 breathed until now
+     *
+     * @param longi the longitude to be saved
+     * @param lati  the latitude to be saved
+     * @return the saved state
+     */
+    public State calculatePM25(double longi, double lati) {
+
+        Log.e(TAG, "calculatePM25 " + System.currentTimeMillis());
+        Double breath = 0.0;
+        Double density = PM25Density;
+        boolean isConnected = ShortcutUtil.isNetworkAvailable(mContext);
+
+        Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC; // motionService.getMotionStatus();
+        // int numStepsForRecord = motionService.getNumStepsForRecord();
+        int numStepsForRecord = 0;
+        double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
+
+        if (static_breath == 0.0) {
+            static_breath = 6.6; // using the default one
+        }
+        if (mMotionStatus == Const.MotionStatus.STATIC) {
+            breath = static_breath;
+        } else if (mMotionStatus == Const.MotionStatus.WALK) {
+            breath = static_breath * 2.1;
+        } else if (mMotionStatus == Const.MotionStatus.RUN) {
+            breath = static_breath * 6;
+        }
+
+        venVolToday += breath;
+        breath = breath / 1000; //change L/min to m3/min
+        PM25Today += density * breath;
+
+        State state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
+                String.valueOf(longi),
+                String.valueOf(lati),
+                String.valueOf(inOutDoor),
+                mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
+                Integer.toString(numStepsForRecord), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
+        numStepsForRecord = 0;
+        return state;
     }
 
     /**
@@ -137,7 +208,7 @@ public class DataService {
         }
         int count = 0;
         for (State state : states) {
-            if (state.getOutdoor().equals(LocationService.Outdoor)) {
+            if (state.getOutdoor().equals(LocationServiceUtil.Outdoor)) {
                 count++;
             }
         }
@@ -161,6 +232,83 @@ public class DataService {
 
     }
 
+    public void cachePMResult(double density,int source){
+        aCache.put(Const.Cache_PM_Density, density);
+        aCache.put(Const.Cache_PM_Source, String.valueOf(source));
+    }
+
+    /**
+     *
+     * @param inOutDoor must be
+     * @see LocationServiceUtil indoor and outdoor
+     */
+    public void cacheInOutdoor(int inOutDoor){
+        aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
+    }
+
+    public void cacheLocation(Location location){
+        aCache.put(Const.Cache_Latitude, location.getLatitude());
+        aCache.put(Const.Cache_Longitude, location.getLongitude());
+    }
+
+    public void cacheLocation(double latitude,double longitude){
+        aCache.put(Const.Cache_Latitude, latitude);
+        aCache.put(Const.Cache_Longitude, longitude);
+    }
+
+    public void cacheMaxLocation(Location location){
+        aCache.put(Const.Cache_Latitude, location.getLatitude());
+        aCache.put(Const.Cache_Longitude, location.getLongitude());
+    }
+
+    public void cacheMaxLocation(double latitude,double longitude){
+        aCache.put(Const.Cache_Last_Max_Lati, latitude);
+        aCache.put(Const.Cache_Last_Max_Longi, longitude);
+    }
+
+    public void cacheLastUploadTime(long time){
+        aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(time));
+    }
+
+    public State getCurrentState(){
+        return state;
+    }
+
+    public void setCurrentState(State state){
+        this.state = state;
+    }
+
+    public double getLatitude(){
+        String lati = aCache.getAsString(Const.Cache_Latitude);
+        if(ShortcutUtil.isStringOK(lati)){
+            return Double.valueOf(lati);
+        }
+        return 0.0;
+    }
+
+    public double getLongitude(){
+        String longi = aCache.getAsString(Const.Cache_Longitude);
+        if(ShortcutUtil.isStringOK(longi)){
+            return Double.valueOf(longi);
+        }
+        return 0.0;
+    }
+
+    public double getMaxLatitude(){
+        String lati = aCache.getAsString(Const.Cache_Last_Max_Lati);
+        if(ShortcutUtil.isStringOK(lati)){
+            return Double.valueOf(lati);
+        }
+        return 0.0;
+    }
+
+    public double getMaxLongitude(){
+        String longi = aCache.getAsString(Const.Cache_Last_Max_Longi);
+        if(ShortcutUtil.isStringOK(longi)){
+            return Double.valueOf(longi);
+        }
+        return 0.0;
+    }
 
     public double getPM25Density() {
         return PM25Density;

@@ -5,9 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Message;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -24,7 +22,7 @@ import app.utils.FileUtil;
 /**
  * Created by Haodong on 3/22/2016.
  */
-public class InOutdoorService{
+public class InOutdoorServiceUtil {
 
     public static final String TAG = "InOutdoorService";
     private Context mContext;
@@ -54,7 +52,7 @@ public class InOutdoorService{
 
     Handler mHandler = new Handler();
 
-    public InOutdoorService(Context context){
+    public InOutdoorServiceUtil(Context context){
         isRunning = false;
         this.mContext = context;
         executionTimer = 0;
@@ -81,8 +79,8 @@ public class InOutdoorService{
     }
 
     public int getIndoorOutdoor(){
-        if(status == Indoor) return LocationService.Indoor;
-        else return LocationService.Outdoor;
+        if(status == Indoor) return LocationServiceUtil.Indoor;
+        else return LocationServiceUtil.Outdoor;
     }
 
     private class ResultFetch extends Thread{

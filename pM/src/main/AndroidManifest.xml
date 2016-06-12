@@ -32,18 +32,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
 
-    <receiver android:process=":remote" android:name="app.services.BackgroundService">
-        <intent-filter>
-            <action android:name="ELITOR_CLOCK"></action>
-        </intent-filter>
-    </receiver>
-
-    <receiver android:name="app.services.AutoStartReceiver">
-        <intent-filter>
-            <action android:name="android.intent.action.BOOT_COMPLETED"></action>
-        </intent-filter>
-    </receiver>
-
     <application
         android:screenOrientation="portrait"
         android:name=".MyApplication"
@@ -146,6 +134,16 @@
         <service
             android:name="app.bluetooth.BluetoothService"
             android:exported="true" />
+
+        <receiver android:process=":remote" android:name="app.services.BackgroundService">
+        </receiver>
+
+        <receiver android:process=":remote" android:name="app.services.AutoStartReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

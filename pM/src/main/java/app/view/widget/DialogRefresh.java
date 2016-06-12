@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.example.pm.R;
 
-import app.services.LocationService;
+import app.services.LocationServiceUtil;
 
 /**
  * Created by liuhaodong1 on 16/1/30.
@@ -25,7 +25,7 @@ public class DialogRefresh extends Dialog implements View.OnClickListener
     TextView mLati;
     TextView mLoading;
     Handler mHandler;
-    LocationService locationService;
+    LocationServiceUtil locationServiceUtil;
     boolean isStop;
     boolean isRunning;
     Runnable runnable = new Runnable() {
@@ -58,7 +58,7 @@ public class DialogRefresh extends Dialog implements View.OnClickListener
         isRunning = false;
         mContext = context;
         mHandler = parent;
-        locationService = LocationService.getInstance(mContext);
+        locationServiceUtil = LocationServiceUtil.getInstance(mContext);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class DialogRefresh extends Dialog implements View.OnClickListener
     private void getLocation() {
         setRunning();
         isRunning = true;
-        locationService.run();
+        locationServiceUtil.run();
     }
 
     private void setRunning(){

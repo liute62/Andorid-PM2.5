@@ -10,6 +10,7 @@ import android.util.Log;
 
 /**
  * Created by liuhaodong1 on 16/2/3.
+ * Get the wifi state for later usage
  */
 
 public class WifiReceiver extends BroadcastReceiver {
