@@ -44,6 +44,16 @@ public class HttpUtil {
 
     public static final String UploadBatch_url = base_url + "mobile-data/upload";
 
+    //jiangph for 805
+    public static final String SERVERIP="255.255.255.255";
+
+    public static final int SERVERPORT=6666;
+
+    public static String deviceNumber=null;
+
+    public static String SDM_url="http://ilab.tongji.edu.cn/pm25/web/restful/device-datas";
+
+
     private static HttpUtil instance;
 
     public static HttpUtil Instance() {
