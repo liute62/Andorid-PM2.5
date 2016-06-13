@@ -5,5 +5,4 @@ package app.services;
  */
 public class AffliatedService {
 
-
 }

@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import app.model.PMModel;
+import app.services.DataServiceUtil;
 import app.services.ForegroundService;
 import app.utils.ACache;
 import app.utils.StableCache;
@@ -49,6 +50,7 @@ import app.view.widget.DialogConfirm;
 import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
 import app.view.widget.DialogGetLocation;
+import app.view.widget.DialogInitial;
 import app.view.widget.LoadingDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
@@ -198,6 +200,9 @@ public class MainFragment extends Fragment implements OnClickListener {
                     break;
                 case Const.Handler_Refresh_All:
                     break;
+                case Const.Handler_Initial_Success:
+                    foregroundInitial();
+                    break;
             }
 
         }
@@ -283,7 +288,16 @@ public class MainFragment extends Fragment implements OnClickListener {
         aCache = ACache.get(mActivity.getApplicationContext());
         stableCache = StableCache.getInstance(mActivity);
         ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
-        //GPS Task
+        if(!ShortcutUtil.isInitialized(DataServiceUtil.getInstance(mActivity))){
+            DialogInitial dialogInitial = new DialogInitial(mActivity,mDataHandler);
+            dialogInitial.setActivity(mActivity);
+            dialogInitial.show();
+            return;
+        }
+        foregroundInitial();
+    }
+
+    private void foregroundInitial(){
         if (!ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
             dbReceiver = new DBServiceReceiver();
             intentFilter = new IntentFilter();

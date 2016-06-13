@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import app.services.DataServiceUtil;
+
 /**
  * Created by liuhaodong1 on 15/11/10.
  */
@@ -460,5 +462,15 @@ public class ShortcutUtil {
                new File(dir, children[i]).delete();
            }
        }
+    }
+
+    public static  boolean isInitialized(DataServiceUtil dataServiceUtil){
+
+        Double lati = dataServiceUtil.getLatitude();
+        Double longi = dataServiceUtil.getLongitude();
+        if(lati == 0.0 || longi == 0.0) return false;
+        double density = dataServiceUtil.getPM25Density();
+        if(density == -1) return false;
+        return true;
     }
 }

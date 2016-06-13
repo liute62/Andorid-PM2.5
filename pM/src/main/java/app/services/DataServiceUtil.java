@@ -42,7 +42,7 @@ public class DataServiceUtil {
 
     private long IDToday;
 
-    private double PM25Density;
+    private double PM25Density = -1;
 
     private double PM25Today;
 
@@ -276,6 +276,10 @@ public class DataServiceUtil {
 
     public void setCurrentState(State state){
         this.state = state;
+    }
+
+    public int getInOutDoor(){
+        return 0;
     }
 
     public double getLatitude(){

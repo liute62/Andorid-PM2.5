@@ -53,9 +53,9 @@ public class BackgroundService extends BroadcastReceiver {
 
     public static final String TAG = "BackgroundService";
 
-    long startTime = 0; // the nano time for start the process of a cycle.
+    private long startTime = 0; // the nano time for start the process of a cycle.
 
-    int repeatingCycle = 0; //
+    private int repeatingCycle = 0; //
 
     private boolean isGoingToSearchPM = false;
 
@@ -83,7 +83,9 @@ public class BackgroundService extends BroadcastReceiver {
 
     private Location mLocation = null; //current location
 
-    State state = null;
+    private State state = null;
+
+    private int inOutDoor = 0;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -101,6 +103,7 @@ public class BackgroundService extends BroadcastReceiver {
         mLocation.setLongitude(0.0);
         isFinished = false;
         dataServiceUtil = DataServiceUtil.getInstance(mContext);
+        motionServiceUtil = MotionServiceUtil.getInstance(mContext);
         cache = StableCache.getInstance(mContext);
     }
 
@@ -116,11 +119,16 @@ public class BackgroundService extends BroadcastReceiver {
         getLastParams();
         Log.e(TAG, repeatingCycle + " ");
         saveValues();
-        if (isGoingToGetLocation || repeatingCycle % 20 == 0) {
-            getLocations(1000 * 10);
+        if (isGoingToGetLocation || repeatingCycle % 23 == 0) {
+            //getLocations(1000 * 10);
         }
-        if (isGoingToSearchPM || repeatingCycle % 120 == 0) {
-            searchPMResult(String.valueOf(mLocation.getLatitude()), String.valueOf(mLocation.getLongitude()));
+        if (isGoingToSearchPM || repeatingCycle % 101 == 0) {
+            //searchPMResult(String.valueOf(mLocation.getLatitude()), String.valueOf(mLocation.getLongitude()));
+        }
+        //every 1 hour to check if some data need to be uploaded
+        if(repeatingCycle % 111 == 0){
+            FileUtil.appendStrToFile(repeatingCycle, "every 1 hour to check pm data for upload");
+            //checkPMDataForUpload();
         }
     }
 
@@ -191,7 +199,7 @@ public class BackgroundService extends BroadcastReceiver {
                 }
             }
         });
-        locationServiceUtil.run();
+        locationServiceUtil.run(LocationServiceUtil.TYPE_BAIDU);
         locationServiceUtil.setTimeIntervalBeforeStop(runningTime);
     }
 
@@ -207,9 +215,9 @@ public class BackgroundService extends BroadcastReceiver {
      */
     private void searchPMResult(String longitude, String latitude) {
 
-        Log.e(TAG, "searchPMResult " + System.currentTimeMillis());
         String url = HttpUtil.Search_PM_url;
         url = url + "?longitude=" + longitude + "&latitude=" + latitude;
+        FileUtil.appendStrToFile(repeatingCycle,"searchPMResult "+url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -375,10 +383,10 @@ public class BackgroundService extends BroadcastReceiver {
     }
 
 
-    public static void SetAlarm(Context context) {
+    public static void runBackgroundService(Context context) {
         context = context.getApplicationContext();
         FileUtil.appendStrToFile("setAlarm");
-        Log.e(TAG, "SetAlarm");
+        Log.e(TAG, "runBackgroundService");
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, BackgroundService.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
@@ -387,7 +395,7 @@ public class BackgroundService extends BroadcastReceiver {
         //am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
     }
 
-    public void CancelAlarm(Context context) {
+    public void CancelBackgroundService(Context context) {
         Intent intent = new Intent(context, BackgroundService.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

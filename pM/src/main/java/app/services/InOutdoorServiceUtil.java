@@ -39,6 +39,7 @@ public class InOutdoorServiceUtil {
     public static final int executionCircle = 9;
 
     Runnable mRunnable = new Runnable() {
+
         @Override
         public void run() {
             if(isRunning) {

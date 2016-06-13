@@ -133,6 +133,8 @@ public class Const {
 
     public static final int Handler_Refresh_Text = 100013;
 
+    public static final int Handler_Initial_Success = 100014;
+
     /**
      * Intent Tag Code*
      */

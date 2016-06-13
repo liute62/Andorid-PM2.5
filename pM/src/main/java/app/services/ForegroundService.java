@@ -53,8 +53,6 @@ public class ForegroundService extends Service {
     private boolean isPMSearchSuccess;
     private boolean isRefreshRunning;
     private String isBackground = null;
-    private final static String bgStr = "false";
-
     /**
      * for indoor and outdoor judgement
      **/
@@ -148,15 +146,15 @@ public class ForegroundService extends Service {
                     DBRunTime = 1;
 
                 }
-                if (state.getId() > State_TooMuch) DB_Chart_Loop = 24;
-                else DB_Chart_Loop = 12;
+                if (state.getId() > State_TooMuch) DB_Chart_Loop = 10;
+                else DB_Chart_Loop = 5;
                 Bundle mBundle = new Bundle();
                 SQLiteDatabase db = dataServiceUtil.getDBHelper().getReadableDatabase();
                 switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
-                    case 3:
+                    case 1:
                         UpdateServiceUtil.run(getApplicationContext(), aCache, dataServiceUtil.getDBHelper());
                         break;
-                    case 5:
+                    case 2:
                         intentChart = new Intent(Const.Action_Chart_Result_1);
                         DataCalculator.getIntance(db).updateLastTwoHourState();
                         mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
@@ -166,7 +164,7 @@ public class ForegroundService extends Service {
                         intentChart.putExtras(mBundle);
                         sendBroadcast(intentChart);
                         break;
-                    case 7:
+                    case 3:
                         intentChart = new Intent(Const.Action_Chart_Result_2);
                         DataCalculator.getIntance(db).updateLastDayState();
                         Bundle mBundle2 = new Bundle();
@@ -178,7 +176,7 @@ public class ForegroundService extends Service {
                         intentChart.putExtras(mBundle2);
                         sendBroadcast(intentChart);
                         break;
-                    case 10:
+                    case 4:
                         intentChart = new Intent(Const.Action_Chart_Result_3);
                         DataCalculator.getIntance(db).updateLastWeekState();
                         Bundle mBundle3 = new Bundle();
@@ -198,13 +196,13 @@ public class ForegroundService extends Service {
                 }
                 //to much data here, we need to slow it down, every 1 min to check it
                 intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                if (DBRunTime % (3 * mul) == 0) { //15s 30s
+                if (DBRunTime % (1 * mul) == 0) { //15s 30s
                     intentText.putExtra(Const.Intent_DB_PM_Hour, DataCalculator.getIntance(db).calLastHourPM());
                 }
-                if (DBRunTime % (6 * mul) == 0) {//30s 1min
+                if (DBRunTime % (2 * mul) == 0) {//30s 1min
                     intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
                 }
-                if (DBRunTime % (12 * mul) == 0) {//1min 2min
+                if (DBRunTime % (3 * mul) == 0) {//1min 2min
                     intentText.putExtra(Const.Intent_DB_PM_Week, DataCalculator.getIntance(db).calLastWeekAvgPM());
                 }
                 sendBroadcast(intentText);
@@ -215,58 +213,6 @@ public class ForegroundService extends Service {
                 sendBroadcast(intent);
             }
 
-            //every 10 min to open the GPS and if get the last location, close it.
-//            if (DBRunTime % 120 == 0) { //120 240 360, 480, 600, 720
-//                FileUtil.appendStrToFile(DBRunTime, "the location service open and get in/outdoor state");
-//                locationService.run(LocationService.TYPE_BAIDU);
-//                Loc_Runtime = 0;
-//            }
-            // Loc_Runtime++;
-//            if (Loc_Runtime >= DB_Loc_Close_Per) {
-//                Loc_Runtime = Integer.MIN_VALUE;
-//                FileUtil.appendStrToFile(DBRunTime, "the location service close");
-//                locationService.stop();
-//                int tmp = locationService.getIndoorOutdoor();
-//                inOutDoor = tmp;
-//                aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
-//                FileUtil.appendStrToFile(DBRunTime, "stop getting the in/outdoor state with state == " + inOutDoor);
-//            }
-            //every 1 min to calculate the pm result
-//            if (DBRunTime % 12 == 0) {
-//               // State last = state;
-//                //state = calculatePM25(longitude, latitude);
-//                State now = state;
-//                if (!isSurpass(last, now)) {
-//                    dataService.insertState(state);
-//                } else {
-//                    reset();
-//                }
-//            }
-            //every 1 hour to check if it need to search the PM density from server
-//            String lastTime = aCache.getAsString(Const.Cache_DB_Lastime_searchDensity);
-//            if (!ShortcutUtil.isStringOK(lastTime)) {
-//                lastTime = String.valueOf(System.currentTimeMillis());
-//                aCache.put(Const.Cache_DB_Lastime_searchDensity, lastTime);
-//            }
-//            Long curTime = System.currentTimeMillis();
-//            if (curTime - Long.valueOf(lastTime) > Const.Min_Search_PM_Time) {
-//                FileUtil.appendStrToFile(DBRunTime, "every 1 hour to search the PM density from server");
-//                aCache.put(Const.Cache_DB_Lastime_searchDensity, String.valueOf(System.currentTimeMillis()));
-//                searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
-//            }
-            //every 1 hour to check if some data need to be uploaded
-//            String lastUploadTime = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
-//            if (!ShortcutUtil.isStringOK(lastUploadTime)) {
-//                lastUploadTime = String.valueOf(System.currentTimeMillis());
-//                aCache.put(Const.Cache_DB_Lastime_Upload, lastUploadTime);
-//            }
-            //every 1 hour to check pm data for upload
-//            if (curTime - Long.valueOf(lastUploadTime) > Const.Min_Upload_Check_Time) {
-//                aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
-//                FileUtil.appendStrToFile(DBRunTime, "every 1 hour to check pm data for upload");
-//                //check it user have login
-//                checkPMDataForUpload();
-//            }
             DBRunTime++;
             if (DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle
 
@@ -357,7 +303,7 @@ public class ForegroundService extends Service {
 
         serviceStateInitial();
         DBHandler.sendEmptyMessageDelayed(0, 10000);//10s
-        BackgroundService.SetAlarm(this);
+        BackgroundService.runBackgroundService(this);
     }
 
     @Override
