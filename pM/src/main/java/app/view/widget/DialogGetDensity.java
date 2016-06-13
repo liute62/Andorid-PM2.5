@@ -23,10 +23,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import app.model.PMModel;
-import app.utils.ACache;
+import app.services.DataServiceUtil;
+import app.services.NotifyServiceUtil;
 import app.utils.Const;
 import app.utils.HttpUtil;
-import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 
 /**
@@ -36,24 +36,28 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
 {
 
     public static final String TAG = "DialogGetDensity";
-    ACache aCache;
-    Context mContext;
-    boolean isRunning;
-    PMModel pmModel;
-    Double PM25Density;
-    TextView mLoading;
-    TextView mLati;
-    TextView mLongi;
-    TextView mDensity;
-    Button mCancel;
-    Button mSearch;
-    boolean isStop;
 
-    Runnable mRunnable = new Runnable() {
+    private Context mContext;
+    private DataServiceUtil dataServiceUtil;
+
+    private boolean isRunning;
+    private boolean isStop;
+    private PMModel pmModel;
+    private Double PM25Density;
+
+    private TextView mLoading;
+    private TextView mLati;
+    private TextView mLongi;
+    private TextView mDensity;
+    private Button mCancel;
+    private Button mSearch;
+
+    private Runnable mRunnable = new Runnable() {
 
         int num = 0;
         @Override
         public void run() {
+
             if(!isStop) {
                 if (num == 0) {
                     mLoading.setText(mContext.getResources().getString(R.string.dialog_base_loading));
@@ -72,7 +76,7 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
 
     };
 
-    Handler mHandler = new Handler();
+    private Handler mHandler = new Handler();
 
     public DialogGetDensity(Context context) {
         super(context);
@@ -97,13 +101,13 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
     }
 
     private void init(){
-        aCache = ACache.get(mContext);
-        String longiStr = aCache.getAsString(Const.Cache_Longitude);
-        String latiStr = aCache.getAsString(Const.Cache_Latitude);
-        String density = aCache.getAsString(Const.Cache_PM_Density);
-        if(ShortcutUtil.isStringOK(latiStr)) mLati.setText(latiStr);
-        if(ShortcutUtil.isStringOK(longiStr)) mLongi.setText(longiStr);
-        if(ShortcutUtil.isStringOK(density)) mDensity.setText(density);
+        dataServiceUtil = DataServiceUtil.getInstance(mContext);
+        String longiStr = String.valueOf(dataServiceUtil.getLongitude());
+        String latiStr = String.valueOf(dataServiceUtil.getLatitude());
+        String density = String.valueOf(dataServiceUtil.getPM25Density());
+        mLati.setText(latiStr);
+        mLongi.setText(longiStr);
+        mDensity.setText(density);
     }
 
     private void setStop(){
@@ -121,12 +125,6 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
         mContext.sendBroadcast(intent);
     }
 
-    /**
-     * Get and Update Current PM info.
-     *
-     * @param longitude
-     * @param latitude
-     */
     private void searchPMRequest(String longitude, String latitude) {
         mSearch.setEnabled(false);
         mSearch.setClickable(false);
@@ -143,19 +141,21 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
                 setStop();
                 try {
                     int status = response.getInt("status");
+
                     if(status == 1) {
+
                         pmModel = PMModel.parse(response.getJSONObject("data"));
                         Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
                         intent.putExtra(Const.Intent_PM_Density, pmModel.getPm25());
                         //set current pm density for calculation
                         PM25Density = Double.valueOf(pmModel.getPm25());
                         int source = pmModel.getSource();
-                        Log.e(TAG, "searchPMRequest PM2.5 Density " + String.valueOf(PM25Density));
+
                         mDensity.setText(String.valueOf(PM25Density));
-                        aCache.put(Const.Cache_PM_Density, PM25Density);
-                        aCache.put(Const.Cache_PM_Source,String.valueOf(source));
+                        dataServiceUtil.cachePMResult(PM25Density, source);
                         notifyService(PM25Density);
                         Toast.makeText(mContext.getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
+
                     }else {
                         String str = response.getString("message");
                         mDensity.setText(str);

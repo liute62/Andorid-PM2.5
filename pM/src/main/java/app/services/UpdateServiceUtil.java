@@ -165,6 +165,7 @@ public class UpdateServiceUtil {
     update state with real density
      */
     public void UpdateDensity(final State state) {
+
         final String timePoint = ShortcutUtil.refFormatDateAndTimeInHour(Long.valueOf(state.getTime_point()));
         String density = aCache.getAsString(timePoint);
         if (density!=null) {

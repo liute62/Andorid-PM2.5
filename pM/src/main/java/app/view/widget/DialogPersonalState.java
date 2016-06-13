@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.pm.DataResultActivity;
 import com.example.pm.R;
 
+import app.services.DataServiceUtil;
 import app.services.LocationServiceUtil;
 import app.utils.ACache;
 import app.utils.StableCache;
@@ -23,29 +24,31 @@ import app.utils.Const;
 import app.utils.ShortcutUtil;
 
 /**
- * Created by Administrator on 1/11/2016.
+ * Created by haodong on 1/11/2016.
  */
 public class DialogPersonalState extends Dialog implements View.OnClickListener{
+
+    private Handler mHandler;
+    private DataServiceUtil dataServiceUtil;
+    private StableCache stableCache;
+    private Context mContext;
+
+    private TextView mSaveWeight;
+    private EditText mWeight;
+    private TextView mLongitude;
+    private TextView mLatitude;
+    private Button mBack;
+    private Button mLocalization;
+    private RadioButton mIndoor;
+    private RadioButton mOutdoor;
+    private Button mDataResult;
+    private TextView mGPSNum;
 
     public DialogPersonalState(Context context,Handler parent) {
         super(context);
         mContext = context;
         this.mHandler = parent;
     }
-    Handler mHandler;
-    ACache aCache;
-    StableCache stableCache;
-    Context mContext;
-    TextView mSaveWeight;
-    EditText mWeight;
-    TextView mLongitude;
-    TextView mLatitude;
-    Button mBack;
-    Button mLocalization;
-    RadioButton mIndoor;
-    RadioButton mOutdoor;
-    Button mDataResult;
-    TextView mGPSNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +56,7 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         setCanceledOnTouchOutside(false);
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.widget_dialog_personal_state);
+
         mSaveWeight = (TextView)findViewById(R.id.personal_state_weight_save);
         mSaveWeight.setOnClickListener(this);
         mWeight = (EditText)findViewById(R.id.personal_state_weight);
@@ -73,26 +77,26 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
     }
 
     private void loadData(){
-        aCache = ACache.get(mContext.getApplicationContext());
+
+        dataServiceUtil = DataServiceUtil.getInstance(mContext);
+
         stableCache = StableCache.getInstance(mContext);
-        String lati = aCache.getAsString(Const.Cache_Latitude);
-        String longi = aCache.getAsString(Const.Cache_Longitude);
         String weight = stableCache.getAsString(Const.Cache_User_Weight);
-        String inOut = aCache.getAsString(Const.Cache_Indoor_Outdoor);
         String gps = stableCache.getAsString(Const.Cache_GPS_SATE_NUM);
-        if(lati != null) mLatitude.setText(lati);
-        if(longi != null) mLongitude.setText(longi);
+
+        mLatitude.setText(String.valueOf(dataServiceUtil.getLatitude()));
+        mLongitude.setText(String.valueOf(dataServiceUtil.getLongitude()));
         if(weight != null) mWeight.setText(weight);
-        if(inOut != null) setLocation(inOut);
+        setLocation(dataServiceUtil.getInOutDoor());
         if(gps != null) mGPSNum.setText(gps);
     }
 
-    private void setLocation(String state){
-        Integer inOut = Integer.valueOf(state);
-        if(inOut == LocationServiceUtil.Indoor){
+    private void setLocation(int state){
+
+        if(state == LocationServiceUtil.Indoor){
             mIndoor.setChecked(true);
             mOutdoor.setChecked(false);
-        }else if(inOut == LocationServiceUtil.Outdoor){
+        }else if(state == LocationServiceUtil.Outdoor){
             mIndoor.setChecked(false);
             mOutdoor.setChecked(true);
         }
@@ -121,12 +125,12 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
             case R.id.personal_state_indoor:
                 mIndoor.setChecked(true);
                 mOutdoor.setChecked(false);
-                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationServiceUtil.Indoor));
+                dataServiceUtil.cacheInOutdoor(LocationServiceUtil.Indoor);
                 break;
             case R.id.personal_state_outdoor:
                 mIndoor.setChecked(false);
                 mOutdoor.setChecked(true);
-                aCache.put(Const.Cache_Indoor_Outdoor,String.valueOf(LocationServiceUtil.Outdoor));
+                dataServiceUtil.cacheInOutdoor(LocationServiceUtil.Outdoor);
                 break;
             case R.id.personal_state_get_location:
                 DialogGetLocation getLocation = new DialogGetLocation(mContext);

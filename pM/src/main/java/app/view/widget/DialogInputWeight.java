@@ -18,15 +18,16 @@ import app.utils.Const;
 import app.utils.ShortcutUtil;
 
 /**
- * Created by Administrator on 1/11/2016.
+ * Created by haodong on 1/11/2016.
  */
 public class DialogInputWeight extends Dialog implements View.OnClickListener{
 
-    EditText mContent;
-    Button mConfirm;
-    Button mCancel;
-    Context mContext;
-    Handler mHandler;
+    private Context mContext;
+
+    private EditText mContent;
+    private Button mConfirm;
+    private Button mCancel;
+    private Handler mHandler;
 
     public DialogInputWeight(Context context,Handler mParent) {
         super(context);
@@ -38,6 +39,7 @@ public class DialogInputWeight extends Dialog implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.widget_dialog_input_weight);
         mConfirm = (Button)findViewById(R.id.input_weight_confirm);
         mConfirm.setOnClickListener(this);

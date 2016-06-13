@@ -123,7 +123,7 @@ public class BackgroundService extends BroadcastReceiver {
             //getLocations(1000 * 10);
         }
         if (isGoingToSearchPM || repeatingCycle % 101 == 0) {
-            //searchPMResult(String.valueOf(mLocation.getLatitude()), String.valueOf(mLocation.getLongitude()));
+           // searchPMResult(String.valueOf(mLocation.getLongitude()), String.valueOf(mLocation.getLatitude()));
         }
         //every 1 hour to check if some data need to be uploaded
         if(repeatingCycle % 111 == 0){
@@ -389,7 +389,7 @@ public class BackgroundService extends BroadcastReceiver {
         Log.e(TAG, "runBackgroundService");
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, BackgroundService.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()
                 ,60*1000, pi);
         //am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute

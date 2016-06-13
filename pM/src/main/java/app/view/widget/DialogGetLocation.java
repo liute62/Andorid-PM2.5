@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.pm.R;
 
+import app.services.DataServiceUtil;
 import app.services.LocationServiceUtil;
 import app.utils.ACache;
 import app.utils.Const;
@@ -30,27 +31,31 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
 {
 
     public static final String TAG = "DialogGetLocation";
-    ACache aCache;
-    Context mContext;
-    TextView mNewLati;
-    TextView mNewLongi;
-    TextView mLati;
-    TextView mLongi;
-    Button mSave;
-    Button mSearch;
-    Button mCancel;
-    RadioButton mBaidu;
-    RadioButton mGPS;
-    RadioButton mNetwork;
-    LocationServiceUtil locationServiceUtil;
-    boolean isSearching;
-    boolean isRunnable;
-    Handler handler = new Handler();
 
-    Runnable runnable = new Runnable() {
+    private Context mContext;
+    private LocationServiceUtil locationServiceUtil;
+    private DataServiceUtil dataServiceUtil;
+    private Handler handler = new Handler();
+
+    private TextView mNewLati;
+    private TextView mNewLongi;
+    private TextView mLati;
+    private TextView mLongi;
+    private Button mSave;
+    private Button mSearch;
+    private Button mCancel;
+    private RadioButton mBaidu;
+    private RadioButton mGPS;
+    private RadioButton mNetwork;
+
+    private boolean isSearching;
+    private boolean isRunnable;
+
+    private Runnable runnable = new Runnable() {
         int num = 0;
         @Override
         public void run() {
+
             if(isRunnable) {
                 if (num == 0) {
                     mSearch.setText(mContext.getString(R.string.dialog_base_searching));
@@ -73,7 +78,7 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     public DialogGetLocation(Context context) {
         super(context);
         mContext = context;
-        aCache = ACache.get(context);
+        dataServiceUtil = DataServiceUtil.getInstance(context);
         locationServiceUtil = LocationServiceUtil.getInstance(context);
         isSearching = false;
         isRunnable = true;
@@ -105,10 +110,10 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     }
 
     private void init(){
-        String lati = aCache.getAsString(Const.Cache_Latitude);
-        String longi = aCache.getAsString(Const.Cache_Longitude);
-        if(ShortcutUtil.isStringOK(lati)) mLati.setText(lati);
-        if(ShortcutUtil.isStringOK(longi)) mLongi.setText(longi);
+        String lati = String.valueOf(dataServiceUtil.getLatitude());
+        String longi = String.valueOf(dataServiceUtil.getLongitude());
+        mLati.setText(lati);
+        mLongi.setText(longi);
         baiduChecked();
         //GPSChecked();
     }
@@ -132,8 +137,7 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
                 String lati = mNewLati.getText().toString();
                 String longi = mNewLongi.getText().toString();
                 if(ShortcutUtil.isStringOK(lati) && !lati.equals("0") && ShortcutUtil.isStringOK(longi) && !longi.equals("0")) {
-                    aCache.put(Const.Cache_Latitude,lati);
-                    aCache.put(Const.Cache_Longitude, longi);
+                    dataServiceUtil.cacheLocation(Double.valueOf(lati),Double.valueOf(longi));
                     Toast.makeText(mContext.getApplicationContext(),Const.Info_Location_Saved,Toast.LENGTH_SHORT).show();
                     notifyService(Double.valueOf(lati),Double.valueOf(longi));
                 }

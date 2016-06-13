@@ -37,6 +37,7 @@ import java.util.List;
 import app.model.PMModel;
 import app.services.DataServiceUtil;
 import app.services.ForegroundService;
+import app.services.NotifyServiceUtil;
 import app.utils.ACache;
 import app.utils.StableCache;
 import app.utils.ChartsConst;
@@ -75,74 +76,78 @@ import lecho.lib.hellocharts.view.LineChartView;
 public class MainFragment extends Fragment implements OnClickListener {
 
     public static final String TAG = "MainFragment";
-    //Todo, a icon to alert that user 60km away from station
-    Activity mActivity;
-    ImageView mProfile;
-    ImageView mHotMap;
-    ImageView mRefreshChart;
-    TextView mTime;
-    TextView mAirQuality;
-    TextView mCity;
-    TextView mHint;
-    TextView mHourPM;
-    TextView mDayPM;
-    TextView mWeekPM;
-    TextView mChangeChart1;
-    TextView mChangeChart2;
-    TextView mChart1Title;
-    TextView mChart2Title;
-    ImageView mChart2Hint;
-    ImageView mDensityError;
-    ImageView mRunError;
-    ImageView mChart1Alert;
-    ImageView mChart2Alert;
-    ImageView mAddCity;
-    TextView mViewMore2;
 
-    Double PMDensity;
-    Double PMBreatheHour;
-    Double PMBreatheDay;
-    Double PMBreatheWeekAvg;
-    int currentHour;
-    int currentMin;
-    String currentLatitude;
-    String currentLongitude;
-    String currentCity;
-    ClockTask clockTask;
-    boolean isClockTaskRun = false;
+    private Activity mActivity;
+    private DBServiceReceiver dbReceiver;
+
+    private ImageView mProfile;
+    private ImageView mHotMap;
+    private ImageView mRefreshChart;
+    private TextView mTime;
+    private TextView mAirQuality;
+    private TextView mCity;
+    private TextView mHint;
+    private TextView mHourPM;
+    private TextView mDayPM;
+    private TextView mWeekPM;
+    private TextView mChangeChart1;
+    private TextView mChangeChart2;
+    private TextView mChart1Title;
+    private TextView mChart2Title;
+    private ImageView mChart2Hint;
+    private ImageView mDensityError;
+    private ImageView mRunError;
+    private ImageView mChart1Alert;
+    private ImageView mChart2Alert;
+    private ImageView mAddCity;
+    private TextView mViewMore2;
+
+    private Double PMDensity;
+    private Double PMBreatheHour;
+    private Double PMBreatheDay;
+    private Double PMBreatheWeekAvg;
+
+    private int currentHour;
+    private int currentMin;
+    private ClockTask clockTask;
+    private boolean isClockTaskRun = false;
+
+    private String currentLatitude;
+    private String currentLongitude;
+    private String currentCity;
 
     LoadingDialog loadingDialog;
     PMModel pmModel;
     ACache aCache;
     StableCache stableCache;
     private IntentFilter intentFilter;
+
     /**
      * Charts*
      */
-    int current_chart1_index;
-    int current_chart2_index;
-    ColumnChartView mChart1column;
-    LineChartView mChart1line;
-    ColumnChartView mChart2column;
-    LineChartView mChart2line;
+    private int current_chart1_index;
+    private int current_chart2_index;
+    private ColumnChartView mChart1column;
+    private LineChartView mChart1line;
+    private ColumnChartView mChart2column;
+    private LineChartView mChart2line;
     /**
      * Charts data
      **/
-    HashMap<Integer, Float> chartData1; //data for chart 1
-    HashMap<Integer, Float> chartData2; //data for chart 2
-    HashMap<Integer, Float> chartData3; //data for chart 3
-    HashMap<Integer, Float> chartData4; //data for chart 4
-    HashMap<Integer, Float> chartData5; //data for chart 5
-    HashMap<Integer, Float> chartData6; //data for chart 6
-    HashMap<Integer, Float> chartData7; //data for chart 7
-    List<String> chart7Date;           //date(mm.dd) for chart 7
-    HashMap<Integer, Float> chartData8; //data for chart 8
-    ArrayList<String> chart8Time;
-    HashMap<Integer, Float> chartData10; //data for chart 10
-    HashMap<Integer, Float> chartData12; //data for chart 12
-    List<String> chart12Date;           //date(mm.dd) for chart 12
+    private HashMap<Integer, Float> chartData1; //data for chart 1
+    private HashMap<Integer, Float> chartData2; //data for chart 2
+    private HashMap<Integer, Float> chartData3; //data for chart 3
+    private HashMap<Integer, Float> chartData4; //data for chart 4
+    private HashMap<Integer, Float> chartData5; //data for chart 5
+    private HashMap<Integer, Float> chartData6; //data for chart 6
+    private HashMap<Integer, Float> chartData7; //data for chart 7
+    private List<String> chart7Date;           //date(mm.dd) for chart 7
+    private HashMap<Integer, Float> chartData8; //data for chart 8
+    private ArrayList<String> chart8Time;
+    private HashMap<Integer, Float> chartData10; //data for chart 10
+    private HashMap<Integer, Float> chartData12; //data for chart 12
+    private List<String> chart12Date;           //date(mm.dd) for chart 12
 
-    private DBServiceReceiver dbReceiver;
     Handler mClockHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -188,14 +193,13 @@ public class MainFragment extends Fragment implements OnClickListener {
                 case Const.Handler_City_Name:
                     String name = (String)msg.obj;
                     currentCity = name;
-                    mAddCity.setVisibility(View.GONE);
                     mCity.setText(currentCity);
-                    aCache.put(Const.Cache_City,currentCity);
+                    DataServiceUtil.getInstance(mActivity).cacheCityName(name);
                     break;
                 case Const.Handler_Add_City:
                     String name2 = (String)msg.obj;
+                    DataServiceUtil.getInstance(mActivity).cacheCityName(name2);
                     currentCity = name2;
-                    mAddCity.setVisibility(View.GONE);
                     mCity.setText(currentCity);
                     break;
                 case Const.Handler_Refresh_All:
@@ -260,16 +264,21 @@ public class MainFragment extends Fragment implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mActivity = getActivity();
+
         PMDensity = 0.0;
         PMBreatheDay = 0.0;
         PMBreatheHour = 0.0;
         PMBreatheWeekAvg = 0.0;
+
         currentLongitude = null;
         currentLatitude = null;
+
         current_chart1_index = 1;
         current_chart2_index = 2;
         isClockTaskRun = false;
+
         chart7Date = new ArrayList<>();
         chart12Date = new ArrayList<>();
         chartData1 = new HashMap<>();
@@ -283,11 +292,13 @@ public class MainFragment extends Fragment implements OnClickListener {
         chart8Time = new ArrayList<>();
         chartData10 = new HashMap<>();
         chartData12 = new HashMap<>();
+
         pmModel = new PMModel();
         loadingDialog = new LoadingDialog(getActivity());
         aCache = ACache.get(mActivity.getApplicationContext());
         stableCache = StableCache.getInstance(mActivity);
         ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
+
         if(!ShortcutUtil.isInitialized(DataServiceUtil.getInstance(mActivity))){
             DialogInitial dialogInitial = new DialogInitial(mActivity,mDataHandler);
             dialogInitial.setActivity(mActivity);
@@ -322,6 +333,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+
         mProfile = (ImageView) view.findViewById(R.id.main_profile);
         mHotMap = (ImageView) view.findViewById(R.id.main_hot_map);
         mRefreshChart = (ImageView)view.findViewById(R.id.main_refresh_chart);
@@ -347,17 +359,19 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChart2Alert = (ImageView) view.findViewById(R.id.main_chart_2_alert);
         mAddCity = (ImageView)view.findViewById(R.id.main_add_city);
         mViewMore2 = (TextView)view.findViewById(R.id.main_view_more_2);
+
         setFonts(view);
         setTextSizeByWidth();
         setListener();
         cacheInitial();
-        dataInitial();
+        showingData();
         chartInitial(current_chart1_index, current_chart2_index);
-        taskInitial();
+        clockTaskStart();
         return view;
     }
 
     private void checkForRefresh(){
+
         String refresh = aCache.getAsString(Const.Cache_DB_Lastime_Refresh);
         if(!ShortcutUtil.isStringOK(refresh)){
             aCache.put(Const.Cache_DB_Lastime_Refresh,String.valueOf(System.currentTimeMillis()));
@@ -372,9 +386,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             }
             Log.e(TAG,"checkForRefresh ref: "+ShortcutUtil.refFormatDateAndTime(refTime)+" cur: "+ShortcutUtil.refFormatDateAndTime(curTime));
             if(curTime - refTime > Const.Refresh_Chart_Interval){
-                //notify the service to refresh the chart
-                Intent intent = new Intent(Const.Action_Refresh_Chart_ToService);
-                mActivity.sendBroadcast(intent);
+                NotifyServiceUtil.notifyRefreshChart(mActivity);
             }
             aCache.put(Const.Cache_DB_Lastime_Refresh,String.valueOf(curTime));
         }
@@ -393,7 +405,6 @@ public class MainFragment extends Fragment implements OnClickListener {
     }
 
     private void setFonts(View view) {
-//        Typeface typeFace = Typeface.createFromAsset(mActivity.getAssets(), "SourceHanSansCNLight.ttf");
         Typeface typeFace = Typeface.createFromAsset(mActivity.getAssets(), "kaiti.TTF");
         TextView textView1 = (TextView) view.findViewById(R.id.textView1);
         textView1.setTypeface(typeFace);
@@ -405,6 +416,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     }
 
     private void cacheInitial() {
+
         String access_token = aCache.getAsString(Const.Cache_Access_Token);
         String user_name = aCache.getAsString(Const.Cache_User_Name);
         String user_nickname = aCache.getAsString(Const.Cache_User_Nickname);
@@ -413,9 +425,15 @@ public class MainFragment extends Fragment implements OnClickListener {
         String pm_hour = aCache.getAsString(Const.Cache_PM_LastHour);
         String pm_day = aCache.getAsString(Const.Cache_PM_LastDay);
         String pm_week = aCache.getAsString(Const.Cache_PM_LastWeek);
-        String longitude = aCache.getAsString(Const.Cache_Longitude);
-        String latitude = aCache.getAsString(Const.Cache_Latitude);
-        String city = aCache.getAsString(Const.Cache_City);
+
+        double longitude = DataServiceUtil.getInstance(mActivity).getLongitude();
+        double latitude = DataServiceUtil.getInstance(mActivity).getLatitude();
+        currentLatitude = String.valueOf(latitude);
+        currentLongitude = String.valueOf(longitude);
+        searchCityRequest(currentLatitude,currentLongitude);
+
+        currentCity = DataServiceUtil.getInstance(mActivity).getCityName();
+
         if (ShortcutUtil.isStringOK(access_token))
             Const.CURRENT_ACCESS_TOKEN = access_token;
         if (ShortcutUtil.isStringOK(user_name))
@@ -432,17 +450,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             PMBreatheDay = Double.valueOf(pm_day);
         if (ShortcutUtil.isStringOK(pm_week))
             PMBreatheWeekAvg = Double.valueOf(pm_week);
-        if (ShortcutUtil.isStringOK(longitude))
-            currentLongitude = longitude;
-        if (ShortcutUtil.isStringOK(latitude))
-            currentLatitude = latitude;
-        if (ShortcutUtil.isStringOK(city)) {
-            currentCity = city;
-            mAddCity.setVisibility(View.GONE);
-        }else {
-            currentCity = "null";
-            mAddCity.setVisibility(View.VISIBLE);
-        }
+
         /*********Chart Data Initial**********/
         Object chart1 = aCache.getAsObject(Const.Cache_Chart_1);
         Object chart2 = aCache.getAsObject(Const.Cache_Chart_2);
@@ -475,7 +483,7 @@ public class MainFragment extends Fragment implements OnClickListener {
             chart8Time = (ArrayList) chart8obj;
     }
 
-    private void dataInitial() {
+    private void showingData() {
         Time t = new Time();
         t.setToNow();
         currentHour = t.hour;
@@ -505,37 +513,8 @@ public class MainFragment extends Fragment implements OnClickListener {
 
     }
 
-    private void chartInitial(int chart1_index, int chart2_index) {
-        mChart1Title.setText(ChartsConst.Chart_title[chart1_index]);
-        if (ChartsConst.Chart_type[chart1_index] == 0) {
-            mChart1column.setVisibility(View.VISIBLE);
-            mChart1line.setVisibility(View.INVISIBLE);
-            setChartViewport(mChart1column, setChartDataByIndex(chart1_index));
-        } else if (ChartsConst.Chart_type[chart1_index] == 1) {
-            mChart1column.setVisibility(View.INVISIBLE);
-            mChart1line.setVisibility(View.VISIBLE);
-            setChartViewport(mChart1line, setChartDataByIndex(chart1_index));
-        } else {
-            mChart1column.setVisibility(View.INVISIBLE);
-            mChart1line.setVisibility(View.INVISIBLE);
-        }
-        mChart2Title.setText(ChartsConst.Chart_title[chart2_index]);
-        if (ChartsConst.Chart_type[chart2_index] == 0) {
-            mChart2column.setVisibility(View.VISIBLE);
-            mChart2line.setVisibility(View.INVISIBLE);
-            setChartViewport(mChart2column, setChartDataByIndex(chart2_index));
-        } else if (ChartsConst.Chart_type[chart2_index] == 1) {
-            mChart2column.setVisibility(View.INVISIBLE);
-            mChart2line.setVisibility(View.VISIBLE);
-            setChartViewport(mChart2line, setChartDataByIndex(chart2_index));
-        } else {
-            mChart2column.setVisibility(View.INVISIBLE);
-            mChart2line.setVisibility(View.INVISIBLE);
-        }
-    }
+    private void clockTaskStart() {
 
-    private void taskInitial() {
-        //clock task
         if (isClockTaskRun == false) {
             isClockTaskRun = true;
             clockTask = new ClockTask();
@@ -671,15 +650,18 @@ public class MainFragment extends Fragment implements OnClickListener {
 
 
     /**
+     *
      * Get and Update Current City Name.
      *
-     * @param lati  latitude
-     * @param Longi longitude
+     * @param lati  latitude the latitude passed for searching
+     * @param Longi longitude the longitude passed for searching
      */
     private void searchCityRequest(String lati, final String Longi) {
+
         String url = HttpUtil.SearchCity_url;
         url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;
         Log.e(TAG,"searchCityRequest "+url);
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -687,13 +669,15 @@ public class MainFragment extends Fragment implements OnClickListener {
                     JSONObject result = response.getJSONObject("result");
                     JSONObject component = result.getJSONObject("addressComponent");
                     String cityName = component.getString("city");
-                    FileUtil.appendStrToFile(-2,"5.search city success and city == "+cityName);
+
+                    FileUtil.appendStrToFile(TAG,"Search city success and city == "+cityName);
+
                     if (cityName != null && !cityName.trim().equals("")) {
                         Message msg = new Message();
                         msg.what = Const.Handler_City_Name;
                         msg.obj = cityName;
                         mDataHandler.sendMessage(msg);
-                        aCache.put(Const.Cache_City, cityName);
+                        DataServiceUtil.getInstance(mActivity).cacheCityName(cityName);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -702,7 +686,10 @@ public class MainFragment extends Fragment implements OnClickListener {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+
                 String bg = aCache.getAsString(Const.Cache_Is_Background);
+                FileUtil.appendErrorToFile(0,Const.ERROR_NO_CITY_RESULT);
+
                 if(ShortcutUtil.isStringOK(bg) && bg.equals("false"))
                    Toast.makeText(mActivity.getApplicationContext(), Const.ERROR_NO_CITY_RESULT, Toast.LENGTH_SHORT).show();
             }
@@ -842,7 +829,42 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
     }
 
+    /**
+     * ********* Chart *********
+     * */
+
+    private void chartInitial(int chart1_index, int chart2_index) {
+
+        mChart1Title.setText(ChartsConst.Chart_title[chart1_index]);
+        if (ChartsConst.Chart_type[chart1_index] == 0) {
+            mChart1column.setVisibility(View.VISIBLE);
+            mChart1line.setVisibility(View.INVISIBLE);
+            setChartViewport(mChart1column, setChartDataByIndex(chart1_index));
+        } else if (ChartsConst.Chart_type[chart1_index] == 1) {
+            mChart1column.setVisibility(View.INVISIBLE);
+            mChart1line.setVisibility(View.VISIBLE);
+            setChartViewport(mChart1line, setChartDataByIndex(chart1_index));
+        } else {
+            mChart1column.setVisibility(View.INVISIBLE);
+            mChart1line.setVisibility(View.INVISIBLE);
+        }
+        mChart2Title.setText(ChartsConst.Chart_title[chart2_index]);
+        if (ChartsConst.Chart_type[chart2_index] == 0) {
+            mChart2column.setVisibility(View.VISIBLE);
+            mChart2line.setVisibility(View.INVISIBLE);
+            setChartViewport(mChart2column, setChartDataByIndex(chart2_index));
+        } else if (ChartsConst.Chart_type[chart2_index] == 1) {
+            mChart2column.setVisibility(View.INVISIBLE);
+            mChart2line.setVisibility(View.VISIBLE);
+            setChartViewport(mChart2line, setChartDataByIndex(chart2_index));
+        } else {
+            mChart2column.setVisibility(View.INVISIBLE);
+            mChart2line.setVisibility(View.INVISIBLE);
+        }
+    }
+
     private Object setChartDataByIndex(int index) {
+
         switch (index) {
             case 1:
                 return DataGenerator.chart1DataGenerator(chartData1);

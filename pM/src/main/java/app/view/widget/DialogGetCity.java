@@ -19,35 +19,40 @@ import com.example.pm.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import app.utils.ACache;
+import app.services.DataServiceUtil;
 import app.utils.Const;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
 import app.utils.VolleyQueue;
 
 /**
- * Created by Administrator on 1/18/2016.
+ * Created by Haodong on 1/18/2016.
  */
 public class DialogGetCity extends Dialog implements View.OnClickListener{
+
+    public static final String TAG = "DialogGetCity";
 
     public static final String loadingText = "正在搜索";
     public static final String successText = "搜索成功";
 
-    Context mContext;
-    Handler mHandler;
-    TextView mLoading;
-    TextView mCity;
-    TextView mLati;
-    TextView mLongi;
-    Button mConfirm;
-    Button mBack;
-    Button mReLocalization;
-    ACache aCache;
-    boolean isSearchTaskRun;
-    boolean isSuccess;
-    boolean isRunnableRun;
-    String longiStr;
-    String latiStr;
+    private Context mContext;
+    private Handler mHandler;
+    private DataServiceUtil dataServiceUtil;
+
+    private TextView mLoading;
+    private TextView mCity;
+    private TextView mLati;
+    private TextView mLongi;
+    private Button mConfirm;
+    private Button mBack;
+    private Button mReLocalization;
+
+
+    private boolean isSearchTaskRun;
+    private boolean isSuccess;
+    private boolean isRunnableRun;
+    private String longiStr;
+    private String latiStr;
 
     Handler handler = new Handler(){
         @Override
@@ -112,11 +117,11 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
         mLati = (TextView)findViewById(R.id.localization_lati);
         mLongi = (TextView)findViewById(R.id.localization_longi);
         mCity = (TextView)findViewById(R.id.localization_city_name);
-        aCache = ACache.get(mContext);
-        longiStr = aCache.getAsString(Const.Cache_Longitude);
-        latiStr = aCache.getAsString(Const.Cache_Latitude);
-        if(ShortcutUtil.isStringOK(latiStr)) mLati.setText(latiStr);
-        if(ShortcutUtil.isStringOK(longiStr)) mLongi.setText(longiStr);
+        dataServiceUtil = DataServiceUtil.getInstance(mContext);
+        longiStr = String.valueOf(dataServiceUtil.getLongitude());
+        latiStr =  String.valueOf(dataServiceUtil.getLatitude());
+        mLati.setText(latiStr);
+        mLongi.setText(longiStr);
         background.run();
     }
 

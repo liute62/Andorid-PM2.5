@@ -64,6 +64,7 @@ public class DataServiceUtil {
     private DataServiceUtil(Context context){
         mContext = context;
         aCache = ACache.get(context);
+        initDefaultData();
         DBInitial();
     }
 
@@ -235,6 +236,7 @@ public class DataServiceUtil {
     public void cachePMResult(double density,int source){
         aCache.put(Const.Cache_PM_Density, density);
         aCache.put(Const.Cache_PM_Source, String.valueOf(source));
+        PM25Density = density;
     }
 
     /**
@@ -249,6 +251,10 @@ public class DataServiceUtil {
     public void cacheLocation(Location location){
         aCache.put(Const.Cache_Latitude, location.getLatitude());
         aCache.put(Const.Cache_Longitude, location.getLongitude());
+    }
+
+    public void cacheCityName(String city){
+        aCache.put(Const.Cache_City,city);
     }
 
     public void cacheLocation(double latitude,double longitude){
@@ -312,6 +318,14 @@ public class DataServiceUtil {
             return Double.valueOf(longi);
         }
         return 0.0;
+    }
+
+    public String getCityName(){
+        String city = aCache.getAsString(Const.Cache_City);
+        if(ShortcutUtil.isStringOK(city)){
+            return city;
+        }
+        return "null";
     }
 
     public double getPM25Density() {

@@ -18,8 +18,9 @@ import java.util.jar.Attributes;
  */
 public class DialogNotification extends Dialog {
 
-    Button mBack;
-    int resId;
+    private Button mBack;
+    private int resId;
+
     public DialogNotification(Context context) {
         super(context);
         resId = R.layout.widget_dialog_notification;

@@ -15,18 +15,18 @@ import com.example.pm.R;
  */
 public class InfoDialog extends Dialog {
 
-    Activity mActivity;
-    Button mSure;
-    Button mCancel;
-    TextView mContent;
-    String content;
-    View.OnClickListener cancelListener;
-    View.OnClickListener sureListener;
+    private Button mSure;
+    private Button mCancel;
+    private TextView mContent;
+
+    private String content;
+
+    private View.OnClickListener cancelListener;
+    private View.OnClickListener sureListener;
 
     public InfoDialog(Activity mActivity) {
         super(mActivity);
         setCancelable(false);
-        this.mActivity = mActivity;
     }
 
     @Override

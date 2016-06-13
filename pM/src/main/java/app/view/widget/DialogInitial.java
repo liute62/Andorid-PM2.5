@@ -5,13 +5,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
-import android.nfc.tech.TagTechnology;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -40,35 +41,35 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
 
     public static final String TAG = "DialogInitial";
 
-    Activity mActivity = null;
+    private Activity mActivity = null;
 
-    Context mContext;
+    private Context mContext;
 
-    DataServiceUtil dataServiceUtil;
+    private DataServiceUtil dataServiceUtil;
 
-    LocationServiceUtil locationServiceUtil;
+    private LocationServiceUtil locationServiceUtil;
 
-    boolean isSuccess;
+    private boolean isSuccess;
 
-    boolean isSearchDensity = false;
+    private boolean isSearchDensity = false;
 
-    boolean isSearchLocation = false;
+    private boolean isSearchLocation = false;
 
-    TextView mLati;
+    private TextView mLati;
 
-    TextView mLongi;
+    private TextView mLongi;
 
-    TextView mDensity;
+    private TextView mDensity;
 
-    TextView mLocalization;
+    private TextView mLocalization;
 
-    TextView mSearch;
+    private TextView mSearch;
 
-    Button mSuccess;
+    private Button mSuccess;
 
-    Button mCancel;
+    private Button mCancel;
 
-    Handler mHandler;
+    private Handler mHandler;
 
     public DialogInitial(Context context,Handler handler) {
         super(context);
@@ -115,6 +116,26 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.initial_search_density:
+                searchDensity();
+                break;
+            case R.id.initial_search_location:
+                searchLocation();
+                break;
+            case R.id.initial_success:
+                isSuccess = true;
+                mHandler.sendEmptyMessage(Const.Handler_Initial_Success);
+                DialogInitial.this.dismiss();
+                break;
+            case R.id.initial_back:
+                DialogInitial.this.dismiss();
+                break;
+        }
+    }
+
     private void searchDensity(){
 
         if(!isSearchDensity){
@@ -123,7 +144,7 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
             if(lati != 0.0 && longi != 0.0) {
                 isSearchDensity = true;
                 mSearch.setTextColor(Color.GRAY);
-                searchPMResult(String.valueOf(lati),String.valueOf(longi));
+                searchPMResult(String.valueOf(longi),String.valueOf(lati));
             }
         }
     }
@@ -136,6 +157,7 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
     }
 
     private void updateDensity(){
+
         if(dataServiceUtil.getPM25Density() != -1){
             mDensity.setText(String.valueOf(dataServiceUtil.getPM25Density()));
         }
@@ -154,17 +176,19 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
 
                 @Override
                 public void onSearchStop(Location location) {
-                    if(location != null)
+                    if (location != null)
                         dataServiceUtil.cacheLocation(location);
+                    else  Toast.makeText(mContext,Const.Info_Failed_Location,Toast.LENGTH_SHORT).show();
                     searchLocationFinished();
                 }
             });
+            locationServiceUtil.run(LocationServiceUtil.TYPE_BAIDU);
         }
     }
 
     private void searchLocationFinished(){
         isSearchLocation = false;
-        mSearch.setTextColor(Color.BLUE);
+        mLocalization.setTextColor(Color.BLUE);
         updateLocation();
         checkSuccessAvailable();
     }
@@ -176,17 +200,12 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
         }
     }
 
-    /**
-     * Get and Update Current PM info.
-     *
-     * @param longitude the current zone longitude
-     * @param latitude  the current zone latitude
-     */
     private void searchPMResult(String longitude, String latitude) {
 
         String url = HttpUtil.Search_PM_url;
         url = url + "?longitude=" + longitude + "&latitude=" + latitude;
         FileUtil.appendStrToFile(TAG,"searchPMResult " + url);
+        Log.e(TAG,url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -200,6 +219,7 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
                         dataServiceUtil.cachePMResult(PM25Density, PM25Source);
                         FileUtil.appendStrToFile(TAG,"3.search pm density success, density: " + PM25Density);
                     } else {
+                        Toast.makeText(mContext,Const.Info_Failed_PMDensity,Toast.LENGTH_SHORT).show();
                         FileUtil.appendErrorToFile(-1,"search pm density failed, status != 1");
                     }
                 } catch (JSONException e) {
@@ -211,6 +231,7 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
             @Override
             public void onErrorResponse(VolleyError error) {
                 searchDensityFinished();
+                Toast.makeText(mContext,Const.Info_Failed_PMDensity,Toast.LENGTH_SHORT).show();
                 FileUtil.appendErrorToFile(-1, "search pm density failed " + error.getMessage() + " " + error);
             }
 
@@ -232,25 +253,5 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
             mActivity.finish();
         }
         super.onStop();
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.initial_search_density:
-                searchDensity();
-                break;
-            case R.id.initial_search_location:
-                searchLocation();
-                break;
-            case R.id.initial_success:
-                isSuccess = true;
-                mHandler.sendEmptyMessage(Const.Handler_Initial_Success);
-                DialogInitial.this.dismiss();
-                break;
-            case R.id.initial_back:
-                DialogInitial.this.dismiss();
-                break;
-        }
     }
 }

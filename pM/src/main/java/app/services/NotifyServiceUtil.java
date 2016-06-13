@@ -19,9 +19,10 @@ public class NotifyServiceUtil {
         context.sendBroadcast(intentText);
     }
 
-    public static void notifyDensityChanged(String density){
+    public static void notifyDensityChanged(Context context,String density){
         Intent intent = new Intent(Const.Action_DB_MAIN_PMDensity);
         intent.putExtra(Const.Intent_PM_Density, density);
+        context.sendBroadcast(intent);
     }
 
     /**
@@ -41,5 +42,10 @@ public class NotifyServiceUtil {
         intentText.putExtra(Const.Intent_DB_PM_Longi, String.valueOf(longitude));
         intentText.putExtra(Const.Intent_DB_City_Ref, 1);
         context.sendBroadcast(intentText);
+    }
+
+    public static void notifyRefreshChart(Context context){
+        Intent intent = new Intent(Const.Action_Refresh_Chart_ToService);
+        context.sendBroadcast(intent);
     }
 }

@@ -342,6 +342,8 @@ public class Const {
 
     public static final String Info_Failed_PMDensity = "获取PM2.5浓度信息失败";
 
+    public static final String Info_Failed_Location = "获取地理位置信息失败";
+
     public static final String Info_Location_Saved = "地理位置信息保存成功";
 
     public static final String Info_Refresh_Chart_Success = "更新图表成功";

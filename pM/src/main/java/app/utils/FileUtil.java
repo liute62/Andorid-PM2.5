@@ -65,6 +65,36 @@ public class FileUtil {
         }
     }
 
+    public static void appendErrorToFile(String TAG, String errorMsg){
+        long time = System.currentTimeMillis();
+        String timeStr = ShortcutUtil.refFormatDateAndTime(time);
+        String path = error_file_name + ".txt";
+        File dir = new File(log_path);
+        String txt = timeStr+" Tag = "+TAG+" "+errorMsg;
+        PrintWriter printWriter = null;
+        if(!dir.exists())
+            dir.mkdirs();
+        File file = new File(path);
+        if(!file.exists())
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG,"file = "+path+" create failed");
+            }
+        try {
+            OutputStream outputStream = new FileOutputStream(file,true);
+            printWriter = new PrintWriter(outputStream);
+            printWriter.println(txt);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e(TAG,"file = "+path+" not found");
+        }finally {
+            if(printWriter != null)
+                printWriter.close();
+        }
+    }
+
     public static void appendStrToFile(int runTime,String content){
         long time = System.currentTimeMillis();
         String timeStr = ShortcutUtil.refFormatDateAndTime(time);
