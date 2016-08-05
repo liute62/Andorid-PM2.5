@@ -12,6 +12,12 @@ import app.utils.Const;
 public class NotifyServiceUtil {
 
 
+    /**
+     * Notify location has been changed to main fragment.
+     * @param context
+     * @param latitude
+     * @param longitude
+     */
     public static void notifyLocationChanged(Context context,double latitude,double longitude){
         Intent intentText = new Intent(Const.Action_DB_MAIN_Location);
         intentText.putExtra(Const.Intent_DB_PM_Lati, String.valueOf(latitude));

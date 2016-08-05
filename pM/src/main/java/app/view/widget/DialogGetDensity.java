@@ -24,7 +24,6 @@ import org.json.JSONObject;
 
 import app.model.PMModel;
 import app.services.DataServiceUtil;
-import app.services.NotifyServiceUtil;
 import app.utils.Const;
 import app.utils.HttpUtil;
 import app.utils.VolleyQueue;
@@ -102,8 +101,8 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
 
     private void init(){
         dataServiceUtil = DataServiceUtil.getInstance(mContext);
-        String longiStr = String.valueOf(dataServiceUtil.getLongitude());
-        String latiStr = String.valueOf(dataServiceUtil.getLatitude());
+        String longiStr = String.valueOf(dataServiceUtil.getLongitudeFromCache());
+        String latiStr = String.valueOf(dataServiceUtil.getLatitudeFromCache());
         String density = String.valueOf(dataServiceUtil.getPM25Density());
         mLati.setText(latiStr);
         mLongi.setText(longiStr);
@@ -153,6 +152,8 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
 
                         mDensity.setText(String.valueOf(PM25Density));
                         dataServiceUtil.cachePMResult(PM25Density, source);
+                        dataServiceUtil.cacheSearchPMFailed(0);
+
                         notifyService(PM25Density);
                         Toast.makeText(mContext.getApplicationContext(), Const.Info_PMDATA_Success, Toast.LENGTH_SHORT).show();
 
@@ -169,8 +170,11 @@ public class DialogGetDensity extends Dialog implements View.OnClickListener
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+
                 Log.e(TAG,"dialog get density searchPMRequest error "+error.toString());
                 Toast.makeText(mContext.getApplicationContext(),Const.Info_Failed_PMDensity,Toast.LENGTH_SHORT).show();
+                dataServiceUtil.cacheSearchPMFailed(dataServiceUtil.getSearchFailedCountFromCache()+1);
+
                 if(error != null){
                     if(error.getMessage() != null) {
                         Log.e(TAG, error.getMessage());

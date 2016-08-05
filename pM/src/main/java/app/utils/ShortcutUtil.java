@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import app.services.DataServiceUtil;
@@ -408,15 +407,23 @@ public class ShortcutUtil {
         try {
             weight = Integer.valueOf(weightStr);
         }catch (Exception e){
+            FileUtil.appendErrorToFile(TAG,"calStaticBreath parsing error1 "+
+            weightStr);
             return 0.0f;
         }
         float a = 7.8f;
         int num = 13;
         double result = weight * a * num / 1000;
         String resultStr = String.valueOf(result);
-        if(resultStr.length() > 5)
-            resultStr = resultStr.substring(0,4);
-        return Double.valueOf(resultStr);
+        try {
+            if(resultStr.length() > 5)
+                resultStr = resultStr.substring(0,4);
+            return Double.valueOf(resultStr);
+        }catch (Exception e){
+            FileUtil.appendErrorToFile(TAG,"calStaticBreath parsing error2 "+
+                    resultStr);
+        }
+        return 0.0;
     }
 
     public static String subStrLocation(String location){
@@ -466,8 +473,8 @@ public class ShortcutUtil {
 
     public static  boolean isInitialized(DataServiceUtil dataServiceUtil){
 
-        Double lati = dataServiceUtil.getLatitude();
-        Double longi = dataServiceUtil.getLongitude();
+        Double lati = dataServiceUtil.getLatitudeFromCache();
+        Double longi = dataServiceUtil.getLongitudeFromCache();
         if(lati == 0.0 || longi == 0.0) return false;
         double density = dataServiceUtil.getPM25Density();
         if(density == -1) return false;

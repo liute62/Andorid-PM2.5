@@ -102,8 +102,8 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
         mCancel.setOnClickListener(this);
 
         mDensity.setText(""+dataServiceUtil.getPM25Density());
-        mLongi.setText(""+dataServiceUtil.getLongitude());
-        mLati.setText(""+dataServiceUtil.getLatitude());
+        mLongi.setText(""+dataServiceUtil.getLongitudeFromCache());
+        mLati.setText(""+dataServiceUtil.getLatitudeFromCache());
 
         checkSuccessAvailable();
     }
@@ -139,8 +139,8 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
     private void searchDensity(){
 
         if(!isSearchDensity){
-            double lati = dataServiceUtil.getLatitude();
-            double longi = dataServiceUtil.getLongitude();
+            double lati = dataServiceUtil.getLatitudeFromCache();
+            double longi = dataServiceUtil.getLongitudeFromCache();
             if(lati != 0.0 && longi != 0.0) {
                 isSearchDensity = true;
                 mSearch.setTextColor(Color.GRAY);
@@ -194,9 +194,9 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
     }
 
     private void updateLocation(){
-        if(dataServiceUtil.getLatitude() != 0.0 && dataServiceUtil.getLongitude() != 0.0){
-            mLati.setText(String.valueOf(dataServiceUtil.getLatitude()));
-            mLongi.setText(String.valueOf(dataServiceUtil.getLongitude()));
+        if(dataServiceUtil.getLatitudeFromCache() != 0.0 && dataServiceUtil.getLongitudeFromCache() != 0.0){
+            mLati.setText(String.valueOf(dataServiceUtil.getLatitudeFromCache()));
+            mLongi.setText(String.valueOf(dataServiceUtil.getLongitudeFromCache()));
         }
     }
 
@@ -212,8 +212,10 @@ public class DialogInitial extends Dialog implements View.OnClickListener{
                 try {
                     int status = response.getInt("status");
                     if (status == 1) {
+
                         PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
-                        NotifyServiceUtil.notifyDensityChanged(pmModel.getPm25());
+                        NotifyServiceUtil.notifyDensityChanged(mContext,pmModel.getPm25());
+
                         double PM25Density = Double.valueOf(pmModel.getPm25());
                         int PM25Source = pmModel.getSource();
                         dataServiceUtil.cachePMResult(PM25Density, PM25Source);

@@ -20,6 +20,8 @@ public class Const {
 
     public static Long Min_Upload_Check_Time = Long.valueOf(60 * 60 * 1000);
 
+    public static Long Min_Search_City_Time = Long.valueOf(10 * 60 * 1000);
+
     public final static int Gender_Male = 1;
 
     public final static int Gender_Female = 2;
@@ -79,6 +81,11 @@ public class Const {
     public static final String Cache_Last_Max_Lati = "Cache_Last_Max_Lati";
     public static final String Cache_City = "Cache_City";
     public static final String Cache_Indoor_Outdoor = "Cache_Indoor_Outdoor";
+    public static final String Cache_Search_PM_Failed_Count = "Cache_Search_PM_Failed_Count";
+    public static final String Cache_Surpass_Reset = "Cache_Surpass_Reset";
+    public static final String Cache_Step_Num = "Cache_Step_Num";
+    public static final String Cache_Hearth_Rate = "Cache_Hearth_Rate";
+    public static final String Cache_Lasttime_Search_City = "Cache_Lasttime_Search_City";
 
     public static final String Cache_Chart_1 = "Cache_Chart_1";
     public static final String Cache_Chart_2 = "Cache_Chart_2";
@@ -227,7 +234,7 @@ public class Const {
      */
     public final static int DB_Run_Time_INTERVAL = 1000 * 5; //5s
 
-    public final static long Refresh_Chart_Interval = 1000 * 60 * 10; //10min
+    public final static long Refresh_Chart_Interval = 1000 * 60 * 1; //1min
 
     public static final String ERROR_NO_CITY_RESULT = "获取当前城市失败";
 

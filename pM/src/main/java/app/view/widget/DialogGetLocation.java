@@ -19,7 +19,6 @@ import com.example.pm.R;
 
 import app.services.DataServiceUtil;
 import app.services.LocationServiceUtil;
-import app.utils.ACache;
 import app.utils.Const;
 import app.utils.ShortcutUtil;
 
@@ -110,8 +109,8 @@ public class DialogGetLocation extends Dialog implements View.OnClickListener,
     }
 
     private void init(){
-        String lati = String.valueOf(dataServiceUtil.getLatitude());
-        String longi = String.valueOf(dataServiceUtil.getLongitude());
+        String lati = String.valueOf(dataServiceUtil.getLatitudeFromCache());
+        String longi = String.valueOf(dataServiceUtil.getLongitudeFromCache());
         mLati.setText(lati);
         mLongi.setText(longi);
         baiduChecked();

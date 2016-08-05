@@ -18,7 +18,6 @@ import com.example.pm.R;
 
 import app.services.DataServiceUtil;
 import app.services.LocationServiceUtil;
-import app.utils.ACache;
 import app.utils.StableCache;
 import app.utils.Const;
 import app.utils.ShortcutUtil;
@@ -84,10 +83,10 @@ public class DialogPersonalState extends Dialog implements View.OnClickListener{
         String weight = stableCache.getAsString(Const.Cache_User_Weight);
         String gps = stableCache.getAsString(Const.Cache_GPS_SATE_NUM);
 
-        mLatitude.setText(String.valueOf(dataServiceUtil.getLatitude()));
-        mLongitude.setText(String.valueOf(dataServiceUtil.getLongitude()));
+        mLatitude.setText(String.valueOf(dataServiceUtil.getLatitudeFromCache()));
+        mLongitude.setText(String.valueOf(dataServiceUtil.getLongitudeFromCache()));
         if(weight != null) mWeight.setText(weight);
-        setLocation(dataServiceUtil.getInOutDoor());
+        setLocation(dataServiceUtil.getInOutDoorFromCache());
         if(gps != null) mGPSNum.setText(gps);
     }
 

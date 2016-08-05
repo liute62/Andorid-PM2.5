@@ -53,6 +53,7 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
     private boolean isRunnableRun;
     private String longiStr;
     private String latiStr;
+    private int failedCount = 0;
 
     Handler handler = new Handler(){
         @Override
@@ -73,8 +74,9 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
         public void run() {
             if (isRunnableRun) {
                if (!isSearchTaskRun && !isSuccess) {
-                    if (ShortcutUtil.isStringOK(latiStr) && ShortcutUtil.isStringOK(longiStr))
+                    if (ShortcutUtil.isStringOK(latiStr) && ShortcutUtil.isStringOK(longiStr)) {
                         searchCityRequest(latiStr, longiStr);
+                    }
                 }
                 if (num == 0) {
                     mLoading.setText(loadingText);
@@ -87,7 +89,12 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
                     num = -1;
                 }
                 num++;
-                handler.postDelayed(this, 300);
+                if(failedCount > 10){
+                    //means failed too much
+                    mLoading.setText("");
+                }else {
+                    handler.postDelayed(this, 300);
+                }
             }
         }
     };
@@ -117,9 +124,12 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
         mLati = (TextView)findViewById(R.id.localization_lati);
         mLongi = (TextView)findViewById(R.id.localization_longi);
         mCity = (TextView)findViewById(R.id.localization_city_name);
+
         dataServiceUtil = DataServiceUtil.getInstance(mContext);
-        longiStr = String.valueOf(dataServiceUtil.getLongitude());
-        latiStr =  String.valueOf(dataServiceUtil.getLatitude());
+        longiStr = String.valueOf(dataServiceUtil.getLongitudeFromCache());
+        latiStr =  String.valueOf(dataServiceUtil.getLatitudeFromCache());
+
+        mCity.setText(dataServiceUtil.getCityNameFromCache());
         mLati.setText(latiStr);
         mLongi.setText(longiStr);
         background.run();
@@ -153,6 +163,7 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
                     String cityName = component.getString("city");
                     // Log.e("searchCityRequest city",cityName);
                     if (cityName != null && !cityName.trim().equals("")) {
+                        failedCount = 0;
                         Message msg = new Message();
                         msg.what = Const.Handler_City_Name;
                         msg.obj = cityName;
@@ -165,6 +176,7 @@ public class DialogGetCity extends Dialog implements View.OnClickListener{
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                failedCount ++;
                 isSearchTaskRun = false;
                 isSuccess = false;
             }

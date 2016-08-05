@@ -15,15 +15,32 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.pm.MainActivity;
 import com.example.pm.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import app.Entity.State;
+import app.model.PMModel;
 import app.utils.ACache;
 import app.utils.Const;
 import app.utils.DataCalculator;
 import app.utils.FileUtil;
+import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
+import app.utils.VolleyQueue;
 
 
 /**
@@ -37,36 +54,21 @@ public class ForegroundService extends Service {
     /**
      * for data operations
      */
-    private ACache aCache;
+    private ACache aCache; //for temporary chart data
     private DataServiceUtil dataServiceUtil = null;
-    /**
-     * for PM State
-     */
-    private double longitude;  //the newest longitude
-    private double latitude;  // the newest latitude
     /**
      * for cycling
      */
-    private int DBRunTime;
-    private final int State_TooMuch = 600;
+    private int DBRunTime = 0;
+    private final int State_TooMuch = 1000;
     private int DB_Chart_Loop = 12;
-    private boolean isPMSearchSuccess;
     private boolean isRefreshRunning;
     private String isBackground = null;
-    /**
-     * for indoor and outdoor judgement
-     **/
-    //private InOutdoorService inOutdoorService;
-
-    /**
-     * for motion detection
-     */
-    MotionServiceUtil motionServiceUtil;
 
     private volatile HandlerThread mHandlerThread;
     private Handler refreshHandler;
 
-    Handler DBHandler = new Handler() {
+    private Handler DBHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
@@ -84,6 +86,7 @@ public class ForegroundService extends Service {
         public void run() {
 
             int runTimeInterval = Const.DB_Run_Time_INTERVAL;
+
             /***** DB Run First time *****/
             if (DBRunTime == 0) {   //The initial state, set cache for chart
 
@@ -111,10 +114,12 @@ public class ForegroundService extends Service {
                 }
                 sendBroadcast(intentChart);
                 aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
-                // searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+                searchPMResult(String.valueOf(dataServiceUtil.getLongitudeFromCache()),
+                        String.valueOf(dataServiceUtil.getLatitudeFromCache()));
                 aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(System.currentTimeMillis()));
 
             }
+
             isBackground = aCache.getAsString(Const.Cache_Is_Background);
             if (isBackground == null) { //App first run
                 isBackground = "false";
@@ -124,9 +129,15 @@ public class ForegroundService extends Service {
             }
 
             if (isBackground.equals("false")) {
-                runTimeInterval = Const.DB_Run_Time_INTERVAL;
-                /** notify user whether using the old PM2.5 density **/
 
+                double latitude = dataServiceUtil.getLatitudeFromCache();
+                double longitude = dataServiceUtil.getLongitudeFromCache();
+                boolean isPMSearchSuccess =
+                        dataServiceUtil.getSearchFailedCountFromCache() > 2? false:true;
+
+                runTimeInterval = Const.DB_Run_Time_INTERVAL;
+
+                /** notify user whether using the old PM2.5 density **/
                 if ((longitude == 0.0 && latitude == 0.0) || !isPMSearchSuccess) {
                     Intent intent = new Intent(Const.Action_DB_Running_State);
                     intent.putExtra(Const.Intent_DB_Run_State, 1);
@@ -137,14 +148,27 @@ public class ForegroundService extends Service {
                     sendBroadcast(intent);
                 }
                 if (DBRunTime % 5 == 0) {
-                    NotifyServiceUtil.notifyLocationChanged(ForegroundService.this, latitude, longitude);
+                    NotifyServiceUtil.notifyLocationChanged(
+                            ForegroundService.this, latitude, longitude);
                 }
                 /***** DB Running Normally *****/
+                dataServiceUtil.refresh();
                 State state = dataServiceUtil.getCurrentState();
                 if(state == null) return;
                 if (DBRunTime == 0) { //Initialize the state when DB start
                     DBRunTime = 1;
-
+                }
+                /**check if there is some data for uploading after aimed interval**/
+                if(dataServiceUtil.isToUpload()) {
+                    checkPMDataForUpload();
+                    dataServiceUtil.cacheLastUploadTime(System.currentTimeMillis());
+                }
+                if(dataServiceUtil.isToSearchCity()){
+                    Intent intent = new Intent(Const.Action_DB_MAIN_Location);
+                    intent.putExtra(Const.Intent_DB_PM_Lati,dataServiceUtil.getLatitudeFromCache());
+                    intent.putExtra(Const.Intent_DB_PM_Longi,dataServiceUtil.getLongitudeFromCache());
+                    sendBroadcast(intent);
+                    dataServiceUtil.cacheLastSearchCityTime(System.currentTimeMillis());
                 }
                 if (state.getId() > State_TooMuch) DB_Chart_Loop = 10;
                 else DB_Chart_Loop = 5;
@@ -152,7 +176,7 @@ public class ForegroundService extends Service {
                 SQLiteDatabase db = dataServiceUtil.getDBHelper().getReadableDatabase();
                 switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
                     case 1:
-                        UpdateServiceUtil.run(getApplicationContext(), aCache, dataServiceUtil.getDBHelper());
+                        //UpdateServiceUtil.run(getApplicationContext(), aCache, dataServiceUtil.getDBHelper());
                         break;
                     case 2:
                         intentChart = new Intent(Const.Action_Chart_Result_1);
@@ -188,30 +212,18 @@ public class ForegroundService extends Service {
                         sendBroadcast(intentChart);
                         break;
                 }
-
-                //every 5 second to check and to update the text in Mainfragment, even though there is no newly data calculated.
-                int mul = 1;
-                if (state != null && state.getId() > State_TooMuch) {
-                    mul = 2;
-                }
-                //to much data here, we need to slow it down, every 1 min to check it
                 intentText = new Intent(Const.Action_DB_MAIN_PMResult);
-                if (DBRunTime % (1 * mul) == 0) { //15s 30s
-                    intentText.putExtra(Const.Intent_DB_PM_Hour, DataCalculator.getIntance(db).calLastHourPM());
-                }
-                if (DBRunTime % (2 * mul) == 0) {//30s 1min
-                    intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
-                }
-                if (DBRunTime % (3 * mul) == 0) {//1min 2min
-                    intentText.putExtra(Const.Intent_DB_PM_Week, DataCalculator.getIntance(db).calLastWeekAvgPM());
-                }
+                intentText.putExtra(Const.Intent_DB_PM_Hour, DataCalculator.getIntance(db).calLastHourPM());
+                intentText.putExtra(Const.Intent_DB_PM_Day, state.getPm25());
+                intentText.putExtra(Const.Intent_DB_PM_Week, DataCalculator.getIntance(db).calLastWeekAvgPM());
                 sendBroadcast(intentText);
-            } else {
-                //using a more soft way to notify user that DB is not running
-                Intent intent = new Intent(Const.Action_DB_Running_State);
-                intent.putExtra(Const.Intent_DB_Run_State, -1);
-                sendBroadcast(intent);
             }
+//            else {
+//                //using a more soft way to notify user that DB is not running
+//                Intent intent = new Intent(Const.Action_DB_Running_State);
+//                intent.putExtra(Const.Intent_DB_Run_State, -1);
+//                sendBroadcast(intent);
+//            }
 
             DBRunTime++;
             if (DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle
@@ -221,9 +233,11 @@ public class ForegroundService extends Service {
     };
 
     private void initialThread() {
+
         mHandlerThread = new HandlerThread("DBHandlerThread");
         mHandlerThread.start();
         refreshHandler = new Handler(mHandlerThread.getLooper()) {
+
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
@@ -269,7 +283,8 @@ public class ForegroundService extends Service {
                     intentChart.putExtras(mBundle);
                     sendBroadcast(intentChart);
                     isRefreshRunning = false;
-                    Toast.makeText(ForegroundService.this.getApplicationContext(), Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ForegroundService.this.getApplicationContext(),
+                            Const.Info_Refresh_Chart_Success, Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -287,29 +302,22 @@ public class ForegroundService extends Service {
 
         FileUtil.appendStrToFile(TAG + "OnCreate");
         initialThread();
-        longitude = 0.0;
-        latitude = 0.0;
-        DBRunTime = 0;
-        //isPMSearchSuccess = false;
-        isRefreshRunning = false;
         dataServiceUtil = DataServiceUtil.getInstance(this);
+        DBRunTime = 0;
+        isRefreshRunning = false;
         aCache = ACache.get(getApplicationContext());
         registerAReceiver();
-        /**
-         * init motion detection
-         */
-        //motionService = MotionService.getInstance(this);
-        //motionService.start();
-
         serviceStateInitial();
-        DBHandler.sendEmptyMessageDelayed(0, 10000);//10s
+        DBHandler.sendEmptyMessageDelayed(0, 1000);//1s
         BackgroundService.runBackgroundService(this);
+
+        MotionServiceUtil motionServiceUtil = MotionServiceUtil.getInstance(this);
+        motionServiceUtil.start();
     }
 
     @Override
     public void onDestroy() {
         FileUtil.appendStrToFile(TAG + " onDestory");
-        motionServiceUtil.stop();
         mHandlerThread.quit();
         super.onDestroy();
         DBRunnable = null;
@@ -345,31 +353,39 @@ public class ForegroundService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             if (intent.getAction().equals(Const.Action_Bluetooth_Hearth)) {
+
                 String hearthStr = intent.getStringExtra(Const.Intent_Bluetooth_HearthRate);
+
                 if (ShortcutUtil.isStringOK(hearthStr)) {
-                    FileUtil.appendStrToFile(DBRunTime, "using hearth rate from bluetooth " + hearthStr);
+
+                    // TODO: 16/8/5 change treating as cache to a more proper one
+                    int rate;
+                    FileUtil.appendStrToFile(TAG,"using hearth rate from bluetooth " + hearthStr);
                     try {
-                        int rate = Integer.valueOf(hearthStr);
-                        //avg_rate = String.valueOf(rate);
+                        rate = Integer.valueOf(hearthStr);
+                        dataServiceUtil.cacheHearthRate(rate);
                     } catch (Exception e) {
-                        //avg_rate = "12";
+                        FileUtil.appendStrToFile(TAG,"onReceive parsing hearth rate error "+
+                        hearthStr);
                     }
                 }
             } else if (intent.getAction().equals(Const.Action_Search_Density_ToService)) {
+
                 Intent intentTmp = new Intent(Const.Action_DB_Running_State);
                 intent.putExtra(Const.Intent_DB_Run_State, 0);
                 sendBroadcast(intentTmp);
-                isPMSearchSuccess = true;
-                double PM25Density = intent.getDoubleExtra(Const.Intent_PM_Density, 0.0);
-                if (PM25Density != 0.0)
-                    aCache.put(Const.Cache_PM_Density, PM25Density);
+
             } else if (intent.getAction().equals(Const.Action_Get_Location_ToService)) {
+
                 double lati = intent.getDoubleExtra(Const.Intent_DB_PM_Lati, 0.0);
                 double longi = intent.getDoubleExtra(Const.Intent_DB_PM_Longi, 0.0);
                 if (lati != 0.0 && longi != 0.0) {
-                    latitude = lati;
-                    longitude = longi;
+                    dataServiceUtil.cacheLocation(lati,longi);
+                }else {
+                    FileUtil.appendErrorToFile(TAG,"onReceive passing location, latitude == "+
+                    lati+" longitude == "+longi);
                 }
             } else if (intent.getAction().equals(Const.Action_Refresh_Chart_ToService)) {
                 //when open the phone, check if it need to refresh.
@@ -381,13 +397,144 @@ public class ForegroundService extends Service {
         }
     }
 
+
+    /**
+     * Check DB if there are some data for uploading
+     * if there is, upload  < 1000 state items at once
+     */
+    public void checkPMDataForUpload() {
+
+        int idStr = dataServiceUtil.getUserIdFromCache();
+
+        if (idStr != 0) {
+            final List<State> states = dataServiceUtil.getPMDataForUpload();
+
+            String url = HttpUtil.UploadBatch_url;
+            JSONArray array = new JSONArray();
+            final int size = states.size() < 1000 ? states.size() : 1000;
+            for (int i = 0; i < size; i++) {
+                JSONObject tmp = State.toJsonobject(states.get(i), String.valueOf(idStr));
+                array.put(tmp);
+            }
+            JSONObject batchData = null;
+            try {
+                batchData = new JSONObject();
+                batchData.put("data", array);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                FileUtil.appendErrorToFile(TAG,"checkPMDataForUpload JSON Error at batchData");
+            }
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                    Request.Method.POST, url, batchData, new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        String value = response.getString("succeed_count");
+                        FileUtil.appendStrToFile(TAG,"checkPMDataForUpload" +
+                                " upload success value = " + value);
+                        if (Integer.valueOf(value) == size) {
+                            for (int i = 0; i < size; i++) {
+                                dataServiceUtil.updateStateUpLoad(states.get(i), 1);
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        FileUtil.appendErrorToFile(TAG,
+                                "checkPMDataForUpload JSON Error at onResponse");
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if (error.getMessage() != null)
+                        FileUtil.appendErrorToFile(TAG,"checkPMDataForUpload error msg" +
+                                error.getMessage());
+                    if (error.networkResponse != null)
+                        FileUtil.appendErrorToFile(TAG,"checkPMDataForUpload error statusCode "
+                                + error.networkResponse.statusCode);
+                    FileUtil.appendErrorToFile(TAG,"1.checkPMDataForUpload error all "+
+                            error.toString());
+                }
+            }) {
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    headers.put("Content-Type", "application/json; charset=utf-8");
+                    return headers;
+                }
+            };
+            jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    Const.Default_Timeout_Long,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            VolleyQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+        }
+    }
+
+    /**
+     * Get and Update Current PM info.
+     * @param longitude the current zone longitude
+     * @param latitude  the current zone latitude
+     */
+    private void searchPMResult(String longitude, String latitude) {
+
+        String url = HttpUtil.Search_PM_url;
+        url = url + "?longitude=" + longitude + "&latitude=" + latitude;
+        FileUtil.appendStrToFile(TAG,"searchPMResult " + url);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    int status = response.getInt("status");
+
+                    if (status == 1) {
+                        PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
+                        NotifyServiceUtil.notifyDensityChanged(ForegroundService.this, pmModel.getPm25());
+                        double PM25Density = Double.valueOf(pmModel.getPm25());
+                        int PM25Source = pmModel.getSource();
+                        dataServiceUtil.cachePMResult(PM25Density, PM25Source);
+                        dataServiceUtil.cacheSearchPMFailed(0);
+                        FileUtil.appendStrToFile(TAG, "searchPMResult success, density == " +
+                                PM25Density);
+                    } else {
+                        dataServiceUtil.cacheSearchPMFailed(
+                                dataServiceUtil.getSearchFailedCountFromCache()+1);
+                        FileUtil.appendErrorToFile(TAG, "searchPMResult failed, status != 1");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    FileUtil.appendErrorToFile(TAG, "searchPMResult failed, JSON parsing error");
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                dataServiceUtil.cacheSearchPMFailed(dataServiceUtil.getSearchFailedCountFromCache()+1);
+                FileUtil.appendErrorToFile(TAG, "searchPMResult failed error msg == " +
+                        error.getMessage() + " " + error);
+            }
+
+        });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                Const.Default_Timeout,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        VolleyQueue.getInstance(
+               ForegroundService.this.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    /*
+    * after the user press the fresh button.
+     */
     private void refreshAll() {
         refreshHandler.sendEmptyMessage(Const.Handler_Refresh_Text);
-        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 2000);
-        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 3000);
-        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 4000);
-        NotifyServiceUtil.notifyCityChanged(this, dataServiceUtil.getLatitude(), dataServiceUtil.getLongitude());
-        //if (!isPMSearchSuccess)
-        //searchPMRequest(String.valueOf(longitude), String.valueOf(latitude));
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart1, 300);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart2, 600);
+        refreshHandler.sendEmptyMessageDelayed(Const.Handler_Refresh_Chart3, 1200);
+        NotifyServiceUtil.notifyCityChanged(this, dataServiceUtil.getLatitudeFromCache(),
+                dataServiceUtil.getLongitudeFromCache());
     }
 }

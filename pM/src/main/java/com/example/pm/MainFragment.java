@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NavUtils;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,20 +40,19 @@ import app.services.DataServiceUtil;
 import app.services.ForegroundService;
 import app.services.NotifyServiceUtil;
 import app.utils.ACache;
-import app.utils.StableCache;
 import app.utils.ChartsConst;
 import app.utils.Const;
 import app.utils.DataGenerator;
 import app.utils.FileUtil;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
+import app.utils.StableCache;
 import app.utils.VolleyQueue;
 import app.view.widget.DialogConfirm;
 import app.view.widget.DialogGetCity;
 import app.view.widget.DialogGetDensity;
 import app.view.widget.DialogGetLocation;
 import app.view.widget.DialogInitial;
-import app.view.widget.LoadingDialog;
 import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.Viewport;
@@ -80,50 +80,75 @@ public class MainFragment extends Fragment implements OnClickListener {
     private Activity mActivity;
     private DBServiceReceiver dbReceiver;
 
+    /**
+     * The top bar buttons of main page
+     **/
     private ImageView mProfile;
     private ImageView mHotMap;
     private ImageView mRefreshChart;
+
+    /**
+     * The upper field of main page
+     **/
     private TextView mTime;
     private TextView mAirQuality;
     private TextView mCity;
     private TextView mHint;
+
+    /**
+     * The middle field of main page
+     **/
     private TextView mHourPM;
     private TextView mDayPM;
     private TextView mWeekPM;
+
+    /**
+     * The chart related operations
+     **/
     private TextView mChangeChart1;
     private TextView mChangeChart2;
     private TextView mChart1Title;
     private TextView mChart2Title;
-    private ImageView mChart2Hint;
+
+    /**
+     * The hint for warning and error
+     **/
     private ImageView mDensityError;
     private ImageView mRunError;
     private ImageView mChart1Alert;
     private ImageView mChart2Alert;
-    private ImageView mAddCity;
     private TextView mViewMore2;
 
+    /**
+     * Used for showing current pm result
+     **/
     private Double PMDensity;
     private Double PMBreatheHour;
     private Double PMBreatheDay;
     private Double PMBreatheWeekAvg;
 
+    /**
+     * Used for showing current time
+     **/
     private int currentHour;
     private int currentMin;
     private ClockTask clockTask;
     private boolean isClockTaskRun = false;
 
+    /**
+     * Used for showing current location and city
+     **/
     private String currentLatitude;
     private String currentLongitude;
     private String currentCity;
+    private ImageView mAddCity;
 
-    LoadingDialog loadingDialog;
-    PMModel pmModel;
-    ACache aCache;
-    StableCache stableCache;
+    private ACache aCache;
+    private StableCache stableCache;
     private IntentFilter intentFilter;
 
     /**
-     * Charts*
+     * Charts related params
      */
     private int current_chart1_index;
     private int current_chart2_index;
@@ -132,7 +157,7 @@ public class MainFragment extends Fragment implements OnClickListener {
     private ColumnChartView mChart2column;
     private LineChartView mChart2line;
     /**
-     * Charts data
+     * Charts related data structures
      **/
     private HashMap<Integer, Float> chartData1; //data for chart 1
     private HashMap<Integer, Float> chartData2; //data for chart 2
@@ -148,7 +173,10 @@ public class MainFragment extends Fragment implements OnClickListener {
     private HashMap<Integer, Float> chartData12; //data for chart 12
     private List<String> chart12Date;           //date(mm.dd) for chart 12
 
-    Handler mClockHandler = new Handler() {
+    /**
+     * To process clock refreshing
+     **/
+    private Handler mClockHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -163,15 +191,15 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
     };
 
-    Handler mDataHandler = new Handler() {
+    private Handler mDataHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+
+            switch (msg.what) {
                 case Const.Handler_PM_Density:
                     PMModel data1 = (PMModel) msg.obj;
                     PMDensity = Double.valueOf(data1.getPm25());
-                    //dataInitial();
                     text1Initial();
                     break;
                 case Const.Handler_PM_Data:
@@ -191,13 +219,13 @@ public class MainFragment extends Fragment implements OnClickListener {
                     text2Initial();
                     break;
                 case Const.Handler_City_Name:
-                    String name = (String)msg.obj;
+                    String name = (String) msg.obj;
                     currentCity = name;
                     mCity.setText(currentCity);
                     DataServiceUtil.getInstance(mActivity).cacheCityName(name);
                     break;
                 case Const.Handler_Add_City:
-                    String name2 = (String)msg.obj;
+                    String name2 = (String) msg.obj;
                     DataServiceUtil.getInstance(mActivity).cacheCityName(name2);
                     currentCity = name2;
                     mCity.setText(currentCity);
@@ -205,6 +233,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 case Const.Handler_Refresh_All:
                     break;
                 case Const.Handler_Initial_Success:
+                    String lati = String.valueOf(
+                            DataServiceUtil.getInstance(mActivity).getLatitudeFromCache());
+                    String longi = String.valueOf(
+                            DataServiceUtil.getInstance(mActivity).getLongitudeFromCache());
+                    searchCityRequest(lati,longi);
                     foregroundInitial();
                     break;
             }
@@ -214,7 +247,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 
     @Override
     public void onPause() {
-        Log.d(TAG,"onPause");
         mActivity.unregisterReceiver(dbReceiver);
         aCache.put(Const.Cache_Is_Background, "true");
         aCache.put(Const.Cache_Pause_Time, String.valueOf(System.currentTimeMillis()));
@@ -225,22 +257,19 @@ public class MainFragment extends Fragment implements OnClickListener {
     public void onResume() {
         if (mActivity != null) {
             dbReceiver = new DBServiceReceiver();
-            intentFilter = new IntentFilter();
-            intentFilter.addAction(Const.Action_DB_Running_State);
-            intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
-            intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
-            intentFilter.addAction(Const.Action_Chart_Cache);
-            intentFilter.addAction(Const.Action_Chart_Result_1);
-            intentFilter.addAction(Const.Action_Chart_Result_2);
-            intentFilter.addAction(Const.Action_Chart_Result_3);
-            intentFilter.addAction(Const.Action_DB_MAIN_Location);
+            intentFilter = getDefaultAction();
             aCache.put(Const.Cache_Is_Background, "false");
             String tmpTime = aCache.getAsString(Const.Cache_Pause_Time);
-            //Todo if longer than 30 min
             long curTime = System.currentTimeMillis();
-            if(tmpTime != null && Long.valueOf(tmpTime) - curTime > 1){
-                Log.d(TAG,"CurrentTime "+ShortcutUtil.refFormatNowDate(curTime));
-                Const.CURRENT_NEED_REFRESH = true;
+            long lasttime;
+            try {
+                lasttime = Long.valueOf(tmpTime);
+                if (curTime - lasttime > 10000) {
+                    Const.CURRENT_NEED_REFRESH = true;
+                }
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG,"onResume parsing pause time error "+
+                tmpTime);
             }
             mActivity.registerReceiver(dbReceiver, intentFilter);
         }
@@ -251,14 +280,13 @@ public class MainFragment extends Fragment implements OnClickListener {
         mClockHandler.sendEmptyMessage(1);
         checkForRefresh();
         super.onResume();
-        Log.d(TAG, "onResume");
     }
 
     @Override
     public void onDestroy() {
+        //check if there is temporary screenshots left and remove it
         ShortcutUtil.removeNormalScreenShots();
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
     }
 
     @Override
@@ -293,14 +321,11 @@ public class MainFragment extends Fragment implements OnClickListener {
         chartData10 = new HashMap<>();
         chartData12 = new HashMap<>();
 
-        pmModel = new PMModel();
-        loadingDialog = new LoadingDialog(getActivity());
         aCache = ACache.get(mActivity.getApplicationContext());
         stableCache = StableCache.getInstance(mActivity);
-        ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
 
-        if(!ShortcutUtil.isInitialized(DataServiceUtil.getInstance(mActivity))){
-            DialogInitial dialogInitial = new DialogInitial(mActivity,mDataHandler);
+        if (!ShortcutUtil.isInitialized(DataServiceUtil.getInstance(mActivity))) {
+            DialogInitial dialogInitial = new DialogInitial(mActivity, mDataHandler);
             dialogInitial.setActivity(mActivity);
             dialogInitial.show();
             return;
@@ -308,25 +333,30 @@ public class MainFragment extends Fragment implements OnClickListener {
         foregroundInitial();
     }
 
-    private void foregroundInitial(){
+    private void foregroundInitial() {
+
         if (!ShortcutUtil.isServiceWork(mActivity, Const.Name_DB_Service)) {
             dbReceiver = new DBServiceReceiver();
-            intentFilter = new IntentFilter();
-            intentFilter.addAction(Const.Action_DB_Running_State);
-            intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
-            intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
-            intentFilter.addAction(Const.Action_Chart_Cache);
-            intentFilter.addAction(Const.Action_Chart_Result_1);
-            intentFilter.addAction(Const.Action_Chart_Result_2);
-            intentFilter.addAction(Const.Action_Chart_Result_3);
-            intentFilter.addAction(Const.Action_DB_MAIN_Location);
-            if(mActivity != null) {
+            intentFilter = getDefaultAction();
+            if (mActivity != null) {
                 mActivity.registerReceiver(dbReceiver, intentFilter);
-                intentFilter = new IntentFilter();
                 Intent mIntent = new Intent(mActivity, ForegroundService.class);
                 mActivity.startService(mIntent);
             }
         }
+    }
+
+    private IntentFilter getDefaultAction() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Const.Action_DB_Running_State);
+        intentFilter.addAction(Const.Action_DB_MAIN_PMDensity);
+        intentFilter.addAction(Const.Action_DB_MAIN_PMResult);
+        intentFilter.addAction(Const.Action_Chart_Cache);
+        intentFilter.addAction(Const.Action_Chart_Result_1);
+        intentFilter.addAction(Const.Action_Chart_Result_2);
+        intentFilter.addAction(Const.Action_Chart_Result_3);
+        intentFilter.addAction(Const.Action_DB_MAIN_Location);
+        return intentFilter;
     }
 
     @Override
@@ -336,7 +366,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 
         mProfile = (ImageView) view.findViewById(R.id.main_profile);
         mHotMap = (ImageView) view.findViewById(R.id.main_hot_map);
-        mRefreshChart = (ImageView)view.findViewById(R.id.main_refresh_chart);
+        mRefreshChart = (ImageView) view.findViewById(R.id.main_refresh_chart);
         mTime = (TextView) view.findViewById(R.id.main_current_time);
         mAirQuality = (TextView) view.findViewById(R.id.main_air_quality);
         mCity = (TextView) view.findViewById(R.id.main_current_city);
@@ -344,9 +374,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         mHourPM = (TextView) view.findViewById(R.id.main_hour_pm);
         mDayPM = (TextView) view.findViewById(R.id.main_day_pm);
         mWeekPM = (TextView) view.findViewById(R.id.main_week_pm);
-        mDensityError = (ImageView)view.findViewById(R.id.main_density_error);
-        mRunError = (ImageView)view.findViewById(R.id.main_run_error);
-        mChart2Hint = (ImageView)view.findViewById(R.id.main_chart_hint_2);
+        mDensityError = (ImageView) view.findViewById(R.id.main_density_error);
+        mRunError = (ImageView) view.findViewById(R.id.main_run_error);
         mChart1column = (ColumnChartView) view.findViewById(R.id.main_chart_1_column);
         mChart1line = (LineChartView) view.findViewById(R.id.main_chart_1_line);
         mChart2column = (ColumnChartView) view.findViewById(R.id.main_chart_2_column);
@@ -357,8 +386,8 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChart2Title = (TextView) view.findViewById(R.id.main_chart2_title);
         mChart1Alert = (ImageView) view.findViewById(R.id.main_chart_1_alert);
         mChart2Alert = (ImageView) view.findViewById(R.id.main_chart_2_alert);
-        mAddCity = (ImageView)view.findViewById(R.id.main_add_city);
-        mViewMore2 = (TextView)view.findViewById(R.id.main_view_more_2);
+        mAddCity = (ImageView) view.findViewById(R.id.main_add_city);
+        mViewMore2 = (TextView) view.findViewById(R.id.main_view_more_2);
 
         setFonts(view);
         setTextSizeByWidth();
@@ -370,28 +399,34 @@ public class MainFragment extends Fragment implements OnClickListener {
         return view;
     }
 
-    private void checkForRefresh(){
+    /**
+     * Check if there is a need for refreshing chart data
+     * and currently interval is equal to 1 min
+     **/
+    private void checkForRefresh() {
 
         String refresh = aCache.getAsString(Const.Cache_DB_Lastime_Refresh);
-        if(!ShortcutUtil.isStringOK(refresh)){
-            aCache.put(Const.Cache_DB_Lastime_Refresh,String.valueOf(System.currentTimeMillis()));
-        }else {
+        if (!ShortcutUtil.isStringOK(refresh)) {
+            aCache.put(Const.Cache_DB_Lastime_Refresh, String.valueOf(System.currentTimeMillis()));
+        } else {
             long refTime = 0;
             long curTime = 0;
             try {
                 refTime = Long.valueOf(refresh);
                 curTime = System.currentTimeMillis();
-            }catch (Exception e){
-                FileUtil.appendErrorToFile(0,"checkForRefresh error "+refresh);
+            } catch (Exception e) {
+                FileUtil.appendErrorToFile(TAG,"checkForRefresh parsing error " + refresh);
             }
-            Log.e(TAG,"checkForRefresh ref: "+ShortcutUtil.refFormatDateAndTime(refTime)+" cur: "+ShortcutUtil.refFormatDateAndTime(curTime));
-            if(curTime - refTime > Const.Refresh_Chart_Interval){
+            if (curTime - refTime > Const.Refresh_Chart_Interval) {
                 NotifyServiceUtil.notifyRefreshChart(mActivity);
             }
-            aCache.put(Const.Cache_DB_Lastime_Refresh,String.valueOf(curTime));
+            aCache.put(Const.Cache_DB_Lastime_Refresh, String.valueOf(curTime));
         }
     }
 
+    /**
+     * Set buttons click listener
+     **/
     private void setListener() {
         mProfile.setOnClickListener(this);
         mHotMap.setOnClickListener(this);
@@ -404,6 +439,9 @@ public class MainFragment extends Fragment implements OnClickListener {
         mAirQuality.setOnClickListener(this);
     }
 
+    /**
+     * Set the main page textview fonts to kaiti
+     **/
     private void setFonts(View view) {
         Typeface typeFace = Typeface.createFromAsset(mActivity.getAssets(), "kaiti.TTF");
         TextView textView1 = (TextView) view.findViewById(R.id.textView1);
@@ -415,6 +453,10 @@ public class MainFragment extends Fragment implements OnClickListener {
         mChangeChart2.setTypeface(typeFace);
     }
 
+    /*
+    * todo change the achae to dataserviceutil, the code is work
+    * but not meet the format
+     */
     private void cacheInitial() {
 
         String access_token = aCache.getAsString(Const.Cache_Access_Token);
@@ -426,13 +468,13 @@ public class MainFragment extends Fragment implements OnClickListener {
         String pm_day = aCache.getAsString(Const.Cache_PM_LastDay);
         String pm_week = aCache.getAsString(Const.Cache_PM_LastWeek);
 
-        double longitude = DataServiceUtil.getInstance(mActivity).getLongitude();
-        double latitude = DataServiceUtil.getInstance(mActivity).getLatitude();
+        double longitude = DataServiceUtil.getInstance(mActivity).getLongitudeFromCache();
+        double latitude = DataServiceUtil.getInstance(mActivity).getLatitudeFromCache();
         currentLatitude = String.valueOf(latitude);
         currentLongitude = String.valueOf(longitude);
-        searchCityRequest(currentLatitude,currentLongitude);
+        searchCityRequest(currentLatitude, currentLongitude);
 
-        currentCity = DataServiceUtil.getInstance(mActivity).getCityName();
+        currentCity = DataServiceUtil.getInstance(mActivity).getCityNameFromCache();
 
         if (ShortcutUtil.isStringOK(access_token))
             Const.CURRENT_ACCESS_TOKEN = access_token;
@@ -479,10 +521,12 @@ public class MainFragment extends Fragment implements OnClickListener {
             chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
         }
         Object chart8obj = aCache.getAsObject(Const.Cache_Chart_8_Time);
-        if(chart8obj != null)
+        if (chart8obj != null)
             chart8Time = (ArrayList) chart8obj;
     }
 
+
+    /****/
     private void showingData() {
         Time t = new Time();
         t.setToNow();
@@ -496,23 +540,32 @@ public class MainFragment extends Fragment implements OnClickListener {
         mCity.setText(currentCity);
         text1Initial();
         text2Initial();
-     }
+    }
 
-    private void text1Initial(){
+    /**
+     * Showing the upper field data
+     **/
+    private void text1Initial() {
         mAirQuality.setText(DataGenerator.setAirQualityText(PMDensity));
         mAirQuality.setTextColor(DataGenerator.setAirQualityColor(PMDensity));
         mHint.setText(DataGenerator.setHeathHintText(PMDensity));
         mHint.setTextColor(DataGenerator.setHeathHintColor(PMDensity));
     }
 
-    private void text2Initial(){
+    /**
+     * Showing the middle field data
+     **/
+    private void text2Initial() {
         String ugStr = mActivity.getResources().getString(R.string.str_ug);
-        mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) +" "+ugStr);
-        mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " "+ugStr);
-        mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1))+" "+ugStr);
+        mHourPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheHour, 2)) + " " + ugStr);
+        mDayPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheDay, 1)) + " " + ugStr);
+        mWeekPM.setText(String.valueOf(ShortcutUtil.ugScale(PMBreatheWeekAvg, 1)) + " " + ugStr);
 
     }
 
+    /**
+     * Start the clock running process
+     **/
     private void clockTaskStart() {
 
         if (isClockTaskRun == false) {
@@ -530,11 +583,11 @@ public class MainFragment extends Fragment implements OnClickListener {
                 getDensity.show();
                 break;
             case R.id.main_current_city:
-                DialogGetCity dialog2 = new DialogGetCity(mActivity,mDataHandler);
+                DialogGetCity dialog2 = new DialogGetCity(mActivity, mDataHandler);
                 dialog2.show();
                 break;
             case R.id.main_add_city:
-                DialogGetCity dialog = new DialogGetCity(mActivity,mDataHandler);
+                DialogGetCity dialog = new DialogGetCity(mActivity, mDataHandler);
                 dialog.show();
                 break;
             case R.id.main_profile:
@@ -553,13 +606,13 @@ public class MainFragment extends Fragment implements OnClickListener {
             case R.id.main_chart_1_change:
                 if (current_chart1_index == 7)
                     current_chart1_index = 1;
-                 else
+                else
                     current_chart1_index += 2;
                 boolean result1 = Const.Chart_Alert_Show[current_chart1_index];
-                if(result1 == true){
+                if (result1 == true) {
                     mChart1Alert.setVisibility(View.VISIBLE);
                     mChart1Alert.setOnClickListener(this);
-                }else mChart1Alert.setVisibility(View.GONE);
+                } else mChart1Alert.setVisibility(View.GONE);
                 mChart1Title.setText(ChartsConst.Chart_title[current_chart1_index]);
                 chartInitial(current_chart1_index, current_chart2_index);
                 break;
@@ -568,46 +621,47 @@ public class MainFragment extends Fragment implements OnClickListener {
                     current_chart2_index = 2;
                 else
                     current_chart2_index += 2;
-                if(current_chart2_index == 8) mViewMore2.setVisibility(View.VISIBLE);
+                if (current_chart2_index == 8) mViewMore2.setVisibility(View.VISIBLE);
                 else mViewMore2.setVisibility(View.GONE);
                 boolean result2 = Const.Chart_Alert_Show[current_chart2_index];
-                if(result2 == true){
+                if (result2 == true) {
                     mChart2Alert.setVisibility(View.VISIBLE);
                     mChart2Alert.setOnClickListener(this);
-                }else mChart2Alert.setVisibility(View.GONE);
+                } else mChart2Alert.setVisibility(View.GONE);
                 mChart2Title.setText(ChartsConst.Chart_title[current_chart2_index]);
                 chartInitial(current_chart1_index, current_chart2_index);
                 break;
             case R.id.main_chart_hint_2:
-                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Chart_Data_Lost,Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.getApplicationContext(), Const.Info_Chart_Data_Lost, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_density_error:
-                Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Location,Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.getApplicationContext(), Const.Info_DB_Not_Location, Toast.LENGTH_SHORT).show();
                 DialogGetDensity dialogGetDensity = new DialogGetDensity(mActivity);
                 dialogGetDensity.show();
                 break;
             case R.id.main_run_error:
-                Toast.makeText(mActivity.getApplicationContext(),Const.Info_DB_Not_Running,Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.getApplicationContext(), Const.Info_DB_Not_Running, Toast.LENGTH_SHORT).show();
                 DialogGetLocation getLocation = new DialogGetLocation(mActivity);
                 getLocation.show();
                 break;
             case R.id.main_chart_1_alert:
-                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.getApplicationContext(), Const.Info_Data_Lost, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_chart_2_alert:
-                Toast.makeText(mActivity.getApplicationContext(),Const.Info_Data_Lost,Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity.getApplicationContext(), Const.Info_Data_Lost, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_view_more_2:
                 String start = mActivity.getResources().getString(R.string.str_no_data);
                 String end = mActivity.getResources().getString(R.string.str_no_data);
-                if(chart8Time.size() >= 2){
-                    start  = chart8Time.get(0);
+                if (chart8Time.size() >= 2) {
+                    start = chart8Time.get(0);
                     end = chart8Time.get(chart8Time.size() - 1);
                 }
                 String lastTwoHour = mActivity.getResources().getString(R.string.str_last_two_hour);
                 String from = mActivity.getResources().getString(R.string.str_from);
                 String to = mActivity.getResources().getString(R.string.str_to);
-                DialogConfirm confirm = new DialogConfirm(mActivity,lastTwoHour,from+": "+start+to+": "+end);
+                DialogConfirm confirm = new DialogConfirm(
+                        mActivity, lastTwoHour, from + ": " + start + to + ": " + end);
                 confirm.show();
                 confirm.setAllDismissListener();
                 break;
@@ -650,7 +704,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 
 
     /**
-     *
      * Get and Update Current City Name.
      *
      * @param lati  latitude the latitude passed for searching
@@ -660,7 +713,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 
         String url = HttpUtil.SearchCity_url;
         url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;
-        Log.e(TAG,"searchCityRequest "+url);
+        Log.e(TAG, "searchCityRequest " + url);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
@@ -670,7 +723,7 @@ public class MainFragment extends Fragment implements OnClickListener {
                     JSONObject component = result.getJSONObject("addressComponent");
                     String cityName = component.getString("city");
 
-                    FileUtil.appendStrToFile(TAG,"Search city success and city == "+cityName);
+                    //FileUtil.appendStrToFile(TAG, "Search city success and city == " + cityName);
 
                     if (cityName != null && !cityName.trim().equals("")) {
                         Message msg = new Message();
@@ -688,10 +741,16 @@ public class MainFragment extends Fragment implements OnClickListener {
             public void onErrorResponse(VolleyError error) {
 
                 String bg = aCache.getAsString(Const.Cache_Is_Background);
-                FileUtil.appendErrorToFile(0,Const.ERROR_NO_CITY_RESULT);
+                if(error.networkResponse != null)
+                  FileUtil.appendErrorToFile(TAG,"searchCityRequest failed statusCode "+
+                          error.networkResponse.statusCode);
+                if(error.getMessage() != null)
+                    FileUtil.appendErrorToFile(TAG,"searchCityRequest failed message "+
+                            error.getMessage());
 
-                if(ShortcutUtil.isStringOK(bg) && bg.equals("false"))
-                   Toast.makeText(mActivity.getApplicationContext(), Const.ERROR_NO_CITY_RESULT, Toast.LENGTH_SHORT).show();
+                if (ShortcutUtil.isStringOK(bg) && bg.equals("false"))
+                    Toast.makeText(mActivity.getApplicationContext(),
+                            Const.ERROR_NO_CITY_RESULT, Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -706,25 +765,25 @@ public class MainFragment extends Fragment implements OnClickListener {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(Const.Action_DB_Running_State)){
-                int state = intent.getIntExtra(Const.Intent_DB_Run_State,0);
-                if(state == 1){
+            if (intent.getAction().equals(Const.Action_DB_Running_State)) {
+                int state = intent.getIntExtra(Const.Intent_DB_Run_State, 0);
+                if (state == 1) {
                     mDensityError.setVisibility(View.VISIBLE);
                     mDensityError.setOnClickListener(MainFragment.this);
-                }else if(state == -1){
+                } else if (state == -1) {
                     mRunError.setVisibility(View.VISIBLE);
                     mRunError.setOnClickListener(MainFragment.this);
-                }else {
-                    if(mDensityError.getVisibility() == View.VISIBLE)
+                } else {
+                    if (mDensityError.getVisibility() == View.VISIBLE)
                         mDensityError.setVisibility(View.GONE);
-                    if(mRunError.getVisibility() == View.VISIBLE)
+                    if (mRunError.getVisibility() == View.VISIBLE)
                         mRunError.setVisibility(View.GONE);
                 }
                 text1Initial();
             }
             if (intent.getAction().equals(Const.Action_DB_MAIN_PMDensity)) {
                 //Update the density of PM
-                if(mRunError.getVisibility() == View.VISIBLE)
+                if (mRunError.getVisibility() == View.VISIBLE)
                     mRunError.setVisibility(View.GONE);
                 PMModel model = new PMModel();
                 model.setPm25(intent.getStringExtra(Const.Intent_PM_Density));
@@ -759,30 +818,9 @@ public class MainFragment extends Fragment implements OnClickListener {
                 chart12Date = (ArrayList) aCache.getAsObject(Const.Cache_Chart_12_Date);
                 chartInitial(current_chart1_index, current_chart2_index);
             } else if (intent.getAction().equals(Const.Action_DB_MAIN_Location)) {
-                String lati = intent.getStringExtra(Const.Intent_DB_PM_Lati);
-                String longi = intent.getStringExtra(Const.Intent_DB_PM_Longi);
-                int isRefresh = intent.getIntExtra(Const.Intent_DB_City_Ref,0);
-                String last_lati = aCache.getAsString(Const.Cache_Latitude);
-                String last_longi = aCache.getAsString(Const.Cache_Longitude);
-                Log.e(TAG,"lati "+lati+" last_lati"+last_lati+" longi"+longi+" last_longi"+last_longi);
-                if (last_lati == null || last_longi == null) {
-                    aCache.put(Const.Cache_Latitude, lati);
-                    aCache.put(Const.Cache_Longitude, longi);
-                    searchCityRequest(lati, longi);
-                } else {
-                    if (last_lati.equals(lati) && last_longi.equals(longi)) {
-                        //no change
-                        //for safe, if current city == null. search City anyway
-                        String city = mCity.getText().toString();
-                        if(city == null || city.equals("null") || isRefresh == 1){
-                            searchCityRequest(lati,longi);
-                        }
-                    } else {
-                        aCache.put(Const.Cache_Latitude, lati);
-                        aCache.put(Const.Cache_Longitude, longi);
-                        searchCityRequest(lati, longi);
-                    }
-                }
+                double lati = intent.getDoubleExtra(Const.Intent_DB_PM_Lati,0.0);
+                double longi = intent.getDoubleExtra(Const.Intent_DB_PM_Longi, 0.0);
+                searchCityRequest(String.valueOf(lati),String.valueOf(longi));
 
             } else if (intent.getAction().equals(Const.Action_Chart_Result_1)) {
                 HashMap data4 = (HashMap) intent.getExtras().getSerializable(Const.Intent_chart4_data);
@@ -833,6 +871,9 @@ public class MainFragment extends Fragment implements OnClickListener {
      * ********* Chart *********
      * */
 
+    /**
+     * Initial aimed chart showing, hiding others
+     **/
     private void chartInitial(int chart1_index, int chart2_index) {
 
         mChart1Title.setText(ChartsConst.Chart_title[chart1_index]);
@@ -863,6 +904,9 @@ public class MainFragment extends Fragment implements OnClickListener {
         }
     }
 
+    /**
+     * Update chart currently showing data by index
+     **/
     private Object setChartDataByIndex(int index) {
 
         switch (index) {
@@ -890,19 +934,26 @@ public class MainFragment extends Fragment implements OnClickListener {
         return null;
     }
 
-    private Viewport calChartViewport(AbstractChartView view,Object data){
+    /**
+     * Calculate the chart margin to avoid overlapping
+     **/
+    private Viewport calChartViewport(AbstractChartView view, Object data) {
         view.setViewportCalculationEnabled(true);
-        if(view instanceof LineChartView){
-            ((LineChartView) view).setLineChartData((LineChartData)data);
-        }else if(view instanceof ColumnChartView) {
+        if (view instanceof LineChartView) {
+            ((LineChartView) view).setLineChartData((LineChartData) data);
+        } else if (view instanceof ColumnChartView) {
             ((ColumnChartView) view).setColumnChartData((ColumnChartData) data);
         }
         view.resetViewports();
         return view.getCurrentViewport();
     }
 
-    private void setChartViewport(AbstractChartView view,Object data){
-        final Viewport v = calChartViewport(view,data);
+    /**
+     * Set the chart viewport obeying such rule
+     * the top showing value = the top real value * 1.2
+     **/
+    private void setChartViewport(AbstractChartView view, Object data) {
+        final Viewport v = calChartViewport(view, data);
         v.top = v.top * 1.2f;
         v.bottom = 0;
         view.setMaximumViewport(v);
@@ -910,10 +961,13 @@ public class MainFragment extends Fragment implements OnClickListener {
         view.setViewportCalculationEnabled(false);
     }
 
-    private void setTextSizeByWidth(){
+    /**
+     * To smooth the textview's font over bigger issue
+     **/
+    private void setTextSizeByWidth() {
         int width = Const.CURRENT_WIDTH;
-        if(width == -1) return;
-        if(width <= Const.Resolution_Small){
+        if (width == -1) return;
+        if (width <= Const.Resolution_Small) {
             mChart1Title.setTextSize(12);
             mChart2Title.setTextSize(12);
         }

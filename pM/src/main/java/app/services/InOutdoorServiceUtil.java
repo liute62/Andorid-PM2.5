@@ -25,20 +25,26 @@ import app.utils.FileUtil;
 public class InOutdoorServiceUtil {
 
     public static final String TAG = "InOutdoorService";
+
     private Context mContext;
-    public int executionTimer;
+    private Handler mHandler = new Handler();
+
     private SignalDetection signalDetection;
     private MagnetDetection magnetDetection;
     private LightDetection lightDetection;
+
+    public int executionTimer;
     private boolean isRunning;
     private int status;
+
     private ResultFetch resultFetch;
+
     private static final int Indoor = 0;
     private static final int Semi_Outdoor = 1;
     private static final int Outdoor = 2;
     public static final int executionCircle = 9;
 
-    Runnable mRunnable = new Runnable() {
+    private Runnable mRunnable = new Runnable() {
 
         @Override
         public void run() {
@@ -50,8 +56,6 @@ public class InOutdoorServiceUtil {
             }
         }
     };
-
-    Handler mHandler = new Handler();
 
     public InOutdoorServiceUtil(Context context){
         isRunning = false;

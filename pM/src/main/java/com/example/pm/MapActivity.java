@@ -263,7 +263,7 @@ public class MapActivity extends Activity {
             if (density.equals("")) {
                 density = "0";
             }
-            //Log.d("result",position.getName()+" "+position.getLatitude()+" "+position.getLongtitude()+" "+position.getDensity());
+            //Log.d("result",position.getName()+" "+position.getLatitudeFromCache()+" "+position.getLongtitude()+" "+position.getDensity());
             monitorPoints.put(new LatLng(position.getLatitude(), position.getLongitude()), Double.valueOf(density));
         }
         for (LatLng point : monitorPoints.keySet()) {

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import app.utils.ShortcutUtil;
 import app.utils.StableCache;
 import app.utils.Const;
 import app.utils.FileUtil;
@@ -70,7 +71,7 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
     /**
      * A queue for storing location,
      */
-    LocationQueue locationQueue;
+    private LocationQueue locationQueue;
 
     private int localization_type;
 
@@ -94,6 +95,8 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
 
     private boolean isWifiAvailable;
 
+    private DataServiceUtil dataServiceUtil;
+
     public static LocationServiceUtil getInstance(Context context){
         if(instance == null)
             instance = new LocationServiceUtil(context);
@@ -106,6 +109,7 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
         isRunning = false;
         mContext = context.getApplicationContext();
         locationQueue = new LocationQueue();
+        dataServiceUtil = DataServiceUtil.getInstance(mContext);
         setDefaultTag();
     }
 
@@ -128,6 +132,8 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
             localization_type = type;
         else return;
         Log.e(TAG,"is running"+localization_type);
+        FileUtil.appendStrToFile(TAG,"type == "+type+" start: "+
+                ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
         isRunning = true;
         initMethodByType(localization_type);
         runMethodByType(localization_type);
@@ -135,6 +141,8 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
 
     public void stop(){
         Log.e(TAG,"is stop"+localization_type);
+        FileUtil.appendStrToFile(TAG, "type == " + localization_type + " stop: " +
+                ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
         if(isRunning)
           stopMethodByType(localization_type);
         isRunning = false;
@@ -236,8 +244,8 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
                 locationGPS.setLatitude(location.getLatitude());
                 isGpsAvailable = true;
                 getLocation(locationGPS);
-                FileUtil.appendStrToFile(0,"Baidu Map  is using GPS as the localization choice");
-
+                FileUtil.appendStrToFile(0, "Baidu Map  is using GPS as the localization choice");
+                dataServiceUtil.cacheInOutdoor(LocationServiceUtil.Outdoor);
             } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// network localization result
 
                 Location locationNetwork = new Location(LocationManager.NETWORK_PROVIDER);
@@ -246,7 +254,7 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
                 getLocation(locationNetwork);
                 isGpsAvailable = false;
                 FileUtil.appendStrToFile(0,"Baidu Map is using Network as the localization choice");
-
+                dataServiceUtil.cacheInOutdoor(LocationServiceUtil.Indoor);
             } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// offline localization result
 
                 Location locationPassive = new Location(LocationManager.PASSIVE_PROVIDER);
@@ -535,7 +543,7 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
             Map<Double,Integer> latis = new HashMap<>();
             Map<Double,Integer> longis = new HashMap<>();
             for(int i = 0; i != size(); i++){
-                Location location = (Location) get(i);
+                Location location = get(i);
                 double lati = location.getLatitude();
                 double longi = location.getLongitude();
                 if(latis.containsKey(lati)){

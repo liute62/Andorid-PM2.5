@@ -16,14 +16,12 @@ import com.umeng.socialize.controller.UMServiceFactory;
 import com.umeng.socialize.controller.UMSocialService;
 import com.umeng.socialize.sso.UMSsoHandler;
 
-import app.utils.ACache;
 import app.utils.Const;
 import app.utils.FileUtil;
 
 public class MainActivity extends SlidingActivity {
 
     public static final String TAG = "MainActivity";
-    ACache aCache;
     Fragment newFragment;
     private final UMSocialService mController = UMServiceFactory
             .getUMSocialService("com.umeng.share");
@@ -33,7 +31,7 @@ public class MainActivity extends SlidingActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Display d = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Display d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int width = d.getWidth();
         int height = d.getHeight();
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -41,9 +39,9 @@ public class MainActivity extends SlidingActivity {
         int densityDPI = displayMetrics.densityDpi;
         offset = getOffsetByResolution(width);
         MyInitial();
-        FileUtil.appendStrToFile(-1,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height)
-        +" "+"density: "+String.valueOf(density)+" densityDPI "+String.valueOf(densityDPI));
-        Log.e(TAG,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height));
+        //FileUtil.appendStrToFile(-1, "screen width: " + String.valueOf(width) + " " + "height: " + String.valueOf(height)
+          //      + " " + "density: " + String.valueOf(density) + " densityDPI " + String.valueOf(densityDPI));
+        //Log.e(TAG,"screen width: "+String.valueOf(width)+" "+"height: "+String.valueOf(height));
     }
 
     /**
@@ -52,10 +50,11 @@ public class MainActivity extends SlidingActivity {
      * for 720 X 1280 case 720
      * for 1080 X 1920 case 1080
      * for 1440 X 2560 case 1440
-     * @param width
-     * @return
+     *
+     * @param width the width of screen resolution
+     * @return the adjusted offset value
      */
-    private int getOffsetByResolution(int width){
+    private int getOffsetByResolution(int width) {
         Const.CURRENT_WIDTH = width;
         int result;
         int num = width / 160;
@@ -94,32 +93,20 @@ public class MainActivity extends SlidingActivity {
         //getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    /**
-     *
-     */
-    public void switchContent(Fragment fragment) {
-        newFragment = fragment;
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content, fragment)
-                .commit();
-        getSlidingMenu().showContent();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        UMSsoHandler ssoHandler = mController.getConfig().getSsoHandler(requestCode) ;
-        if(ssoHandler != null){
+        UMSsoHandler ssoHandler = mController.getConfig().getSsoHandler(requestCode);
+        if (ssoHandler != null) {
             ssoHandler.authorizeCallBack(requestCode, resultCode, data);
         }
     }
 
-    public Fragment getMainFragment(){
+    public Fragment getMainFragment() {
         return newFragment;
     }
 
-    public UMSocialService getShareController(){
+    public UMSocialService getShareController() {
         return mController;
     }
 

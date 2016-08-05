@@ -11,7 +11,6 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -27,16 +26,13 @@ import java.util.Map;
 
 import app.Entity.State;
 import app.model.PMModel;
-import app.utils.Const;
 import app.utils.FileUtil;
 import app.utils.HttpUtil;
 import app.utils.ShortcutUtil;
-import app.utils.StableCache;
 import app.utils.VolleyQueue;
 
 /**
  * Created by liuhaodong1 on 16/6/2.
- * <p/>
  * This service (receiver) is intended to running on background and do some discrete tasks.
  * Every time there is only one background service running
  * The sequence series are shown as below
@@ -53,39 +49,36 @@ public class BackgroundService extends BroadcastReceiver {
 
     public static final String TAG = "BackgroundService";
 
-    private long startTime = 0; // the nano time for start the process of a cycle.
-
     private int repeatingCycle = 0; //
 
     private boolean isGoingToSearchPM = false;
 
     private boolean isGoingToGetLocation = false;
 
-    private boolean isGoingToSaveData = false;
+    private boolean isHaveTask = false;
 
     private boolean isPMSearchSuccess = false;
-
-    private StableCache cache; // a cache that
 
     private PowerManager.WakeLock wakeLock = null;
 
     private Context mContext = null;
 
-    private boolean isFinished = true; //if the background process has finished his job
+    private boolean isFinished = true; //if all tasks of background process has finished their job
 
-    private LocationServiceUtil locationServiceUtil = null; // a service for retrieving location information
+    private DataServiceUtil dataServiceUtil = null;
 
     private InOutdoorServiceUtil inOutdoorServiceUtil = null;
-
-    private MotionServiceUtil motionServiceUtil = null; // a service for retrieving motion information
-
-    private DataServiceUtil dataServiceUtil = null; // a service for retrieving database and cache result
 
     private Location mLocation = null; //current location
 
     private State state = null;
 
-    private int inOutDoor = 0;
+    private int stepNum = 0;
+
+    private int inOutDoor = LocationServiceUtil.Indoor;
+
+    private boolean isReset = false; //if surpass a day, then reset the value.
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -93,18 +86,44 @@ public class BackgroundService extends BroadcastReceiver {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "backgroundWake");
         wakeLock.acquire();
+        FileUtil.appendStrToFile(TAG, "wakeLock acquire");
         initInner();
         startInner();
     }
 
+    /**
+     * set default values
+     */
     private void initInner() {
         mLocation = new Location("default");
         mLocation.setLatitude(0.0);
         mLocation.setLongitude(0.0);
         isFinished = false;
         dataServiceUtil = DataServiceUtil.getInstance(mContext);
-        motionServiceUtil = MotionServiceUtil.getInstance(mContext);
-        cache = StableCache.getInstance(mContext);
+    }
+
+    /**
+     * getting the last cycle params
+     */
+    private void getLastParams() {
+
+        isHaveTask = false;
+        repeatingCycle = (int) dataServiceUtil.getIDToday();
+        double lati = dataServiceUtil.getLatitudeFromCache();
+        double longi = dataServiceUtil.getLongitudeFromCache();
+        stepNum = dataServiceUtil.getStepNumFromCache();
+        state = dataServiceUtil.getCurrentState();
+        isReset = dataServiceUtil.isSurpassFromCache();
+        if (lati != 0.0 && longi != 0.0) {
+            mLocation = new Location("cache");
+            mLocation.setLatitude(lati);
+            mLocation.setLongitude(longi);
+            isGoingToGetLocation = false;
+        } else {
+            getLocations(1000 * 10);
+            isGoingToGetLocation = false;
+        }
+        dataServiceUtil.initDefaultData();
     }
 
     /**
@@ -115,59 +134,42 @@ public class BackgroundService extends BroadcastReceiver {
      */
     private void startInner() {
 
-        startTime = System.currentTimeMillis();
         getLastParams();
         Log.e(TAG, repeatingCycle + " ");
-        saveValues();
         if (isGoingToGetLocation || repeatingCycle % 23 == 0) {
-            //getLocations(1000 * 10);
+            isHaveTask = true;
+            getLocations(1000 * 10);
         }
         if (isGoingToSearchPM || repeatingCycle % 101 == 0) {
-           // searchPMResult(String.valueOf(mLocation.getLongitude()), String.valueOf(mLocation.getLatitude()));
+            isHaveTask = true;
+            searchPMResult(String.valueOf(mLocation.getLongitude()), String.valueOf(mLocation.getLatitude()));
         }
         //every 1 hour to check if some data need to be uploaded
-        if(repeatingCycle % 111 == 0){
+        if (repeatingCycle % 119 == 0) {
             FileUtil.appendStrToFile(repeatingCycle, "every 1 hour to check pm data for upload");
-            //checkPMDataForUpload();
+            isHaveTask = true;
+            checkPMDataForUpload();
         }
+        saveValues();
+        onFinished("startInner finished");
     }
 
-    private void getLastParams() {
-
-        String repeating = cache.getAsString(Const.Cache_Repeating_Time);
-        double lati = dataServiceUtil.getLatitude();
-        double longi = dataServiceUtil.getLongitude();
-
-        if (ShortcutUtil.isStringOK(repeating)) {
-            repeatingCycle = Integer.valueOf(repeating);
-        } else {
-            repeatingCycle = 1;
-            cache.put(Const.Cache_Repeating_Time, repeatingCycle);
-        }
-
-        if (lati != 0.0 && longi !=0.0) {
-            mLocation = new Location("cache");
-            mLocation.setLatitude(lati);
-            mLocation.setLongitude(longi);
-            isGoingToGetLocation = false;
-        } else {
-            getLocations(1000 * 10);
-            isGoingToGetLocation = false;
-        }
-
-        dataServiceUtil.initDefaultData();
-    }
-
+    /**
+     *
+     * @param runningTime
+     */
     private void getLocations(long runningTime) {
 
-        Log.e(TAG, "getLocations " + System.currentTimeMillis());
         LocationServiceUtil locationServiceUtil = LocationServiceUtil.getInstance(mContext);
+
         if (locationServiceUtil.getLastKnownLocation() != null) {
 
             mLocation = locationServiceUtil.getLastKnownLocation();
             dataServiceUtil.cacheLocation(mLocation.getLatitude(), mLocation.getLongitude());
             FileUtil.appendStrToFile(repeatingCycle, "locationInitial getLastKnownLocation " +
                     String.valueOf(mLocation.getLatitude()) + " " + String.valueOf(mLocation.getLongitude()));
+            isHaveTask = false;
+            onFinished("getLocations getLastKnownLocation");
         }
         locationServiceUtil.setGetTheLocationListener(new LocationServiceUtil.GetTheLocation() {
             @Override
@@ -176,11 +178,12 @@ public class BackgroundService extends BroadcastReceiver {
 
             @Override
             public void onSearchStop(Location location) {
+
                 if (location != null) {
                     Log.e(TAG, "onSearchStop location " + location.getLongitude());
                     mLocation = location;
-                    double last_lati = dataServiceUtil.getMaxLatitude();
-                    double last_longi = dataServiceUtil.getMaxLongitude();
+                    double last_lati = dataServiceUtil.getMaxLatitudeFromCache();
+                    double last_longi = dataServiceUtil.getMaxLongitudeFromCache();
                     boolean isEnough = false;
                     if (last_lati == 0.0 || last_longi == 0.0) {
                         dataServiceUtil.cacheLocation(mLocation.getLatitude(), mLocation.getLongitude());
@@ -197,15 +200,13 @@ public class BackgroundService extends BroadcastReceiver {
                     }
                     dataServiceUtil.cacheLocation(mLocation);
                 }
+                isHaveTask = false;
+                onFinished("getLocations onSearchStop");
             }
         });
         locationServiceUtil.run(LocationServiceUtil.TYPE_BAIDU);
         locationServiceUtil.setTimeIntervalBeforeStop(runningTime);
     }
-
-    PMModel pmModel;
-    double PM25Density;
-    int PM25Source;
 
     /**
      * Get and Update Current PM info.
@@ -217,19 +218,23 @@ public class BackgroundService extends BroadcastReceiver {
 
         String url = HttpUtil.Search_PM_url;
         url = url + "?longitude=" + longitude + "&latitude=" + latitude;
-        FileUtil.appendStrToFile(repeatingCycle,"searchPMResult "+url);
+        FileUtil.appendStrToFile(repeatingCycle, "searchPMResult " + url);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     int status = response.getInt("status");
                     if (status == 1) {
                         isPMSearchSuccess = true;
-                        pmModel = PMModel.parse(response.getJSONObject("data"));
-                        NotifyServiceUtil.notifyDensityChanged(pmModel.getPm25());
-                        PM25Density = Double.valueOf(pmModel.getPm25());
-                        PM25Source = pmModel.getSource();
+                        PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
+                        NotifyServiceUtil.notifyDensityChanged(mContext, pmModel.getPm25());
+                        double PM25Density = Double.valueOf(pmModel.getPm25());
+                        int PM25Source = pmModel.getSource();
+
                         dataServiceUtil.cachePMResult(PM25Density, PM25Source);
+                        dataServiceUtil.cacheSearchPMFailed(0);
+
                         FileUtil.appendStrToFile(repeatingCycle, "3.search pm density success, density: " + PM25Density);
                     } else {
                         isPMSearchSuccess = false;
@@ -238,37 +243,56 @@ public class BackgroundService extends BroadcastReceiver {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
+                isHaveTask = false;
+                onFinished("searchPMResult success");
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                isHaveTask = false;
+                onFinished("searchPMResult error");
+                dataServiceUtil.cacheSearchPMFailed(dataServiceUtil.getSearchFailedCountFromCache()+1);
                 isPMSearchSuccess = false;
                 FileUtil.appendErrorToFile(repeatingCycle, "search pm density failed " + error.getMessage() + " " + error);
             }
 
         });
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                Const.Default_Timeout,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleyQueue.getInstance(mContext.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     /**
-     * Check DB if there are some data for uploading
+     *
      */
-    public void checkPMDataForUpload2() {
+    private void saveValues() {
 
-        String idStr = cache.getAsString(Const.Cache_User_Id);
-        if (ShortcutUtil.isStringOK(idStr) && !idStr.equals("0")) {
+        State last = state;
+        state = dataServiceUtil.calculatePM25(mLocation.getLatitude(), mLocation.getLongitude(),stepNum);
+        state.print();
+        State now = state;
+        if (!isSurpass(last, now) || isReset) {
+            dataServiceUtil.insertState(state);
+            dataServiceUtil.cacheSurpass(false);
+        } else {
+            reset();
+            dataServiceUtil.cacheSurpass(true);
+        }
+        Log.e(TAG, "repeating times: " + repeatingCycle);
+        // if (!isHaveTask) onFinished();
+    }
+
+    private void checkPMDataForUpload() {
+        dataServiceUtil.cacheLastUploadTime(System.currentTimeMillis());
+        FileUtil.appendStrToFile(repeatingCycle, "every 1 hour to check pm data for upload");
+        int idStr = dataServiceUtil.getUserIdFromCache();
+
+        if (idStr != 0) {
             final List<State> states = dataServiceUtil.getPMDataForUpload();
             //FileUtil.appendStrToFile(DBRunTime, "1.checkPMDataForUpload upload batch start size = " + states.size());
             String url = HttpUtil.UploadBatch_url;
             JSONArray array = new JSONArray();
             final int size = states.size() < 1000 ? states.size() : 1000;
             for (int i = 0; i < size; i++) {
-                JSONObject tmp = State.toJsonobject(states.get(i), cache.getAsString(Const.Cache_User_Id));
+                JSONObject tmp = State.toJsonobject(states.get(i), String.valueOf(idStr));
                 array.put(tmp);
             }
             JSONObject batchData = null;
@@ -292,10 +316,14 @@ public class BackgroundService extends BroadcastReceiver {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    isHaveTask = false;
+                    onFinished("checkPMDataForUpload success");
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    isHaveTask = false;
+                    onFinished("checkPMDataForUpload error");
                     if (error.getMessage() != null)
                         FileUtil.appendErrorToFile(repeatingCycle, "1.checkPMDataForUpload error getMessage" + error.getMessage());
                     if (error.networkResponse != null)
@@ -309,43 +337,12 @@ public class BackgroundService extends BroadcastReceiver {
                     return headers;
                 }
             };
-            jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    Const.Default_Timeout_Long,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             VolleyQueue.getInstance(mContext.getApplicationContext()).addToRequestQueue(jsonObjectRequest);
         }
     }
 
-    private void saveValues() {
-        repeatingCycle++;
-        cache.put(Const.Cache_Repeating_Time, repeatingCycle);
-        State last = state;
-        state = dataServiceUtil.calculatePM25(mLocation.getLatitude(), mLocation.getLongitude());
-        state.print();
-        State now = state;
-        if (!isSurpass(last, now)) {
-            dataServiceUtil.insertState(state);
-        } else {
-            reset();
-        }
-        Log.e(TAG, "repeating times: " + repeatingCycle);
-        FileUtil.appendStrToFile("cycle " + repeatingCycle);
-        if(wakeLock != null) wakeLock.release();
-        else {
-            FileUtil.appendStrToFile("wakelock == null");
-        }
-    }
-
-    private void checkPMDataForUpload() {
-        dataServiceUtil.cacheLastUploadTime(System.currentTimeMillis());
-        FileUtil.appendStrToFile(repeatingCycle, "every 1 hour to check pm data for upload");
-
-    }
-
     /**
      * Check if service running surpass a day
-     *
      * @param lastTime last time state info
      * @param nowTime  current state info
      * @return result true means to reset, false means keep going
@@ -373,29 +370,37 @@ public class BackgroundService extends BroadcastReceiver {
         mLocation.setLatitude(0.0);
         repeatingCycle = 0;
         //refreshAll();
-        dataServiceUtil.reset();
-        motionServiceUtil.reset();
+        //motionServiceUtil.reset();
     }
 
-    private void onFinished() {
-        isFinished = true;
-        wakeLock.release();
+    private void onFinished(String tag) {
+        FileUtil.appendStrToFile(TAG,tag+" onFinished");
+        if(isHaveTask == false) {
+            if (wakeLock != null && wakeLock.isHeld())
+                wakeLock.release();
+            FileUtil.appendStrToFile(TAG, "wakelock release");
+            isHaveTask = false;
+            isFinished = true;
+        }
     }
 
 
     public static void runBackgroundService(Context context) {
+
         context = context.getApplicationContext();
-        FileUtil.appendStrToFile("setAlarm");
-        Log.e(TAG, "runBackgroundService");
+        cancelBackgroundService(context);
+        FileUtil.appendStrToFile(TAG, "------begin background service------");
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, BackgroundService.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()
-                ,60*1000, pi);
+                , 60 * 1000, pi);
         //am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 60, pi); // Millisec * Second * Minute
     }
 
-    public void CancelBackgroundService(Context context) {
+    public static void cancelBackgroundService(Context context) {
+
+        FileUtil.appendStrToFile(TAG, "------begin cancel background service------");
         Intent intent = new Intent(context, BackgroundService.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

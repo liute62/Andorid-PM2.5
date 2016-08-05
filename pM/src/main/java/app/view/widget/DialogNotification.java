@@ -14,7 +14,7 @@ import com.example.pm.R;
 import java.util.jar.Attributes;
 
 /**
- * Created by Administrator on 1/11/2016.
+ * Created by haodong on 1/11/2016.
  */
 public class DialogNotification extends Dialog {
 

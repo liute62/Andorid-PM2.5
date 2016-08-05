@@ -18,13 +18,13 @@ import app.utils.DBConstants;
 import app.utils.DBHelper;
 import app.utils.FileUtil;
 import app.utils.ShortcutUtil;
+import app.utils.StableCache;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * Created by liuhaodong1 on 16/6/9.
  * This is a service intended to perform database related operations.
- *
  */
 public class DataServiceUtil {
 
@@ -50,9 +50,13 @@ public class DataServiceUtil {
 
     private ACache aCache;
 
+    private StableCache stableCache;
+
     private int inOutDoor;
 
     private String avg_rate = "12";
+
+    private int searchFailedCount = 0;
 
     public static DataServiceUtil getInstance(Context context){
        if(instance == null){
@@ -64,6 +68,7 @@ public class DataServiceUtil {
     private DataServiceUtil(Context context){
         mContext = context;
         aCache = ACache.get(context);
+        stableCache = StableCache.getInstance(context);
         initDefaultData();
         DBInitial();
     }
@@ -127,17 +132,16 @@ public class DataServiceUtil {
      * @param lati  the latitude to be saved
      * @return the saved state
      */
-    public State calculatePM25(double longi, double lati) {
+    public State calculatePM25(double longi, double lati,int steps) {
 
         Log.e(TAG, "calculatePM25 " + System.currentTimeMillis());
         Double breath = 0.0;
         Double density = PM25Density;
         boolean isConnected = ShortcutUtil.isNetworkAvailable(mContext);
 
-        Const.MotionStatus mMotionStatus = Const.MotionStatus.STATIC; // motionService.getMotionStatus();
-        // int numStepsForRecord = motionService.getNumStepsForRecord();
-        int numStepsForRecord = 0;
-        double static_breath = ShortcutUtil.calStaticBreath(aCache.getAsString(Const.Cache_User_Weight));
+        Const.MotionStatus mMotionStatus = MotionServiceUtil.getMotionStatus(steps); // motionService.getMotionStatus();
+        double static_breath =
+                ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
 
         if (static_breath == 0.0) {
             static_breath = 6.6; // using the default one
@@ -154,20 +158,18 @@ public class DataServiceUtil {
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
 
-        State state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
+        state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
                 String.valueOf(longi),
                 String.valueOf(lati),
-                String.valueOf(inOutDoor),
+                String.valueOf(getInOutDoorFromCache()),
                 mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(numStepsForRecord), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
-        numStepsForRecord = 0;
+                Integer.toString(steps), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
         return state;
     }
 
     /**
      * DB Operations, insert a calculated pm state model to DB
-     *
-     * @param state
+     * @param state the state you want to insert
      */
     public void insertState(State state) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -178,9 +180,9 @@ public class DataServiceUtil {
     }
 
     /**
-     *
-     * @param state
-     * @param upload
+     * DB Operations, update the upload value of state
+     * @param state the state to update
+     * @param upload the value to update
      */
     public void updateStateUpLoad(State state, int upload) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -190,8 +192,8 @@ public class DataServiceUtil {
     }
 
     /**
-     *
-     * @return
+     * get last indoor and outdoor ratio during last seven days
+     * @return the ratio of last week.
      */
     public double getLastSevenDaysInOutRatio() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -220,19 +222,37 @@ public class DataServiceUtil {
         return ratio;
     }
 
+    /**
+     * get list of data to upload from DB
+     * @return a list of state for uploading
+     */
     public List<State> getPMDataForUpload(){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         return cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD +
                 "=? AND " + DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0", "1").list();
     }
 
-    /**
-     *
-     */
-    public void reset() {
 
+    /*
+    * refresh the temporary value of DataServiceUtil
+     */
+    public void refresh(){
+        DBInitial();
     }
 
+    /****************** Below here are cache operations ******************/
+    /*
+    * set user's id into cache
+     */
+    public void cacheUsrId(int id){
+        aCache.put(Const.Cache_User_Id, String.valueOf(id));
+    }
+
+    /**
+     * cache the pm density and source.
+     * @param density the current pm density to cache
+     * @param source the source of pm data to cache
+     */
     public void cachePMResult(double density,int source){
         aCache.put(Const.Cache_PM_Density, density);
         aCache.put(Const.Cache_PM_Source, String.valueOf(source));
@@ -240,40 +260,351 @@ public class DataServiceUtil {
     }
 
     /**
-     *
-     * @param inOutDoor must be
+     * cache the consecutive times for searching pm2.5 density and failed.
+     * @param count the consecutive failed times for getting pm2.5 result
+     */
+    public void cacheSearchPMFailed(int count){
+        aCache.put(Const.Cache_Search_PM_Failed_Count, String.valueOf(count));
+    }
+
+    /**
+     * cache the in and outdoor status
+     * @param inOutDoor must be 1 or 0, 1 means: outdoor 0 means: indoor
      * @see LocationServiceUtil indoor and outdoor
      */
     public void cacheInOutdoor(int inOutDoor){
-        aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
+        if(inOutDoor == LocationServiceUtil.Indoor ||
+                inOutDoor == LocationServiceUtil.Outdoor)
+            aCache.put(Const.Cache_Indoor_Outdoor, String.valueOf(inOutDoor));
+        else FileUtil.appendErrorToFile(TAG,
+                "cacheInOutdoor value == "+inOutDoor+" not meet the requirement");
     }
 
-    public void cacheLocation(Location location){
-        aCache.put(Const.Cache_Latitude, location.getLatitude());
-        aCache.put(Const.Cache_Longitude, location.getLongitude());
-    }
-
+    /**
+     * cache name of the city
+     * @param city the name of city
+     */
     public void cacheCityName(String city){
         aCache.put(Const.Cache_City,city);
     }
 
+    /**
+     * cache the current location
+     * @param location the location to cache
+     */
+    public void cacheLocation(Location location){
+        if(location != null) {
+            aCache.put(Const.Cache_Latitude, location.getLatitude());
+            aCache.put(Const.Cache_Longitude, location.getLongitude());
+        }else {
+            FileUtil.appendErrorToFile(TAG,
+                    "cacheLocation location == NULL");
+        }
+    }
+
+    /**
+     * cache the current location
+     * @param latitude the latitude of current location
+     * @param longitude the longitude of current location
+     */
     public void cacheLocation(double latitude,double longitude){
         aCache.put(Const.Cache_Latitude, latitude);
         aCache.put(Const.Cache_Longitude, longitude);
     }
 
-    public void cacheMaxLocation(Location location){
-        aCache.put(Const.Cache_Latitude, location.getLatitude());
-        aCache.put(Const.Cache_Longitude, location.getLongitude());
+    /*
+    * cache if the insertion data process has surpass a day
+    * if surpass, need to reset aimed temporary values.
+    * isReset, true: isSurpass, false: not Surpass
+     */
+    public void cacheSurpass(boolean isReset){
+        aCache.put(Const.Cache_Surpass_Reset,isReset);
     }
 
+    /**
+     * cache the maximum location.
+     * @param location the maximum location to cache
+     */
+    public void cacheMaxLocation(Location location){
+        aCache.put(Const.Cache_Last_Max_Lati, location.getLatitude());
+        aCache.put(Const.Cache_Last_Max_Lati, location.getLongitude());
+    }
+
+    /*
+    * cache the maximum location by latitude and longitude
+     */
     public void cacheMaxLocation(double latitude,double longitude){
         aCache.put(Const.Cache_Last_Max_Lati, latitude);
         aCache.put(Const.Cache_Last_Max_Longi, longitude);
     }
 
+    /**
+     * cache the time for uploading to see if next time need to upload.
+     * @param time the current time for uploading
+     */
     public void cacheLastUploadTime(long time){
         aCache.put(Const.Cache_DB_Lastime_Upload, String.valueOf(time));
+    }
+
+    public void cacheLastSearchCityTime(long time){
+        aCache.put(Const.Cache_Lasttime_Search_City,String.valueOf(time));
+    }
+
+    /**
+     * cache the number of user's steps.
+     * @param stepNum the number of user's steps
+     */
+    public void cacheStepNum(int stepNum){
+        aCache.put(Const.Cache_Step_Num,String.valueOf(stepNum));
+    }
+
+    public void cacheHearthRate(int rate){
+        aCache.put(Const.Cache_Hearth_Rate,String.valueOf(rate));
+    }
+
+    /**
+     * get the user's id from cache, if failed, return 0
+     * @return the user id
+     */
+    public int getUserIdFromCache(){
+        String usrIdStr = aCache.getAsString(Const.Cache_User_Id);
+        if(ShortcutUtil.isStringOK(usrIdStr)){
+            try{
+                return Integer.valueOf(usrIdStr);
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG,"getUserIdFromCache parsing error"
+                        +" in/outdoor == "+usrIdStr);
+                return 0;
+            }
+        }else {
+            return 0;
+        }
+    }
+
+    /**
+     * get indoor and outdoor status from cache.
+     * @return 0 means indoor, 1 means outdoor
+     */
+    public int getInOutDoorFromCache(){
+
+        int result = LocationServiceUtil.Indoor;
+        String str = aCache.getAsString(Const.Cache_Indoor_Outdoor);
+        if(ShortcutUtil.isStringOK(str)){
+            try {
+                result =  Integer.valueOf(str);
+            }catch (Exception e){
+                result = LocationServiceUtil.Indoor;
+                FileUtil.appendErrorToFile(TAG,"getInOutDoorFromCache parsing error"
+                        +" in/outdoor == "+str);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * get the value for is surpassing a day from cache
+     * @return true : surpass, false: not surpass
+     */
+    public boolean isSurpassFromCache(){
+        boolean reset = false;
+        String tmp = null;
+        try {
+            tmp = aCache.getAsString(Const.Cache_Surpass_Reset);
+            if(ShortcutUtil.isStringOK(tmp))
+                reset = Boolean.valueOf(tmp);
+        }catch (Exception e){
+            FileUtil.appendErrorToFile(TAG,"isSurpassFromCache parsing error"
+                    +" isSurpass == "+tmp);
+            return false;
+        }
+        return reset;
+    }
+
+    /**
+     * get the current longitude from cache.
+     * @return 0.0 if not found
+     */
+    public double getLongitudeFromCache(){
+        String longi = aCache.getAsString(Const.Cache_Longitude);
+        if(ShortcutUtil.isStringOK(longi)){
+            try{
+                return Double.valueOf(longi);
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG,"getLongitudeFromCache parsing error"
+                        +" lati == "+longi);
+                return 0.0;
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * get the current latitude from cache.
+     * @return 0.0 if not found
+     */
+    public double getLatitudeFromCache(){
+        String lati = aCache.getAsString(Const.Cache_Latitude);
+        if(ShortcutUtil.isStringOK(lati)){
+            try{
+                return Double.valueOf(lati);
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG,"getLatitudeFromCache parsing error"
+                        +" lati == "+lati);
+                return 0.0;
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * get the maximum latitude from cache.
+     * @return 0.0 if not found
+     */
+    public double getMaxLatitudeFromCache(){
+        String lati = aCache.getAsString(Const.Cache_Last_Max_Lati);
+        if(ShortcutUtil.isStringOK(lati)){
+            try{
+                return Double.valueOf(lati);
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG,"getMaxLatitudeFromCache parsing error"
+                        +" lati == "+lati);
+                return 0.0;
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * get the maximum longitude from cache.
+     * @return 0.0 if not found
+     */
+    public double getMaxLongitudeFromCache(){
+        String longi = aCache.getAsString(Const.Cache_Last_Max_Longi);
+        if(ShortcutUtil.isStringOK(longi)){
+            try {
+                return Double.valueOf(longi);
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG,"getMaxLongitudeFromCache parsing error"
+                        +" longi == "+longi);
+                return 0.0;
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * get the current city name from cache.
+     * @return the string of city name, return "null" if failed
+     */
+    public String getCityNameFromCache(){
+        String city = aCache.getAsString(Const.Cache_City);
+        if(ShortcutUtil.isStringOK(city)){
+            return city;
+        }
+        return "null";
+    }
+
+    /**
+     * get the number of failed searching pm density from cache.
+     * @return the consecutive search pm density failed count, if failed, 0
+     */
+    public int getSearchFailedCountFromCache(){
+        int result = 0;
+        String count = aCache.getAsString(Const.Cache_Search_PM_Failed_Count);
+        if(ShortcutUtil.isStringOK(count)){
+            try {
+                result =  Integer.valueOf(count);
+            }catch (Exception e){
+                result = 0;
+                FileUtil.appendErrorToFile(TAG,"getSearchFailedCountFromCache parsing error"
+                +" count == "+count);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * get the current step number of user
+     * @return the current step number
+     */
+    public int getStepNumFromCache(){
+        int result = 0;
+        String num = aCache.getAsString(Const.Cache_Step_Num);
+        if(ShortcutUtil.isStringOK(num)){
+            try {
+                result = Integer.valueOf(num);
+            }catch (Exception e){
+                result = 0;
+                FileUtil.appendErrorToFile(TAG,"getStepNumFromCache parsing error "+
+                num);
+            }
+        }
+        return result;
+    }
+
+    /*
+     * get the hearth rate of the user from cache
+     * @return the hearth rate
+     */
+    public int getHearthRateFromCache(){
+        int rate = 12;
+        String str = aCache.getAsString(Const.Cache_Hearth_Rate);
+        if(ShortcutUtil.isStringOK(str)){
+            try {
+                rate = Integer.valueOf(str);
+            }catch (Exception e){
+                rate = 12;
+                FileUtil.appendErrorToFile(TAG,"getHearthRateFromCache parsing error "+
+                str);
+            }
+        }
+        return rate;
+    }
+
+    /**
+     * check if it is time for uploading db data from cache.
+     * @return
+     */
+    public boolean isToUpload() {
+        String tmp = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
+        if (ShortcutUtil.isStringOK(tmp)) {
+            try {
+                long time = Long.valueOf(tmp);
+                if (System.currentTimeMillis() - time > Const.Min_Upload_Check_Time) {
+                    return true;
+                }
+            } catch (Exception e) {
+                FileUtil.appendErrorToFile(TAG, "isToUpload failed, parsing error lasttime == "
+                        +tmp);
+                cacheLastUploadTime(System.currentTimeMillis());
+                return false;
+            }
+        }else {
+            cacheLastUploadTime(System.currentTimeMillis());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isToSearchCity(){
+        String tmp = aCache.getAsString(Const.Cache_Lasttime_Search_City);
+        if(ShortcutUtil.isStringOK(tmp)){
+            try {
+                long time = Long.valueOf(tmp);
+                if(System.currentTimeMillis() - time > Const.Min_Search_City_Time){
+                    return true;
+                }
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG, "isToSearchCity failed, parsing error lastime == "
+                        +tmp);
+                cacheLastUploadTime(System.currentTimeMillis());
+                return false;
+            }
+        }else {
+            cacheLastUploadTime(System.currentTimeMillis());
+            return true;
+        }
+        return false;
     }
 
     public State getCurrentState(){
@@ -282,50 +613,6 @@ public class DataServiceUtil {
 
     public void setCurrentState(State state){
         this.state = state;
-    }
-
-    public int getInOutDoor(){
-        return 0;
-    }
-
-    public double getLatitude(){
-        String lati = aCache.getAsString(Const.Cache_Latitude);
-        if(ShortcutUtil.isStringOK(lati)){
-            return Double.valueOf(lati);
-        }
-        return 0.0;
-    }
-
-    public double getLongitude(){
-        String longi = aCache.getAsString(Const.Cache_Longitude);
-        if(ShortcutUtil.isStringOK(longi)){
-            return Double.valueOf(longi);
-        }
-        return 0.0;
-    }
-
-    public double getMaxLatitude(){
-        String lati = aCache.getAsString(Const.Cache_Last_Max_Lati);
-        if(ShortcutUtil.isStringOK(lati)){
-            return Double.valueOf(lati);
-        }
-        return 0.0;
-    }
-
-    public double getMaxLongitude(){
-        String longi = aCache.getAsString(Const.Cache_Last_Max_Longi);
-        if(ShortcutUtil.isStringOK(longi)){
-            return Double.valueOf(longi);
-        }
-        return 0.0;
-    }
-
-    public String getCityName(){
-        String city = aCache.getAsString(Const.Cache_City);
-        if(ShortcutUtil.isStringOK(city)){
-            return city;
-        }
-        return "null";
     }
 
     public double getPM25Density() {
@@ -351,4 +638,6 @@ public class DataServiceUtil {
     public DBHelper getDBHelper() {
         return dbHelper;
     }
+
+
 }
