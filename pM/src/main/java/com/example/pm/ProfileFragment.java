@@ -24,6 +24,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import app.model.UserModel;
 import app.services.ForegroundService;
 import app.utils.ACache;
 import app.utils.Const;
@@ -42,30 +44,32 @@ import app.view.widget.PullScrollView;
 public class ProfileFragment extends Fragment implements
         OnClickListener, PullScrollView.OnTurnListener {
 
-    Activity mActivity;
-    ImageView mHead;
-    PullScrollView mScrollView;
-    TextView mName;
-    TextView mUsername;
-    TextView mGender;
-    TextView mLogOff;
-    Button mLogin;
-    Button mExit;
-    Button mTurnOffUpload;
-    Button mClear;
-    Button mRegister;
+    private Activity mActivity;
+    private ImageView mHead;
+    private PullScrollView mScrollView;
+
+    private TextView mName;
+    private TextView mUsername;
+    private TextView mGender;
+    private TextView mLogOff;
+    private Button mLogin;
+    private Button mExit;
+    private Button mTurnOffUpload;
+    private Button mClear;
+    private Button mRegister;
     //Button mTurnOffService;
-    Button mHelp;
-    Button mBluetooth;
-    Button mModifyPwd;
-    Button mShare;
-    Button mSavingBattery;
-    TextView mResetPwd;
-    TextView mNotification;
-    TextView mModifyAndView;
-    ACache aCache;
-    InfoDialog infoDialog;
-    boolean infoDialogShow;
+    private Button mHelp;
+    private Button mBluetooth;
+    private Button mModifyPwd;
+    private Button mShare;
+    private Button mSavingBattery;
+    private TextView mResetPwd;
+    private TextView mNotification;
+    private TextView mModifyAndView;
+
+    private ACache aCache;
+    private InfoDialog infoDialog;
+    private boolean infoDialogShow;
 
     Handler loginHandler = new Handler() {
         @Override
@@ -86,9 +90,9 @@ public class ProfileFragment extends Fragment implements
             if (msg.what == Const.Handler_Gender_Updated){
                 String gender = aCache.getAsString(Const.Cache_User_Gender);
                 if(gender != null){
-                    if(Integer.valueOf(gender) == Const.Gender_Female){
+                    if(Integer.valueOf(gender) == UserModel.FEMALE){
                         mGender.setText(mActivity.getResources().getString(R.string.profile_gender_female));
-                    }else if(Integer.valueOf(gender) == Const.Gender_Male){
+                    }else if(Integer.valueOf(gender) == UserModel.MALE){
                         mGender.setText(mActivity.getResources().getString(R.string.profile_gender_male));
                     }
                 }
@@ -164,9 +168,9 @@ public class ProfileFragment extends Fragment implements
             }catch (Exception e){
                 genderInt = 0;
             }
-            if (genderInt == Const.Gender_Male)
+            if (genderInt == UserModel.MALE)
                 mGender.setText(mActivity.getResources().getString(R.string.profile_gender_male));
-            else if (genderInt == Const.Gender_Female)
+            else if (genderInt == UserModel.FEMALE)
                 mGender.setText(mActivity.getResources().getString(R.string.profile_gender_female));
             else
                 mGender.setText(mActivity.getResources().getString(R.string.profile_gender));

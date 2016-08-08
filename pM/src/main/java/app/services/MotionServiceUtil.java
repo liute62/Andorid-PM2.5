@@ -21,11 +21,15 @@ public class MotionServiceUtil implements SensorEventListener{
 
     private static MotionServiceUtil instance = null;
 
-    public static final int Motion_Detection_Interval = 60 * 1000; //1min
+    public static final int Motion_Detection_Interval = 10 * 1000; //10 seconds
 
-    public static final int Motion_Run_Thred = 100; //100 step / min
+    public static final int Motion_Run_Thred = 20; // step / 10s
 
-    public static final int Motion_Walk_Thred = 20; // > 10 step / min -- walk
+    public static final int Motion_Walk_Thred = 4; // > 10 step / seconds -- walk
+
+    public static final int TYPE_ALGORITHM = 0;
+
+    public static final int TYPE_STEP_COUNTER = 1;
 
     private SensorManager mSensorManager;
 
@@ -45,15 +49,26 @@ public class MotionServiceUtil implements SensorEventListener{
 
     private Context mContext;
 
+    private int valueFromStepCounter = 0;
+
+    private onGetStepListener listener = null;
+
+    private boolean isStartOnce = false;
+
+    private long start_time_point = 0;
+
     private MotionServiceUtil(Context context){
         mContext = context;
         mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mStepCounter = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        if(mStepCounter == null){
-            Log.e(TAG,"mStepCounter == NULL");
-        }
         simpleStepDetector = new SimpleStepDetector();
+        listener = new onGetStepListener() {
+            @Override
+            public void onGetStep(int type, int num) {
+
+            }
+        };
     }
 
     public static MotionServiceUtil getInstance(Context context){
@@ -62,7 +77,9 @@ public class MotionServiceUtil implements SensorEventListener{
         return instance;
     }
 
-    public void start(){
+    public void start(boolean isOnce){
+        isStartOnce = isOnce;
+        start_time_point = System.currentTimeMillis();
         sensorStart();
     }
 
@@ -92,21 +109,24 @@ public class MotionServiceUtil implements SensorEventListener{
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             simpleStepDetector.updateAccel(event.values[0], event.values[1], event.values[2]);
             Log.e(TAG,event.values[0]+" "+event.values[1]);
+            long time2 = System.currentTimeMillis();
+            if (time2 - time1 > Motion_Detection_Interval) {
+                if (numSteps > Motion_Run_Thred)
+                    mMotionStatus = Const.MotionStatus.RUN;
+                else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
+                    mMotionStatus = Const.MotionStatus.WALK;
+                else
+                    mMotionStatus = Const.MotionStatus.STATIC;
+                numStepsForRecord = numSteps;
+                listener.onGetStep(TYPE_ALGORITHM,numStepsForRecord*6);
+                if (isStartOnce) stop();
+                numSteps = 0;
+                time1 = time2;
+            }
         }else if(event.sensor.getType() == Sensor.TYPE_STEP_COUNTER){
-            Log.e(TAG,"step counter "+(int)(event.values[0]));
-        }
-        long time2 = System.currentTimeMillis();
-        if (time2 - time1 > Motion_Detection_Interval) {
-            if (numSteps > Motion_Run_Thred)
-                mMotionStatus = Const.MotionStatus.RUN;
-            else if (numSteps <= Motion_Run_Thred && numSteps >= Motion_Walk_Thred)
-                mMotionStatus = Const.MotionStatus.WALK;
-            else
-                mMotionStatus = Const.MotionStatus.STATIC;
-            numStepsForRecord = numSteps;
-            numSteps = 0;
-            time1 = time2;
-            FileUtil.appendStrToFile("number of steps: " + numStepsForRecord);
+            valueFromStepCounter = (int)event.values[0];
+            listener.onGetStep(TYPE_ALGORITHM,valueFromStepCounter);
+            if (isStartOnce) stop();
         }
     }
 
@@ -132,5 +152,30 @@ public class MotionServiceUtil implements SensorEventListener{
 
     public int getNumStepsForRecord(){
         return numStepsForRecord;
+    }
+
+    public int getValueFromStepCounter(){
+        return valueFromStepCounter;
+    }
+
+    public interface onGetStepListener{
+        void onGetStep(int type,int num);
+    }
+
+    public void setOnGetStepListener(onGetStepListener l){
+        this.listener = l;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        int minus = (int)(System.currentTimeMillis() - start_time_point);
+        if(minus < Motion_Detection_Interval){
+            listener.onGetStep(TYPE_ALGORITHM,numStepsForRecord);
+            int step_minute = numSteps * (60*1000) / minus;
+            listener.onGetStep(TYPE_ALGORITHM,step_minute);
+            FileUtil.appendErrorToFile(TAG,"finalize before detection interval, "
+            +minus+" step number in a minute "+step_minute);
+        }
+        super.finalize();
     }
 }

@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Parcelable;
@@ -478,6 +480,16 @@ public class ShortcutUtil {
         if(lati == 0.0 || longi == 0.0) return false;
         double density = dataServiceUtil.getPM25Density();
         if(density == -1) return false;
+        return true;
+    }
+
+    public static boolean hasStepCounter(Context context){
+
+        SensorManager sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
+        Sensor mStepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if(mStepCounter == null){
+            return false;
+        }
         return true;
     }
 }

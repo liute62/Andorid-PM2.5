@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.NavUtils;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -463,7 +462,6 @@ public class MainFragment extends Fragment implements OnClickListener {
         String user_name = aCache.getAsString(Const.Cache_User_Name);
         String user_nickname = aCache.getAsString(Const.Cache_User_Nickname);
         String user_gender = aCache.getAsString(Const.Cache_User_Gender);
-        String density = aCache.getAsString(Const.Cache_PM_Density);
         String pm_hour = aCache.getAsString(Const.Cache_PM_LastHour);
         String pm_day = aCache.getAsString(Const.Cache_PM_LastDay);
         String pm_week = aCache.getAsString(Const.Cache_PM_LastWeek);
@@ -484,8 +482,6 @@ public class MainFragment extends Fragment implements OnClickListener {
             Const.CURRENT_USER_NICKNAME = user_nickname;
         if (ShortcutUtil.isStringOK(user_gender))
             Const.CURRENT_USER_GENDER = user_gender;
-        if (ShortcutUtil.isStringOK(density))
-            PMDensity = Double.valueOf(density);
         if (ShortcutUtil.isStringOK(pm_hour))
             PMBreatheHour = Double.valueOf(pm_hour);
         if (ShortcutUtil.isStringOK(pm_day))
@@ -493,6 +489,7 @@ public class MainFragment extends Fragment implements OnClickListener {
         if (ShortcutUtil.isStringOK(pm_week))
             PMBreatheWeekAvg = Double.valueOf(pm_week);
 
+        PMDensity = DataServiceUtil.getInstance(mActivity).getPM25Density();
         /*********Chart Data Initial**********/
         Object chart1 = aCache.getAsObject(Const.Cache_Chart_1);
         Object chart2 = aCache.getAsObject(Const.Cache_Chart_2);
@@ -710,6 +707,8 @@ public class MainFragment extends Fragment implements OnClickListener {
      * @param Longi longitude the longitude passed for searching
      */
     private void searchCityRequest(String lati, final String Longi) {
+
+        if(lati.equals("0.0") || Longi.equals("0.0")) return;
 
         String url = HttpUtil.SearchCity_url;
         url = url + "&location=" + lati + "," + Longi + "&ak=" + Const.APP_MAP_KEY;

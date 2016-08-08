@@ -36,27 +36,23 @@ public class DataServiceUtil {
 
     private Context mContext;
 
-    private State state = null;
+    private State state = null; // a stable holding of current state of DB
 
     private double venVolToday;
 
     private long IDToday;
 
-    private double PM25Density = -1;
+    private double PM25Density = -1; //a stable holding of pm density of cache.
 
     private double PM25Today;
 
-    private int PM25Source;
+    private int PM25Source; //a stable holding of pm density of cache.
 
     private ACache aCache;
 
     private StableCache stableCache;
 
-    private int inOutDoor;
-
-    private String avg_rate = "12";
-
-    private int searchFailedCount = 0;
+    private int avg_rate = 12; //a stable holding of current hearth rate of cache.
 
     public static DataServiceUtil getInstance(Context context){
        if(instance == null){
@@ -108,19 +104,9 @@ public class DataServiceUtil {
      *
      */
     public void initDefaultData(){
-        if (aCache.getAsString(Const.Cache_PM_Density) != null) {
-            PM25Density = Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
-        }
-        if (aCache.getAsString(Const.Cache_PM_Source) != null) {
-            int source;
-            try {
-                source = Integer.valueOf(aCache.getAsString(Const.Cache_PM_Source));
-            } catch (Exception e) {
-                FileUtil.appendErrorToFile(0, "error in parse source from string to integer");
-                source = 0;
-            }
-            PM25Source = source;
-        }
+        PM25Density = getPMDensityFromCache();
+        PM25Source = getPM25Source();
+        avg_rate = getHearthRateFromCache();
     }
 
     /**
@@ -139,7 +125,7 @@ public class DataServiceUtil {
         Double density = PM25Density;
         boolean isConnected = ShortcutUtil.isNetworkAvailable(mContext);
 
-        Const.MotionStatus mMotionStatus = MotionServiceUtil.getMotionStatus(steps); // motionService.getMotionStatus();
+        Const.MotionStatus mMotionStatus = MotionServiceUtil.getMotionStatus(steps);
         double static_breath =
                 ShortcutUtil.calStaticBreath(stableCache.getAsString(Const.Cache_User_Weight));
 
@@ -158,12 +144,18 @@ public class DataServiceUtil {
         breath = breath / 1000; //change L/min to m3/min
         PM25Today += density * breath;
 
-        state = new State(IDToday, aCache.getAsString(Const.Cache_User_Id), Long.toString(System.currentTimeMillis()),
-                String.valueOf(longi),
-                String.valueOf(lati),
-                String.valueOf(getInOutDoorFromCache()),
-                mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
-                Integer.toString(steps), avg_rate, String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today), String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
+        try {
+            state = new State(IDToday, String.valueOf(getUserIdFromCache()), Long.toString(System.currentTimeMillis()),
+                    String.valueOf(longi),
+                    String.valueOf(lati),
+                    String.valueOf(getInOutDoorFromCache()),
+                    mMotionStatus == Const.MotionStatus.STATIC ? "1" : mMotionStatus == Const.MotionStatus.WALK ? "2" : "3",
+                    Integer.toString(steps), String.valueOf(avg_rate),
+                    String.valueOf(venVolToday), density.toString(), String.valueOf(PM25Today),
+                    String.valueOf(PM25Source), 0, isConnected ? 1 : 0);
+        }catch (Exception e){
+            FileUtil.appendErrorToFile(TAG,"calculatePM25 error in initialized state");
+        }
         return state;
     }
 
@@ -176,7 +168,6 @@ public class DataServiceUtil {
         state.print();
         cupboard().withDatabase(db).put(state);
         IDToday++;
-        aCache.put(Const.Cache_Lastime_Timepoint, state.getTime_point());
     }
 
     /**
@@ -230,6 +221,15 @@ public class DataServiceUtil {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         return cupboard().withDatabase(db).query(State.class).withSelection(DBConstants.DB_MetaData.STATE_HAS_UPLOAD +
                 "=? AND " + DBConstants.DB_MetaData.STATE_CONNECTION + "=?", "0", "1").list();
+    }
+
+    /*
+    * reset the tmporary data for a new day after day surpass
+     */
+    public void reset(){
+        IDToday = 0;
+        PM25Today = 0;
+        venVolToday = 0;
     }
 
 
@@ -360,6 +360,15 @@ public class DataServiceUtil {
 
     public void cacheHearthRate(int rate){
         aCache.put(Const.Cache_Hearth_Rate,String.valueOf(rate));
+        avg_rate = rate;
+    }
+
+    public void cacheIsSearchDensity(boolean isTo){
+        aCache.put(Const.Cache_Is_To_Search_Density,String.valueOf(isTo));
+    }
+
+    public void cacheHasStepCounter(boolean has){
+        aCache.put(Const.Cache_Has_Step_Counter,String.valueOf(has));
     }
 
     /**
@@ -379,6 +388,38 @@ public class DataServiceUtil {
         }else {
             return 0;
         }
+    }
+
+    public double getPMDensityFromCache(){
+
+        String tmp = aCache.getAsString(Const.Cache_PM_Density);
+        if(ShortcutUtil.isStringOK(tmp)){
+            try {
+                return Double.valueOf(aCache.getAsString(Const.Cache_PM_Density));
+            } catch (Exception e) {
+                FileUtil.appendErrorToFile(TAG, "getPMDensityFromCache parsing error "+
+                        tmp);
+                cacheIsSearchDensity(true);
+                return 0.0;
+            }
+        }else {
+            FileUtil.appendErrorToFile(TAG, "getPMDensityFromCache PM Density == NULL");
+            cacheIsSearchDensity(true);
+        }
+        return 0.0;
+    }
+
+    public int getPMSourceFromCache(){
+        String tmp = aCache.getAsString(Const.Cache_PM_Source);
+        if (ShortcutUtil.isStringOK(tmp)) {
+            try {
+                return Integer.valueOf(aCache.getAsString(Const.Cache_PM_Source));
+            } catch (Exception e) {
+                FileUtil.appendErrorToFile(TAG, "getPMSourceFromCache parsing error "+
+                        tmp);
+            }
+        }
+        return 0;
     }
 
     /**
@@ -563,7 +604,7 @@ public class DataServiceUtil {
 
     /**
      * check if it is time for uploading db data from cache.
-     * @return
+     * @return true: is going to upload, false: otherwise
      */
     public boolean isToUpload() {
         String tmp = aCache.getAsString(Const.Cache_DB_Lastime_Upload);
@@ -603,6 +644,36 @@ public class DataServiceUtil {
         }else {
             cacheLastUploadTime(System.currentTimeMillis());
             return true;
+        }
+        return false;
+    }
+
+    public boolean isToSearchPMDensity(){
+        String tmp = aCache.getAsString(Const.Cache_Is_To_Search_Density);
+        if(ShortcutUtil.isStringOK(tmp)){
+            try {
+               return Boolean.valueOf(tmp);
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG, "isToSearchPMDensity failed, parsing error tmp == "
+                        +tmp);
+                cacheIsSearchDensity(false);
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public boolean isHasStepCounter(){
+        String tmp = aCache.getAsString(Const.Cache_Has_Step_Counter);
+        if(ShortcutUtil.isStringOK(tmp)){
+            try {
+                return Boolean.valueOf(tmp);
+            }catch (Exception e){
+                FileUtil.appendErrorToFile(TAG, "isHasStepCounter failed, parsing error tmp == "
+                        +tmp);
+                cacheHasStepCounter(false);
+                return false;
+            }
         }
         return false;
     }

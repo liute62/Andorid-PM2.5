@@ -8,6 +8,10 @@ import org.json.JSONObject;
  */
 public class UserModel extends BaseModel {
 
+    public static final int MALE = 1;
+
+    public static final int FEMALE = 2;
+
     public static final String ID = "id";
 
     public static final String CODE = "code";

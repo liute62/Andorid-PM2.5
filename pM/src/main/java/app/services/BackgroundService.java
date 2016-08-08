@@ -55,27 +55,27 @@ public class BackgroundService extends BroadcastReceiver {
 
     private boolean isGoingToGetLocation = false;
 
-    private boolean isHaveTask = false;
+    private boolean isLocationFinished = true;
 
-    private boolean isPMSearchSuccess = false;
+    private boolean isSearchDensityFinished = true;
+
+    private boolean isUploadFinished = true;
+
+    private boolean isGetStepFinished = true;
 
     private PowerManager.WakeLock wakeLock = null;
 
     private Context mContext = null;
 
-    private boolean isFinished = true; //if all tasks of background process has finished their job
-
     private DataServiceUtil dataServiceUtil = null;
 
-    private InOutdoorServiceUtil inOutdoorServiceUtil = null;
+    private MotionServiceUtil motionServiceUtil = null;
 
     private Location mLocation = null; //current location
 
     private State state = null;
 
     private int stepNum = 0;
-
-    private int inOutDoor = LocationServiceUtil.Indoor;
 
     private boolean isReset = false; //if surpass a day, then reset the value.
 
@@ -98,8 +98,8 @@ public class BackgroundService extends BroadcastReceiver {
         mLocation = new Location("default");
         mLocation.setLatitude(0.0);
         mLocation.setLongitude(0.0);
-        isFinished = false;
         dataServiceUtil = DataServiceUtil.getInstance(mContext);
+        motionServiceUtil = MotionServiceUtil.getInstance(mContext);
     }
 
     /**
@@ -107,13 +107,17 @@ public class BackgroundService extends BroadcastReceiver {
      */
     private void getLastParams() {
 
-        isHaveTask = false;
+        isLocationFinished = true;
+        isSearchDensityFinished = true;
+        isUploadFinished = true;
+        isGetStepFinished = true;
         repeatingCycle = (int) dataServiceUtil.getIDToday();
         double lati = dataServiceUtil.getLatitudeFromCache();
         double longi = dataServiceUtil.getLongitudeFromCache();
         stepNum = dataServiceUtil.getStepNumFromCache();
         state = dataServiceUtil.getCurrentState();
         isReset = dataServiceUtil.isSurpassFromCache();
+
         if (lati != 0.0 && longi != 0.0) {
             mLocation = new Location("cache");
             mLocation.setLatitude(lati);
@@ -137,21 +141,21 @@ public class BackgroundService extends BroadcastReceiver {
         getLastParams();
         Log.e(TAG, repeatingCycle + " ");
         if (isGoingToGetLocation || repeatingCycle % 23 == 0) {
-            isHaveTask = true;
+            isLocationFinished = false;
             getLocations(1000 * 10);
         }
         if (isGoingToSearchPM || repeatingCycle % 101 == 0) {
-            isHaveTask = true;
+            isSearchDensityFinished = false;
             searchPMResult(String.valueOf(mLocation.getLongitude()), String.valueOf(mLocation.getLatitude()));
         }
         //every 1 hour to check if some data need to be uploaded
         if (repeatingCycle % 119 == 0) {
             FileUtil.appendStrToFile(repeatingCycle, "every 1 hour to check pm data for upload");
-            isHaveTask = true;
+            isUploadFinished = false;
             checkPMDataForUpload();
         }
+        onGetSteps();
         saveValues();
-        onFinished("startInner finished");
     }
 
     /**
@@ -165,12 +169,25 @@ public class BackgroundService extends BroadcastReceiver {
         if (locationServiceUtil.getLastKnownLocation() != null) {
 
             mLocation = locationServiceUtil.getLastKnownLocation();
+            double last_lati = dataServiceUtil.getMaxLatitudeFromCache();
+            double last_longi = dataServiceUtil.getMaxLongitudeFromCache();
+            boolean isEnough = ShortcutUtil.isLocationChangeEnough(last_lati, mLocation.getLatitude(),
+                    last_longi, mLocation.getLongitude());
+            if(isEnough){
+                FileUtil.appendStrToFile(TAG, "max latitude " + last_lati + " max longitude" +
+                        last_longi + " latitude " + mLocation.getLatitude() + " " +
+                        "longitude " + mLocation.getLongitude());
+                dataServiceUtil.cacheMaxLocation(mLocation);
+                dataServiceUtil.cacheIsSearchDensity(true);
+            }
             dataServiceUtil.cacheLocation(mLocation.getLatitude(), mLocation.getLongitude());
             FileUtil.appendStrToFile(repeatingCycle, "locationInitial getLastKnownLocation " +
-                    String.valueOf(mLocation.getLatitude()) + " " + String.valueOf(mLocation.getLongitude()));
-            isHaveTask = false;
+                    String.valueOf(mLocation.getLatitude()) + " " +
+                    String.valueOf(mLocation.getLongitude()));
+            isLocationFinished = true;
             onFinished("getLocations getLastKnownLocation");
         }
+
         locationServiceUtil.setGetTheLocationListener(new LocationServiceUtil.GetTheLocation() {
             @Override
             public void onGetLocation(Location location) {
@@ -185,27 +202,35 @@ public class BackgroundService extends BroadcastReceiver {
                     double last_lati = dataServiceUtil.getMaxLatitudeFromCache();
                     double last_longi = dataServiceUtil.getMaxLongitudeFromCache();
                     boolean isEnough = false;
-                    if (last_lati == 0.0 || last_longi == 0.0) {
-                        dataServiceUtil.cacheLocation(mLocation.getLatitude(), mLocation.getLongitude());
-                    } else {
-                        isEnough = ShortcutUtil.isLocationChangeEnough(last_lati, mLocation.getLatitude(),
-                                last_longi, mLocation.getLongitude());
-                    }
+                    isEnough = ShortcutUtil.isLocationChangeEnough(last_lati, mLocation.getLatitude(),
+                            last_longi, mLocation.getLongitude());
                     if (isEnough) {
-                        FileUtil.appendStrToFile(0, "max latitude " + last_lati + " max longitude" +
+                        FileUtil.appendStrToFile(TAG, "max latitude " + last_lati + " max longitude" +
                                 last_longi + " latitude " + mLocation.getLatitude() + " " +
                                 "longitude " + mLocation.getLongitude());
-                        isGoingToSearchPM = true;
                         dataServiceUtil.cacheMaxLocation(mLocation);
+                        dataServiceUtil.cacheIsSearchDensity(true);
                     }
                     dataServiceUtil.cacheLocation(mLocation);
                 }
-                isHaveTask = false;
+                isLocationFinished = true;
                 onFinished("getLocations onSearchStop");
             }
         });
         locationServiceUtil.run(LocationServiceUtil.TYPE_BAIDU);
         locationServiceUtil.setTimeIntervalBeforeStop(runningTime);
+    }
+
+    private void onGetSteps(){
+        isGetStepFinished = false;
+        motionServiceUtil.setOnGetStepListener(new MotionServiceUtil.onGetStepListener() {
+            @Override
+            public void onGetStep(int type, int num) {
+                dataServiceUtil.cacheStepNum(num);
+                isGetStepFinished = true;
+            }
+        });
+        motionServiceUtil.start(true);
     }
 
     /**
@@ -226,34 +251,34 @@ public class BackgroundService extends BroadcastReceiver {
                 try {
                     int status = response.getInt("status");
                     if (status == 1) {
-                        isPMSearchSuccess = true;
+
                         PMModel pmModel = PMModel.parse(response.getJSONObject("data"));
                         NotifyServiceUtil.notifyDensityChanged(mContext, pmModel.getPm25());
                         double PM25Density = Double.valueOf(pmModel.getPm25());
                         int PM25Source = pmModel.getSource();
 
+                        dataServiceUtil.cacheIsSearchDensity(false);
                         dataServiceUtil.cachePMResult(PM25Density, PM25Source);
                         dataServiceUtil.cacheSearchPMFailed(0);
 
-                        FileUtil.appendStrToFile(repeatingCycle, "3.search pm density success, density: " + PM25Density);
+                        FileUtil.appendStrToFile(TAG,"searchPMResult success, density: " + PM25Density);
                     } else {
-                        isPMSearchSuccess = false;
-                        FileUtil.appendErrorToFile(repeatingCycle, "search pm density failed, status != 1");
+                        FileUtil.appendErrorToFile(TAG,"searchPMResult failed, status != 1");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    FileUtil.appendErrorToFile(TAG, "searchPMResult JSON error");
                 }
-                isHaveTask = false;
+                isSearchDensityFinished = true;
                 onFinished("searchPMResult success");
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                isHaveTask = false;
+                isSearchDensityFinished = true;
                 onFinished("searchPMResult error");
                 dataServiceUtil.cacheSearchPMFailed(dataServiceUtil.getSearchFailedCountFromCache()+1);
-                isPMSearchSuccess = false;
-                FileUtil.appendErrorToFile(repeatingCycle, "search pm density failed " + error.getMessage() + " " + error);
+                FileUtil.appendErrorToFile(TAG,"searchPMResult failed msg: " + error.getMessage());
             }
 
         });
@@ -269,6 +294,10 @@ public class BackgroundService extends BroadcastReceiver {
         state = dataServiceUtil.calculatePM25(mLocation.getLatitude(), mLocation.getLongitude(),stepNum);
         state.print();
         State now = state;
+
+        //most of cases, isReset would be false, so when isSurpass a day happened,
+        //then jump to "else code block", since a new state not inserted, isSurpass always return true
+        // only using isReset to jump to "if block" again.
         if (!isSurpass(last, now) || isReset) {
             dataServiceUtil.insertState(state);
             dataServiceUtil.cacheSurpass(false);
@@ -277,7 +306,6 @@ public class BackgroundService extends BroadcastReceiver {
             dataServiceUtil.cacheSurpass(true);
         }
         Log.e(TAG, "repeating times: " + repeatingCycle);
-        // if (!isHaveTask) onFinished();
     }
 
     private void checkPMDataForUpload() {
@@ -316,13 +344,13 @@ public class BackgroundService extends BroadcastReceiver {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    isHaveTask = false;
+                    isUploadFinished = true;
                     onFinished("checkPMDataForUpload success");
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    isHaveTask = false;
+                    isUploadFinished = true;
                     onFinished("checkPMDataForUpload error");
                     if (error.getMessage() != null)
                         FileUtil.appendErrorToFile(repeatingCycle, "1.checkPMDataForUpload error getMessage" + error.getMessage());
@@ -355,7 +383,7 @@ public class BackgroundService extends BroadcastReceiver {
             last = ShortcutUtil.refFormatOnlyDate(Long.valueOf(lastTime.getTime_point()));
             now = ShortcutUtil.refFormatOnlyDate(Long.valueOf(nowTime.getTime_point()));
         } catch (Exception e) {
-            e.printStackTrace();
+            FileUtil.appendErrorToFile(TAG,"isSurpass parsing error or state is null");
             return false;
         }
         result = !last.equals(now);
@@ -369,18 +397,19 @@ public class BackgroundService extends BroadcastReceiver {
         mLocation.setLongitude(0.0);
         mLocation.setLatitude(0.0);
         repeatingCycle = 0;
-        //refreshAll();
-        //motionServiceUtil.reset();
+        dataServiceUtil.reset();
     }
 
     private void onFinished(String tag) {
         FileUtil.appendStrToFile(TAG,tag+" onFinished");
-        if(isHaveTask == false) {
-            if (wakeLock != null && wakeLock.isHeld())
-                wakeLock.release();
-            FileUtil.appendStrToFile(TAG, "wakelock release");
-            isHaveTask = false;
-            isFinished = true;
+        if(isLocationFinished == true &&
+                isSearchDensityFinished == true &&
+                isUploadFinished == true
+                &&isGetStepFinished == true) {
+            if (wakeLock != null && wakeLock.isHeld()) {
+                //wakeLock.release();
+                FileUtil.appendStrToFile(TAG, "all tasks finished");
+            }
         }
     }
 
@@ -388,7 +417,7 @@ public class BackgroundService extends BroadcastReceiver {
     public static void runBackgroundService(Context context) {
 
         context = context.getApplicationContext();
-        cancelBackgroundService(context);
+        //cancelBackgroundService(context);
         FileUtil.appendStrToFile(TAG, "------begin background service------");
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, BackgroundService.class);

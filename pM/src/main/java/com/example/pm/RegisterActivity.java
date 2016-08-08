@@ -17,24 +17,26 @@ import org.json.JSONObject;
 import app.model.UserModel;
 import app.utils.ACache;
 import app.utils.Const;
+import app.utils.FileUtil;
 import app.utils.HttpUtil;
 import app.utils.VolleyQueue;
 
 public class RegisterActivity extends Activity implements View.OnClickListener {
 
+    public static String TAG = "RegisterActivity";
     //todo input check
-    EditText mInviteCode;
-    EditText mUsername;
-    EditText mPassword;
-    EditText mConfirmPwd;
-    EditText mLastname;
-    EditText mFirstname;
-    EditText mEmail;
-    EditText mPhone;
-    CheckBox mMale;
-    CheckBox mFemale;
-    TextView mSure;
-    TextView mCancel;
+    private EditText mInviteCode;
+    private EditText mUsername;
+    private EditText mPassword;
+    private EditText mConfirmPwd;
+    private EditText mLastname;
+    private EditText mFirstname;
+    private EditText mEmail;
+    private EditText mPhone;
+    private CheckBox mMale;
+    private CheckBox mFemale;
+    private TextView mSure;
+    private TextView mCancel;
     boolean isRegTaskRun = false;
 
     @Override
@@ -103,10 +105,10 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 if (firstname == null || firstname.trim().equals("")) inputSuccess = false;
                 if (mail == null || mail.trim().equals("")) inputSuccess = false;
                 if (mMale.isChecked()) {
-                    gender = 1;
+                    gender = UserModel.MALE;
                 }
                 if (mFemale.isChecked()) {
-                    gender = 2;
+                    gender = UserModel.FEMALE;
                 }
                 if (gender == 0) inputSuccess = false;
                 if (inputSuccess) {
@@ -167,6 +169,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    FileUtil.appendErrorToFile(TAG,"register JSON Error");
                 }
                 Log.e("register resp", response.toString());
             }
@@ -175,6 +178,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
             public void onErrorResponse(VolleyError error) {
                 isRegTaskRun = false;
                 Toast.makeText(getApplicationContext(), Const.ERROR_REGISTER_WRONG, Toast.LENGTH_SHORT).show();
+                FileUtil.appendErrorToFile(TAG, "register error msg == "+error.getMessage());
             }
 
         });

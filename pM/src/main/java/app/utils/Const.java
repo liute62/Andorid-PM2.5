@@ -86,6 +86,8 @@ public class Const {
     public static final String Cache_Step_Num = "Cache_Step_Num";
     public static final String Cache_Hearth_Rate = "Cache_Hearth_Rate";
     public static final String Cache_Lasttime_Search_City = "Cache_Lasttime_Search_City";
+    public static final String Cache_Is_To_Search_Density = "Cache_Is_To_Search_Density";
+    public static final String Cache_Has_Step_Counter = "Cache_Has_Step_Counter";
 
     public static final String Cache_Chart_1 = "Cache_Chart_1";
     public static final String Cache_Chart_2 = "Cache_Chart_2";
@@ -102,7 +104,6 @@ public class Const {
     public static final String Cache_Chart_12_Date = "Cache_Chart_12_Date";
     public static final String Cache_Chart_Alert = "Cache_Chart_Alert";
     public static final String Cache_User_Weight = "Cache_User_Weight";
-    public static final String Cache_Lastime_Timepoint = "Cache_Lastime_Timepoint";
     public static final String Cache_Is_Saving_Battery = "Cache_Is_Saving_Battery";
     public static final String Cache_GPS_SATE_NUM = "Cache_GPS_SATE_NUM";
 

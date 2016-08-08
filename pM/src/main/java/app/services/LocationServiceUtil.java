@@ -132,7 +132,8 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
             localization_type = type;
         else return;
         Log.e(TAG,"is running"+localization_type);
-        FileUtil.appendStrToFile(TAG,"type == "+type+" start: "+
+        FileUtil.appendStrToFile(TAG, "type == " + type +
+                " baidu:0,gps:1,network:2" + " start: " +
                 ShortcutUtil.refFormatDateAndTime(System.currentTimeMillis()));
         isRunning = true;
         initMethodByType(localization_type);
@@ -244,7 +245,7 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
                 locationGPS.setLatitude(location.getLatitude());
                 isGpsAvailable = true;
                 getLocation(locationGPS);
-                FileUtil.appendStrToFile(0, "Baidu Map  is using GPS as the localization choice");
+                FileUtil.appendStrToFile(TAG, "Baidu Map is using GPS as the localization choice");
                 dataServiceUtil.cacheInOutdoor(LocationServiceUtil.Outdoor);
             } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// network localization result
 
@@ -253,28 +254,32 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
                 locationNetwork.setLatitude(location.getLatitude());
                 getLocation(locationNetwork);
                 isGpsAvailable = false;
-                FileUtil.appendStrToFile(0,"Baidu Map is using Network as the localization choice");
+                FileUtil.appendStrToFile(TAG,"Baidu Map is using Network as the localization choice");
                 dataServiceUtil.cacheInOutdoor(LocationServiceUtil.Indoor);
+
             } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// offline localization result
 
                 Location locationPassive = new Location(LocationManager.PASSIVE_PROVIDER);
                 locationPassive.setLongitude(location.getLongitude());
                 locationPassive.setLatitude(location.getLatitude());
                 getLocation(locationPassive);
+                FileUtil.appendStrToFile(TAG, "Baidu Map is using offline localization result");
 
             } else if (location.getLocType() == BDLocation.TypeServerError) {
 
-                FileUtil.appendErrorToFile(Const.code_file_baidu_exception1, "failed due to server, please send IMEI code and localization time to loc-bugs@baidu.com, someone will find the reason.");
+                FileUtil.appendErrorToFile(TAG,
+                        "failed due to server, please send IMEI code and" +
+                                " localization time to loc-bugs@baidu.com, someone will find the reason.");
                 getLocation(null);
 
             } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
 
-                FileUtil.appendErrorToFile(Const.code_file_baidu_exception2, "failed due to bad network, please check if network is enable.");
+                FileUtil.appendErrorToFile(TAG, "failed due to bad network, please check if network is enable.");
                 getLocation(null);
 
             } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
-                FileUtil.appendErrorToFile(Const.code_file_baidu_exception3,
-                        "unable to get the location by criteria，most of time due to the mobile," +
+                FileUtil.appendErrorToFile(TAG,
+                        "unable to get the location by criteria, most of time due to the mobile," +
                                 "especially when mobile is in the air mode, so try to restart it.");
                 getLocation(null);
 
@@ -292,17 +297,17 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
         try {
             mLastLocation = mLocationManager.getLastKnownLocation(provider);
             if(mLastLocation != null){
-                FileUtil.appendStrToFile(Const.code_get_lastlocation_gps_notnull, "getLastKnownLocation gps != NULL");
+                FileUtil.appendStrToFile(TAG, "getLastKnownLocation gps != NULL");
                 return mLastLocation;
             }
             initNetwork();
             mLastLocation = mLocationManager.getLastKnownLocation(provider);
             if(mLastLocation != null)
-                FileUtil.appendStrToFile(Const.code_get_last_location_network_notnull, "getLastKnownLocation network != NULL");
+                FileUtil.appendStrToFile(TAG, "getLastKnownLocation network != NULL");
         }catch (SecurityException e){
             e.printStackTrace();
         }
-        if(mLastLocation == null) FileUtil.appendStrToFile(Const.code_get_last_location_isnull, "getLastKnownLocation == NULL");
+        if(mLastLocation == null) FileUtil.appendStrToFile(TAG, "getLastKnownLocation == NULL");
         return mLastLocation;
     }
 
@@ -326,7 +331,7 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
             if(id != null && !id.equals("0x") && !id.equals("<unknown ssid>")) {
                 if(!lastTimeSSID.equals(id)){
                     lastTimeSSID = id;
-                    FileUtil.appendStrToFile(Const.code_file_wifi_info,"LocationService wifiInfo "+id + "wifistate "+wifiState);
+                    FileUtil.appendStrToFile(TAG,"LocationService wifiInfo "+id + "wifistate "+wifiState);
                 }
                 isSuccessConnected = true;
             }
@@ -406,7 +411,8 @@ public class LocationServiceUtil implements LocationListener,GpsStatus.Listener
             if(runMiddleTime - runBeginTime > timeIntervalBeforeStop){
                 runBeginTime = 0;
                 stop();
-                FileUtil.appendErrorToFile(Const.code_get_location_failed, "failed to get the location in location service, running for " + String.valueOf(timeIntervalBeforeStop) + " (ms)");
+                FileUtil.appendErrorToFile(TAG, "failed to get the location in location service, running for "
+                        + String.valueOf(timeIntervalBeforeStop) + " (ms)");
             }
             Log.e(TAG,"onLocationChanged provider = "+provider+" null");
         }

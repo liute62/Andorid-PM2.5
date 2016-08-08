@@ -9,7 +9,8 @@
      android:layout_width="match_parent"
      android:layout_height="match_parent"
      android:layout_above="@+id/notification_cancel"
-     android:layout_marginBottom="6dp">
+     android:layout_marginBottom="6dp"
+     android:fillViewport="false">
    <RelativeLayout
        android:layout_width="match_parent"
        android:layout_height="match_parent">

@@ -164,10 +164,8 @@ public class ForegroundService extends Service {
                     dataServiceUtil.cacheLastUploadTime(System.currentTimeMillis());
                 }
                 if(dataServiceUtil.isToSearchCity()){
-                    Intent intent = new Intent(Const.Action_DB_MAIN_Location);
-                    intent.putExtra(Const.Intent_DB_PM_Lati,dataServiceUtil.getLatitudeFromCache());
-                    intent.putExtra(Const.Intent_DB_PM_Longi,dataServiceUtil.getLongitudeFromCache());
-                    sendBroadcast(intent);
+                    NotifyServiceUtil.notifyLocationChanged(ForegroundService.this,dataServiceUtil.getLatitudeFromCache(),
+                            dataServiceUtil.getLongitudeFromCache());
                     dataServiceUtil.cacheLastSearchCityTime(System.currentTimeMillis());
                 }
                 if (state.getId() > State_TooMuch) DB_Chart_Loop = 10;
@@ -309,10 +307,13 @@ public class ForegroundService extends Service {
         registerAReceiver();
         serviceStateInitial();
         DBHandler.sendEmptyMessageDelayed(0, 1000);//1s
+        dataServiceUtil.cacheHasStepCounter(ShortcutUtil.hasStepCounter(this));
+        if(dataServiceUtil.isHasStepCounter()){
+            FileUtil.appendStrToFile(TAG,"the device has the step counter sensor");
+        }else {
+            FileUtil.appendStrToFile(TAG,"the device is using algorithm to calculate steps");
+        }
         BackgroundService.runBackgroundService(this);
-
-        MotionServiceUtil motionServiceUtil = MotionServiceUtil.getInstance(this);
-        motionServiceUtil.start();
     }
 
     @Override
