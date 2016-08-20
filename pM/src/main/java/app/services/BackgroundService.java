@@ -156,6 +156,7 @@ public class BackgroundService extends BroadcastReceiver {
         }
         onGetSteps();
         saveValues();
+        onFinished("saveValues");
     }
 
     /**
@@ -228,6 +229,7 @@ public class BackgroundService extends BroadcastReceiver {
             public void onGetStep(int type, int num) {
                 dataServiceUtil.cacheStepNum(num);
                 isGetStepFinished = true;
+                onFinished("getSteps Finished");
             }
         });
         motionServiceUtil.start(true);
@@ -407,8 +409,8 @@ public class BackgroundService extends BroadcastReceiver {
                 isUploadFinished == true
                 &&isGetStepFinished == true) {
             if (wakeLock != null && wakeLock.isHeld()) {
-                //wakeLock.release();
-                FileUtil.appendStrToFile(TAG, "all tasks finished");
+                wakeLock.release();
+                FileUtil.appendStrToFile(TAG, "all tasks finished,release wakelock");
             }
         }
     }

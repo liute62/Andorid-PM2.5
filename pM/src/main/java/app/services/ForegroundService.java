@@ -169,14 +169,12 @@ public class ForegroundService extends Service {
                     dataServiceUtil.cacheLastSearchCityTime(System.currentTimeMillis());
                 }
                 if (state.getId() > State_TooMuch) DB_Chart_Loop = 10;
-                else DB_Chart_Loop = 5;
+                else DB_Chart_Loop = 3;
                 Bundle mBundle = new Bundle();
                 SQLiteDatabase db = dataServiceUtil.getDBHelper().getReadableDatabase();
                 switch (DBRunTime % DB_Chart_Loop) { //Send chart data to mainfragment
-                    case 1:
+                    case 0:
                         //UpdateServiceUtil.run(getApplicationContext(), aCache, dataServiceUtil.getDBHelper());
-                        break;
-                    case 2:
                         intentChart = new Intent(Const.Action_Chart_Result_1);
                         DataCalculator.getIntance(db).updateLastTwoHourState();
                         mBundle.putSerializable(Const.Intent_chart4_data, DataCalculator.getIntance(db).calChart4Data());
@@ -186,7 +184,7 @@ public class ForegroundService extends Service {
                         intentChart.putExtras(mBundle);
                         sendBroadcast(intentChart);
                         break;
-                    case 3:
+                    case 1:
                         intentChart = new Intent(Const.Action_Chart_Result_2);
                         DataCalculator.getIntance(db).updateLastDayState();
                         Bundle mBundle2 = new Bundle();
@@ -198,7 +196,7 @@ public class ForegroundService extends Service {
                         intentChart.putExtras(mBundle2);
                         sendBroadcast(intentChart);
                         break;
-                    case 4:
+                    case 2:
                         intentChart = new Intent(Const.Action_Chart_Result_3);
                         DataCalculator.getIntance(db).updateLastWeekState();
                         Bundle mBundle3 = new Bundle();
@@ -216,12 +214,6 @@ public class ForegroundService extends Service {
                 intentText.putExtra(Const.Intent_DB_PM_Week, DataCalculator.getIntance(db).calLastWeekAvgPM());
                 sendBroadcast(intentText);
             }
-//            else {
-//                //using a more soft way to notify user that DB is not running
-//                Intent intent = new Intent(Const.Action_DB_Running_State);
-//                intent.putExtra(Const.Intent_DB_Run_State, -1);
-//                sendBroadcast(intent);
-//            }
 
             DBRunTime++;
             if (DBRunTime >= 721) DBRunTime = 1; //1/5s, 12/min 720/h 721` a cycle

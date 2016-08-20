@@ -23,9 +23,9 @@ public class MotionServiceUtil implements SensorEventListener{
 
     public static final int Motion_Detection_Interval = 10 * 1000; //10 seconds
 
-    public static final int Motion_Run_Thred = 20; // step / 10s
+    public static final int Motion_Run_Thred = 12; // step / 10s
 
-    public static final int Motion_Walk_Thred = 4; // > 10 step / seconds -- walk
+    public static final int Motion_Walk_Thred = 3; // > 10 step / seconds -- walk
 
     public static final int TYPE_ALGORITHM = 0;
 
